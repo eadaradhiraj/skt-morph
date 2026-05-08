@@ -9,7 +9,7 @@ class MorphResult:
     """Dataclass to hold the analyzed morphological data."""
     word: str
     prefixes: List[str]
-    dhatu_id: str
+    dhatu: str
     word_type: str  # 'tinanta' (verb) or 'krdanta' (derivative)
     derivation: str # 'shuddha', 'nich', 'san', etc.
     
@@ -157,7 +157,7 @@ class SktMorph:
                 results.append(MorphResult(
                     word=word_slp1,
                     prefixes=prefixes,
-                    dhatu_id=row['dhatu_id'],
+                    dhatu=row['dhatu_id'],
                     word_type='tinanta',
                     derivation=row['derivation'],
                     prayoga=row['prayoga'],
@@ -172,7 +172,7 @@ class SktMorph:
                 results.append(MorphResult(
                     word=word_slp1,
                     prefixes=prefixes,
-                    dhatu_id=row['dhatu_id'],
+                    dhatu=row['dhatu_id'],
                     word_type='krdanta',
                     derivation=row['derivation'],
                     pratyaya=row['pratyaya']
@@ -180,7 +180,7 @@ class SktMorph:
 
         return results
 
-    def generate_tinanta(self, dhatu_id: str, lakara: str, purusha: int, vacana: int, 
+    def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 
                          derivation: str = 'shuddha', prayoga: str = 'kartari', 
                          prefixes: List[str] = None) -> List[str]:
         """Generates SLP1 Tinanta forms. Applies multiple prefixes sequentially."""
@@ -188,7 +188,7 @@ class SktMorph:
         cursor.execute('''SELECT form_slp1 FROM tinantas 
                           WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
                           AND vacana = ? AND derivation = ? AND prayoga = ?''',
-                       (dhatu_id, lakara, purusha, vacana, derivation, prayoga))
+                       (dhatu, lakara, purusha, vacana, derivation, prayoga))
         
         forms =[row['form_slp1'] for row in cursor.fetchall()]
         if not forms:

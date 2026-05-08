@@ -1,58 +1,111 @@
-# tests/test_morphology.py
 import unittest
+from unittest.mock import patch
+import sys
+import runpy
+import warnings
 from sktmorph.morphology import SktMorph, apply_forward_sandhi
+from sktmorph import cli
 
 class TestSktMorph(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
-        # Initializes the SktMorph analyzer, which automatically finds the bundled SQLite DB
         cls.morph = SktMorph()
 
     def test_forward_sandhi_vowels(self):
-        """Test Sandhi rules for generating words."""
         self.assertEqual(apply_forward_sandhi('pra', 'aBavat'), 'prABavat')
         self.assertEqual(apply_forward_sandhi('pra', 'iRvat'), 'preRvat')
         self.assertEqual(apply_forward_sandhi('vi', 'Akaroti'), 'vyAkaroti')
         self.assertEqual(apply_forward_sandhi('anu', 'aBavat'), 'anvaBavat')
         self.assertEqual(apply_forward_sandhi('ud', 'harati'), 'uddharati')
 
+    def test_forward_sandhi_edge_cases(self):
+        self.assertEqual(apply_forward_sandhi('', 'Bavati'), 'Bavati')
+        self.assertEqual(apply_forward_sandhi('anu', 'eti'), 'anveti')
+        self.assertEqual(apply_forward_sandhi('sam', 'karoti'), 'saMkaroti')
+        self.assertEqual(apply_forward_sandhi('ud', 'gacCati'), 'udgacCati') 
+        self.assertEqual(apply_forward_sandhi('prati', 'ikzate'), 'pratIkzate')
+        self.assertEqual(apply_forward_sandhi('su', 'uktam'), 'sUktam')
+        self.assertEqual(apply_forward_sandhi('ud', 'padyate'), 'utpadyate')
+
+    def test_missing_database(self):
+        with self.assertRaises(FileNotFoundError):
+            SktMorph("fake_path/fake_db.sqlite")
+
     def test_analyzer_base_verb(self):
-        """Test analyzing a base verb without prefixes."""
-        # bhavati -> Root 01.0001
         res = self.morph.analyze('Bavati')
         self.assertTrue(len(res) > 0)
-        self.assertEqual(res[0].prefixes, [])
-        self.assertEqual(res[0].dhatu_id, '01.0001')
+        self.assertEqual(res[0].prefixes,[])
+        self.assertEqual(res[0].dhatu, '01.0001')
         self.assertEqual(res[0].word_type, 'tinanta')
         self.assertEqual(res[0].lakara, 'plat')
 
     def test_analyzer_single_prefix(self):
-        """Test analyzing a word with one prefix."""
-        # prabhavati = pra + bhavati
         res = self.morph.analyze('praBavati')
-        valid_res =[r for r in res if r.prefixes == ['pra'] and r.dhatu_id == '01.0001']
+        valid_res =[r for r in res if r.prefixes ==['pra'] and r.dhatu == '01.0001']
         self.assertTrue(len(valid_res) > 0)
         
-        # prAbhavat = pra + abhavat
         res2 = self.morph.analyze('prABavat')
-        valid_res2 = [r for r in res2 if r.prefixes == ['pra'] and r.dhatu_id == '01.0001']
+        valid_res2 =[r for r in res2 if r.prefixes == ['pra'] and r.dhatu == '01.0001']
         self.assertTrue(len(valid_res2) > 0)
 
     def test_analyzer_krdanta(self):
-        """Test analyzing a derivative noun (Krdanta)."""
-        # bhavanam -> lyut pratyaya
         res = self.morph.analyze('Bavanam')
         valid_res =[r for r in res if r.word_type == 'krdanta' and r.pratyaya == 'lyuw']
         self.assertTrue(len(valid_res) > 0)
 
     def test_generator(self):
-        """Test generating words from database with attached prefixes."""
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
         self.assertIn('praBavati', forms)
-
         forms_past = self.morph.generate_tinanta('01.0001', 'plang', 1, 1, prefixes=['pra'])
         self.assertIn('prABavat', forms_past)
+
+    def test_generator_edge_cases(self):
+        self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1),[])
+        forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1)
+        self.assertIn('Bavati', forms)
+
+class TestCLI(unittest.TestCase):
+    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
+    def test_cli_analyze(self):
+        with patch('builtins.print') as mock_print:
+            cli.main()
+            mock_print.assert_called()
+
+    @patch('sys.argv',['sktmorph', 'analyze', 'fakeWordXyz'])
+    def test_cli_analyze_not_found(self):
+        with patch('builtins.print') as mock_print:
+            cli.main()
+            mock_print.assert_any_call("No morphological data found for 'fakeWordXyz'.")
+
+    @patch('sys.argv',['sktmorph', 'generate', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
+    def test_cli_generate(self):
+        with patch('builtins.print') as mock_print:
+            cli.main()
+            mock_print.assert_called()
+
+    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
+    @patch('sktmorph.cli.SktMorph')
+    def test_cli_db_error(self, mock_sktmorph):
+        mock_sktmorph.side_effect = FileNotFoundError("DB Missing")
+        with patch('builtins.print') as mock_print:
+            with self.assertRaises(SystemExit) as cm:
+                cli.main()
+            self.assertEqual(cm.exception.code, 1)
+            mock_print.assert_called_with("Error: DB Missing")
+
+    @patch('sys.argv', ['sktmorph'])
+    def test_cli_no_args(self):
+        with patch('argparse.ArgumentParser.print_help') as mock_help:
+            cli.main()
+            mock_help.assert_called_once()
+
+    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    def test_module_executions(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)
+            with patch('builtins.print'):
+                runpy.run_module('sktmorph.cli', run_name='__main__')
+                runpy.run_module('sktmorph.__main__', run_name='__main__')
 
 if __name__ == '__main__':
     unittest.main()
