@@ -1,0 +1,1 @@
+sktmorph/data/sanskrit_forms.sqlite filter=lfs diff=lfs merge=lfs -text
