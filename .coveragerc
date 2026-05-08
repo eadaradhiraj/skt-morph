@@ -1,0 +1,8 @@
+[run]
+source = sktmorph
+
+[report]
+show_missing = True
+omit = 
+    tests/*
+    setup.py

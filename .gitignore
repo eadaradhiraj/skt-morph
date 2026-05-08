@@ -48,3 +48,7 @@ Thumbs.db
 
 # Exclude raw data
 data_raw
+# Coverage
+.coverage
+htmlcov/
+*,cover
