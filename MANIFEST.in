@@ -1,1 +1,2 @@
-include skt_tool/data/*.sqlite
+# MANIFEST.in
+include sktmorph/data/*.sqlite
