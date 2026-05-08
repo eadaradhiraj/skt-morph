@@ -100,6 +100,13 @@ def main():
     for f_str in txt_files:
         path = Path(f_str)
         print(f"Processing Forms: {path.name}")
+        if item['type'] == 'tinanta':
+            voice = format_voice(data['derivation'])
+            root_display = data.get('root_slp1', 'Unknown')
+            print(f"[Conjugation]")
+            print(f"  Prefixes : {prefix_str}")
+            print(f"  Root     : {root_display} ({data['dhatu_id']})")
+            print(f"  Voice    : {voice}")
         if 'kartari' in path.name or 'karmani' in path.name:
             process_tinanta_file(path, c)
         elif 'krut' in path.name:

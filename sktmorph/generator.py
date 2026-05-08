@@ -24,10 +24,20 @@ class SanskritGenerator:
     def generate_tinanta(self, root_or_id, lakara, purusha, vacana, derivation='vidyut_shuddha_kartari', prefixes=None):
         d_id = root_or_id if "." in root_or_id else self.get_dhatu_id(root_or_id)
         if not d_id: return None
-        db_lakara = {'lat': 'plat', 'lan': 'plang'}.get(lakara, lakara)
+        
+        # Robust Mapping
+        db_lakara = {'lat': 'plat', 'lan': 'plang', 'lot': 'pqlot', 'lit': 'plit'}.get(lakara.lower(), lakara)
+        
+        p_map = {'p': 'Prathama', 'm': 'Madhyama', 'u': 'Uttama', '1': 'Prathama', '2': 'Madhyama', '3': 'Uttama'}
+        db_purusha = p_map.get(purusha.lower()[0], purusha.title())
+        
+        v_map = {'e': 'Eka', 'd': 'Dvi', 'b': 'Bahu', 's': 'Eka', '1': 'Eka', '2': 'Dvi', '3': 'Bahu'}
+        db_vacana = v_map.get(vacana.lower()[0], vacana.title())
+
         query = "SELECT form_slp1 FROM tinanta WHERE dhatu_id=? AND lakara=? AND purusha=? AND vacana=? AND derivation=?"
-        row = self.analyzer.conn.execute(query, (d_id, db_lakara, purusha.title(), vacana.title(), derivation)).fetchone()
+        row = self.analyzer.conn.execute(query, (d_id, db_lakara, db_purusha, db_vacana, derivation)).fetchone()
         if not row: return None
+        
         res = row['form_slp1']
         if prefixes:
             for p in reversed(prefixes):
