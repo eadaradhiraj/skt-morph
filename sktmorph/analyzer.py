@@ -33,6 +33,22 @@ PREFIX_SPLITS =[
     ('A', 'A', ''),
 ]
 
+# common subanta (noun) endings for consonant stems (like Bavat, marut, vAc)
+SUBANTA_ENDINGS = {
+    'am': 'Dvitiya Eka (Acc. Sg.)',
+    'A':  'Tritiya Eka (Inst. Sg.)',
+    'e':  'Chaturthi Eka (Dat. Sg.)',
+    'as': 'Prathama Bahu / Panchami-Shashthi Eka',
+    'i':  'Saptami Eka (Loc. Sg.)',
+    'O':  'Prathama-Dvitiya Dvi (Nom-Acc. Dual)',
+    'OH': 'Shashthi-Saptami Dvi',
+    'Am': 'Shashthi Bahu (Gen. Pl.)',
+    'su': 'Saptami Bahu (Loc. Pl.)',
+    'ByAm': 'Inst-Dat-Abl Dual',
+    'Byas': 'Dat-Abl Plural',
+    'BiH':  'Tritiya Bahu (Inst. Pl.)',
+}
+
 class SanskritAnalyzer:
     def __init__(self):
         self.db_path = Path(__file__).parent / "data" / "sanskrit_forms.sqlite"
@@ -56,7 +72,19 @@ class SanskritAnalyzer:
 
     def _recursive_analyze(self, word, current_prefixes, depth=0):
         """Recursively strip prefixes and search the database."""
-        results =[]
+        results = []
+
+        # Check Verb forms
+        tinantas, _ = self._base_lookup(word)
+        for t in tinantas:
+            t['prefixes'] = list(current_prefixes)
+            results.append({'type': 'tinanta', 'data': t})
+
+        # Check Noun forms (Subantas)
+        subantas = self._analyze_subanta(word)
+        for s in subantas:
+            s['data']['prefixes'] = list(current_prefixes)
+            results.append(s)
         
         # 1. Base case: Check if current word is a valid root form
         tinantas, krdantas = self._base_lookup(word)
@@ -87,6 +115,27 @@ class SanskritAnalyzer:
                         new_prefixes.append(actual_prefix)
                         results.extend(self._recursive_analyze(remainder, new_prefixes, depth + 1))
                         
+        return results
+
+    def _analyze_subanta(self, word):
+        """Checks if a word is a declined form of a Krdanta stem."""
+        results = []
+        
+        # 1. Check if the word itself is a Pratipadika (like 'Bavat')
+        _, krd_exact = self._base_lookup(word)
+        for k in krd_exact:
+            k['subanta_info'] = 'Pratipadika (Stem)'
+            results.append({'type': 'krdanta', 'data': k})
+
+        # 2. Try stripping suffixes (like 'Bavati' -> 'Bavat' + 'i')
+        for suffix, info in SUBANTA_ENDINGS.items():
+            if word.endswith(suffix):
+                stem = word[:-len(suffix)]
+                _, krd_stems = self._base_lookup(stem)
+                for k in krd_stems:
+                    k['subanta_info'] = info
+                    results.append({'type': 'krdanta', 'data': k})
+        
         return results
 
     def analyze(self, word_slp1):
