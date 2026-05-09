@@ -7,18 +7,22 @@ from .subanta import SubantaGenerator
 
 @dataclass
 class MorphResult:
-    """Dataclass to hold the analyzed morphological data."""
     word: str
     prefixes: List[str]
-    dhatu: str
+    dhatu: Optional[str]
     word_type: str  
-    derivation: str 
+    derivation: Optional[str] 
     prayoga: Optional[str] = None
     lakara: Optional[str] = None
     purusha: Optional[int] = None
     vacana: Optional[int] = None
     pratyaya: Optional[str] = None
     dhatu_details: Optional[Dict[str, Any]] = None
+    
+    # Subanta specific properties
+    pratipadika: Optional[str] = None
+    linga: Optional[str] = None
+    vibhakti: Optional[str] = None
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
     ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pro', 'pra', 'u'), 
@@ -67,8 +71,8 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         if w_start in vowels and w_start not in['i', 'I']: return prefix[:-1] + 'y' + word
         if w_start in['i', 'I']: return prefix[:-1] + 'I' + w_rest
     elif p_end in['u', 'U']:
-        if w_start in vowels and w_start not in ['u', 'U']: return prefix[:-1] + 'v' + word
-        if w_start in ['u', 'U']: return prefix[:-1] + 'U' + w_rest
+        if w_start in vowels and w_start not in['u', 'U']: return prefix[:-1] + 'v' + word
+        if w_start in['u', 'U']: return prefix[:-1] + 'U' + w_rest
 
     if prefix == 'sam': return 'saM' + word
     if prefix == 'ud':
@@ -109,6 +113,7 @@ class SktMorph:
         results =[]
         cursor = self.conn.cursor()
 
+        # 1. Analyze Tinantas & Krdantas
         for prefixes, base_word in candidates:
             cursor.execute("""
                 SELECT t.*, d.details_json 
@@ -122,8 +127,7 @@ class SktMorph:
                     word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
                     word_type='tinanta', derivation=row['derivation'],
                     prayoga=row['prayoga'], lakara=row['lakara'],
-                    purusha=row['purusha'], vacana=row['vacana'],
-                    dhatu_details=details
+                    purusha=row['purusha'], vacana=row['vacana'], dhatu_details=details
                 ))
             
             cursor.execute("""
@@ -137,9 +141,18 @@ class SktMorph:
                 results.append(MorphResult(
                     word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
                     word_type='krdanta', derivation=row['derivation'],
-                    pratyaya=row['pratyaya'],
-                    dhatu_details=details
+                    pratyaya=row['pratyaya'], dhatu_details=details
                 ))
+
+        # 2. Analyze Subantas (Algorithmic Noun Declensions)
+        sub_gen = SubantaGenerator()
+        for match in sub_gen.analyze(word_slp1):
+            results.append(MorphResult(
+                word=word_slp1, prefixes=[], dhatu=None, word_type='subanta', derivation=None,
+                pratipadika=match['pratipadika'], linga=match['linga'],
+                vibhakti=match['vibhakti'], vacana=match['vacana']
+            ))
+
         return results
 
     def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 
