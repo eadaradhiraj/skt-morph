@@ -110,7 +110,7 @@ class TestCLI(unittest.TestCase):
             cli.main()
             mock_print.assert_called()
 
-    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'hari', '--linga', 'pum'])
+    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'go', '--linga', 'pum'])
     def test_cli_generate_noun_error(self):
         with patch('builtins.print') as mock_print:
             with self.assertRaises(SystemExit) as cm:
