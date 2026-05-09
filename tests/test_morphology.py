@@ -51,9 +51,8 @@ class TestSktMorph(unittest.TestCase):
         self.assertTrue(len(valid_res) > 0)
         
     def test_analyzer_subanta(self):
-        # Native integration check: word parsed via the main analyzer returns subanta type
-        res = self.morph.analyze('rAmeRa')
-        valid =[r for r in res if r.word_type == 'subanta' and r.pratipadika == 'rAma' and r.vibhakti == 'tfIyA']
+        res = self.morph.analyze('BavadBiH')
+        valid =[r for r in res if r.word_type == 'subanta' and r.pratipadika == 'Bavat' and r.vibhakti == 'tfIyA']
         self.assertTrue(len(valid) > 0)
 
     def test_missing_dhatu_details_tinanta(self):
@@ -62,7 +61,6 @@ class TestSktMorph(unittest.TestCase):
             mock_conn.cursor.return_value = mock_cursor
             mock_cursor.fetchall.side_effect = [[{'form_slp1': 'fakeBavati', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': 'kartari', 'lakara': 'plat', 'purusha': 1, 'vacana': 1, 'details_json': None}],[]]
             res = self.morph.analyze('fakeBavati')
-            # Check the first item returned (the tinanta match)
             self.assertIsNone(res[0].dhatu_details)
 
     def test_missing_dhatu_details_krdanta(self):
@@ -101,13 +99,13 @@ class TestCLI(unittest.TestCase):
             cli.main()
             mock_print.assert_called()
 
-    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'rAma', '--linga', 'pum'])
+    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'manas', '--linga', 'nap'])
     def test_cli_generate_noun(self):
         with patch('builtins.print') as mock_print:
             cli.main()
             mock_print.assert_called()
 
-    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'go', '--linga', 'pum'])
+    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'vAc', '--linga', 'stri'])
     def test_cli_generate_noun_error(self):
         with patch('builtins.print') as mock_print:
             with self.assertRaises(SystemExit) as cm:
