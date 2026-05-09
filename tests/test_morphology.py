@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import sys
 import runpy
 import warnings
@@ -56,22 +56,23 @@ class TestSktMorph(unittest.TestCase):
         self.assertIsInstance(valid_res[0].dhatu_details, dict)
 
     def test_missing_dhatu_details_tinanta(self):
-        cursor = self.morph.conn.cursor()
-        cursor.execute("INSERT INTO tinantas (form_slp1, dhatu_id, derivation, prayoga, lakara, purusha, vacana) VALUES ('fakeBavati', '99.9999', 'shuddha', 'kartari', 'plat', 1, 1)")
-        self.morph.conn.commit()
-        res = self.morph.analyze('fakeBavati')
-        self.assertIsNone(res[0].dhatu_details)
-        cursor.execute("DELETE FROM tinantas WHERE form_slp1 = 'fakeBavati'")
-        self.morph.conn.commit()
+        with patch.object(self.morph, 'conn') as mock_conn:
+            mock_cursor = MagicMock()
+            mock_conn.cursor.return_value = mock_cursor
+            mock_cursor.fetchall.side_effect = [[{'form_slp1': 'fakeBavati', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': 'kartari', 'lakara': 'plat', 'purusha': 1, 'vacana': 1, 'details_json': None}],[]
+            ]
+            res = self.morph.analyze('fakeBavati')
+            self.assertIsNone(res[0].dhatu_details)
 
     def test_missing_dhatu_details_krdanta(self):
-        cursor = self.morph.conn.cursor()
-        cursor.execute("INSERT INTO krdantas (form_slp1, dhatu_id, derivation, pratyaya) VALUES ('fakeBavanam', '99.9999', 'shuddha', 'lyuw')")
-        self.morph.conn.commit()
-        res = self.morph.analyze('fakeBavanam')
-        self.assertIsNone(res[0].dhatu_details)
-        cursor.execute("DELETE FROM krdantas WHERE form_slp1 = 'fakeBavanam'")
-        self.morph.conn.commit()
+        with patch.object(self.morph, 'conn') as mock_conn:
+            mock_cursor = MagicMock()
+            mock_conn.cursor.return_value = mock_cursor
+            mock_cursor.fetchall.side_effect = [
+                [],[{'form_slp1': 'fakeBavanam', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'pratyaya': 'lyuw', 'details_json': None}]
+            ]
+            res = self.morph.analyze('fakeBavanam')
+            self.assertIsNone(res[0].dhatu_details)
 
     def test_generator(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
@@ -83,7 +84,6 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1),[])
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1)
         self.assertIn('Bavati', forms)
-
 
 class TestCLI(unittest.TestCase):
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
