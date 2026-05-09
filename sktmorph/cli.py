@@ -22,6 +22,11 @@ def main():
     gen_noun_parser.add_argument("--base", type=str, required=True)
     gen_noun_parser.add_argument("--linga", type=str, required=True, choices=["pum", "stri", "nap"])
 
+
+    gen_pronoun_parser = subparsers.add_parser("generate_pronoun", help="Generate pronoun declensions")
+    gen_pronoun_parser.add_argument("--base", type=str, required=True, choices=["tad", "kim", "asmad", "yuzmad", "sarva"])
+    gen_pronoun_parser.add_argument("--linga", type=str, required=True, choices=["pum", "stri", "nap", "any"])
+
     args = parser.parse_args()
     
     try:
@@ -44,6 +49,15 @@ def main():
     elif args.command == "generate_noun":
         try:
             table = morph.generate_subanta(args.base, args.linga)
+            print(json.dumps(table, indent=4, ensure_ascii=False))
+        except NotImplementedError as e:
+            print(f"Error: {e}")
+            sys.exit(1)
+            
+
+    elif args.command == "generate_pronoun":
+        try:
+            table = morph.generate_sarvanama(args.base, args.linga)
             print(json.dumps(table, indent=4, ensure_ascii=False))
         except NotImplementedError as e:
             print(f"Error: {e}")

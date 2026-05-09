@@ -55,6 +55,11 @@ class TestSktMorph(unittest.TestCase):
         valid =[r for r in res if r.word_type == 'subanta' and r.pratipadika == 'Bavat' and r.vibhakti == 'tfIyA']
         self.assertTrue(len(valid) > 0)
 
+
+    def test_analyzer_sarvanama(self):
+        res = self.morph.analyze("aham")
+        valid =[r for r in res if r.word_type == "sarvanama" and r.pratipadika == "asmad"]
+        self.assertTrue(len(valid) > 0)
     def test_missing_dhatu_details_tinanta(self):
         with patch.object(self.morph, 'conn') as mock_conn:
             mock_cursor = MagicMock()

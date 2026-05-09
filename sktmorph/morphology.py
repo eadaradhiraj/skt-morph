@@ -4,6 +4,7 @@ import json
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Any, Optional
 from .subanta import SubantaGenerator
+from .sarvanama import SarvanamaGenerator
 
 @dataclass
 class MorphResult:
@@ -153,6 +154,16 @@ class SktMorph:
                 vibhakti=match['vibhakti'], vacana=match['vacana']
             ))
 
+
+        # 3. Analyze Sarvanamas (Pronouns)
+        sarv_gen = SarvanamaGenerator()
+        for match in sarv_gen.analyze(word_slp1):
+            results.append(MorphResult(
+                word=word_slp1, prefixes=[], dhatu=None, word_type="sarvanama", derivation=None,
+                pratipadika=match["pratipadika"], linga=match["linga"],
+                vibhakti=match["vibhakti"], vacana=match["vacana"]
+            ))
+
         return results
 
     def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 
@@ -179,3 +190,7 @@ class SktMorph:
     def generate_subanta(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
         sub_gen = SubantaGenerator()
         return sub_gen.generate(pratipadika, linga)
+
+    def generate_sarvanama(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
+        sarv_gen = SarvanamaGenerator()
+        return sarv_gen.generate(pratipadika, linga)
