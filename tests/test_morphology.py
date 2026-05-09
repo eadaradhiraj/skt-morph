@@ -34,7 +34,7 @@ class TestSktMorph(unittest.TestCase):
     def test_analyzer_base_verb(self):
         res = self.morph.analyze('Bavati')
         self.assertTrue(len(res) > 0)
-        self.assertEqual(res[0].prefixes, [])
+        self.assertEqual(res[0].prefixes,[])
         self.assertEqual(res[0].dhatu, '01.0001')
         self.assertEqual(res[0].word_type, 'tinanta')
 
@@ -74,6 +74,23 @@ class TestSktMorph(unittest.TestCase):
             res = self.morph.analyze('fakeBavanam')
             self.assertIsNone(res[0].dhatu_details)
 
+    def test_resolve_dhatu_ids_success(self):
+        with patch.object(self.morph, 'conn') as mock_conn:
+            mock_cursor = MagicMock()
+            mock_conn.cursor.return_value = mock_cursor
+            mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+            ids = self.morph.resolve_dhatu_ids('BU')
+            self.assertEqual(ids, ['01.0001'])
+
+    @patch.dict('sys.modules', {'indic_transliteration': None})
+    def test_resolve_dhatu_ids_import_error(self):
+        with patch.object(self.morph, 'conn') as mock_conn:
+            mock_cursor = MagicMock()
+            mock_conn.cursor.return_value = mock_cursor
+            mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+            ids = self.morph.resolve_dhatu_ids('BU')
+            self.assertEqual(ids, ['01.0001'])
+
     def test_generator_tinanta(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
         self.assertIn('praBavati', forms)
@@ -82,7 +99,6 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1),[])
         
     def test_generator_krdanta(self):
-        # prabhavanam -> pra + bhū (01.0001) + lyuw
         forms = self.morph.generate_krdanta('01.0001', 'lyuw', prefixes=['pra'])
         self.assertIn('praBavanam', forms)
 
@@ -142,7 +158,7 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     @patch('sktmorph.cli.SktMorph')
     def test_cli_db_error(self, mock_sktmorph):
         mock_sktmorph.side_effect = FileNotFoundError("DB Missing")

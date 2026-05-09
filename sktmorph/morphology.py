@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import json
+import re
 from dataclasses import dataclass
 from typing import List, Tuple, Dict, Any, Optional
 from .subanta import SubantaGenerator
@@ -161,21 +162,42 @@ class SktMorph:
 
         return results
 
+    def resolve_dhatu_ids(self, dhatu_query: str) -> List[str]:
+        """Resolves a numerical ID (e.g., 01.0001) or SLP1 Root Name (e.g., BU) to a list of IDs."""
+        if re.match(r'^\d{2}\.\d{4}$', dhatu_query):
+            return[dhatu_query]
+            
+        try:
+            from indic_transliteration import sanscript
+            from indic_transliteration.sanscript import transliterate
+            dev_query = transliterate(dhatu_query, sanscript.SLP1, sanscript.DEVANAGARI)
+        except ImportError:
+            dev_query = dhatu_query
+
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT dhatu_id FROM dhatus WHERE details_json LIKE ? OR details_json LIKE ?", 
+                       (f'%"{dev_query}"%', f'%"{dhatu_query}"%'))
+        return [row['dhatu_id'] for row in cursor.fetchall()]
+
     def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 
                          derivation: str = 'shuddha', prayoga: str = 'kartari', 
                          prefixes: List[str] = None) -> List[str]:
+        dhatu_ids = self.resolve_dhatu_ids(dhatu)
         cursor = self.conn.cursor()
-        cursor.execute('''SELECT form_slp1 FROM tinantas 
-                          WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
-                          AND vacana = ? AND derivation = ? AND prayoga = ?''',
-                       (dhatu, lakara, purusha, vacana, derivation, prayoga))
         
-        forms = [row['form_slp1'] for row in cursor.fetchall()]
-        if not forms: return[]
-        if not prefixes: return forms
+        all_forms =[]
+        for d_id in dhatu_ids:
+            cursor.execute('''SELECT form_slp1 FROM tinantas 
+                              WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
+                              AND vacana = ? AND derivation = ? AND prayoga = ?''',
+                           (d_id, lakara, purusha, vacana, derivation, prayoga))
+            all_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            
+        if not all_forms: return[]
+        if not prefixes: return all_forms
             
         final_forms =[]
-        for form in forms:
+        for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
                 current_form = apply_forward_sandhi(p, current_form)
@@ -184,18 +206,21 @@ class SktMorph:
 
     def generate_krdanta(self, dhatu: str, pratyaya: str, derivation: str = 'shuddha', 
                          prefixes: List[str] = None) -> List[str]:
-        """Generates a Participle form from the database and applies dynamic prefix sandhi."""
+        dhatu_ids = self.resolve_dhatu_ids(dhatu)
         cursor = self.conn.cursor()
-        cursor.execute('''SELECT form_slp1 FROM krdantas 
-                          WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
-                       (dhatu, pratyaya, derivation))
         
-        forms = [row['form_slp1'] for row in cursor.fetchall()]
-        if not forms: return[]
-        if not prefixes: return forms
+        all_forms =[]
+        for d_id in dhatu_ids:
+            cursor.execute('''SELECT form_slp1 FROM krdantas 
+                              WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
+                           (d_id, pratyaya, derivation))
+            all_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            
+        if not all_forms: return[]
+        if not prefixes: return all_forms
             
         final_forms =[]
-        for form in forms:
+        for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
                 current_form = apply_forward_sandhi(p, current_form)
