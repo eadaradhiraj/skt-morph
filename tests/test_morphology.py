@@ -38,6 +38,7 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(res[0].dhatu, '01.0001')
         self.assertEqual(res[0].word_type, 'tinanta')
         self.assertEqual(res[0].lakara, 'plat')
+        self.assertIsInstance(res[0].dhatu_details, dict)
 
     def test_analyzer_single_prefix(self):
         res = self.morph.analyze('praBavati')
@@ -52,6 +53,25 @@ class TestSktMorph(unittest.TestCase):
         res = self.morph.analyze('Bavanam')
         valid_res =[r for r in res if r.word_type == 'krdanta' and r.pratyaya == 'lyuw']
         self.assertTrue(len(valid_res) > 0)
+        self.assertIsInstance(valid_res[0].dhatu_details, dict)
+
+    def test_missing_dhatu_details_tinanta(self):
+        cursor = self.morph.conn.cursor()
+        cursor.execute("INSERT INTO tinantas (form_slp1, dhatu_id, derivation, prayoga, lakara, purusha, vacana) VALUES ('fakeBavati', '99.9999', 'shuddha', 'kartari', 'plat', 1, 1)")
+        self.morph.conn.commit()
+        res = self.morph.analyze('fakeBavati')
+        self.assertIsNone(res[0].dhatu_details)
+        cursor.execute("DELETE FROM tinantas WHERE form_slp1 = 'fakeBavati'")
+        self.morph.conn.commit()
+
+    def test_missing_dhatu_details_krdanta(self):
+        cursor = self.morph.conn.cursor()
+        cursor.execute("INSERT INTO krdantas (form_slp1, dhatu_id, derivation, pratyaya) VALUES ('fakeBavanam', '99.9999', 'shuddha', 'lyuw')")
+        self.morph.conn.commit()
+        res = self.morph.analyze('fakeBavanam')
+        self.assertIsNone(res[0].dhatu_details)
+        cursor.execute("DELETE FROM krdantas WHERE form_slp1 = 'fakeBavanam'")
+        self.morph.conn.commit()
 
     def test_generator(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
@@ -78,7 +98,6 @@ class TestCLI(unittest.TestCase):
             cli.main()
             mock_print.assert_any_call("No morphological data found for 'fakeWordXyz'.")
 
-    # Fixed: generate -> generate_verb
     @patch('sys.argv',['sktmorph', 'generate_verb', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
     def test_cli_generate_verb(self):
         with patch('builtins.print') as mock_print:
@@ -114,7 +133,7 @@ class TestCLI(unittest.TestCase):
             cli.main()
             mock_help.assert_called_once()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_module_executions(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
