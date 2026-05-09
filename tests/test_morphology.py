@@ -64,6 +64,7 @@ class TestSktMorph(unittest.TestCase):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1)
         self.assertIn('Bavati', forms)
 
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
@@ -77,11 +78,25 @@ class TestCLI(unittest.TestCase):
             cli.main()
             mock_print.assert_any_call("No morphological data found for 'fakeWordXyz'.")
 
-    @patch('sys.argv',['sktmorph', 'generate', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
-    def test_cli_generate(self):
+    # Fixed: generate -> generate_verb
+    @patch('sys.argv',['sktmorph', 'generate_verb', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
+    def test_cli_generate_verb(self):
         with patch('builtins.print') as mock_print:
             cli.main()
             mock_print.assert_called()
+
+    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'rAma', '--linga', 'pum'])
+    def test_cli_generate_noun(self):
+        with patch('builtins.print') as mock_print:
+            cli.main()
+            mock_print.assert_called()
+
+    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'hari', '--linga', 'pum'])
+    def test_cli_generate_noun_error(self):
+        with patch('builtins.print') as mock_print:
+            with self.assertRaises(SystemExit) as cm:
+                cli.main()
+            self.assertEqual(cm.exception.code, 1)
 
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     @patch('sktmorph.cli.SktMorph')

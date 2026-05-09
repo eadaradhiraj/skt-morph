@@ -110,6 +110,8 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
             
     return prefix + word
 
+from .subanta import SubantaGenerator
+
 class SktMorph:
     """Main Class handling Generation and Analysis."""
     
@@ -206,3 +208,7 @@ class SktMorph:
             final_forms.append(current_form)
             
         return final_forms
+    def generate_subanta(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
+        """Generates noun declensions using algorithmic rules."""
+        sub_gen = SubantaGenerator()
+        return sub_gen.generate(pratipadika, linga)

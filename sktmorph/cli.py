@@ -1,6 +1,7 @@
 # sktmorph/cli.py
 import argparse
 import sys
+import json
 from .morphology import SktMorph
 
 def main():
@@ -11,13 +12,18 @@ def main():
     analyze_parser = subparsers.add_parser("analyze", help="Analyze a Sanskrit word in SLP1")
     analyze_parser.add_argument("word", type=str, help="Word to analyze in SLP1 (e.g. prabhavati)")
     
-    # Generate Command
-    generate_parser = subparsers.add_parser("generate", help="Generate a verb form")
-    generate_parser.add_argument("--dhatu", type=str, required=True, help="Dhatu ID (e.g., 01.0001)")
-    generate_parser.add_argument("--lakara", type=str, required=True, help="Lakara (e.g., plat for Lat)")
-    generate_parser.add_argument("--purusha", type=int, required=True, help="1, 2, or 3")
-    generate_parser.add_argument("--vacana", type=int, required=True, help="1, 2, or 3")
-    generate_parser.add_argument("--prefixes", type=str, nargs="*", default=[], help="List of prefixes (e.g. vi A)")
+    # Generate Verb Command
+    gen_verb_parser = subparsers.add_parser("generate_verb", help="Generate a verb form")
+    gen_verb_parser.add_argument("--dhatu", type=str, required=True)
+    gen_verb_parser.add_argument("--lakara", type=str, required=True)
+    gen_verb_parser.add_argument("--purusha", type=int, required=True)
+    gen_verb_parser.add_argument("--vacana", type=int, required=True)
+    gen_verb_parser.add_argument("--prefixes", type=str, nargs="*", default=[])
+
+    # Generate Noun Command
+    gen_noun_parser = subparsers.add_parser("generate_noun", help="Generate noun declensions (Subantas)")
+    gen_noun_parser.add_argument("--base", type=str, required=True, help="Base noun (pratipadika) in SLP1 e.g., rAma")
+    gen_noun_parser.add_argument("--linga", type=str, required=True, choices=['pum', 'stri', 'nap'], help="Gender")
 
     args = parser.parse_args()
     
@@ -34,9 +40,18 @@ def main():
         for res in results:
             print(res)
             
-    elif args.command == "generate":
+    elif args.command == "generate_verb":
         forms = morph.generate_tinanta(args.dhatu, args.lakara, args.purusha, args.vacana, prefixes=args.prefixes)
         print(f"Generated Forms: {forms}")
+        
+    elif args.command == "generate_noun":
+        try:
+            table = morph.generate_subanta(args.base, args.linga)
+            print(json.dumps(table, indent=4, ensure_ascii=False))
+        except NotImplementedError as e:
+            print(f"Error: {e}")
+            sys.exit(1)
+            
     else:
         parser.print_help()
 
