@@ -63,7 +63,7 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     vowels = {'a', 'A', 'i', 'I', 'u', 'U', 'f', 'F', 'e', 'E', 'o', 'O'}
     
     if p_end in['a', 'A']:
-        if w_start in ['a', 'A']: return prefix[:-1] + 'A' + w_rest
+        if w_start in['a', 'A']: return prefix[:-1] + 'A' + w_rest
         if w_start in['i', 'I']: return prefix[:-1] + 'e' + w_rest
         if w_start in['u', 'U']: return prefix[:-1] + 'o' + w_rest
         if w_start in['f', 'F']: return prefix[:-1] + 'Ar' + w_rest
@@ -163,10 +163,7 @@ class SktMorph:
         return results
 
     def resolve_dhatu_ids(self, dhatu_query: str) -> List[str]:
-        """Resolves a numerical ID (e.g., 01.0001) or SLP1 Root Name (e.g., BU) to a list of IDs."""
-        if re.match(r'^\d{2}\.\d{4}$', dhatu_query):
-            return[dhatu_query]
-            
+        if re.match(r'^\d{2}\.\d{4}$', dhatu_query): return[dhatu_query]
         try:
             from indic_transliteration import sanscript
             from indic_transliteration.sanscript import transliterate
@@ -185,23 +182,30 @@ class SktMorph:
         dhatu_ids = self.resolve_dhatu_ids(dhatu)
         cursor = self.conn.cursor()
         
-        all_forms =[]
+        raw_forms =[]
         for d_id in dhatu_ids:
             cursor.execute('''SELECT form_slp1 FROM tinantas 
                               WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
                               AND vacana = ? AND derivation = ? AND prayoga = ?''',
                            (d_id, lakara, purusha, vacana, derivation, prayoga))
-            all_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
             
+        # Split forms BEFORE applying prefixes!
+        all_forms = []
+        for raw in raw_forms:
+            all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
+            
+        all_forms = sorted(list(set(all_forms)))
         if not all_forms: return[]
-        if not prefixes: return sorted(list(set(all_forms)))
+        if not prefixes: return all_forms
             
         final_forms =[]
         for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
                 current_form = apply_forward_sandhi(p, current_form)
-            final_forms.extend([f.strip() for f in current_form.replace(";", ",").split(",")])
+            final_forms.append(current_form)
+            
         return sorted(list(set(final_forms)))
 
     def generate_krdanta(self, dhatu: str, pratyaya: str, derivation: str = 'shuddha', 
@@ -209,22 +213,29 @@ class SktMorph:
         dhatu_ids = self.resolve_dhatu_ids(dhatu)
         cursor = self.conn.cursor()
         
-        all_forms =[]
+        raw_forms =[]
         for d_id in dhatu_ids:
             cursor.execute('''SELECT form_slp1 FROM krdantas 
                               WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
                            (d_id, pratyaya, derivation))
-            all_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
             
+        # Split forms BEFORE applying prefixes!
+        all_forms =[]
+        for raw in raw_forms:
+            all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
+            
+        all_forms = sorted(list(set(all_forms)))
         if not all_forms: return[]
-        if not prefixes: return sorted(list(set(all_forms)))
+        if not prefixes: return all_forms
             
         final_forms =[]
         for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
                 current_form = apply_forward_sandhi(p, current_form)
-            final_forms.extend([f.strip() for f in current_form.replace(";", ",").split(",")])
+            final_forms.append(current_form)
+            
         return sorted(list(set(final_forms)))
 
     def generate_subanta(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
