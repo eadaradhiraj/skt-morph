@@ -20,7 +20,6 @@ class MorphResult:
     pratyaya: Optional[str] = None
     dhatu_details: Optional[Dict[str, Any]] = None
     
-    # Subanta specific properties
     pratipadika: Optional[str] = None
     linga: Optional[str] = None
     vibhakti: Optional[str] = None
@@ -62,7 +61,7 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     w_rest = word[1:]
     vowels = {'a', 'A', 'i', 'I', 'u', 'U', 'f', 'F', 'e', 'E', 'o', 'O'}
     
-    if p_end in ['a', 'A']:
+    if p_end in['a', 'A']:
         if w_start in ['a', 'A']: return prefix[:-1] + 'A' + w_rest
         if w_start in['i', 'I']: return prefix[:-1] + 'e' + w_rest
         if w_start in['u', 'U']: return prefix[:-1] + 'o' + w_rest
@@ -91,7 +90,7 @@ class SktMorph:
         self.conn.row_factory = sqlite3.Row
 
     def get_candidate_splits(self, word: str) -> List[Tuple[List[str], str]]:
-        candidates = [([], word)]
+        candidates =[([], word)]
         queue = [([], word)]
         visited = set()
         
@@ -114,7 +113,6 @@ class SktMorph:
         results =[]
         cursor = self.conn.cursor()
 
-        # 1. Analyze Tinantas & Krdantas
         for prefixes, base_word in candidates:
             cursor.execute("""
                 SELECT t.*, d.details_json 
@@ -145,7 +143,6 @@ class SktMorph:
                     pratyaya=row['pratyaya'], dhatu_details=details
                 ))
 
-        # 2. Analyze Subantas (Algorithmic Noun Declensions)
         sub_gen = SubantaGenerator()
         for match in sub_gen.analyze(word_slp1):
             results.append(MorphResult(
@@ -154,8 +151,6 @@ class SktMorph:
                 vibhakti=match['vibhakti'], vacana=match['vacana']
             ))
 
-
-        # 3. Analyze Sarvanamas (Pronouns)
         sarv_gen = SarvanamaGenerator()
         for match in sarv_gen.analyze(word_slp1):
             results.append(MorphResult(
@@ -176,7 +171,27 @@ class SktMorph:
                        (dhatu, lakara, purusha, vacana, derivation, prayoga))
         
         forms = [row['form_slp1'] for row in cursor.fetchall()]
-        if not forms: return []
+        if not forms: return[]
+        if not prefixes: return forms
+            
+        final_forms =[]
+        for form in forms:
+            current_form = form
+            for p in reversed(prefixes):
+                current_form = apply_forward_sandhi(p, current_form)
+            final_forms.append(current_form)
+        return final_forms
+
+    def generate_krdanta(self, dhatu: str, pratyaya: str, derivation: str = 'shuddha', 
+                         prefixes: List[str] = None) -> List[str]:
+        """Generates a Participle form from the database and applies dynamic prefix sandhi."""
+        cursor = self.conn.cursor()
+        cursor.execute('''SELECT form_slp1 FROM krdantas 
+                          WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
+                       (dhatu, pratyaya, derivation))
+        
+        forms = [row['form_slp1'] for row in cursor.fetchall()]
+        if not forms: return[]
         if not prefixes: return forms
             
         final_forms =[]

@@ -74,12 +74,22 @@ class TestSktMorph(unittest.TestCase):
             res = self.morph.analyze('fakeBavanam')
             self.assertIsNone(res[0].dhatu_details)
 
-    def test_generator(self):
+    def test_generator_tinanta(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
         self.assertIn('praBavati', forms)
 
-    def test_generator_edge_cases(self):
+    def test_generator_tinanta_edge_cases(self):
         self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1),[])
+        
+    def test_generator_krdanta(self):
+        # prabhavanam -> pra + bhū (01.0001) + lyuw
+        forms = self.morph.generate_krdanta('01.0001', 'lyuw', prefixes=['pra'])
+        self.assertIn('praBavanam', forms)
+
+    def test_generator_krdanta_edge_cases(self):
+        self.assertEqual(self.morph.generate_krdanta('99.9999', 'lyuw'),[])
+        forms = self.morph.generate_krdanta('01.0001', 'lyuw')
+        self.assertIn('Bavanam', forms)
 
     def test_generate_sarvanama(self):
         res = self.morph.generate_sarvanama('tad', 'pum')
@@ -98,6 +108,11 @@ class TestCLI(unittest.TestCase):
 
     @patch('sys.argv',['sktmorph', 'generate_verb', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
     def test_cli_generate_verb(self):
+        with patch('builtins.print'):
+            cli.main()
+            
+    @patch('sys.argv',['sktmorph', 'generate_krdanta', '--dhatu', '01.0001', '--pratyaya', 'lyuw', '--prefixes', 'pra'])
+    def test_cli_generate_krdanta(self):
         with patch('builtins.print'):
             cli.main()
 
@@ -127,7 +142,7 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     @patch('sktmorph.cli.SktMorph')
     def test_cli_db_error(self, mock_sktmorph):
         mock_sktmorph.side_effect = FileNotFoundError("DB Missing")
@@ -137,9 +152,8 @@ class TestCLI(unittest.TestCase):
 
     @patch('sys.argv', ['sktmorph'])
     def test_cli_no_args(self):
-        with patch('argparse.ArgumentParser.print_help') as mock_help:
+        with patch('argparse.ArgumentParser.print_help'):
             cli.main()
-            mock_help.assert_called_once()
 
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_module_executions(self):

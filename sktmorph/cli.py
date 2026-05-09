@@ -18,10 +18,14 @@ def main():
     gen_verb_parser.add_argument("--vacana", type=int, required=True)
     gen_verb_parser.add_argument("--prefixes", type=str, nargs="*", default=[])
 
+    gen_krdanta_parser = subparsers.add_parser("generate_krdanta", help="Generate a krdanta (participle)")
+    gen_krdanta_parser.add_argument("--dhatu", type=str, required=True)
+    gen_krdanta_parser.add_argument("--pratyaya", type=str, required=True)
+    gen_krdanta_parser.add_argument("--prefixes", type=str, nargs="*", default=[])
+
     gen_noun_parser = subparsers.add_parser("generate_noun", help="Generate noun declensions")
     gen_noun_parser.add_argument("--base", type=str, required=True)
     gen_noun_parser.add_argument("--linga", type=str, required=True, choices=["pum", "stri", "nap"])
-
 
     gen_pronoun_parser = subparsers.add_parser("generate_pronoun", help="Generate pronoun declensions")
     gen_pronoun_parser.add_argument("--base", type=str, required=True, choices=["tad", "kim", "asmad", "yuzmad", "sarva"])
@@ -45,6 +49,10 @@ def main():
     elif args.command == "generate_verb":
         forms = morph.generate_tinanta(args.dhatu, args.lakara, args.purusha, args.vacana, prefixes=args.prefixes)
         print(f"Generated Forms: {forms}")
+
+    elif args.command == "generate_krdanta":
+        forms = morph.generate_krdanta(args.dhatu, args.pratyaya, prefixes=args.prefixes)
+        print(f"Generated Forms: {forms}")
         
     elif args.command == "generate_noun":
         try:
@@ -53,7 +61,6 @@ def main():
         except NotImplementedError as e:
             print(f"Error: {e}")
             sys.exit(1)
-            
 
     elif args.command == "generate_pronoun":
         try:
