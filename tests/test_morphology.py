@@ -107,6 +107,18 @@ class TestSktMorph(unittest.TestCase):
         forms = self.morph.generate_krdanta('01.0001', 'lyuw')
         self.assertIn('Bavanam', forms)
 
+
+    def test_generator_split_before_prefix(self):
+        with patch.object(self.morph, "conn") as mock_conn:
+            mock_cursor = MagicMock()
+            mock_conn.cursor.return_value = mock_cursor
+            # Simulate a messy row with commas and semicolons
+            mock_cursor.fetchall.return_value =[{"form_slp1": "Bavanam,BAvana;BUtvA"}]
+            # Apply prefix "anu"
+            forms = self.morph.generate_krdanta("01.0001", "lyuw", prefixes=["anu"])
+            # It should output exactly these three, properly prefixed and sorted
+            self.assertEqual(forms, sorted(["anuBAvana", "anuBavanam", "anuBUtvA"]))
+
     def test_generate_sarvanama(self):
         res = self.morph.generate_sarvanama('tad', 'pum')
         self.assertIn('prathamA', res)
