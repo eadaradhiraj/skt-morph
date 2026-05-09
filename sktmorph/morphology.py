@@ -194,15 +194,15 @@ class SktMorph:
             all_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
             
         if not all_forms: return[]
-        if not prefixes: return all_forms
+        if not prefixes: return sorted(list(set(all_forms)))
             
         final_forms =[]
         for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
                 current_form = apply_forward_sandhi(p, current_form)
-            final_forms.append(current_form)
-        return final_forms
+            final_forms.extend([f.strip() for f in current_form.replace(";", ",").split(",")])
+        return sorted(list(set(final_forms)))
 
     def generate_krdanta(self, dhatu: str, pratyaya: str, derivation: str = 'shuddha', 
                          prefixes: List[str] = None) -> List[str]:
@@ -217,15 +217,15 @@ class SktMorph:
             all_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
             
         if not all_forms: return[]
-        if not prefixes: return all_forms
+        if not prefixes: return sorted(list(set(all_forms)))
             
         final_forms =[]
         for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
                 current_form = apply_forward_sandhi(p, current_form)
-            final_forms.append(current_form)
-        return final_forms
+            final_forms.extend([f.strip() for f in current_form.replace(";", ",").split(",")])
+        return sorted(list(set(final_forms)))
 
     def generate_subanta(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
         sub_gen = SubantaGenerator()
