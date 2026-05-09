@@ -40,7 +40,7 @@ class TestSktMorph(unittest.TestCase):
 
     def test_analyzer_single_prefix(self):
         res = self.morph.analyze('praBavati')
-        valid = [r for r in res if r.prefixes == ['pra'] and r.dhatu == '01.0001']
+        valid =[r for r in res if r.prefixes == ['pra'] and r.dhatu == '01.0001']
         self.assertTrue(len(valid) > 0)
 
     def test_analyzer_krdanta(self):
@@ -86,12 +86,12 @@ class TestSktMorph(unittest.TestCase):
         self.assertIn('prathamA', res)
 
 class TestCLI(unittest.TestCase):
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
         with patch('builtins.print'):
             cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'fakeWordXyz'])
+    @patch('sys.argv',['sktmorph', 'analyze', 'fakeWordXyz'])
     def test_cli_analyze_not_found(self):
         with patch('builtins.print'):
             cli.main()
@@ -137,9 +137,9 @@ class TestCLI(unittest.TestCase):
 
     @patch('sys.argv', ['sktmorph'])
     def test_cli_no_args(self):
-        with patch('argparse.ArgumentParser.print_help'):
-            with self.assertRaises(SystemExit):
-                cli.main()
+        with patch('argparse.ArgumentParser.print_help') as mock_help:
+            cli.main()
+            mock_help.assert_called_once()
 
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_module_executions(self):
