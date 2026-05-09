@@ -8,6 +8,9 @@ def apply_natva(word_stem: str, suffix: str) -> str:
     n_pos = suffix.find('n')
     full_n_pos = len(word_stem) + n_pos
     
+    # Padānta rule: no natva at the end of a word
+    if full_n_pos == len(word) - 1: return suffix
+    
     trigger = False
     blockers = set('cCjJYSwWqQRtTdDnlS') # All consonants that block natva
     
