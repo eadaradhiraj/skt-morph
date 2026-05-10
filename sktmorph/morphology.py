@@ -82,13 +82,34 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     return prefix + word
 
 class SktMorph:
-    def __init__(self, db_path: str = None):
-        if db_path is None:
-            db_path = os.path.join(os.path.dirname(__file__), 'data', 'sanskrit_forms.sqlite')
-        if not os.path.exists(db_path):
-            raise FileNotFoundError(f"Database not found at {db_path}. Please build the DB first.")
-        self.conn = sqlite3.connect(db_path)
+    def __init__(self, db_dir: str = None):
+        if db_dir is None:
+            db_dir = os.path.join(os.path.dirname(__file__), 'data')
+        self.db_dir = db_dir
+        
+        main_db = os.path.join(self.db_dir, 'dhatus.sqlite')
+        if not os.path.exists(main_db):
+            raise FileNotFoundError(f"Database not found at {main_db}. Please build the DBs first.")
+            
+        self.conn = sqlite3.connect(main_db)
         self.conn.row_factory = sqlite3.Row
+        
+        # 1. Attach Krdantas Database
+        k_db = os.path.join(self.db_dir, 'krdantas.sqlite')
+        if os.path.exists(k_db):
+            self.conn.execute(f"ATTACH DATABASE '{k_db}' AS kdb")
+            self.conn.execute("CREATE TEMP VIEW krdantas AS SELECT * FROM kdb.krdantas")
+            
+        # 2. Attach Tinantas Databases dynamically via a UNION view
+        view_queries = []
+        for der in ['shuddha', 'nich', 'san', 'yang', 'yangluk']:
+            t_db = os.path.join(self.db_dir, f'tinantas_{der}.sqlite')
+            if os.path.exists(t_db):
+                self.conn.execute(f"ATTACH DATABASE '{t_db}' AS tdb_{der}")
+                view_queries.append(f"SELECT * FROM tdb_{der}.tinantas")
+                
+        if view_queries:
+            self.conn.execute("CREATE TEMP VIEW tinantas AS " + " UNION ALL ".join(view_queries))
 
     def get_candidate_splits(self, word: str) -> List[Tuple[List[str], str]]:
         candidates =[([], word)]
@@ -115,34 +136,42 @@ class SktMorph:
         cursor = self.conn.cursor()
 
         for prefixes, base_word in candidates:
-            cursor.execute("""
-                SELECT t.*, d.details_json 
-                FROM tinantas t 
-                LEFT JOIN dhatus d ON t.dhatu_id = d.dhatu_id 
-                WHERE t.form_slp1 = ?
-            """, (base_word,))
-            for row in cursor.fetchall():
-                details = json.loads(row['details_json']) if row['details_json'] else None
-                results.append(MorphResult(
-                    word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
-                    word_type='tinanta', derivation=row['derivation'],
-                    prayoga=row['prayoga'], lakara=row['lakara'],
-                    purusha=row['purusha'], vacana=row['vacana'], dhatu_details=details
-                ))
+            # Check Tinantas (uses the virtual UNION view across all 5 split DBs!)
+            try:
+                cursor.execute("""
+                    SELECT t.*, d.details_json 
+                    FROM tinantas t 
+                    LEFT JOIN dhatus d ON t.dhatu_id = d.dhatu_id 
+                    WHERE t.form_slp1 = ?
+                """, (base_word,))
+                for row in cursor.fetchall():
+                    details = json.loads(row['details_json']) if row['details_json'] else None
+                    results.append(MorphResult(
+                        word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
+                        word_type='tinanta', derivation=row['derivation'],
+                        prayoga=row['prayoga'], lakara=row['lakara'],
+                        purusha=row['purusha'], vacana=row['vacana'], dhatu_details=details
+                    ))
+            except sqlite3.OperationalError:
+                pass # Temp view might not exist if DB wasn't built fully
             
-            cursor.execute("""
-                SELECT k.*, d.details_json 
-                FROM krdantas k 
-                LEFT JOIN dhatus d ON k.dhatu_id = d.dhatu_id 
-                WHERE k.form_slp1 = ?
-            """, (base_word,))
-            for row in cursor.fetchall():
-                details = json.loads(row['details_json']) if row['details_json'] else None
-                results.append(MorphResult(
-                    word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
-                    word_type='krdanta', derivation=row['derivation'],
-                    pratyaya=row['pratyaya'], dhatu_details=details
-                ))
+            # Check Krdantas
+            try:
+                cursor.execute("""
+                    SELECT k.*, d.details_json 
+                    FROM krdantas k 
+                    LEFT JOIN dhatus d ON k.dhatu_id = d.dhatu_id 
+                    WHERE k.form_slp1 = ?
+                """, (base_word,))
+                for row in cursor.fetchall():
+                    details = json.loads(row['details_json']) if row['details_json'] else None
+                    results.append(MorphResult(
+                        word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
+                        word_type='krdanta', derivation=row['derivation'],
+                        pratyaya=row['pratyaya'], dhatu_details=details
+                    ))
+            except sqlite3.OperationalError:
+                pass
 
         sub_gen = SubantaGenerator()
         for match in sub_gen.analyze(word_slp1):
@@ -184,14 +213,16 @@ class SktMorph:
         
         raw_forms =[]
         for d_id in dhatu_ids:
-            cursor.execute('''SELECT form_slp1 FROM tinantas 
-                              WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
-                              AND vacana = ? AND derivation = ? AND prayoga = ?''',
-                           (d_id, lakara, purusha, vacana, derivation, prayoga))
-            raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            try:
+                cursor.execute('''SELECT form_slp1 FROM tinantas 
+                                  WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
+                                  AND vacana = ? AND derivation = ? AND prayoga = ?''',
+                               (d_id, lakara, purusha, vacana, derivation, prayoga))
+                raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            except sqlite3.OperationalError:
+                pass
             
-        # Split forms BEFORE applying prefixes!
-        all_forms = []
+        all_forms =[]
         for raw in raw_forms:
             all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
             
@@ -215,12 +246,14 @@ class SktMorph:
         
         raw_forms =[]
         for d_id in dhatu_ids:
-            cursor.execute('''SELECT form_slp1 FROM krdantas 
-                              WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
-                           (d_id, pratyaya, derivation))
-            raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            try:
+                cursor.execute('''SELECT form_slp1 FROM krdantas 
+                                  WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
+                               (d_id, pratyaya, derivation))
+                raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+            except sqlite3.OperationalError:
+                pass
             
-        # Split forms BEFORE applying prefixes!
         all_forms =[]
         for raw in raw_forms:
             all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])

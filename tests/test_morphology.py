@@ -29,7 +29,7 @@ class TestSktMorph(unittest.TestCase):
 
     def test_missing_database(self):
         with self.assertRaises(FileNotFoundError):
-            SktMorph("fake_path/fake_db.sqlite")
+            SktMorph(db_dir="fake_path")
 
     def test_analyzer_base_verb(self):
         res = self.morph.analyze('Bavati')
