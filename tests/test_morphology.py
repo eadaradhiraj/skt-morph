@@ -91,6 +91,19 @@ class TestSktMorph(unittest.TestCase):
             ids = self.morph.resolve_dhatu_ids('BU')
             self.assertEqual(ids, ['01.0001'])
 
+    def test_operational_errors(self):
+        import sqlite3
+        with patch.object(self.morph, 'conn') as mock_conn:
+            mock_cursor = MagicMock()
+            mock_conn.cursor.return_value = mock_cursor
+            # Safe object patching without any decorators
+            mock_cursor.execute.side_effect = sqlite3.OperationalError("Mock Error")
+            
+            self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1),[])
+            self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"),[])
+            res = self.morph.analyze("fakeWord")
+            self.assertFalse(any(r.word_type in["tinanta", "krdanta"] for r in res))
+
     def test_generator_tinanta(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
         self.assertIn('praBavati', forms)
@@ -107,21 +120,18 @@ class TestSktMorph(unittest.TestCase):
         forms = self.morph.generate_krdanta('01.0001', 'lyuw')
         self.assertIn('Bavanam', forms)
 
-
     def test_generator_split_before_prefix(self):
         with patch.object(self.morph, "conn") as mock_conn:
             mock_cursor = MagicMock()
             mock_conn.cursor.return_value = mock_cursor
-            # Simulate a messy row with commas and semicolons
             mock_cursor.fetchall.return_value =[{"form_slp1": "Bavanam,BAvana;BUtvA"}]
-            # Apply prefix "anu"
             forms = self.morph.generate_krdanta("01.0001", "lyuw", prefixes=["anu"])
-            # It should output exactly these three, properly prefixed and sorted
             self.assertEqual(forms, sorted(["anuBAvana", "anuBavanam", "anuBUtvA"]))
 
     def test_generate_sarvanama(self):
         res = self.morph.generate_sarvanama('tad', 'pum')
         self.assertIn('prathamA', res)
+
 
 class TestCLI(unittest.TestCase):
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
@@ -170,7 +180,7 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     @patch('sktmorph.cli.SktMorph')
     def test_cli_db_error(self, mock_sktmorph):
         mock_sktmorph.side_effect = FileNotFoundError("DB Missing")
@@ -178,7 +188,7 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv', ['sktmorph'])
+    @patch('sys.argv',['sktmorph'])
     def test_cli_no_args(self):
         with patch('argparse.ArgumentParser.print_help'):
             cli.main()
