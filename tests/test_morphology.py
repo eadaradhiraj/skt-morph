@@ -27,6 +27,17 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(apply_forward_sandhi('su', 'uktam'), 'sUktam')
         self.assertEqual(apply_forward_sandhi('ud', 'padyate'), 'utpadyate')
 
+
+    def test_gati_prefixes(self):
+        # Test Analysis Stripping
+        res = self.morph.analyze("purogamanam")
+        valid =[r for r in res if r.word_type == "krdanta" and "puras" in r.prefixes]
+        self.assertTrue(len(valid) > 0)
+        
+        # Test Generation Sandhi
+        self.assertEqual(apply_forward_sandhi("puras", "gamanam"), "purogamanam")
+        self.assertEqual(apply_forward_sandhi("puras", "carati"), "puraScarati")
+
     def test_missing_database(self):
         with self.assertRaises(FileNotFoundError):
             SktMorph(db_dir="fake_path")

@@ -27,6 +27,11 @@ class MorphResult:
     vibhakti: Optional[str] = None
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
+    ("puro", "puras", ""), ("puras", "puras", ""), ("puraH", "puras", ""),
+    ("tiro", "tiras", ""), ("tiras", "tiras", ""), ("tiraH", "tiras", ""),
+    ("antar", "antar", ""), ("alam", "alam", ""), ("alaM", "alam", ""),
+    ("prAdur", "prAdus", ""), ("prAduz", "prAdus", ""), ("prAduH", "prAdus", ""),
+    ("Avir", "Avis", ""), ("Aviz", "Avis", ""), ("AviH", "Avis", ""),
     ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pro', 'pra', 'u'), 
     ('prAr', 'pra', 'f'), ('pra', 'pra', ''),
     ('vyA', 'vi', 'A'), ('vya', 'vi', 'a'), ('vyu', 'vi', 'u'), ('vI', 'vi', 'i'), ('vI', 'vi', 'I'), 
@@ -76,7 +81,15 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         if w_start in vowels and w_start not in['u', 'U']: return prefix[:-1] + 'v' + word
         if w_start in['u', 'U']: return prefix[:-1] + 'U' + w_rest
 
-    if prefix == 'sam': return 'saM' + word
+
+    if p_end == "s":
+        voiced = {"g","G","j","J","q","Q","d","D","b","B","N","Y","R","n","m","y","r","l","v","h"}
+        if prefix.endswith("as") and w_start in voiced:
+            return prefix[:-2] + "o" + word
+        if w_start in ["c", "C"]: return prefix[:-1] + "S" + word
+        if w_start in ["w", "W"]: return prefix[:-1] + "z" + word
+
+    if prefix == "sam": return "saM" + word
     if prefix == 'ud':
         if w_start in['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: return 'ut' + word
         if w_start == 'h': return 'uddh' + w_rest
