@@ -150,6 +150,19 @@ class TestSktMorph(unittest.TestCase):
         self.assertIn('prathamA', res)
 
 
+
+    def test_adhas_prefix(self):
+        # 1. Test standard dictionary form
+        res_full = self.morph.analyze("aDogamanam")
+        self.assertTrue(any(r.word_type == "krdanta" and "aDas" in r.prefixes for r in res_full))
+        
+        # 2. Test bare stem smart lookup
+        res_bare = self.morph.analyze("aDogamana")
+        self.assertTrue(any(r.word_type == "krdanta" and "aDas" in r.prefixes for r in res_bare))
+        
+        # 3. Test forward sandhi generation
+        self.assertEqual(apply_forward_sandhi("aDas", "gamanam"), "aDogamanam")
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
