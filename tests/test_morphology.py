@@ -34,9 +34,8 @@ class TestSktMorph(unittest.TestCase):
     def test_analyzer_base_verb(self):
         res = self.morph.analyze('Bavati')
         self.assertTrue(len(res) > 0)
-        self.assertEqual(res[0].prefixes,[])
-        self.assertEqual(res[0].dhatu, '01.0001')
-        self.assertEqual(res[0].word_type, 'tinanta')
+        valid =[r for r in res if r.prefixes == [] and r.dhatu == '01.0001' and r.word_type == 'tinanta']
+        self.assertTrue(len(valid) > 0)
 
     def test_analyzer_single_prefix(self):
         res = self.morph.analyze('praBavati')
@@ -59,46 +58,51 @@ class TestSktMorph(unittest.TestCase):
         self.assertTrue(len(valid) > 0)
 
     def test_missing_dhatu_details_tinanta(self):
-        with patch.object(self.morph, 'conn') as mock_conn:
-            mock_cursor = MagicMock()
-            mock_conn.cursor.return_value = mock_cursor
-            mock_cursor.fetchall.side_effect = [[{'form_slp1': 'fakeBavati', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': 'kartari', 'lakara': 'plat', 'purusha': 1, 'vacana': 1, 'details_json': None}],[]]
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.side_effect = [[{'form_slp1': 'fakeBavati', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': 'kartari', 'lakara': 'plat', 'purusha': 1, 'vacana': 1, 'pratyaya': None, 'details_json': None}],[]]
+        with patch.object(self.morph, 'tinanta_conns', [mock_conn]):
             res = self.morph.analyze('fakeBavati')
             self.assertIsNone(res[0].dhatu_details)
 
     def test_missing_dhatu_details_krdanta(self):
-        with patch.object(self.morph, 'conn') as mock_conn:
-            mock_cursor = MagicMock()
-            mock_conn.cursor.return_value = mock_cursor
-            mock_cursor.fetchall.side_effect = [[],[{'form_slp1': 'fakeBavanam', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'pratyaya': 'lyuw', 'details_json': None}]]
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        # Tinanta returns empty, Krdanta returns the mocked row
+        mock_cursor.fetchall.side_effect = [[],[{'form_slp1': 'fakeBavanam', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': None, 'lakara': None, 'purusha': None, 'vacana': None, 'pratyaya': 'lyuw', 'details_json': None}]]
+        with patch.object(self.morph, 'tinanta_conns', [mock_conn]), patch.object(self.morph, 'krdanta_conns', [mock_conn]):
             res = self.morph.analyze('fakeBavanam')
             self.assertIsNone(res[0].dhatu_details)
 
     def test_resolve_dhatu_ids_success(self):
-        with patch.object(self.morph, 'conn') as mock_conn:
-            mock_cursor = MagicMock()
-            mock_conn.cursor.return_value = mock_cursor
-            mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+        with patch.object(self.morph, 'conn_dhatus', mock_conn):
             ids = self.morph.resolve_dhatu_ids('BU')
             self.assertEqual(ids, ['01.0001'])
 
     @patch.dict('sys.modules', {'indic_transliteration': None})
     def test_resolve_dhatu_ids_import_error(self):
-        with patch.object(self.morph, 'conn') as mock_conn:
-            mock_cursor = MagicMock()
-            mock_conn.cursor.return_value = mock_cursor
-            mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+        with patch.object(self.morph, 'conn_dhatus', mock_conn):
             ids = self.morph.resolve_dhatu_ids('BU')
-            self.assertEqual(ids, ['01.0001'])
+            self.assertEqual(ids,['01.0001'])
 
     def test_operational_errors(self):
         import sqlite3
-        with patch.object(self.morph, 'conn') as mock_conn:
-            mock_cursor = MagicMock()
-            mock_conn.cursor.return_value = mock_cursor
-            # Safe object patching without any decorators
-            mock_cursor.execute.side_effect = sqlite3.OperationalError("Mock Error")
-            
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.execute.side_effect = sqlite3.OperationalError("Mock Error")
+        
+        with patch.object(self.morph, 'tinanta_conns',[mock_conn]), patch.object(self.morph, 'krdanta_conns',[mock_conn]):
             self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1),[])
             self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"),[])
             res = self.morph.analyze("fakeWord")
@@ -121,10 +125,11 @@ class TestSktMorph(unittest.TestCase):
         self.assertIn('Bavanam', forms)
 
     def test_generator_split_before_prefix(self):
-        with patch.object(self.morph, "conn") as mock_conn:
-            mock_cursor = MagicMock()
-            mock_conn.cursor.return_value = mock_cursor
-            mock_cursor.fetchall.return_value =[{"form_slp1": "Bavanam,BAvana;BUtvA"}]
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value =[{"form_slp1": "Bavanam,BAvana;BUtvA"}]
+        with patch.object(self.morph, 'krdanta_conns', [mock_conn]):
             forms = self.morph.generate_krdanta("01.0001", "lyuw", prefixes=["anu"])
             self.assertEqual(forms, sorted(["anuBAvana", "anuBavanam", "anuBUtvA"]))
 
@@ -188,7 +193,7 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv',['sktmorph'])
+    @patch('sys.argv', ['sktmorph'])
     def test_cli_no_args(self):
         with patch('argparse.ArgumentParser.print_help'):
             cli.main()
