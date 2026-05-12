@@ -21,18 +21,17 @@ class MorphResult:
     vacana: Optional[int] = None
     pratyaya: Optional[str] = None
     dhatu_details: Optional[Dict[str, Any]] = None
-    
     pratipadika: Optional[str] = None
     linga: Optional[str] = None
     vibhakti: Optional[str] = None
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
-    ("aDo", "aDas", ""), ("aDas", "aDas", ""), ("aDaH", "aDas", ""),
-    ("puro", "puras", ""), ("puras", "puras", ""), ("puraH", "puras", ""),
-    ("tiro", "tiras", ""), ("tiras", "tiras", ""), ("tiraH", "tiras", ""),
-    ("antar", "antar", ""), ("alam", "alam", ""), ("alaM", "alam", ""),
-    ("prAdur", "prAdus", ""), ("prAduz", "prAdus", ""), ("prAduH", "prAdus", ""),
-    ("Avir", "Avis", ""), ("Aviz", "Avis", ""), ("AviH", "Avis", ""),
+    ('aDo', 'aDas', ''), ('aDas', 'aDas', ''), ('aDaH', 'aDas', ''),
+    ('puro', 'puras', ''), ('puras', 'puras', ''), ('puraH', 'puras', ''),
+    ('tiro', 'tiras', ''), ('tiras', 'tiras', ''), ('tiraH', 'tiras', ''),
+    ('antar', 'antar', ''), ('alam', 'alam', ''), ('alaM', 'alam', ''),
+    ('prAdur', 'prAdus', ''), ('prAduz', 'prAdus', ''), ('prAduH', 'prAdus', ''),
+    ('Avir', 'Avis', ''), ('Aviz', 'Avis', ''), ('AviH', 'Avis', ''),
     ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pro', 'pra', 'u'), 
     ('prAr', 'pra', 'f'), ('pra', 'pra', ''),
     ('vyA', 'vi', 'A'), ('vya', 'vi', 'a'), ('vyu', 'vi', 'u'), ('vI', 'vi', 'i'), ('vI', 'vi', 'I'), 
@@ -69,6 +68,13 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     w_rest = word[1:]
     vowels = {'a', 'A', 'i', 'I', 'u', 'U', 'f', 'F', 'e', 'E', 'o', 'O'}
     
+    if p_end == 's':
+        voiced = {'g','G','j','J','q','Q','d','D','b','B','N','Y','R','n','m','y','r','l','v','h'}
+        if prefix.endswith('as') and w_start in voiced:
+            return prefix[:-2] + 'o' + word
+        if w_start in ['c', 'C']: return prefix[:-1] + 'S' + word
+        if w_start in ['w', 'W']: return prefix[:-1] + 'z' + word
+        
     if p_end in['a', 'A']:
         if w_start in['a', 'A']: return prefix[:-1] + 'A' + w_rest
         if w_start in['i', 'I']: return prefix[:-1] + 'e' + w_rest
@@ -82,15 +88,7 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         if w_start in vowels and w_start not in['u', 'U']: return prefix[:-1] + 'v' + word
         if w_start in['u', 'U']: return prefix[:-1] + 'U' + w_rest
 
-
-    if p_end == "s":
-        voiced = {"g","G","j","J","q","Q","d","D","b","B","N","Y","R","n","m","y","r","l","v","h"}
-        if prefix.endswith("as") and w_start in voiced:
-            return prefix[:-2] + "o" + word
-        if w_start in ["c", "C"]: return prefix[:-1] + "S" + word
-        if w_start in ["w", "W"]: return prefix[:-1] + "z" + word
-
-    if prefix == "sam": return "saM" + word
+    if prefix == 'sam': return 'saM' + word
     if prefix == 'ud':
         if w_start in['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: return 'ut' + word
         if w_start == 'h': return 'uddh' + w_rest
@@ -112,7 +110,6 @@ class SktMorph:
         self.tinanta_conns =[]
         self.krdanta_conns =[]
         
-        # Open pools and attach the main dictionary to each shard
         for f in glob.glob(os.path.join(self.db_dir, 'tinantas_*.sqlite')):
             c = sqlite3.connect(f)
             c.row_factory = sqlite3.Row
@@ -148,7 +145,6 @@ class SktMorph:
         results =[]
 
         for prefixes, base_word in candidates:
-            # Search across all Tinanta shards
             for conn in self.tinanta_conns:
                 try:
                     cursor = conn.cursor()
@@ -168,16 +164,16 @@ class SktMorph:
                         ))
                 except sqlite3.OperationalError: pass
             
-            # Search across all Krdanta shards
             for conn in self.krdanta_conns:
                 try:
                     cursor = conn.cursor()
+                    # THE FIX: Intelligently queries the base word AND its potential dictionary endings!
                     cursor.execute("""
                         SELECT k.*, d.details_json 
                         FROM krdantas k 
                         LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
-                        WHERE k.form_slp1 = ?
-                    """, (base_word,))
+                        WHERE k.form_slp1 IN (?, ?, ?, ?, ?)
+                    """, (base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I'))
                     for row in cursor.fetchall():
                         details = json.loads(row['details_json']) if row['details_json'] else None
                         results.append(MorphResult(
