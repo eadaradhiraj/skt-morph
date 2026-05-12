@@ -37,6 +37,7 @@ class TestSktMorph(unittest.TestCase):
         # Test Generation Sandhi
         self.assertEqual(apply_forward_sandhi("puras", "gamanam"), "purogamanam")
         self.assertEqual(apply_forward_sandhi("puras", "carati"), "puraScarati")
+        self.assertEqual(apply_forward_sandhi("puras", "wIkatI"), "purazwIkatI")
 
     def test_missing_database(self):
         with self.assertRaises(FileNotFoundError):

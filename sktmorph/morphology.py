@@ -27,6 +27,7 @@ class MorphResult:
     vibhakti: Optional[str] = None
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
+    ("aDo", "aDas", ""), ("aDas", "aDas", ""), ("aDaH", "aDas", ""),
     ("puro", "puras", ""), ("puras", "puras", ""), ("puraH", "puras", ""),
     ("tiro", "tiras", ""), ("tiras", "tiras", ""), ("tiraH", "tiras", ""),
     ("antar", "antar", ""), ("alam", "alam", ""), ("alaM", "alam", ""),
