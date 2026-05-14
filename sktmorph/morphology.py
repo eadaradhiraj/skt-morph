@@ -63,37 +63,67 @@ UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
 
 def apply_forward_sandhi(prefix: str, word: str) -> str:
     if not prefix: return word
-    word = word.lstrip('-') # THE FIX: Strip hyphens before sandhi (for bound lyap forms)
+    word = word.lstrip('-')
     p_end = prefix[-1]
     w_start = word[0]
     w_rest = word[1:]
     vowels = {'a', 'A', 'i', 'I', 'u', 'U', 'f', 'F', 'e', 'E', 'o', 'O'}
+    voiced_cons = {'g','G','j','J','q','Q','d','D','b','B','N','Y','R','n','m','y','r','l','v','h'}
+    unvoiced_cons = {'k','K','c','C','w','W','t','T','p','P','S','z','s'}
+    
+    result = prefix + word
     
     if p_end == 's':
-        voiced = {'g','G','j','J','q','Q','d','D','b','B','N','Y','R','n','m','y','r','l','v','h'}
-        if prefix.endswith('as') and w_start in voiced:
-            return prefix[:-2] + 'o' + word
-        if w_start in ['c', 'C']: return prefix[:-1] + 'S' + word
-        if w_start in ['w', 'W']: return prefix[:-1] + 'z' + word
+        if prefix.endswith('as'):
+            if w_start in voiced_cons: result = prefix[:-2] + 'o' + word
+            elif w_start == 'a': result = prefix[:-2] + 'o' + w_rest
+            elif w_start in vowels: result = prefix[:-2] + 'a' + word
+            elif w_start in ['c', 'C']: result = prefix[:-1] + 'S' + word
+            elif w_start in ['w', 'W']: result = prefix[:-1] + 'z' + word
+            elif w_start in ['k', 'K', 'p', 'P']: result = prefix[:-1] + 'H' + word
+        elif prefix.endswith('is') or prefix.endswith('us'):
+            if w_start in voiced_cons or w_start in vowels: result = prefix[:-1] + 'r' + word
+            elif w_start in ['c', 'C']: result = prefix[:-1] + 'S' + word
+            elif w_start in ['w', 'W']: result = prefix[:-1] + 'z' + word
+            elif w_start in ['k', 'K', 'p', 'P']: result = prefix[:-1] + 'z' + word
+    elif p_end in ['a', 'A']:
+        if w_start in ['a', 'A']: result = prefix[:-1] + 'A' + w_rest
+        elif w_start in ['i', 'I']: result = prefix[:-1] + 'e' + w_rest
+        elif w_start in ['u', 'U']: result = prefix[:-1] + 'o' + w_rest
+        elif w_start in ['f', 'F']: result = prefix[:-1] + 'Ar' + w_rest
+        elif w_start == 'e': result = prefix[:-1] + 'e' + w_rest
+        elif w_start == 'E': result = prefix[:-1] + 'E' + w_rest
+        elif w_start == 'o': result = prefix[:-1] + 'O' + w_rest
+        elif w_start == 'O': result = prefix[:-1] + 'O' + w_rest
+    elif p_end in ['i', 'I']:
+        if w_start in vowels and w_start not in ['i', 'I']: result = prefix[:-1] + 'y' + word
+        elif w_start in ['i', 'I']: result = prefix[:-1] + 'I' + w_rest
+    elif p_end in ['u', 'U']:
+        if w_start in vowels and w_start not in ['u', 'U']: result = prefix[:-1] + 'v' + word
+        elif w_start in ['u', 'U']: result = prefix[:-1] + 'U' + w_rest
+    elif prefix.endswith('m') and (w_start in voiced_cons or w_start in unvoiced_cons):
+        result = prefix[:-1] + 'M' + word
+    elif prefix == 'ud':
+        if w_start in ['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: result = 'ut' + word
+        elif w_start == 'h': result = 'uddh' + w_rest
         
-    if p_end in['a', 'A']:
-        if w_start in['a', 'A']: return prefix[:-1] + 'A' + w_rest
-        if w_start in['i', 'I']: return prefix[:-1] + 'e' + w_rest
-        if w_start in['u', 'U']: return prefix[:-1] + 'o' + w_rest
-        if w_start in['f', 'F']: return prefix[:-1] + 'Ar' + w_rest
-        if w_start == 'e': return prefix[:-1] + 'e' + w_rest
-    elif p_end in['i', 'I']:
-        if w_start in vowels and w_start not in['i', 'I']: return prefix[:-1] + 'y' + word
-        if w_start in['i', 'I']: return prefix[:-1] + 'I' + w_rest
-    elif p_end in['u', 'U']:
-        if w_start in vowels and w_start not in['u', 'U']: return prefix[:-1] + 'v' + word
-        if w_start in['u', 'U']: return prefix[:-1] + 'U' + w_rest
-
-    if prefix == 'sam': return 'saM' + word
-    if prefix == 'ud':
-        if w_start in['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: return 'ut' + word
-        if w_start == 'h': return 'uddh' + w_rest
-    return prefix + word
+    # Apply Natva Rule structurally to the entire reconstructed word
+    trigger = False
+    blockers = set('cCjJYSwWqQRtTdDlsS')
+    chars = list(result)
+    prefix_len = len(result) - len(word)
+    natva_prefixes = {'pra', 'parA', 'pari', 'nis', 'dus', 'antar'}
+    for i, char in enumerate(chars):
+        if char in ['r', 'f', 'F', 'z']:
+            if i < prefix_len and prefix not in natva_prefixes:
+                continue
+            trigger = True
+        elif trigger and char == 'n':
+            if i != len(chars) - 1: chars[i] = 'R'
+        elif trigger and char in blockers:
+            trigger = False
+                
+    return "".join(chars)
 
 class SktMorph:
     def __init__(self, db_dir: str = None):
@@ -108,8 +138,8 @@ class SktMorph:
         self.conn_dhatus = sqlite3.connect(main_db)
         self.conn_dhatus.row_factory = sqlite3.Row
         
-        self.tinanta_conns =[]
-        self.krdanta_conns =[]
+        self.tinanta_conns = []
+        self.krdanta_conns = []
         
         for f in glob.glob(os.path.join(self.db_dir, 'tinantas_*.sqlite')):
             c = sqlite3.connect(f)
@@ -124,7 +154,7 @@ class SktMorph:
             self.krdanta_conns.append(c)
 
     def get_candidate_splits(self, word: str) -> List[Tuple[List[str], str]]:
-        candidates =[([], word)]
+        candidates = [([], word)]
         queue = [([], word)]
         visited = set()
         while queue:
@@ -140,9 +170,9 @@ class SktMorph:
                             candidates.append((list(new_prefixes), remainder))
                             queue.append((list(new_prefixes), remainder))
                             
-                        # THE FIX: Reverse Natva! If prefix caused n -> R, revert it for dictionary lookup
-                        if "R" in remainder:
-                            remainder_n = remainder.replace("R", "n")
+                        # REVERSE NATVA: Check dictionary for stem with 'n' if prefix caused an 'R'
+                        if 'R' in remainder:
+                            remainder_n = remainder.replace('R', 'n')
                             state_n = (tuple(new_prefixes), remainder_n)
                             if state_n not in visited:
                                 visited.add(state_n)
@@ -152,9 +182,17 @@ class SktMorph:
 
     def analyze(self, word_slp1: str) -> List[MorphResult]:
         candidates = self.get_candidate_splits(word_slp1)
-        results =[]
+        results = []
 
         for prefixes, base_word in candidates:
+            # STRICT FORWARD VALIDATION
+            if prefixes:
+                reconstructed = base_word
+                for p in reversed(prefixes):
+                    reconstructed = apply_forward_sandhi(p, reconstructed)
+                if reconstructed != word_slp1:
+                    continue # Reject false positive splits (like missing Natva!)
+
             for conn in self.tinanta_conns:
                 try:
                     cursor = conn.cursor()
@@ -177,7 +215,6 @@ class SktMorph:
             for conn in self.krdanta_conns:
                 try:
                     cursor = conn.cursor()
-                    # THE FIX: Added '-' + base_word to catch bound lyap forms like '-yujya'
                     cursor.execute("""
                         SELECT k.*, d.details_json 
                         FROM krdantas k 
@@ -210,7 +247,7 @@ class SktMorph:
         return results
 
     def resolve_dhatu_ids(self, dhatu_query: str) -> List[str]:
-        if re.match(r'^\d{2}\.\d{4}$', dhatu_query): return[dhatu_query]
+        if re.match(r'^\d{2}\.\d{4}$', dhatu_query): return [dhatu_query]
         try:
             from indic_transliteration import sanscript
             from indic_transliteration.sanscript import transliterate
@@ -227,7 +264,7 @@ class SktMorph:
                          derivation: str = 'shuddha', prayoga: str = 'kartari', 
                          prefixes: List[str] = None) -> List[str]:
         dhatu_ids = self.resolve_dhatu_ids(dhatu)
-        raw_forms =[]
+        raw_forms = []
         for d_id in dhatu_ids:
             for conn in self.tinanta_conns:
                 try:
@@ -239,15 +276,15 @@ class SktMorph:
                     raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
                 except sqlite3.OperationalError: pass
             
-        all_forms =[]
+        all_forms = []
         for raw in raw_forms:
             all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
             
         all_forms = sorted(list(set(all_forms)))
-        if not all_forms: return[]
+        if not all_forms: return []
         if not prefixes: return all_forms
             
-        final_forms =[]
+        final_forms = []
         for form in all_forms:
             current_form = form
             for p in reversed(prefixes):
@@ -259,7 +296,7 @@ class SktMorph:
     def generate_krdanta(self, dhatu: str, pratyaya: str, derivation: str = 'shuddha', 
                          prefixes: List[str] = None) -> List[str]:
         dhatu_ids = self.resolve_dhatu_ids(dhatu)
-        raw_forms =[]
+        raw_forms = []
         for d_id in dhatu_ids:
             for conn in self.krdanta_conns:
                 try:
@@ -270,15 +307,15 @@ class SktMorph:
                     raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
                 except sqlite3.OperationalError: pass
             
-        all_forms =[]
+        all_forms = []
         for raw in raw_forms:
             all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
             
         all_forms = sorted(list(set(all_forms)))
-        if not all_forms: return[]
+        if not all_forms: return []
         if not prefixes: return all_forms
             
-        final_forms =[]
+        final_forms = []
         for form in all_forms:
             current_form = form
             for p in reversed(prefixes):

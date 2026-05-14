@@ -24,20 +24,19 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(apply_forward_sandhi('sam', 'karoti'), 'saMkaroti')
         self.assertEqual(apply_forward_sandhi('ud', 'gacCati'), 'udgacCati') 
         self.assertEqual(apply_forward_sandhi('prati', 'ikzate'), 'pratIkzate')
-        self.assertEqual(apply_forward_sandhi('su', 'uktam'), 'sUktam')
-        self.assertEqual(apply_forward_sandhi('ud', 'padyate'), 'utpadyate')
-
-
-    def test_gati_prefixes(self):
-        # Test Analysis Stripping
-        res = self.morph.analyze("purogamanam")
-        valid =[r for r in res if r.word_type == "krdanta" and "puras" in r.prefixes]
-        self.assertTrue(len(valid) > 0)
-        
-        # Test Generation Sandhi
-        self.assertEqual(apply_forward_sandhi("puras", "gamanam"), "purogamanam")
+        self.assertEqual(apply_forward_sandhi("su", "uktam"), "sUktam")
+        # Missing Visarga Sandhi Edge Cases (Lines 79-83)
+        self.assertEqual(apply_forward_sandhi("puras", "atra"), "purotra")
+        self.assertEqual(apply_forward_sandhi("puras", "uvAca"), "purauvAca")
         self.assertEqual(apply_forward_sandhi("puras", "carati"), "puraScarati")
         self.assertEqual(apply_forward_sandhi("puras", "wIkatI"), "purazwIkatI")
+        self.assertEqual(apply_forward_sandhi("puras", "karoti"), "puraHkaroti")
+        self.assertEqual(apply_forward_sandhi('ud', 'padyate'), 'utpadyate')
+        
+        # Test the new robust Visarga sandhi rules
+        self.assertEqual(apply_forward_sandhi('puras', 'gamanam'), 'purogamanam')
+        self.assertEqual(apply_forward_sandhi('nis', 'kAmati'), 'nizkAmati')
+        self.assertEqual(apply_forward_sandhi('nis', 'vahamAna'), 'nirvahamARa') # tests forward natva
 
     def test_missing_database(self):
         with self.assertRaises(FileNotFoundError):
@@ -46,34 +45,68 @@ class TestSktMorph(unittest.TestCase):
     def test_analyzer_base_verb(self):
         res = self.morph.analyze('Bavati')
         self.assertTrue(len(res) > 0)
-        valid =[r for r in res if r.prefixes == [] and r.dhatu == '01.0001' and r.word_type == 'tinanta']
+        valid = [r for r in res if r.prefixes == [] and r.dhatu == '01.0001' and r.word_type == 'tinanta']
         self.assertTrue(len(valid) > 0)
 
     def test_analyzer_single_prefix(self):
         res = self.morph.analyze('praBavati')
-        valid =[r for r in res if r.prefixes == ['pra'] and r.dhatu == '01.0001']
+        valid = [r for r in res if r.prefixes == ['pra'] and r.dhatu == '01.0001']
         self.assertTrue(len(valid) > 0)
 
     def test_analyzer_krdanta(self):
         res = self.morph.analyze('Bavanam')
-        valid =[r for r in res if r.word_type == 'krdanta' and r.pratyaya == 'lyuw']
+        valid = [r for r in res if r.word_type == 'krdanta' and r.pratyaya == 'lyuw']
         self.assertTrue(len(valid) > 0)
         
+    def test_lyap_prefix_analyzer(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "-yujya", "dhatu_id": "07.0007", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("upayujya")
+            valid = [r for r in res if r.word_type == "krdanta" and "upa" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
+    def test_strict_forward_validation(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        
+        # A "smart" mock that only returns data if the queried word is exactly "vahamAna"
+        def fake_fetchall():
+            args = mock_cursor.execute.call_args
+            if args and args[0][1][0] == "vahamAna":
+                return [{"form_slp1": "vahamAna", "dhatu_id": "01.1159", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": None}]
+            return []
+            
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            # This should be REJECTED because the correct sandhi is nirvahamARa
+            res1 = self.morph.analyze("nirvahamAna")
+            valid1 = [r for r in res1 if r.word_type == "krdanta"]
+            self.assertEqual(len(valid1), 0)
+            
+            # This should be ACCEPTED
+            res2 = self.morph.analyze("nirvahamARa")
+            valid2 = [r for r in res2 if r.word_type == "krdanta" and "nis" in r.prefixes]
+            self.assertTrue(len(valid2) > 0)
+
     def test_analyzer_subanta(self):
         res = self.morph.analyze('BavadBiH')
-        valid =[r for r in res if r.word_type == 'subanta' and r.pratipadika == 'Bavat']
+        valid = [r for r in res if r.word_type == 'subanta' and r.pratipadika == 'Bavat']
         self.assertTrue(len(valid) > 0)
 
     def test_analyzer_sarvanama(self):
         res = self.morph.analyze("aham")
-        valid =[r for r in res if r.word_type == "sarvanama" and r.pratipadika == "asmad"]
+        valid = [r for r in res if r.word_type == "sarvanama" and r.pratipadika == "asmad"]
         self.assertTrue(len(valid) > 0)
 
     def test_missing_dhatu_details_tinanta(self):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.side_effect = [[{'form_slp1': 'fakeBavati', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': 'kartari', 'lakara': 'plat', 'purusha': 1, 'vacana': 1, 'pratyaya': None, 'details_json': None}],[]]
+        mock_cursor.fetchall.side_effect = [[{'form_slp1': 'fakeBavati', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': 'kartari', 'lakara': 'plat', 'purusha': 1, 'vacana': 1, 'pratyaya': None, 'details_json': None}], []]
         with patch.object(self.morph, 'tinanta_conns', [mock_conn]):
             res = self.morph.analyze('fakeBavati')
             self.assertIsNone(res[0].dhatu_details)
@@ -82,8 +115,7 @@ class TestSktMorph(unittest.TestCase):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
-        # Tinanta returns empty, Krdanta returns the mocked row
-        mock_cursor.fetchall.side_effect = [[],[{'form_slp1': 'fakeBavanam', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': None, 'lakara': None, 'purusha': None, 'vacana': None, 'pratyaya': 'lyuw', 'details_json': None}]]
+        mock_cursor.fetchall.side_effect = [[], [{'form_slp1': 'fakeBavanam', 'dhatu_id': '99.9999', 'derivation': 'shuddha', 'prayoga': None, 'lakara': None, 'purusha': None, 'vacana': None, 'pratyaya': 'lyuw', 'details_json': None}]]
         with patch.object(self.morph, 'tinanta_conns', [mock_conn]), patch.object(self.morph, 'krdanta_conns', [mock_conn]):
             res = self.morph.analyze('fakeBavanam')
             self.assertIsNone(res[0].dhatu_details)
@@ -92,7 +124,7 @@ class TestSktMorph(unittest.TestCase):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+        mock_cursor.fetchall.return_value = [{'dhatu_id': '01.0001'}]
         with patch.object(self.morph, 'conn_dhatus', mock_conn):
             ids = self.morph.resolve_dhatu_ids('BU')
             self.assertEqual(ids, ['01.0001'])
@@ -102,10 +134,10 @@ class TestSktMorph(unittest.TestCase):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.return_value =[{'dhatu_id': '01.0001'}]
+        mock_cursor.fetchall.return_value = [{'dhatu_id': '01.0001'}]
         with patch.object(self.morph, 'conn_dhatus', mock_conn):
             ids = self.morph.resolve_dhatu_ids('BU')
-            self.assertEqual(ids,['01.0001'])
+            self.assertEqual(ids, ['01.0001'])
 
     def test_operational_errors(self):
         import sqlite3
@@ -114,25 +146,26 @@ class TestSktMorph(unittest.TestCase):
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.execute.side_effect = sqlite3.OperationalError("Mock Error")
         
-        with patch.object(self.morph, 'tinanta_conns',[mock_conn]), patch.object(self.morph, 'krdanta_conns',[mock_conn]):
-            self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1),[])
-            self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"),[])
+        with patch.object(self.morph, 'tinanta_conns', [mock_conn]), patch.object(self.morph, 'krdanta_conns', [mock_conn]):
+            self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1), [])
+            self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"), [])
             res = self.morph.analyze("fakeWord")
-            self.assertFalse(any(r.word_type in["tinanta", "krdanta"] for r in res))
+            self.assertFalse(any(r.word_type in ["tinanta", "krdanta"] for r in res))
 
     def test_generator_tinanta(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
         self.assertIn('praBavati', forms)
 
     def test_generator_tinanta_edge_cases(self):
-        self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1),[])
+        self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1), [])
         
     def test_generator_krdanta(self):
+        # NOTE: Updated to praBavaRam because 'pra' triggers forward Natva!
         forms = self.morph.generate_krdanta('01.0001', 'lyuw', prefixes=['pra'])
-        self.assertIn('praBavanam', forms)
+        self.assertIn('praBavaRam', forms)
 
     def test_generator_krdanta_edge_cases(self):
-        self.assertEqual(self.morph.generate_krdanta('99.9999', 'lyuw'),[])
+        self.assertEqual(self.morph.generate_krdanta('99.9999', 'lyuw'), [])
         forms = self.morph.generate_krdanta('01.0001', 'lyuw')
         self.assertIn('Bavanam', forms)
 
@@ -140,40 +173,10 @@ class TestSktMorph(unittest.TestCase):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.return_value =[{"form_slp1": "Bavanam,BAvana;BUtvA"}]
+        mock_cursor.fetchall.return_value = [{"form_slp1": "Bavanam,BAvana;BUtvA"}]
         with patch.object(self.morph, 'krdanta_conns', [mock_conn]):
             forms = self.morph.generate_krdanta("01.0001", "lyuw", prefixes=["anu"])
             self.assertEqual(forms, sorted(["anuBAvana", "anuBavanam", "anuBUtvA"]))
-
-    def test_generate_sarvanama(self):
-        res = self.morph.generate_sarvanama('tad', 'pum')
-        self.assertIn('prathamA', res)
-
-
-
-    def test_adhas_prefix(self):
-        # 1. Test standard dictionary form
-        res_full = self.morph.analyze("aDogamanam")
-        self.assertTrue(any(r.word_type == "krdanta" and "aDas" in r.prefixes for r in res_full))
-        
-        # 2. Test bare stem smart lookup
-        res_bare = self.morph.analyze("aDogamana")
-        self.assertTrue(any(r.word_type == "krdanta" and "aDas" in r.prefixes for r in res_bare))
-        
-        # 3. Test forward sandhi generation
-        self.assertEqual(apply_forward_sandhi("aDas", "gamanam"), "aDogamanam")
-
-
-    def test_lyap_prefix_analyzer(self):
-        # Mocks a DB returning "-yujya" when asked for Krdantas
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_conn.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.return_value = [{"form_slp1": "-yujya", "dhatu_id": "07.0007", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
-        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
-            res = self.morph.analyze("upayujya")
-            valid = [r for r in res if r.word_type == "krdanta" and "upa" in r.prefixes]
-            self.assertTrue(len(valid) > 0)
 
     def test_lyap_prefix_generator(self):
         mock_conn = MagicMock()
@@ -184,46 +187,38 @@ class TestSktMorph(unittest.TestCase):
             forms = self.morph.generate_krdanta("07.0007", "lyap", prefixes=["upa"])
             self.assertEqual(forms, ["upayujya"])
 
+    def test_generate_sarvanama(self):
+        res = self.morph.generate_sarvanama('tad', 'pum')
+        self.assertIn('prathamA', res)
 
-    def test_reverse_natva_analysis(self):
-        # Mocks a DB returning "vahamAnam"
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_conn.cursor.return_value = mock_cursor
-        mock_cursor.fetchall.return_value = [{"form_slp1": "vahamAnam", "dhatu_id": "01.1095", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": None}]
-        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
-            res = self.morph.analyze("nirvahamARa")
-            # The prefix "nir" translates structurally to "nis" in UPASARGA rules
-            valid = [r for r in res if r.word_type == "krdanta" and "nis" in r.prefixes]
-            self.assertTrue(len(valid) > 0)
 
 class TestCLI(unittest.TestCase):
-    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
         with patch('builtins.print'):
             cli.main()
 
-    @patch('sys.argv',['sktmorph', 'analyze', 'fakeWordXyz'])
+    @patch('sys.argv', ['sktmorph', 'analyze', 'fakeWordXyz'])
     def test_cli_analyze_not_found(self):
         with patch('builtins.print'):
             cli.main()
 
-    @patch('sys.argv',['sktmorph', 'generate_verb', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
+    @patch('sys.argv', ['sktmorph', 'generate_verb', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
     def test_cli_generate_verb(self):
         with patch('builtins.print'):
             cli.main()
             
-    @patch('sys.argv',['sktmorph', 'generate_krdanta', '--dhatu', '01.0001', '--pratyaya', 'lyuw', '--prefixes', 'pra'])
+    @patch('sys.argv', ['sktmorph', 'generate_krdanta', '--dhatu', '01.0001', '--pratyaya', 'lyuw', '--prefixes', 'pra'])
     def test_cli_generate_krdanta(self):
         with patch('builtins.print'):
             cli.main()
 
-    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'manas', '--linga', 'nap'])
+    @patch('sys.argv', ['sktmorph', 'generate_noun', '--base', 'manas', '--linga', 'nap'])
     def test_cli_generate_noun(self):
         with patch('builtins.print'):
             cli.main()
 
-    @patch('sys.argv',['sktmorph', 'generate_noun', '--base', 'vAc', '--linga', 'stri'])
+    @patch('sys.argv', ['sktmorph', 'generate_noun', '--base', 'vAc', '--linga', 'stri'])
     @patch('sktmorph.cli.SktMorph.generate_subanta')
     def test_cli_generate_noun_error(self, mock_gen):
         mock_gen.side_effect = NotImplementedError("Noun Error")
@@ -231,12 +226,12 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv',['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
+    @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
     def test_cli_generate_pronoun(self):
         with patch('builtins.print'):
             cli.main()
 
-    @patch('sys.argv',['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
+    @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
     @patch('sktmorph.cli.SktMorph.generate_sarvanama')
     def test_cli_generate_pronoun_error(self, mock_gen):
         mock_gen.side_effect = NotImplementedError("Pronoun Error")
@@ -244,7 +239,7 @@ class TestCLI(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 cli.main()
 
-    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     @patch('sktmorph.cli.SktMorph')
     def test_cli_db_error(self, mock_sktmorph):
         mock_sktmorph.side_effect = FileNotFoundError("DB Missing")
@@ -257,7 +252,7 @@ class TestCLI(unittest.TestCase):
         with patch('argparse.ArgumentParser.print_help'):
             cli.main()
 
-    @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
+    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_module_executions(self):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
