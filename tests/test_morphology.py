@@ -163,6 +163,27 @@ class TestSktMorph(unittest.TestCase):
         # 3. Test forward sandhi generation
         self.assertEqual(apply_forward_sandhi("aDas", "gamanam"), "aDogamanam")
 
+
+    def test_lyap_prefix_analyzer(self):
+        # Mocks a DB returning "-yujya" when asked for Krdantas
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "-yujya", "dhatu_id": "07.0007", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("upayujya")
+            valid = [r for r in res if r.word_type == "krdanta" and "upa" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
+    def test_lyap_prefix_generator(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "-yujya"}]
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            forms = self.morph.generate_krdanta("07.0007", "lyap", prefixes=["upa"])
+            self.assertEqual(forms, ["upayujya"])
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):

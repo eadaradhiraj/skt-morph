@@ -63,6 +63,7 @@ UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
 
 def apply_forward_sandhi(prefix: str, word: str) -> str:
     if not prefix: return word
+    word = word.lstrip('-') # THE FIX: Strip hyphens before sandhi (for bound lyap forms)
     p_end = prefix[-1]
     w_start = word[0]
     w_rest = word[1:]
@@ -167,13 +168,13 @@ class SktMorph:
             for conn in self.krdanta_conns:
                 try:
                     cursor = conn.cursor()
-                    # THE FIX: Intelligently queries the base word AND its potential dictionary endings!
+                    # THE FIX: Added '-' + base_word to catch bound lyap forms like '-yujya'
                     cursor.execute("""
                         SELECT k.*, d.details_json 
                         FROM krdantas k 
                         LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
-                        WHERE k.form_slp1 IN (?, ?, ?, ?, ?)
-                    """, (base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I'))
+                        WHERE k.form_slp1 IN (?, ?, ?, ?, ?, ?)
+                    """, (base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I', '-' + base_word))
                     for row in cursor.fetchall():
                         details = json.loads(row['details_json']) if row['details_json'] else None
                         results.append(MorphResult(
