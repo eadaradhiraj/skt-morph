@@ -184,6 +184,19 @@ class TestSktMorph(unittest.TestCase):
             forms = self.morph.generate_krdanta("07.0007", "lyap", prefixes=["upa"])
             self.assertEqual(forms, ["upayujya"])
 
+
+    def test_reverse_natva_analysis(self):
+        # Mocks a DB returning "vahamAnam"
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "vahamAnam", "dhatu_id": "01.1095", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": None}]
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("nirvahamARa")
+            # The prefix "nir" translates structurally to "nis" in UPASARGA rules
+            valid = [r for r in res if r.word_type == "krdanta" and "nis" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv',['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):

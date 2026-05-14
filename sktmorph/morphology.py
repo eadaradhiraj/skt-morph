@@ -139,6 +139,15 @@ class SktMorph:
                             visited.add(state)
                             candidates.append((list(new_prefixes), remainder))
                             queue.append((list(new_prefixes), remainder))
+                            
+                        # THE FIX: Reverse Natva! If prefix caused n -> R, revert it for dictionary lookup
+                        if "R" in remainder:
+                            remainder_n = remainder.replace("R", "n")
+                            state_n = (tuple(new_prefixes), remainder_n)
+                            if state_n not in visited:
+                                visited.add(state_n)
+                                candidates.append((list(new_prefixes), remainder_n))
+                                queue.append((list(new_prefixes), remainder_n))
         return candidates
 
     def analyze(self, word_slp1: str) -> List[MorphResult]:
