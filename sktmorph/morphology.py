@@ -80,6 +80,7 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     unvoiced_cons = {'k','K','c','C','w','W','t','T','p','P','S','z','s'}
     
     result = prefix + word
+    if p_end in vowels and w_start == 'C': result = prefix + 'c' + word
     
     if p_end == 's':
         if prefix.endswith('as'):
@@ -177,7 +178,15 @@ class SktMorph:
                             candidates.append((list(new_prefixes), remainder))
                             queue.append((list(new_prefixes), remainder))
                             
-                        if 'R' in remainder:
+                        if remainder.startswith("cC"):
+                            remainder_C = remainder[1:]
+                            state_C = (tuple(new_prefixes), remainder_C)
+                            if state_C not in visited:
+                                visited.add(state_C)
+                                candidates.append((list(new_prefixes), remainder_C))
+                                queue.append((list(new_prefixes), remainder_C))
+                                
+                        if "R" in remainder:
                             remainder_n = remainder.replace('R', 'n')
                             state_n = (tuple(new_prefixes), remainder_n)
                             if state_n not in visited:

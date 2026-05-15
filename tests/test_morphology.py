@@ -37,6 +37,22 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(apply_forward_sandhi('puras', 'wIkatI'), 'purazwIkatI')
         self.assertEqual(apply_forward_sandhi('puras', 'karoti'), 'puraHkaroti')
 
+
+    def test_tuk_agama_sandhi(self):
+        # Test Forward Sandhi
+        self.assertEqual(apply_forward_sandhi("pra", "CAdya"), "pracCAdya")
+        self.assertEqual(apply_forward_sandhi("A", "CAdya"), "AcCAdya")
+        
+        # Test Reverse Analyzer
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "-CAdya", "dhatu_id": "10.0370", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("pracCAdya")
+            valid = [r for r in res if r.word_type == "krdanta" and "pra" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
     def test_missing_database(self):
         with self.assertRaises(FileNotFoundError):
             SktMorph(db_dir="fake_path")
