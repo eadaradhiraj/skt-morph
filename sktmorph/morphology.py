@@ -25,6 +25,14 @@ class MorphResult:
     linga: Optional[str] = None
     vibhakti: Optional[str] = None
 
+PADA_RESTRICTIONS = {
+    ("09.0001", "vi"): "A",
+    ("09.0001", "pari"): "A",
+    ("09.0001", "ava"): "A",
+    ("01.0631", "vi"): "A",
+    ("01.0631", "parA"): "A"
+}
+
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
     ('aDo', 'aDas', ''), ('aDas', 'aDas', ''), ('aDaH', 'aDas', ''),
     ('puro', 'puras', ''), ('puras', 'puras', ''), ('puraH', 'puras', ''),
@@ -107,7 +115,6 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         if w_start in ['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: result = 'ut' + word
         elif w_start == 'h': result = 'uddh' + w_rest
         
-    # Apply Natva Rule structurally to the entire reconstructed word
     trigger = False
     blockers = set('cCjJYSwWqQRtTdDlsS')
     chars = list(result)
@@ -170,7 +177,6 @@ class SktMorph:
                             candidates.append((list(new_prefixes), remainder))
                             queue.append((list(new_prefixes), remainder))
                             
-                        # REVERSE NATVA: Check dictionary for stem with 'n' if prefix caused an 'R'
                         if 'R' in remainder:
                             remainder_n = remainder.replace('R', 'n')
                             state_n = (tuple(new_prefixes), remainder_n)
@@ -185,13 +191,12 @@ class SktMorph:
         results = []
 
         for prefixes, base_word in candidates:
-            # STRICT FORWARD VALIDATION
             if prefixes:
                 reconstructed = base_word
                 for p in reversed(prefixes):
                     reconstructed = apply_forward_sandhi(p, reconstructed)
                 if reconstructed != word_slp1:
-                    continue # Reject false positive splits (like missing Natva!)
+                    continue 
 
             for conn in self.tinanta_conns:
                 try:
@@ -203,6 +208,14 @@ class SktMorph:
                         WHERE t.form_slp1 = ?
                     """, (base_word,))
                     for row in cursor.fetchall():
+                        allowed_pada = None
+                        for p in prefixes:
+                            if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
+                                allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
+                        
+                        if allowed_pada == "A" and row["lakara"].startswith("p"): continue
+                        if allowed_pada == "P" and row["lakara"].startswith("a"): continue
+
                         details = json.loads(row['details_json']) if row['details_json'] else None
                         results.append(MorphResult(
                             word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],

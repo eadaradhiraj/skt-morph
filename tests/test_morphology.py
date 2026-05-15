@@ -24,19 +24,18 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(apply_forward_sandhi('sam', 'karoti'), 'saMkaroti')
         self.assertEqual(apply_forward_sandhi('ud', 'gacCati'), 'udgacCati') 
         self.assertEqual(apply_forward_sandhi('prati', 'ikzate'), 'pratIkzate')
-        self.assertEqual(apply_forward_sandhi("su", "uktam"), "sUktam")
-        # Missing Visarga Sandhi Edge Cases (Lines 79-83)
-        self.assertEqual(apply_forward_sandhi("puras", "atra"), "purotra")
-        self.assertEqual(apply_forward_sandhi("puras", "uvAca"), "purauvAca")
-        self.assertEqual(apply_forward_sandhi("puras", "carati"), "puraScarati")
-        self.assertEqual(apply_forward_sandhi("puras", "wIkatI"), "purazwIkatI")
-        self.assertEqual(apply_forward_sandhi("puras", "karoti"), "puraHkaroti")
+        self.assertEqual(apply_forward_sandhi('su', 'uktam'), 'sUktam')
         self.assertEqual(apply_forward_sandhi('ud', 'padyate'), 'utpadyate')
         
-        # Test the new robust Visarga sandhi rules
         self.assertEqual(apply_forward_sandhi('puras', 'gamanam'), 'purogamanam')
         self.assertEqual(apply_forward_sandhi('nis', 'kAmati'), 'nizkAmati')
-        self.assertEqual(apply_forward_sandhi('nis', 'vahamAna'), 'nirvahamARa') # tests forward natva
+        self.assertEqual(apply_forward_sandhi('nis', 'vahamAna'), 'nirvahamARa')
+        
+        self.assertEqual(apply_forward_sandhi('puras', 'atra'), 'purotra')
+        self.assertEqual(apply_forward_sandhi('puras', 'uvAca'), 'purauvAca')
+        self.assertEqual(apply_forward_sandhi('puras', 'carati'), 'puraScarati')
+        self.assertEqual(apply_forward_sandhi('puras', 'wIkatI'), 'purazwIkatI')
+        self.assertEqual(apply_forward_sandhi('puras', 'karoti'), 'puraHkaroti')
 
     def test_missing_database(self):
         with self.assertRaises(FileNotFoundError):
@@ -73,7 +72,6 @@ class TestSktMorph(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
         
-        # A "smart" mock that only returns data if the queried word is exactly "vahamAna"
         def fake_fetchall():
             args = mock_cursor.execute.call_args
             if args and args[0][1][0] == "vahamAna":
@@ -82,15 +80,34 @@ class TestSktMorph(unittest.TestCase):
             
         mock_cursor.fetchall.side_effect = fake_fetchall
         with patch.object(self.morph, "krdanta_conns", [mock_conn]):
-            # This should be REJECTED because the correct sandhi is nirvahamARa
             res1 = self.morph.analyze("nirvahamAna")
             valid1 = [r for r in res1 if r.word_type == "krdanta"]
             self.assertEqual(len(valid1), 0)
             
-            # This should be ACCEPTED
             res2 = self.morph.analyze("nirvahamARa")
             valid2 = [r for r in res2 if r.word_type == "krdanta" and "nis" in r.prefixes]
             self.assertTrue(len(valid2) > 0)
+
+    def test_pada_restrictions(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        
+        def fake_fetchall():
+            args = mock_cursor.execute.call_args
+            if args and args[0][1][0] == "krIRAti":
+                return [{"form_slp1": "krIRAti", "dhatu_id": "09.0001", "derivation": "shuddha", "prayoga": "kartari", "lakara": "plat", "purusha": 1, "vacana": 1, "details_json": None}]
+            if args and args[0][1][0] == "krIRIte":
+                return [{"form_slp1": "krIRIte", "dhatu_id": "09.0001", "derivation": "shuddha", "prayoga": "kartari", "lakara": "alat", "purusha": 1, "vacana": 1, "details_json": None}]
+            return []
+            
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "tinanta_conns", [mock_conn]):
+            res_bad = self.morph.analyze("vikrIRAti")
+            self.assertEqual(len([r for r in res_bad if r.word_type == "tinanta"]), 0)
+            
+            res_good = self.morph.analyze("vikrIRIte")
+            self.assertTrue(len([r for r in res_good if r.word_type == "tinanta"]) > 0)
 
     def test_analyzer_subanta(self):
         res = self.morph.analyze('BavadBiH')
@@ -101,6 +118,15 @@ class TestSktMorph(unittest.TestCase):
         res = self.morph.analyze("aham")
         valid = [r for r in res if r.word_type == "sarvanama" and r.pratipadika == "asmad"]
         self.assertTrue(len(valid) > 0)
+
+    def test_adhas_prefix(self):
+        res_full = self.morph.analyze("aDogamanam")
+        self.assertTrue(any(r.word_type == "krdanta" and "aDas" in r.prefixes for r in res_full))
+        
+        res_bare = self.morph.analyze("aDogamana")
+        self.assertTrue(any(r.word_type == "krdanta" and "aDas" in r.prefixes for r in res_bare))
+        
+        self.assertEqual(apply_forward_sandhi("aDas", "gamanam"), "aDogamanam")
 
     def test_missing_dhatu_details_tinanta(self):
         mock_conn = MagicMock()
@@ -160,7 +186,6 @@ class TestSktMorph(unittest.TestCase):
         self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1), [])
         
     def test_generator_krdanta(self):
-        # NOTE: Updated to praBavaRam because 'pra' triggers forward Natva!
         forms = self.morph.generate_krdanta('01.0001', 'lyuw', prefixes=['pra'])
         self.assertIn('praBavaRam', forms)
 
