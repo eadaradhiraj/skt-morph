@@ -233,6 +233,17 @@ class TestSktMorph(unittest.TestCase):
         self.assertIn('prathamA', res)
 
 
+
+    def test_reverse_satva_analysis(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "secaye", "dhatu_id": "06.0140", "derivation": "shuddha", "prayoga": "kartari", "lakara": "plat", "purusha": 1, "vacana": 1, "pratyaya": None, "details_json": None}]
+        with patch.object(self.morph, "tinanta_conns", [mock_conn]):
+            res = self.morph.analyze("aBizecaye")
+            valid = [r for r in res if r.word_type == "tinanta" and "aBi" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):

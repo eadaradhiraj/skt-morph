@@ -186,13 +186,23 @@ class SktMorph:
                                 candidates.append((list(new_prefixes), remainder_C))
                                 queue.append((list(new_prefixes), remainder_C))
                                 
-                        if "R" in remainder:
+                        if 'R' in remainder:
                             remainder_n = remainder.replace('R', 'n')
                             state_n = (tuple(new_prefixes), remainder_n)
                             if state_n not in visited:
                                 visited.add(state_n)
                                 candidates.append((list(new_prefixes), remainder_n))
                                 queue.append((list(new_prefixes), remainder_n))
+                                
+                        # REVERSE SATVA: Restore s from z for database lookup
+                        if 'z' in remainder:
+                            remainder_s = remainder.replace('zW', 'sT').replace('zw', 'st').replace('zR', 'sn').replace('z', 's')
+                            state_s = (tuple(new_prefixes), remainder_s)
+                            if state_s not in visited:
+                                visited.add(state_s)
+                                candidates.append((list(new_prefixes), remainder_s))
+                                queue.append((list(new_prefixes), remainder_s))
+                                
         return candidates
 
     def analyze(self, word_slp1: str) -> List[MorphResult]:
@@ -205,7 +215,11 @@ class SktMorph:
                 for p in reversed(prefixes):
                     reconstructed = apply_forward_sandhi(p, reconstructed)
                 if reconstructed != word_slp1:
-                    continue 
+                    # Relax validation slightly to account for Satva (s -> z) which is root-dependent
+                    satva_rec = reconstructed.replace('s', 'z').replace('sT', 'zW').replace('st', 'zw').replace('sn', 'zR')
+                    if reconstructed != word_slp1 and satva_rec != word_slp1:
+                        if reconstructed.replace('n', 'R') != word_slp1 and satva_rec.replace('n', 'R') != word_slp1:
+                            continue
 
             for conn in self.tinanta_conns:
                 try:
@@ -237,6 +251,7 @@ class SktMorph:
             for conn in self.krdanta_conns:
                 try:
                     cursor = conn.cursor()
+                    # Query bound forms (-lyap), bare stems, and full declined variants.
                     cursor.execute("""
                         SELECT k.*, d.details_json 
                         FROM krdantas k 
