@@ -244,6 +244,24 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if r.word_type == "tinanta" and "aBi" in r.prefixes]
             self.assertTrue(len(valid) > 0)
 
+
+    def test_complex_multi_prefix(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        
+        def fake_fetchall():
+            args = mock_cursor.execute.call_args
+            if args and args[0][1][0] == "IkzeTAH":
+                return [{"form_slp1": "IkzeTAH", "dhatu_id": "01.0016", "derivation": "shuddha", "prayoga": "kartari", "lakara": "vidhilin", "purusha": 2, "vacana": 1, "details_json": None}]
+            return []
+            
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "tinanta_conns", [mock_conn]):
+            res = self.morph.analyze("pratyudIkzeTAH")
+            valid = [r for r in res if r.word_type == "tinanta" and r.prefixes == ["prati", "ud"]]
+            self.assertTrue(len(valid) > 0)
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):

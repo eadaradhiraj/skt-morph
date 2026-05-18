@@ -34,39 +34,40 @@ PADA_RESTRICTIONS = {
 }
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
-    ('aDo', 'aDas', ''), ('aDas', 'aDas', ''), ('aDaH', 'aDas', ''),
-    ('puro', 'puras', ''), ('puras', 'puras', ''), ('puraH', 'puras', ''),
-    ('tiro', 'tiras', ''), ('tiras', 'tiras', ''), ('tiraH', 'tiras', ''),
-    ('antar', 'antar', ''), ('alam', 'alam', ''), ('alaM', 'alam', ''),
-    ('prAdur', 'prAdus', ''), ('prAduz', 'prAdus', ''), ('prAduH', 'prAdus', ''),
-    ('Avir', 'Avis', ''), ('Aviz', 'Avis', ''), ('AviH', 'Avis', ''),
-    ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pro', 'pra', 'u'), 
-    ('prAr', 'pra', 'f'), ('pra', 'pra', ''),
-    ('vyA', 'vi', 'A'), ('vya', 'vi', 'a'), ('vyu', 'vi', 'u'), ('vI', 'vi', 'i'), ('vI', 'vi', 'I'), 
-    ('vi', 'vi', ''), ('vy', 'vi', 'a'),
-    ('saM', 'sam', ''), ('saY', 'sam', ''), ('saN', 'sam', ''), ('saR', 'sam', ''), 
-    ('san', 'sam', ''), ('sam', 'sam', ''),
-    ('anvA', 'anu', 'A'), ('anva', 'anu', 'a'), ('anvI', 'anu', 'I'), ('anU', 'anu', 'u'), 
-    ('anu', 'anu', ''), ('anv', 'anu', 'a'),
-    ('uddh', 'ud', 'h'), ('ut', 'ud', ''), ('uc', 'ud', 'c'), ('uj', 'ud', 'j'), 
-    ('ul', 'ud', 'l'), ('ud', 'ud', ''),
-    ('nyA', 'ni', 'A'), ('nya', 'ni', 'a'), ('nI', 'ni', 'i'), ('nI', 'ni', 'I'), 
-    ('ni', 'ni', ''), ('ny', 'ni', 'a'),
-    ('upA', 'upa', 'a'), ('upA', 'upa', 'A'), ('upe', 'upa', 'i'), ('upo', 'upa', 'u'), 
-    ('upa', 'upa', ''),
-    ('avA', 'ava', 'a'), ('avA', 'ava', 'A'), ('ava', 'ava', ''),
-    ('aByA', 'aBi', 'A'), ('aBya', 'aBi', 'a'), ('aBI', 'aBi', 'i'), ('aBi', 'aBi', ''),
-    ('pratyA', 'prati', 'A'), ('pratya', 'prati', 'a'), ('pratI', 'prati', 'i'), ('prati', 'prati', ''),
-    ('paryA', 'pari', 'A'), ('parya', 'pari', 'a'), ('parI', 'pari', 'i'), ('pari', 'pari', ''),
-    ('atyA', 'ati', 'A'), ('atya', 'ati', 'a'), ('atI', 'ati', 'i'), ('ati', 'ati', ''),
-    ('aDyA', 'aDi', 'A'), ('aDya', 'aDi', 'a'), ('aDI', 'aDi', 'i'), ('aDi', 'aDi', ''),
-    ('apyA', 'api', 'A'), ('apya', 'api', 'a'), ('apI', 'api', 'i'), ('api', 'api', ''),
-    ('svA', 'su', 'A'), ('sva', 'su', 'a'), ('sU', 'su', 'u'), ('su', 'su', ''),
-    ('apA', 'apa', 'a'), ('apA', 'apa', 'A'), ('apa', 'apa', ''),
-    ('parA', 'parA', 'a'), ('parA', 'parA', 'A'), ('parA', 'parA', ''),
-    ('A', 'A', ''),
-    ('nir', 'nis', ''), ('niz', 'nis', ''), ('niS', 'nis', ''), ('nih', 'nis', ''), ('nis', 'nis', ''),
-    ('dur', 'dus', ''), ('duz', 'dus', ''), ('duS', 'dus', ''), ('duh', 'dus', ''), ('dus', 'dus', '')
+    ("aDo", "aDas", ""), ("aDas", "aDas", ""), ("aDaH", "aDas", ""),
+    ("puro", "puras", ""), ("puras", "puras", ""), ("puraH", "puras", ""),
+    ("tiro", "tiras", ""), ("tiras", "tiras", ""), ("tiraH", "tiras", ""),
+    ("antar", "antar", ""), ("alam", "alam", ""), ("alaM", "alam", ""),
+    ("prAdur", "prAdus", ""), ("prAduz", "prAdus", ""), ("prAduH", "prAdus", ""),
+    ("Avir", "Avis", ""), ("Aviz", "Avis", ""), ("AviH", "Avis", ""),
+    
+    # "a/A" ending Upasargas
+    ("prA", "pra", "a"), ("prA", "pra", "A"), ("pre", "pra", "i"), ("pre", "pra", "I"), ("pro", "pra", "u"), ("pro", "pra", "U"), ("prAr", "pra", "f"), ("prAr", "pra", "F"), ("pra", "pra", ""),
+    ("upA", "upa", "a"), ("upA", "upa", "A"), ("upe", "upa", "i"), ("upe", "upa", "I"), ("upo", "upa", "u"), ("upo", "upa", "U"), ("upAr", "upa", "f"), ("upAr", "upa", "F"), ("upa", "upa", ""),
+    ("avA", "ava", "a"), ("avA", "ava", "A"), ("ave", "ava", "i"), ("ave", "ava", "I"), ("avo", "ava", "u"), ("avo", "ava", "U"), ("avAr", "ava", "f"), ("avAr", "ava", "F"), ("ava", "ava", ""),
+    ("apA", "apa", "a"), ("apA", "apa", "A"), ("ape", "apa", "i"), ("ape", "apa", "I"), ("apo", "apa", "u"), ("apo", "apa", "U"), ("apAr", "apa", "f"), ("apAr", "apa", "F"), ("apa", "apa", ""),
+    ("A", "A", "a"), ("A", "A", "A"), ("e", "A", "i"), ("e", "A", "I"), ("o", "A", "u"), ("o", "A", "U"), ("Ar", "A", "f"), ("Ar", "A", "F"), ("A", "A", ""),
+    ("parA", "parA", "a"), ("parA", "parA", "A"), ("pare", "parA", "i"), ("pare", "parA", "I"), ("paro", "parA", "u"), ("paro", "parA", "U"), ("parA", "parA", ""),
+    
+    # "i/I" ending Upasargas (Using Generalized Yan Sandhi Rules)
+    ("vI", "vi", "i"), ("vI", "vi", "I"), ("vy", "vi", ""), ("vi", "vi", ""),
+    ("nI", "ni", "i"), ("nI", "ni", "I"), ("ny", "ni", ""), ("ni", "ni", ""),
+    ("aBI", "aBi", "i"), ("aBI", "aBi", "I"), ("aBy", "aBi", ""), ("aBi", "aBi", ""),
+    ("pratI", "prati", "i"), ("pratI", "prati", "I"), ("praty", "prati", ""), ("prati", "prati", ""),
+    ("parI", "pari", "i"), ("parI", "pari", "I"), ("pary", "pari", ""), ("pari", "pari", ""),
+    ("atI", "ati", "i"), ("atI", "ati", "I"), ("aty", "ati", ""), ("ati", "ati", ""),
+    ("aDI", "aDi", "i"), ("aDI", "aDi", "I"), ("aDy", "aDi", ""), ("aDi", "aDi", ""),
+    ("apI", "api", "i"), ("apI", "api", "I"), ("apy", "api", ""), ("api", "api", ""),
+    
+    # "u/U" ending Upasargas (Using Generalized Yan Sandhi Rules)
+    ("sU", "su", "u"), ("sU", "su", "U"), ("sv", "su", ""), ("su", "su", ""),
+    ("anU", "anu", "u"), ("anU", "anu", "U"), ("anv", "anu", ""), ("anu", "anu", ""),
+    
+    # Consonant ending Upasargas
+    ("saM", "sam", ""), ("saY", "sam", ""), ("saN", "sam", ""), ("saR", "sam", ""), ("san", "sam", ""), ("sam", "sam", ""),
+    ("uddh", "ud", "h"), ("ut", "ud", ""), ("uc", "ud", "c"), ("uj", "ud", "j"), ("ul", "ud", "l"), ("ud", "ud", ""),
+    ("nir", "nis", ""), ("niz", "nis", ""), ("niS", "nis", ""), ("nih", "nis", ""), ("nis", "nis", ""),
+    ("dur", "dus", ""), ("duz", "dus", ""), ("duS", "dus", ""), ("duh", "dus", ""), ("dus", "dus", "")
 ]
 
 def apply_forward_sandhi(prefix: str, word: str) -> str:
