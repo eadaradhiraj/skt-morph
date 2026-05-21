@@ -168,9 +168,19 @@ class SktMorph:
         visited = set()
         while queue:
             current_prefixes, current_word = queue.pop(0)
+            
+            # Anti-freeze: Max 4 prefixes to prevent combinatorial explosions
+            if len(current_prefixes) >= 4:
+                continue
+                
             for surface, actual, prepend in UPASARGA_SPLIT_RULES:
                 if current_word.startswith(surface):
                     remainder = prepend + current_word[len(surface):]
+                    
+                    # Anti-freeze: Prevent infinite Savarna Dirgha loops (e.g. A + A = A yielding the exact same word)
+                    if remainder == current_word:
+                        continue
+                        
                     if len(remainder) > 0:
                         new_prefixes = current_prefixes + [actual]
                         state = (tuple(new_prefixes), remainder)

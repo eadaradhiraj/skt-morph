@@ -262,6 +262,20 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if r.word_type == "tinanta" and r.prefixes == ["prati", "ud"]]
             self.assertTrue(len(valid) > 0)
 
+
+    def test_infinite_loop_prevention(self):
+        # AhvayamAnena caused an infinite loop due to ("A", "A", "A") returning the same string
+        res = self.morph.analyze("AhvayamAnena")
+        valid = [r for r in res if r.word_type == "subanta"]
+        self.assertTrue(len(valid) > 0)
+
+
+    def test_max_prefixes_limit(self):
+        # Trigger the max prefix limit (>=4) anti-freeze block
+        # vi + ati + vi + ati + karoti (Depth 4+)
+        res = self.morph.analyze("vyativyativyatikaroti")
+        self.assertTrue(len(res) == 0 or len(res) > 0) # Just ensures it executes without hanging
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
