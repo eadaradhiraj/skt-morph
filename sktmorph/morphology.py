@@ -279,11 +279,44 @@ class SktMorph:
                 except sqlite3.OperationalError: pass
 
         for match in SubantaGenerator().analyze(word_slp1):
+            prati = match["pratipadika"]
             results.append(MorphResult(
-                word=word_slp1, prefixes=[], dhatu=None, word_type='subanta', derivation=None,
-                pratipadika=match['pratipadika'], linga=match['linga'],
-                vibhakti=match['vibhakti'], vacana=match['vacana']
+                word=word_slp1, prefixes=[], dhatu=None, word_type="subanta", derivation=None,
+                pratipadika=prati, linga=match["linga"],
+                vibhakti=match["vibhakti"], vacana=match["vacana"]
             ))
+            
+            # Intelligent Declined Participle Check (Is this noun actually a Krdanta?)
+            prati_splits = self.get_candidate_splits(prati)
+            for p_prefixes, p_base in prati_splits:
+                if p_prefixes:
+                    reconstructed = p_base
+                    for p in reversed(p_prefixes):
+                        reconstructed = apply_forward_sandhi(p, reconstructed)
+                    if reconstructed != prati:
+                        satva_rec = reconstructed.replace("s", "z").replace("sT", "zW").replace("st", "zw").replace("sn", "zR")
+                        if reconstructed != prati and satva_rec != prati:
+                            if reconstructed.replace("n", "R") != prati and satva_rec.replace("n", "R") != prati:
+                                continue
+                for conn in self.krdanta_conns:
+                    try:
+                        cursor = conn.cursor()
+                        cursor.execute("""
+                            SELECT k.*, d.details_json 
+                            FROM krdantas k 
+                            LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
+                            WHERE k.form_slp1 IN (?, ?, ?, ?, ?, ?)
+                        """, (p_base, p_base + "m", p_base + "H", p_base + "A", p_base + "I", "-" + p_base))
+                        for row in cursor.fetchall():
+                            details = json.loads(row["details_json"]) if row["details_json"] else None
+                            results.append(MorphResult(
+                                word=word_slp1, prefixes=p_prefixes, dhatu=row["dhatu_id"],
+                                word_type="krdanta", derivation=row["derivation"],
+                                pratyaya=row["pratyaya"], dhatu_details=details,
+                                pratipadika=prati, linga=match["linga"],
+                                vibhakti=match["vibhakti"], vacana=match["vacana"]
+                            ))
+                    except sqlite3.OperationalError: pass
 
         for match in SarvanamaGenerator().analyze(word_slp1):
             results.append(MorphResult(
@@ -292,7 +325,14 @@ class SktMorph:
                 vibhakti=match["vibhakti"], vacana=match["vacana"]
             ))
 
-        return results
+        unique_results = []
+        seen = set()
+        for r in results:
+            key = (r.word, tuple(r.prefixes), r.dhatu, r.word_type, r.derivation, r.prayoga, r.lakara, r.purusha, r.vacana, r.pratyaya, r.pratipadika, r.linga, r.vibhakti)
+            if key not in seen:
+                seen.add(key)
+                unique_results.append(r)
+        return unique_results
 
     def resolve_dhatu_ids(self, dhatu_query: str) -> List[str]:
         if re.match(r'^\d{2}\.\d{4}$', dhatu_query): return [dhatu_query]
