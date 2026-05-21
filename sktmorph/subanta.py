@@ -14,21 +14,21 @@ def apply_natva(word_stem: str, suffix: str) -> str:
     
     for i in range(full_n_pos):
         char = word[i]
-        if char in['r', 'f', 'F', 'z']: trigger = True
+        if char in ['r', 'f', 'F', 'z']: trigger = True
         elif trigger and char in blockers: trigger = False
             
     if trigger: return suffix.replace('n', 'R', 1)
     return suffix
 
 PARADIGMS = {
-    # Ajantas (Vowels)
+    # Ajantas
     ('a', 'pum'): [['aH', 'O', 'AH'],['am', 'O', 'An'],['ena', 'AByAm', 'EH'],['Aya', 'AByAm', 'eByaH'], ['At', 'AByAm', 'eByaH'],['asya', 'ayoH', 'AnAm'], ['e', 'ayoH', 'ezu'],['a', 'O', 'AH']],
     ('a', 'nap'): [['am', 'e', 'Ani'],['am', 'e', 'Ani'], ['ena', 'AByAm', 'EH'],['Aya', 'AByAm', 'eByaH'], ['At', 'AByAm', 'eByaH'],['asya', 'ayoH', 'AnAm'], ['e', 'ayoH', 'ezu'],['a', 'e', 'Ani']],
     ('A', 'stri'): [['A', 'e', 'AH'],['Am', 'e', 'AH'], ['ayA', 'AByAm', 'ABiH'],['AyE', 'AByAm', 'AByaH'],['AyAH', 'AByAm', 'AByaH'],['AyAH', 'ayoH', 'AnAm'],['AyAm', 'ayoH', 'Azu'],['e', 'e', 'AH']],
     ('i', 'pum'): [['iH', 'I', 'ayaH'], ['im', 'I', 'In'],['inA', 'iByAm', 'iBiH'], ['aye', 'iByAm', 'iByaH'],['eH', 'iByAm', 'iByaH'], ['eH', 'yoH', 'InAm'],['O', 'yoH', 'izu'], ['e', 'I', 'ayaH']],
     ('i', 'stri'): [['iH', 'I', 'ayaH'], ['im', 'I', 'IH'],['yA', 'iByAm', 'iBiH'],['yE,aye', 'iByAm', 'iByaH'],['yAH,eH', 'iByAm', 'iByaH'],['yAH,eH', 'yoH', 'InAm'],['yAm,O', 'yoH', 'izu'], ['e', 'I', 'ayaH']],
-    ('i', 'nap'): [['i', 'inI', 'Ini'],
-    ('I', 'stri'): [['I', 'yO', 'yaH'], ['Im', 'yO', 'IH'], ['yA', 'IByAm', 'IBiH'], ['yE', 'IByAm', 'IByaH'], ['yAH', 'IByAm', 'IByaH'], ['yAH', 'yoH', 'InAm'], ['yAm', 'yoH', 'Izu'], ['i', 'yO', 'yaH']], ['i', 'inI', 'Ini'],['inA', 'iByAm', 'iBiH'], ['ine', 'iByAm', 'iByaH'],['inaH', 'iByAm', 'iByaH'],['inaH', 'inoH', 'InAm'],['ini', 'inoH', 'izu'], ['i,e', 'inI', 'Ini']],
+    ('i', 'nap'): [['i', 'inI', 'Ini'], ['i', 'inI', 'Ini'],['inA', 'iByAm', 'iBiH'], ['ine', 'iByAm', 'iByaH'],['inaH', 'iByAm', 'iByaH'],['inaH', 'inoH', 'InAm'],['ini', 'inoH', 'izu'], ['i,e', 'inI', 'Ini']],
+    ('I', 'stri'): [['I', 'yO', 'yaH'], ['Im', 'yO', 'IH'], ['yA', 'IByAm', 'IBiH'], ['yE', 'IByAm', 'IByaH'], ['yAH', 'IByAm', 'IByaH'], ['yAH', 'yoH', 'InAm'], ['yAm', 'yoH', 'Izu'], ['i', 'yO', 'yaH']],
     ('u', 'pum'): [['uH', 'U', 'avaH'],['um', 'U', 'Un'], ['unA', 'uByAm', 'uBiH'],['ave', 'uByAm', 'uByaH'], ['oH', 'uByAm', 'uByaH'],['oH', 'voH', 'UnAm'], ['O', 'voH', 'uzu'],['o', 'U', 'avaH']],
     ('u', 'stri'): [['uH', 'U', 'avaH'],['um', 'U', 'UH'],['vA', 'uByAm', 'uBiH'],['vE,ave', 'uByAm', 'uByaH'],['vAH,oH', 'uByAm', 'uByaH'],['vAH,oH', 'voH', 'UnAm'], ['vAm,O', 'voH', 'uzu'],['o', 'U', 'avaH']],
     ('u', 'nap'): [['u', 'unI', 'Uni'],['u', 'unI', 'Uni'], ['unA', 'uByAm', 'uBiH'],['une', 'uByAm', 'uByaH'],['unaH', 'uByAm', 'uByaH'],['unaH', 'unoH', 'UnAm'], ['uni', 'unoH', 'uzu'],['u,o', 'unI', 'Uni']],
@@ -36,7 +36,7 @@ PARADIGMS = {
     ('f', 'stri'): [['A', 'arO', 'araH'],['aram', 'arO', 'FH'], ['rA', 'fByAm', 'fBiH'],['re', 'fByAm', 'fByaH'], ['uH', 'fByAm', 'fByaH'],['uH', 'roH', 'FnAm'], ['ari', 'roH', 'fzu'],['aH', 'arO', 'araH']],
     ('f', 'nap'): [['f', 'fnI', 'Fni'], ['f', 'fnI', 'Fni'],['fnA', 'fByAm', 'fBiH'], ['fne', 'fByAm', 'fByaH'],['fnaH', 'fByAm', 'fByaH'],['fnaH', 'fnoH', 'FnAm'], ['fni', 'fnoH', 'fzu'],['f,ar', 'fnI', 'Fni']],
     
-    # Halantas (Consonants)
+    # Halantas
     ('in', 'pum'): [['I', 'inO', 'inaH'], ['inam', 'inO', 'inaH'],['inA', 'iByAm', 'iBiH'],['ine', 'iByAm', 'iByaH'], ['inaH', 'iByAm', 'iByaH'],['inaH', 'inoH', 'inAm'], ['ini', 'inoH', 'izu'],['in', 'inO', 'inaH']],
     ('as', 'nap'): [['aH', 'asI', 'AMsi'],['aH', 'asI', 'AMsi'], ['asA', 'oByAm', 'oBiH'],['ase', 'oByAm', 'oByaH'],['asaH', 'oByAm', 'oByaH'], ['asaH', 'asoH', 'asAm'],['asi', 'asoH', 'aHsu'], ['aH', 'asI', 'AMsi']],
     ('at', 'pum'): [['An', 'antO', 'antaH'], ['antam', 'antO', 'ataH'],['atA', 'adByAm', 'adBiH'],['ate', 'adByAm', 'adByaH'], ['ataH', 'adByAm', 'adByaH'],['ataH', 'atoH', 'atAm'], ['ati', 'atoH', 'atsu'],['an', 'antO', 'antaH']]
@@ -44,16 +44,15 @@ PARADIGMS = {
 
 class SubantaGenerator:
     def __init__(self):
-        self.vibhakti_names =["prathamA", "dvitIyA", "tfIyA", "caturTI", "paYcamI", "zazWI", "saptamI", "samboDana"]
-        # Notice we sort endings by length to match multi-char suffixes ('in', 'as', 'at') before single chars ('a', 'i')
+        self.vibhakti_names = ["prathamA", "dvitIyA", "tfIyA", "caturTI", "paYcamI", "zazWI", "saptamI", "samboDana"]
         self.supported_endings = sorted(list(set([k[0] for k in PARADIGMS.keys()])), key=len, reverse=True)
 
     def _generate_table(self, base: str, endings: List[List[str]]) -> Dict[str, List[str]]:
         table = {}
         for i, vibhakti in enumerate(self.vibhakti_names):
-            row =[]
+            row = []
             for suffix_group in endings[i]:
-                forms =[base + apply_natva(base, s) for s in suffix_group.split(',')]
+                forms = [base + apply_natva(base, s) for s in suffix_group.split(',')]
                 row.append("/".join(forms))
             table[vibhakti] = row
         return table
@@ -69,7 +68,7 @@ class SubantaGenerator:
         raise NotImplementedError(f"Generation for '{pratipadika}' ({linga}) is not yet implemented.")
 
     def analyze(self, word: str) -> List[Dict[str, str]]:
-        results =[]
+        results = []
         for (ending, linga), endings_table in PARADIGMS.items():
             for vibh_idx, vibhakti in enumerate(self.vibhakti_names):
                 for vacana_idx, suffix_group in enumerate(endings_table[vibh_idx]):
