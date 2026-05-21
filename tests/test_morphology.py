@@ -308,6 +308,23 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if r.word_type == "krdanta" and r.dhatu == "01.1143" and r.vibhakti == "tfIyA"]
             self.assertTrue(len(valid) > 0)
 
+
+    def test_I_anta_krdanta_bridge(self):
+        from unittest.mock import patch, MagicMock
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall():
+            args = mock_cursor.execute.call_args
+            if args and "nartitavatI" in args[0][1]:
+                return [{"form_slp1": "nartitavatI", "dhatu_id": "04.0010", "derivation": "shuddha", "pratyaya": "ktavatu", "details_json": None}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("nartitavatyaH")
+            valid = [r for r in res if r.word_type == "krdanta" and r.pratyaya == "ktavatu" and r.vibhakti == "prathamA"]
+            self.assertTrue(len(valid) > 0)
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):

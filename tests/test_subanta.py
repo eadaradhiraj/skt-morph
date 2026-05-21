@@ -45,6 +45,12 @@ class TestSubanta(unittest.TestCase):
         matches3 = self.gen.analyze('kariRAm')
         self.assertTrue(any(m['pratipadika'] == 'karin' and m['vacana'] == 3 for m in matches3))
 
+
+    def test_I_anta(self):
+        nadi = self.gen.generate("nadI", "stri")
+        self.assertEqual(nadi["prathamA"], ["nadI", "nadyO", "nadyaH"])
+        self.assertEqual(nadi["zazWI"], ["nadyAH", "nadyoH", "nadInAm"])
+
     def test_unimplemented_and_edge_cases(self):
         # 'vAc' (speech) is a c-anta which is not implemented yet
         with self.assertRaises(NotImplementedError):
