@@ -10,6 +10,7 @@ def main():
     
     analyze_parser = subparsers.add_parser("analyze", help="Analyze a Sanskrit word in SLP1")
     analyze_parser.add_argument("word", type=str, help="Word to analyze in SLP1 (e.g. prabhavati)")
+    analyze_parser.add_argument("--type", type=str, choices=["verb", "declension", "participle", "noun", "pronoun"], help="Filter output by grammatical type")
     
     gen_verb_parser = subparsers.add_parser("generate_verb", help="Generate a verb form")
     gen_verb_parser.add_argument("--dhatu", type=str, required=True)
@@ -40,7 +41,19 @@ def main():
         sys.exit(1)
 
     if args.command == "analyze":
-        results = morph.analyze(args.word)
+        allowed_types = None
+        if args.type:
+            type_map = {
+                "verb": ["tinanta"],
+                "declension": ["subanta", "sarvanama"],
+                "noun": ["subanta"],
+                "pronoun": ["sarvanama"],
+                "participle": ["krdanta"]
+            }
+            allowed_types = type_map[args.type]
+            
+        results = morph.analyze(args.word, allowed_types=allowed_types)
+        
         if not results:
             print(f"No morphological data found for '{args.word}'.")
         for res in results:

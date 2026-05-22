@@ -325,7 +325,38 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if r.word_type == "krdanta" and r.pratyaya == "ktavatu" and r.vibhakti == "prathamA"]
             self.assertTrue(len(valid) > 0)
 
+
+    def test_analyzer_filtered(self):
+        res_verb = self.morph.analyze("praBavati", allowed_types=["tinanta"])
+        self.assertTrue(all(r.word_type == "tinanta" for r in res_verb))
+        self.assertTrue(len(res_verb) > 0)
+        
+        res_decl = self.morph.analyze("praBavati", allowed_types=["subanta"])
+        self.assertTrue(all(r.word_type == "subanta" for r in res_decl))
+        self.assertTrue(len(res_decl) > 0)
+
+        from unittest.mock import patch, MagicMock
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall():
+            args = mock_cursor.execute.call_args
+            if args and args[0][1][0] == "hvayamAna":
+                return [{"form_slp1": "hvayamAna", "dhatu_id": "01.1143", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": None}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res_krd = self.morph.analyze("AhvayamAnena", allowed_types=["krdanta"])
+            self.assertTrue(all(r.word_type == "krdanta" for r in res_krd))
+            self.assertTrue(len(res_krd) > 0)
+
 class TestCLI(unittest.TestCase):
+
+    @patch("sys.argv", ["sktmorph", "analyze", "praBavati", "--type", "verb"])
+    def test_cli_analyze_with_type(self):
+        with patch("builtins.print"):
+            cli.main()
+
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
         with patch('builtins.print'):
