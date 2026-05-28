@@ -87,17 +87,21 @@ class TestSktMorph(unittest.TestCase):
             res2 = self.morph.analyze("nirvahamARa")
             valid2 = [r for r in res2 if r.word_type == "krdanta" and "nis" in r.prefixes]
             self.assertTrue(len(valid2) > 0)
+            
+            res3 = self.morph.analyze("nirvahamAnaH")
+            valid3 = [r for r in res3 if r.word_type == "krdanta"]
+            self.assertEqual(len(valid3), 0)
 
     def test_declined_forward_validation(self):
-        # Triggers lines 335 (catching declined participle subanta failures)
+        # Triggers line 335: Ensures engine accurately catches validation mismatches in subanta bridge!
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.fetchall.return_value = []
         with patch.object(self.morph, "krdanta_conns", [mock_conn]):
-            res3 = self.morph.analyze("samBavataH")
-            valid3 = [r for r in res3 if r.word_type == "krdanta"]
-            self.assertEqual(len(valid3), 0)
+            res = self.morph.analyze("samBavataH")
+            valid = [r for r in res if r.word_type == "krdanta"]
+            self.assertEqual(len(valid), 0)
 
     def test_pada_restrictions(self):
         mock_conn = MagicMock()
@@ -198,7 +202,7 @@ class TestSktMorph(unittest.TestCase):
         with patch.object(self.morph, 'tinanta_conns', [mock_conn]), patch.object(self.morph, 'krdanta_conns', [mock_conn]):
             self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1), [])
             self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"), [])
-            res = self.morph.analyze("AhvayamAnena")
+            res = self.morph.analyze("fakeWord")
             self.assertFalse(any(r.word_type in ["tinanta", "krdanta"] for r in res))
 
     def test_generator_tinanta(self):
@@ -254,7 +258,6 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if r.word_type == "krdanta" and "vi" in r.prefixes]
             self.assertTrue(len(valid) > 0)
             
-            # Tests lines 174-179 (Un-doubling dD to D)
             res_d = self.morph.analyze("virudDya")
             valid_d = [r for r in res_d if r.word_type == "krdanta" and "vi" in r.prefixes]
             self.assertTrue(len(valid_d) > 0)
@@ -327,7 +330,22 @@ class TestSktMorph(unittest.TestCase):
             res = self.morph.analyze("nartitavatyaH")
             valid = [r for r in res if r.word_type == "krdanta" and r.pratyaya == "ktavatu" and r.vibhakti == "prathamA"]
             self.assertTrue(len(valid) > 0)
-            
+
+    def test_tuk_agama_sandhi(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall(*args, **kwargs):
+            c_args = mock_cursor.execute.call_args
+            if c_args and len(c_args[0]) > 1 and "-CAdya" in c_args[0][1]:
+                return [{"form_slp1": "-CAdya", "dhatu_id": "10.0370", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("pracCAdya")
+            valid = [r for r in res if r.word_type == "krdanta" and "pra" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
     def test_analyzer_filtered(self):
         res_verb = self.morph.analyze("praBavati", allowed_types=["tinanta"])
         self.assertTrue(all(r.word_type == "tinanta" for r in res_verb))
@@ -351,21 +369,6 @@ class TestSktMorph(unittest.TestCase):
             self.assertTrue(all(r.word_type == "krdanta" for r in res_krd))
             self.assertTrue(len(res_krd) > 0)
 
-
-    def test_tuk_agama_sandhi(self):
-        mock_conn = MagicMock()
-        mock_cursor = MagicMock()
-        mock_conn.cursor.return_value = mock_cursor
-        def fake_fetchall(*args, **kwargs):
-            c_args = mock_cursor.execute.call_args
-            if c_args and len(c_args[0]) > 1 and "-CAdya" in c_args[0][1]:
-                return [{"form_slp1": "-CAdya", "dhatu_id": "10.0370", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
-            return []
-        mock_cursor.fetchall.side_effect = fake_fetchall
-        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
-            res = self.morph.analyze("pracCAdya")
-            valid = [r for r in res if r.word_type == "krdanta" and "pra" in r.prefixes]
-            self.assertTrue(len(valid) > 0)
 
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])

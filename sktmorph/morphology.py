@@ -48,7 +48,7 @@ UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
     ('parA', 'parA', 'a'), ('parA', 'parA', 'A'), ('pare', 'parA', 'i'), ('pare', 'parA', 'I'), ('paro', 'parA', 'u'), ('paro', 'parA', 'U'), ('parA', 'parA', ''),
     ('vI', 'vi', 'i'), ('vI', 'vi', 'I'), ('vy', 'vi', ''), ('vi', 'vi', ''),
     ('nI', 'ni', 'i'), ('nI', 'ni', 'I'), ('ny', 'ni', ''), ('ni', 'ni', ''),
-    ('aBI', 'aBi', 'i'), ('aBI', "aBi", "I"), ("aBy", "aBi", ""), ("aBi", "aBi", ""),
+    ('aBI', 'aBi', 'i'), ("aBI", "aBi", "I"), ("aBy", "aBi", ""), ("aBi", "aBi", ""),
     ("pratI", "prati", "i"), ("pratI", "prati", "I"), ("praty", "prati", ""), ("prati", "prati", ""),
     ("parI", "pari", "i"), ("parI", "pari", "I"), ("pary", "pari", ""), ("pari", "pari", ""),
     ("atI", "ati", "i"), ("atI", "ati", "I"), ("aty", "ati", ""), ("ati", "ati", ""),
@@ -150,6 +150,24 @@ class SktMorph:
             c.row_factory = sqlite3.Row
             c.execute(f"ATTACH DATABASE '{main_db}' AS ddb")
             self.krdanta_conns.append(c)
+
+    def _get_lyap_cache(self) -> Dict[str, List[sqlite3.Row]]:
+        """Intelligently builds a cache by stripping prefixes from dirty dictionary lyap entries."""
+        if hasattr(self, '_lyap_cache'): return self._lyap_cache
+        self._lyap_cache = {}
+        for conn in self.krdanta_conns:
+            try:
+                cursor = conn.cursor()
+                cursor.execute("SELECT k.*, d.details_json FROM krdantas k LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id WHERE k.pratyaya = 'lyap'")
+                for row in cursor.fetchall():
+                    clean_form = row['form_slp1'].lstrip('-')
+                    splits = self.get_candidate_splits(clean_form)
+                    for prefs, base in splits:
+                        if base not in self._lyap_cache:
+                            self._lyap_cache[base] = []
+                        self._lyap_cache[base].append(row)
+            except sqlite3.OperationalError: pass
+        return self._lyap_cache
 
     def get_candidate_splits(self, word: str) -> List[Tuple[List[str], str]]:
         candidates = [([], word)]
@@ -267,7 +285,6 @@ class SktMorph:
                     try:
                         cursor = conn.cursor()
                         b_var = self._get_anaci_ca_variant(base_word)
-                        # HIGH SPEED FIX: Remove LIKE '%...' query and strictly use IN (?, ?) index hits!
                         query_params = [base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I', '-' + base_word,
                                         b_var, b_var + 'm', b_var + 'H', b_var + 'A', b_var + 'I', '-' + b_var]
                         placeholders = ', '.join('?' for _ in query_params)
@@ -277,7 +294,19 @@ class SktMorph:
                             LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
                             WHERE k.form_slp1 IN ({placeholders})
                         """, query_params)
-                        for row in cursor.fetchall():
+                        rows = list(cursor.fetchall())
+                        
+                        # The Smart Lyap Cache Fallback!
+                        if not rows and base_word.endswith('ya'):
+                            cache = self._get_lyap_cache()
+                            cached_rows = cache.get(base_word, []) + cache.get(b_var, [])
+                            seen_dhatus = set()
+                            for row in cached_rows:
+                                if row['dhatu_id'] not in seen_dhatus:
+                                    seen_dhatus.add(row['dhatu_id'])
+                                    rows.append(row)
+
+                        for row in rows:
                             details = json.loads(row['details_json']) if row['details_json'] else None
                             results.append(MorphResult(
                                 word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
@@ -323,7 +352,19 @@ class SktMorph:
                                     LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
                                     WHERE k.form_slp1 IN ({placeholders})
                                 """, query_params)
-                                for row in cursor.fetchall():
+                                rows = list(cursor.fetchall())
+                                
+                                if not rows and p_base.endswith('ya'):
+                                    cache = self._get_lyap_cache()
+                                    cached_rows = cache.get(p_base, []) + cache.get(b_var, [])
+                                    seen_dhatus = set()
+                                    for row in cached_rows:
+                                        if row['dhatu_id'] not in seen_dhatus:
+                                            seen_dhatus.add(row['dhatu_id'])
+                                            rows.append(row)
+
+                                for row in rows:
+                                    if row["pratyaya"] in ['lyap', 'ktvA', 'tumun', 'RamuL', 'am']: continue
                                     details = json.loads(row["details_json"]) if row["details_json"] else None
                                     results.append(MorphResult(
                                         word=word_slp1, prefixes=p_prefixes, dhatu=row["dhatu_id"],
