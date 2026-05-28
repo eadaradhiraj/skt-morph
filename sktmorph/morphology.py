@@ -34,36 +34,28 @@ PADA_RESTRICTIONS = {
 }
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
-    ("aDo", "aDas", ""), ("aDas", "aDas", ""), ("aDaH", "aDas", ""),
-    ("puro", "puras", ""), ("puras", "puras", ""), ("puraH", "puras", ""),
-    ("tiro", "tiras", ""), ("tiras", "tiras", ""), ("tiraH", "tiras", ""),
-    ("antar", "antar", ""), ("alam", "alam", ""), ("alaM", "alam", ""),
-    ("prAdur", "prAdus", ""), ("prAduz", "prAdus", ""), ("prAduH", "prAdus", ""),
-    ("Avir", "Avis", ""), ("Aviz", "Avis", ""), ("AviH", "Avis", ""),
-    
-    # "a/A" ending Upasargas
-    ("prA", "pra", "a"), ("prA", "pra", "A"), ("pre", "pra", "i"), ("pre", "pra", "I"), ("pro", "pra", "u"), ("pro", "pra", "U"), ("prAr", "pra", "f"), ("prAr", "pra", "F"), ("pra", "pra", ""),
-    ("upA", "upa", "a"), ("upA", "upa", "A"), ("upe", "upa", "i"), ("upe", "upa", "I"), ("upo", "upa", "u"), ("upo", "upa", "U"), ("upAr", "upa", "f"), ("upAr", "upa", "F"), ("upa", "upa", ""),
-    ("avA", "ava", "a"), ("avA", "ava", "A"), ("ave", "ava", "i"), ("ave", "ava", "I"), ("avo", "ava", "u"), ("avo", "ava", "U"), ("avAr", "ava", "f"), ("avAr", "ava", "F"), ("ava", "ava", ""),
-    ("apA", "apa", "a"), ("apA", "apa", "A"), ("ape", "apa", "i"), ("ape", "apa", "I"), ("apo", "apa", "u"), ("apo", "apa", "U"), ("apAr", "apa", "f"), ("apAr", "apa", "F"), ("apa", "apa", ""),
-    ("A", "A", "a"), ("A", "A", "A"), ("e", "A", "i"), ("e", "A", "I"), ("o", "A", "u"), ("o", "A", "U"), ("Ar", "A", "f"), ("Ar", "A", "F"), ("A", "A", ""),
-    ("parA", "parA", "a"), ("parA", "parA", "A"), ("pare", "parA", "i"), ("pare", "parA", "I"), ("paro", "parA", "u"), ("paro", "parA", "U"), ("parA", "parA", ""),
-    
-    # "i/I" ending Upasargas (Using Generalized Yan Sandhi Rules)
-    ("vI", "vi", "i"), ("vI", "vi", "I"), ("vy", "vi", ""), ("vi", "vi", ""),
-    ("nI", "ni", "i"), ("nI", "ni", "I"), ("ny", "ni", ""), ("ni", "ni", ""),
-    ("aBI", "aBi", "i"), ("aBI", "aBi", "I"), ("aBy", "aBi", ""), ("aBi", "aBi", ""),
+    ('aDo', 'aDas', ''), ('aDas', 'aDas', ''), ('aDaH', 'aDas', ''),
+    ('puro', 'puras', ''), ('puras', 'puras', ''), ('puraH', 'puras', ''),
+    ('tiro', 'tiras', ''), ('tiras', 'tiras', ''), ('tiraH', 'tiras', ''),
+    ('antar', 'antar', ''), ('alam', 'alam', ''), ('alaM', 'alam', ''),
+    ('prAdur', 'prAdus', ''), ('prAduz', 'prAdus', ''), ('prAduH', 'prAdus', ''),
+    ('Avir', 'Avis', ''), ('Aviz', 'Avis', ''), ('AviH', 'Avis', ''),
+    ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pre', 'pra', 'I'), ('pro', 'pra', 'u'), ('pro', 'pra', 'U'), ('prAr', 'pra', 'f'), ('prAr', 'pra', 'F'), ('pra', 'pra', ''),
+    ('upA', 'upa', 'a'), ('upA', 'upa', 'A'), ('upe', 'upa', 'i'), ('upe', 'upa', 'I'), ('upo', 'upa', 'u'), ('upo', 'upa', 'U'), ('upAr', 'upa', 'f'), ('upAr', 'upa', 'F'), ('upa', 'upa', ''),
+    ('avA', 'ava', 'a'), ('avA', 'ava', 'A'), ('ave', 'ava', 'i'), ('ave', 'ava', 'I'), ('avo', 'ava', 'u'), ('avo', 'ava', 'U'), ('avAr', 'ava', 'f'), ('avAr', 'ava', 'F'), ('ava', 'ava', ''),
+    ('apA', 'apa', 'a'), ('apA', 'apa', 'A'), ('ape', 'apa', 'i'), ('ape', 'apa', 'I'), ('apo', 'apa', 'u'), ('apo', 'apa', 'U'), ('apAr', 'apa', 'f'), ('apAr', 'apa', 'F'), ('apa', 'apa', ''),
+    ('A', 'A', 'a'), ('A', 'A', 'A'), ('e', 'A', 'i'), ('e', 'A', 'I'), ('o', 'A', 'u'), ('o', 'A', 'U'), ('Ar', 'A', 'f'), ('Ar', 'A', 'F'), ('A', 'A', ''),
+    ('parA', 'parA', 'a'), ('parA', 'parA', 'A'), ('pare', 'parA', 'i'), ('pare', 'parA', 'I'), ('paro', 'parA', 'u'), ('paro', 'parA', 'U'), ('parA', 'parA', ''),
+    ('vI', 'vi', 'i'), ('vI', 'vi', 'I'), ('vy', 'vi', ''), ('vi', 'vi', ''),
+    ('nI', 'ni', 'i'), ('nI', 'ni', 'I'), ('ny', 'ni', ''), ('ni', 'ni', ''),
+    ('aBI', 'aBi', 'i'), ('aBI', "aBi", "I"), ("aBy", "aBi", ""), ("aBi", "aBi", ""),
     ("pratI", "prati", "i"), ("pratI", "prati", "I"), ("praty", "prati", ""), ("prati", "prati", ""),
     ("parI", "pari", "i"), ("parI", "pari", "I"), ("pary", "pari", ""), ("pari", "pari", ""),
     ("atI", "ati", "i"), ("atI", "ati", "I"), ("aty", "ati", ""), ("ati", "ati", ""),
     ("aDI", "aDi", "i"), ("aDI", "aDi", "I"), ("aDy", "aDi", ""), ("aDi", "aDi", ""),
     ("apI", "api", "i"), ("apI", "api", "I"), ("apy", "api", ""), ("api", "api", ""),
-    
-    # "u/U" ending Upasargas (Using Generalized Yan Sandhi Rules)
     ("sU", "su", "u"), ("sU", "su", "U"), ("sv", "su", ""), ("su", "su", ""),
     ("anU", "anu", "u"), ("anU", "anu", "U"), ("anv", "anu", ""), ("anu", "anu", ""),
-    
-    # Consonant ending Upasargas
     ("saM", "sam", ""), ("saY", "sam", ""), ("saN", "sam", ""), ("saR", "sam", ""), ("san", "sam", ""), ("sam", "sam", ""),
     ("uddh", "ud", "h"), ("ut", "ud", ""), ("uc", "ud", "c"), ("uj", "ud", "j"), ("ul", "ud", "l"), ("ud", "ud", ""),
     ("nir", "nis", ""), ("niz", "nis", ""), ("niS", "nis", ""), ("nih", "nis", ""), ("nis", "nis", ""),
@@ -124,8 +116,7 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     natva_prefixes = {'pra', 'parA', 'pari', 'nis', 'dus', 'antar'}
     for i, char in enumerate(chars):
         if char in ['r', 'f', 'F', 'z']:
-            if i < prefix_len and prefix not in natva_prefixes:
-                continue
+            if i < prefix_len and prefix not in natva_prefixes: continue
             trigger = True
         elif trigger and char == 'n':
             if i != len(chars) - 1: chars[i] = 'R'
@@ -136,13 +127,11 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
 
 class SktMorph:
     def __init__(self, db_dir: str = None):
-        if db_dir is None:
-            db_dir = os.path.join(os.path.dirname(__file__), 'data')
+        if db_dir is None: db_dir = os.path.join(os.path.dirname(__file__), 'data')
         self.db_dir = db_dir
         
         main_db = os.path.join(self.db_dir, 'dhatus.sqlite')
-        if not os.path.exists(main_db):
-            raise FileNotFoundError(f"Database not found at {main_db}.")
+        if not os.path.exists(main_db): raise FileNotFoundError(f"Database not found at {main_db}.")
             
         self.conn_dhatus = sqlite3.connect(main_db)
         self.conn_dhatus.row_factory = sqlite3.Row
@@ -168,17 +157,11 @@ class SktMorph:
         visited = set()
         while queue:
             current_prefixes, current_word = queue.pop(0)
-            
-            if len(current_prefixes) >= 4:
-                continue
-                
+            if len(current_prefixes) >= 4: continue
             for surface, actual, prepend in UPASARGA_SPLIT_RULES:
                 if current_word.startswith(surface):
                     remainder = prepend + current_word[len(surface):]
-                    
-                    if remainder == current_word:
-                        continue
-                        
+                    if remainder == current_word: continue
                     if len(remainder) > 0:
                         new_prefixes = current_prefixes + [actual]
                         state = (tuple(new_prefixes), remainder)
@@ -188,30 +171,51 @@ class SktMorph:
                             queue.append((list(new_prefixes), remainder))
                             
                         if remainder.startswith("cC"):
-                            remainder_C = remainder[1:]
-                            state_C = (tuple(new_prefixes), remainder_C)
+                            rem_C = remainder[1:]
+                            state_C = (tuple(new_prefixes), rem_C)
                             if state_C not in visited:
                                 visited.add(state_C)
-                                candidates.append((list(new_prefixes), remainder_C))
-                                queue.append((list(new_prefixes), remainder_C))
+                                candidates.append((list(new_prefixes), rem_C))
+                                queue.append((list(new_prefixes), rem_C))
                                 
                         if 'R' in remainder:
-                            remainder_n = remainder.replace('R', 'n')
-                            state_n = (tuple(new_prefixes), remainder_n)
+                            rem_n = remainder.replace('R', 'n')
+                            state_n = (tuple(new_prefixes), rem_n)
                             if state_n not in visited:
                                 visited.add(state_n)
-                                candidates.append((list(new_prefixes), remainder_n))
-                                queue.append((list(new_prefixes), remainder_n))
+                                candidates.append((list(new_prefixes), rem_n))
+                                queue.append((list(new_prefixes), rem_n))
                                 
                         if 'z' in remainder:
-                            remainder_s = remainder.replace('zW', 'sT').replace('zw', 'st').replace('zR', 'sn').replace('z', 's')
-                            state_s = (tuple(new_prefixes), remainder_s)
+                            rem_s = remainder.replace('zW', 'sT').replace('zw', 'st').replace('zR', 'sn').replace('z', 's')
+                            state_s = (tuple(new_prefixes), rem_s)
                             if state_s not in visited:
                                 visited.add(state_s)
-                                candidates.append((list(new_prefixes), remainder_s))
-                                queue.append((list(new_prefixes), remainder_s))
+                                candidates.append((list(new_prefixes), rem_s))
+                                queue.append((list(new_prefixes), rem_s))
                                 
+                        for d_c, s_c in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]:
+                            if d_c in remainder:
+                                rem_s_c = remainder.replace(d_c, s_c)
+                                state_s_c = (tuple(new_prefixes), rem_s_c)
+                                if state_s_c not in visited:
+                                    visited.add(state_s_c)
+                                    candidates.append((list(new_prefixes), rem_s_c))
+                                    queue.append((list(new_prefixes), rem_s_c))
+                            if s_c in remainder:
+                                rem_d_c = remainder.replace(s_c, d_c)
+                                state_d_c = (tuple(new_prefixes), rem_d_c)
+                                if state_d_c not in visited:
+                                    visited.add(state_d_c)
+                                    candidates.append((list(new_prefixes), rem_d_c))
+                                    queue.append((list(new_prefixes), rem_d_c))
         return candidates
+
+    def _get_anaci_ca_variant(self, word: str) -> str:
+        for d_c, s_c in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]:
+            if d_c in word: return word.replace(d_c, s_c)
+            if s_c in word: return word.replace(s_c, d_c)
+        return word
 
     def analyze(self, word_slp1: str, allowed_types: Optional[List[str]] = None) -> List[MorphResult]:
         candidates = self.get_candidate_splits(word_slp1)
@@ -223,9 +227,13 @@ class SktMorph:
                 for p in reversed(prefixes):
                     reconstructed = apply_forward_sandhi(p, reconstructed)
                 if reconstructed != word_slp1:
+                    def undouble(w):
+                        for d, s in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]: w = w.replace(d, s)
+                        return w
+                        
                     satva_rec = reconstructed.replace('s', 'z').replace('sT', 'zW').replace('st', 'zw').replace('sn', 'zR')
-                    if reconstructed != word_slp1 and satva_rec != word_slp1:
-                        if reconstructed.replace('n', 'R') != word_slp1 and satva_rec.replace('n', 'R') != word_slp1:
+                    if undouble(reconstructed) != undouble(word_slp1) and undouble(satva_rec) != undouble(word_slp1):
+                        if undouble(reconstructed.replace('n', 'R')) != undouble(word_slp1) and undouble(satva_rec.replace('n', 'R')) != undouble(word_slp1):
                             continue
 
             if not allowed_types or 'tinanta' in allowed_types:
@@ -243,10 +251,8 @@ class SktMorph:
                             for p in prefixes:
                                 if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
                                     allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
-                            
                             if allowed_pada == "A" and row["lakara"].startswith("p"): continue
                             if allowed_pada == "P" and row["lakara"].startswith("a"): continue
-
                             details = json.loads(row['details_json']) if row['details_json'] else None
                             results.append(MorphResult(
                                 word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
@@ -260,12 +266,17 @@ class SktMorph:
                 for conn in self.krdanta_conns:
                     try:
                         cursor = conn.cursor()
-                        cursor.execute("""
+                        b_var = self._get_anaci_ca_variant(base_word)
+                        # HIGH SPEED FIX: Remove LIKE '%...' query and strictly use IN (?, ?) index hits!
+                        query_params = [base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I', '-' + base_word,
+                                        b_var, b_var + 'm', b_var + 'H', b_var + 'A', b_var + 'I', '-' + b_var]
+                        placeholders = ', '.join('?' for _ in query_params)
+                        cursor.execute(f"""
                             SELECT k.*, d.details_json 
                             FROM krdantas k 
                             LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
-                            WHERE k.form_slp1 IN (?, ?, ?, ?, ?, ?)
-                        """, (base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I', '-' + base_word))
+                            WHERE k.form_slp1 IN ({placeholders})
+                        """, query_params)
                         for row in cursor.fetchall():
                             details = json.loads(row['details_json']) if row['details_json'] else None
                             results.append(MorphResult(
@@ -278,12 +289,10 @@ class SktMorph:
         if not allowed_types or 'subanta' in allowed_types or 'krdanta' in allowed_types:
             for match in SubantaGenerator().analyze(word_slp1):
                 prati = match['pratipadika']
-                
                 if not allowed_types or 'subanta' in allowed_types:
                     results.append(MorphResult(
                         word=word_slp1, prefixes=[], dhatu=None, word_type='subanta', derivation=None,
-                        pratipadika=prati, linga=match['linga'],
-                        vibhakti=match['vibhakti'], vacana=match['vacana']
+                        pratipadika=prati, linga=match['linga'], vibhakti=match['vibhakti'], vacana=match['vacana']
                     ))
                 
                 if not allowed_types or 'krdanta' in allowed_types:
@@ -294,19 +303,26 @@ class SktMorph:
                             for p in reversed(p_prefixes):
                                 reconstructed = apply_forward_sandhi(p, reconstructed)
                             if reconstructed != prati:
+                                def undouble(w):
+                                    for d, s in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]: w = w.replace(d, s)
+                                    return w
                                 satva_rec = reconstructed.replace("s", "z").replace("sT", "zW").replace("st", "zw").replace("sn", "zR")
-                                if reconstructed != prati and satva_rec != prati:
-                                    if reconstructed.replace("n", "R") != prati and satva_rec.replace("n", "R") != prati:
+                                if undouble(reconstructed) != undouble(prati) and undouble(satva_rec) != undouble(prati):
+                                    if undouble(reconstructed.replace("n", "R")) != undouble(prati) and undouble(satva_rec.replace("n", "R")) != undouble(prati):
                                         continue
                         for conn in self.krdanta_conns:
                             try:
                                 cursor = conn.cursor()
-                                cursor.execute("""
+                                b_var = self._get_anaci_ca_variant(p_base)
+                                query_params = [p_base, p_base + 'm', p_base + 'H', p_base + 'A', p_base + 'I', '-' + p_base,
+                                                b_var, b_var + 'm', b_var + 'H', b_var + 'A', b_var + 'I', '-' + b_var]
+                                placeholders = ', '.join('?' for _ in query_params)
+                                cursor.execute(f"""
                                     SELECT k.*, d.details_json 
                                     FROM krdantas k 
                                     LEFT JOIN ddb.dhatus d ON k.dhatu_id = d.dhatu_id 
-                                    WHERE k.form_slp1 IN (?, ?, ?, ?, ?, ?)
-                                """, (p_base, p_base + "m", p_base + "H", p_base + "A", p_base + "I", "-" + p_base))
+                                    WHERE k.form_slp1 IN ({placeholders})
+                                """, query_params)
                                 for row in cursor.fetchall():
                                     details = json.loads(row["details_json"]) if row["details_json"] else None
                                     results.append(MorphResult(
