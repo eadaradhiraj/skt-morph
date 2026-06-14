@@ -34,6 +34,7 @@ PADA_RESTRICTIONS = {
 }
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
+    ('Srad', 'Srat', ''), ('Srat', 'Srat', ''),
     ('aDo', 'aDas', ''), ('aDas', 'aDas', ''), ('aDaH', 'aDas', ''),
     ('puro', 'puras', ''), ('puras', 'puras', ''), ('puraH', 'puras', ''),
     ('tiro', 'tiras', ''), ('tiras', 'tiras', ''), ('tiraH', 'tiras', ''),
@@ -105,6 +106,9 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         elif w_start in ['u', 'U']: result = prefix[:-1] + 'U' + w_rest
     elif prefix.endswith('m') and (w_start in voiced_cons or w_start in unvoiced_cons):
         result = prefix[:-1] + 'M' + word
+    elif prefix == 'Srat':
+        if w_start in voiced_cons or w_start in vowels: result = 'Srad' + word
+        else: result = 'Srat' + word
     elif prefix == 'ud':
         if w_start in ['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: result = 'ut' + word
         elif w_start == 'h': result = 'uddh' + w_rest

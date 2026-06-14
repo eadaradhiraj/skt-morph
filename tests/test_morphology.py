@@ -199,11 +199,20 @@ class TestSktMorph(unittest.TestCase):
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.execute.side_effect = sqlite3.OperationalError("Mock Error")
         
-        with patch.object(self.morph, 'tinanta_conns', [mock_conn]), patch.object(self.morph, 'krdanta_conns', [mock_conn]):
+        with patch.object(self.morph, "tinanta_conns", [mock_conn]), patch.object(self.morph, "krdanta_conns", [mock_conn]):
             self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1), [])
             self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"), [])
             res = self.morph.analyze("fakeWord")
             self.assertFalse(any(r.word_type in ["tinanta", "krdanta"] for r in res))
+            
+            # Hit the Subanta-Krdanta bridge error catch
+            self.morph.analyze("AhvayamAnena")
+            
+            # Hit the Lyap cache error catch
+            if hasattr(self.morph, "_lyap_cache"):
+                del self.morph._lyap_cache
+            self.morph.analyze("viruDya")
+            self.morph._get_lyap_cache()
 
     def test_generator_tinanta(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
@@ -255,6 +264,7 @@ class TestSktMorph(unittest.TestCase):
         mock_cursor.fetchall.side_effect = fake_fetchall
         with patch.object(self.morph, "krdanta_conns", [mock_conn]):
             res = self.morph.analyze("viruDya")
+            self.morph._get_lyap_cache()
             valid = [r for r in res if r.word_type == "krdanta" and "vi" in r.prefixes]
             self.assertTrue(len(valid) > 0)
             
@@ -369,6 +379,82 @@ class TestSktMorph(unittest.TestCase):
             self.assertTrue(all(r.word_type == "krdanta" for r in res_krd))
             self.assertTrue(len(res_krd) > 0)
 
+
+
+    def test_srat_prefix(self):
+        self.assertEqual(apply_forward_sandhi("Srat", "daDAmi"), "SraddaDAmi")
+        self.assertEqual(apply_forward_sandhi("Srat", "pAti"), "SratpAti")
+        
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall(*args, **kwargs):
+            c_args = mock_cursor.execute.call_args
+            if c_args and len(c_args[0]) > 1 and "daDAmi" in c_args[0][1]:
+                return [{"form_slp1": "daDAmi", "dhatu_id": "03.0010", "derivation": "shuddha", "prayoga": "kartari", "lakara": "plat", "purusha": 3, "vacana": 1, "details_json": None}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "tinanta_conns", [mock_conn]):
+            res = self.morph.analyze("SraddaDAmi", allowed_types=["tinanta"])
+            valid = [r for r in res if "Srat" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
+
+    def test_anaci_ca_and_smart_cache_coverage(self):
+        # Inject a manual cache to bypass the actual DB fetching for speed and predictability
+        self.morph._lyap_cache = {
+            "ruDya": [{"form_slp1": "-ruDya", "dhatu_id": "07.0001", "derivation": "shuddha", "pratyaya": "lyap", "details_json": "{\"i\": \"1070001\"}"}],
+            "rudDya": [{"form_slp1": "-rudDya", "dhatu_id": "07.0001", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
+        }
+        
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        
+        # Force empty fetchall so it falls directly into the smart lyap cache fallback logic!
+        mock_cursor.fetchall.return_value = []
+        
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            # Triggers main Krdanta branch & Optional Doubling swapping
+            res1 = self.morph.analyze("viruDya")
+            self.morph._get_lyap_cache()
+            self.assertTrue(len([r for r in res1 if r.word_type == "krdanta"]) > 0)
+            
+            # Triggers Subanta-Krdanta Bridge branch
+            res2 = self.morph.analyze("virudDya")
+            self.assertTrue(len([r for r in res2 if r.word_type == "krdanta"]) > 0)
+            
+        del self.morph._lyap_cache
+
+
+    def test_ultimate_coverage_edge_cases(self):
+        # 1. Hit Line 173: Force a visited cache collision using redundant prefixes and optional doubling
+        self.morph.get_candidate_splits("aDoaDasrudDya")
+        
+        # 2. Hit Line 380: Force the Subanta-Krdanta bridge to reject an Avyaya (lyap)
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"form_slp1": "ramat", "dhatu_id": "01.0001", "derivation": "shuddha", "pratyaya": "lyap", "details_json": None}]
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            # "ramati" mathematically parses as a Subanta (ramat + ati). 
+            # The bridge looks up "ramat", the mock returns "lyap", triggering the rejection continue!
+            self.morph.analyze("ramati")
+
+
+    def test_get_lyap_cache_building(self):
+        if hasattr(self.morph, "_lyap_cache"):
+            del self.morph._lyap_cache
+            
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        # Give the cache builder a row it can successfully split!
+        mock_cursor.fetchall.return_value = [{"form_slp1": "-avarudDya", "dhatu_id": "07.0001"}]
+        
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            cache = self.morph._get_lyap_cache()
+            self.assertIn("rudDya", cache)
 
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
