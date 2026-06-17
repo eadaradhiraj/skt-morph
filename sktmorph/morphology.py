@@ -58,7 +58,7 @@ UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
     ("sU", "su", "u"), ("sU", "su", "U"), ("sv", "su", ""), ("su", "su", ""),
     ("anU", "anu", "u"), ("anU", "anu", "U"), ("anv", "anu", ""), ("anu", "anu", ""),
     ("saM", "sam", ""), ("saY", "sam", ""), ("saN", "sam", ""), ("saR", "sam", ""), ("san", "sam", ""), ("sam", "sam", ""),
-    ("uddh", "ud", "h"), ("ut", "ud", ""), ("uc", "ud", "c"), ("uj", "ud", "j"), ("ul", "ud", "l"), ("ud", "ud", ""),
+    ("uddh", "ud", "h"), ("utT", "ud", "sT"), ("uttamB", "ud", "stamB"), ("uttaB", "ud", "staB"), ("ut", "ud", ""), ("uc", "ud", "c"), ("uj", "ud", "j"), ("ul", "ud", "l"), ("ud", "ud", ""),
     ("nir", "nis", ""), ("niz", "nis", ""), ("niS", "nis", ""), ("nih", "nis", ""), ("nis", "nis", ""),
     ("dur", "dus", ""), ("duz", "dus", ""), ("duS", "dus", ""), ("duh", "dus", ""), ("dus", "dus", "")
 ]
@@ -110,7 +110,10 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         if w_start in voiced_cons or w_start in vowels: result = 'Srad' + word
         else: result = 'Srat' + word
     elif prefix == 'ud':
-        if w_start in ['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: result = 'ut' + word
+        if word.startswith('sT'): result = 'utT' + word[2:]
+        elif word.startswith('stamB'): result = 'uttamB' + word[5:]
+        elif word.startswith('staB'): result = 'uttaB' + word[4:]
+        elif w_start in ['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: result = 'ut' + word
         elif w_start == 'h': result = 'uddh' + w_rest
         
     trigger = False
