@@ -478,9 +478,19 @@ class TestSktMorph(unittest.TestCase):
             self.assertTrue(len(valid) > 0)
 
 
+    def test_vartika_generation(self):
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        mock_cursor.fetchall.return_value = [{"dhatu_id": "01.0744"}]
+        with patch.object(self.morph, "conn_dhatus", mock_conn):
+            ids = self.morph.resolve_dhatu_ids("Uh")
+            self.assertEqual(ids, ["01.0744"])
+
     def test_vartika_exception(self):
         # Forward Vartika
         self.assertEqual(apply_forward_sandhi("pra", "Uhate"), "prOhate")
+        self.assertEqual(apply_forward_sandhi("pra", "uktam"), "proktam")
         
         # Reverse Vartika Analyzer
         from unittest.mock import patch, MagicMock
@@ -499,82 +509,71 @@ class TestSktMorph(unittest.TestCase):
             self.assertTrue(len(valid) > 0)
 
 class TestCLI(unittest.TestCase):
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    @patch("sys.argv", ["sktmorph", "analyze", "praBavati"])
     def test_cli_analyze(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'fakeWordXyz'])
+    @patch("sys.argv", ["sktmorph", "analyze", "fakeWordXyz"])
     def test_cli_analyze_not_found(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati', '--type', 'verb'])
+    @patch("sys.argv", ["sktmorph", "analyze", "praBavati", "--type", "verb"])
     def test_cli_analyze_with_type(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'generate_verb', '--dhatu', '01.0001', '--lakara', 'plat', '--purusha', '1', '--vacana', '1'])
+    @patch("sys.argv", ["sktmorph", "generate_verb", "--dhatu", "01.0001", "--lakara", "plat", "--purusha", "1", "--vacana", "1"])
     def test_cli_generate_verb(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
             
-    @patch('sys.argv', ['sktmorph', 'generate_krdanta', '--dhatu', '01.0001', '--pratyaya', 'lyuw', '--prefixes', 'pra'])
+    @patch("sys.argv", ["sktmorph", "generate_krdanta", "--dhatu", "01.0001", "--pratyaya", "lyuw", "--prefixes", "pra"])
     def test_cli_generate_krdanta(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'generate_noun', '--base', 'manas', '--linga', 'nap'])
+    @patch("sys.argv", ["sktmorph", "generate_noun", "--base", "manas", "--linga", "nap"])
     def test_cli_generate_noun(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'generate_noun', '--base', 'vAc', '--linga', 'stri'])
-    @patch('sktmorph.cli.SktMorph.generate_subanta')
+    @patch("sys.argv", ["sktmorph", "generate_noun", "--base", "vAc", "--linga", "stri"])
+    @patch("sktmorph.cli.SktMorph.generate_subanta")
     def test_cli_generate_noun_error(self, mock_gen):
         mock_gen.side_effect = NotImplementedError("Noun Error")
-        with patch('builtins.print'):
-            with self.assertRaises(SystemExit):
-                cli.main()
+        with patch("builtins.print"):
+            with self.assertRaises(SystemExit): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
-
-    @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'sarva', '--linga', 'stri'])
+    @patch("sys.argv", ["sktmorph", "generate_pronoun", "--base", "sarva", "--linga", "stri"])
     def test_cli_generate_pronoun_stri(self):
-        with patch('builtins.print'):
-            cli.main()
-    def test_cli_generate_pronoun(self):
-        with patch('builtins.print'):
-            cli.main()
+        with patch("builtins.print"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
-    @patch('sktmorph.cli.SktMorph.generate_sarvanama')
+    @patch("sys.argv", ["sktmorph", "generate_pronoun", "--base", "tad", "--linga", "pum"])
+    def test_cli_generate_pronoun(self):
+        with patch("builtins.print"): cli.main()
+
+    @patch("sys.argv", ["sktmorph", "generate_pronoun", "--base", "tad", "--linga", "pum"])
+    @patch("sktmorph.cli.SktMorph.generate_sarvanama")
     def test_cli_generate_pronoun_error(self, mock_gen):
         mock_gen.side_effect = NotImplementedError("Pronoun Error")
-        with patch('builtins.print'):
-            with self.assertRaises(SystemExit):
-                cli.main()
+        with patch("builtins.print"):
+            with self.assertRaises(SystemExit): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
-    @patch('sktmorph.cli.SktMorph')
+    @patch("sys.argv", ["sktmorph", "analyze", "praBavati"])
+    @patch("sktmorph.cli.SktMorph")
     def test_cli_db_error(self, mock_sktmorph):
         mock_sktmorph.side_effect = FileNotFoundError("DB Missing")
-        with patch('builtins.print'):
-            with self.assertRaises(SystemExit):
-                cli.main()
+        with patch("builtins.print"):
+            with self.assertRaises(SystemExit): cli.main()
 
-    @patch('sys.argv', ['sktmorph'])
+    @patch("sys.argv", ["sktmorph"])
     def test_cli_no_args(self):
-        with patch('argparse.ArgumentParser.print_help'):
-            cli.main()
+        with patch("argparse.ArgumentParser.print_help"): cli.main()
 
-    @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
+    @patch("sys.argv", ["sktmorph", "analyze", "praBavati"])
     def test_module_executions(self):
+        import warnings, runpy
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
-            with patch('builtins.print'):
-                runpy.run_module('sktmorph.cli', run_name='__main__')
-                runpy.run_module('sktmorph.__main__', run_name='__main__')
+            with patch("builtins.print"):
+                runpy.run_module("sktmorph.cli", run_name="__main__")
+                runpy.run_module("sktmorph.__main__", run_name="__main__")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

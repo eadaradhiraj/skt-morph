@@ -34,13 +34,13 @@ PADA_RESTRICTIONS = {
 }
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
-    ('Srad', 'Srat', ''), ('Srat', 'Srat', ''),
     ('aDo', 'aDas', ''), ('aDas', 'aDas', ''), ('aDaH', 'aDas', ''),
     ('puro', 'puras', ''), ('puras', 'puras', ''), ('puraH', 'puras', ''),
     ('tiro', 'tiras', ''), ('tiras', 'tiras', ''), ('tiraH', 'tiras', ''),
     ('antar', 'antar', ''), ('alam', 'alam', ''), ('alaM', 'alam', ''),
     ('prAdur', 'prAdus', ''), ('prAduz', 'prAdus', ''), ('prAduH', 'prAdus', ''),
     ('Avir', 'Avis', ''), ('Aviz', 'Avis', ''), ('AviH', 'Avis', ''),
+    ('Srad', 'Srat', ''), ('Srat', 'Srat', ''),
     ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pre', 'pra', 'I'), ('pro', 'pra', 'u'), ('pro', 'pra', 'U'), ('prO', 'pra', 'U'), ('prAr', 'pra', 'f'), ('prAr', 'pra', 'F'), ('pra', 'pra', ''),
     ('upA', 'upa', 'a'), ('upA', 'upa', 'A'), ('upe', 'upa', 'i'), ('upe', 'upa', 'I'), ('upo', 'upa', 'u'), ('upo', 'upa', 'U'), ('upAr', 'upa', 'f'), ('upAr', 'upa', 'F'), ('upa', 'upa', ''),
     ('avA', 'ava', 'a'), ('avA', 'ava', 'A'), ('ave', 'ava', 'i'), ('ave', 'ava', 'I'), ('avo', 'ava', 'u'), ('avo', 'ava', 'U'), ('avAr', 'ava', 'f'), ('avAr', 'ava', 'F'), ('ava', 'ava', ''),
@@ -108,15 +108,15 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
         elif w_start in ['u', 'U']: result = prefix[:-1] + 'U' + w_rest
     elif prefix.endswith('m') and (w_start in voiced_cons or w_start in unvoiced_cons):
         result = prefix[:-1] + 'M' + word
-    elif prefix == 'Srat':
-        if w_start in voiced_cons or w_start in vowels: result = 'Srad' + word
-        else: result = 'Srat' + word
     elif prefix == 'ud':
         if word.startswith('sT'): result = 'utT' + word[2:]
         elif word.startswith('stamB'): result = 'uttamB' + word[5:]
         elif word.startswith('staB'): result = 'uttaB' + word[4:]
         elif w_start in ['k', 'K', 'c', 'C', 'w', 'W', 't', 'T', 'p', 'P', 's', 'S', 'z']: result = 'ut' + word
         elif w_start == 'h': result = 'uddh' + w_rest
+    elif prefix == 'Srat':
+        if w_start in voiced_cons or w_start in vowels: result = 'Srad' + word
+        else: result = 'Srat' + word
         
     trigger = False
     blockers = set('cCjJYSwWqQRtTdDlsS')
@@ -161,7 +161,6 @@ class SktMorph:
             self.krdanta_conns.append(c)
 
     def _get_lyap_cache(self) -> Dict[str, List[sqlite3.Row]]:
-        """Intelligently builds a cache by stripping prefixes from dirty dictionary lyap entries."""
         if hasattr(self, '_lyap_cache'): return self._lyap_cache
         self._lyap_cache = {}
         for conn in self.krdanta_conns:
@@ -297,6 +296,7 @@ class SktMorph:
                         query_params = [base_word, base_word + 'm', base_word + 'H', base_word + 'A', base_word + 'I', '-' + base_word,
                                         b_var, b_var + 'm', b_var + 'H', b_var + 'A', b_var + 'I', '-' + b_var]
                         placeholders = ', '.join('?' for _ in query_params)
+                        
                         cursor.execute(f"""
                             SELECT k.*, d.details_json 
                             FROM krdantas k 
@@ -305,7 +305,6 @@ class SktMorph:
                         """, query_params)
                         rows = list(cursor.fetchall())
                         
-                        # The Smart Lyap Cache Fallback!
                         if not rows and base_word.endswith('ya'):
                             cache = self._get_lyap_cache()
                             cached_rows = cache.get(base_word, []) + cache.get(b_var, [])
@@ -406,13 +405,13 @@ class SktMorph:
         try:
             from indic_transliteration import sanscript
             from indic_transliteration.sanscript import transliterate
-            dev_query = transliterate(dhatu_query, sanscript.SLP1, sanscript.DEVANAGARI)
+            slp1_query = transliterate(dhatu_query, sanscript.DEVANAGARI, sanscript.SLP1)
         except ImportError:
-            dev_query = dhatu_query
+            slp1_query = dhatu_query
 
         cursor = self.conn_dhatus.cursor()
         cursor.execute("SELECT dhatu_id FROM dhatus WHERE details_json LIKE ? OR details_json LIKE ?", 
-                       (f'%"{dev_query}"%', f'%"{dhatu_query}"%'))
+                       (f'%"{slp1_query}"%', f'%"dhatu": "{slp1_query}"%'))
         return [row['dhatu_id'] for row in cursor.fetchall()]
 
     def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 

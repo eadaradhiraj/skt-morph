@@ -10,13 +10,12 @@ PRONOUNS = {
     ('kim', 'stri'): [['kA', 'ke', 'kAH'],['kAm', 'ke', 'kAH'],['kayA', 'kAByAm', 'kABiH'], ['kasyE', 'kAByAm', 'kAByaH'],['kasyAH', 'kAByAm', 'kAByaH'], ['kasyAH', 'kayoH', 'kAsAm'], ['kasyAm', 'kayoH', 'kAzu']],
     ('kim', 'nap'): [['kim', 'ke', 'kAni'], ['kim', 'ke', 'kAni'],['kena', 'kAByAm', 'kEH'], ['kasmE', 'kAByAm', 'keByaH'],['kasmAt', 'kAByAm', 'keByaH'],['kasya', 'kayoH', 'kezAm'], ['kasmin', 'kayoH', 'kezu']],
     
-    # Asmad and Yuzmad apply universally regardless of gender
     ('asmad', 'any'): [['aham', 'AvAm', 'vayam'], ['mAm,mA', 'AvAm,nO', 'asmAn,naH'],['mayA', 'AvAByAm', 'asmABiH'],['mahyam,me', 'AvAByAm,nO', 'asmaByam,naH'],['mat', 'AvAByAm', 'asmat'], ['mama,me', 'AvayoH,nO', 'asmAkam,naH'],['mayi', 'AvayoH', 'asmAsu']],
     ('yuzmad', 'any'): [['tvam', 'yuvAm', 'yUyam'],['tvAm,tvA', 'yuvAm,vAm', 'yuzmAn,vaH'],['tvayA', 'yuvAByAm', 'yuzmABiH'],['tuByam,te', 'yuvAByAm,vAm', 'yuzmaByam,vaH'],['tvat', 'yuvAByAm', 'yuzmat'],['tava,te', 'yuvayoH,vAm', 'yuzmAkam,vaH'], ['tvayi', 'yuvayoH', 'yuzmAsu']],
     
-    (sarva, pum): [[sarvaH, sarvO, sarve], [sarvam, sarvO, sarvAn],[sarveRa, sarvAByAm, sarvEH],[sarvasmE, sarvAByAm, sarveByaH], [sarvasmAt, sarvAByAm, sarveByaH],[sarvasya, sarvayoH, sarvezAm],[sarvasmin, sarvayoH, sarvezu], [sarva, sarvO, sarve]],
-    (sarva, stri): [[sarvA, sarve, sarvAH], [sarvAm, sarve, sarvAH], [sarvayA, sarvAByAm, sarvABiH], [sarvasyE, sarvAByAm, sarvAByaH], [sarvasyAH, sarvAByAm, sarvAByaH], [sarvasyAH, sarvayoH, sarvAsAm], [sarvasyAm, sarvayoH, sarvAzu], [sarve, sarve, sarvAH]],
-    (sarva, nap): [[sarvam, sarve, sarvARi], [sarvam, sarve, sarvARi], [sarveRa, sarvAByAm, sarvEH], [sarvasmE, sarvAByAm, sarveByaH], [sarvasmAt, sarvAByAm, sarveByaH], [sarvasya, sarvayoH, sarvezAm], [sarvasmin, sarvayoH, sarvezu], [sarva, sarve, sarvARi]]
+    ('sarva', 'pum'): [['sarvaH', 'sarvO', 'sarve'], ['sarvam', 'sarvO', 'sarvAn'],['sarveRa', 'sarvAByAm', 'sarvEH'],['sarvasmE', 'sarvAByAm', 'sarveByaH'], ['sarvasmAt', 'sarvAByAm', 'sarveByaH'],['sarvasya', 'sarvayoH', 'sarvezAm'],['sarvasmin', 'sarvayoH', 'sarvezu'], ['sarva', 'sarvO', 'sarve']],
+    ('sarva', 'stri'): [['sarvA', 'sarve', 'sarvAH'], ['sarvAm', 'sarve', 'sarvAH'], ['sarvayA', 'sarvAByAm', 'sarvABiH'], ['sarvasyE', 'sarvAByAm', 'sarvAByaH'], ['sarvasyAH', 'sarvAByAm', 'sarvAByaH'], ['sarvasyAH', 'sarvayoH', 'sarvAsAm'], ['sarvasyAm', 'sarvayoH', 'sarvAzu'], ['sarve', 'sarve', 'sarvAH']],
+    ('sarva', 'nap'): [['sarvam', 'sarve', 'sarvARi'], ['sarvam', 'sarve', 'sarvARi'], ['sarveRa', 'sarvAByAm', 'sarvEH'], ['sarvasmE', 'sarvAByAm', 'sarveByaH'], ['sarvasmAt', 'sarvAByAm', 'sarveByaH'], ['sarvasya', 'sarvayoH', 'sarvezAm'], ['sarvasmin', 'sarvayoH', 'sarvezu'], ['sarva', 'sarve', 'sarvARi']]
 }
 
 class SarvanamaGenerator:
@@ -33,7 +32,6 @@ class SarvanamaGenerator:
             
         table = {}
         for i, forms in enumerate(endings):
-            # Formats alternate forms beautifully with slashes (e.g. mAm/mA)
             table[self.vibhakti_names[i]] =[f.replace(',', '/') for f in forms]
         return table
 
