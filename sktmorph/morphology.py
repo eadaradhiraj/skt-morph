@@ -41,7 +41,7 @@ UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
     ('antar', 'antar', ''), ('alam', 'alam', ''), ('alaM', 'alam', ''),
     ('prAdur', 'prAdus', ''), ('prAduz', 'prAdus', ''), ('prAduH', 'prAdus', ''),
     ('Avir', 'Avis', ''), ('Aviz', 'Avis', ''), ('AviH', 'Avis', ''),
-    ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pre', 'pra', 'I'), ('pro', 'pra', 'u'), ('pro', 'pra', 'U'), ('prAr', 'pra', 'f'), ('prAr', 'pra', 'F'), ('pra', 'pra', ''),
+    ('prA', 'pra', 'a'), ('prA', 'pra', 'A'), ('pre', 'pra', 'i'), ('pre', 'pra', 'I'), ('pro', 'pra', 'u'), ('pro', 'pra', 'U'), ('prO', 'pra', 'U'), ('prAr', 'pra', 'f'), ('prAr', 'pra', 'F'), ('pra', 'pra', ''),
     ('upA', 'upa', 'a'), ('upA', 'upa', 'A'), ('upe', 'upa', 'i'), ('upe', 'upa', 'I'), ('upo', 'upa', 'u'), ('upo', 'upa', 'U'), ('upAr', 'upa', 'f'), ('upAr', 'upa', 'F'), ('upa', 'upa', ''),
     ('avA', 'ava', 'a'), ('avA', 'ava', 'A'), ('ave', 'ava', 'i'), ('ave', 'ava', 'I'), ('avo', 'ava', 'u'), ('avo', 'ava', 'U'), ('avAr', 'ava', 'f'), ('avAr', 'ava', 'F'), ('ava', 'ava', ''),
     ('apA', 'apa', 'a'), ('apA', 'apa', 'A'), ('ape', 'apa', 'i'), ('ape', 'apa', 'I'), ('apo', 'apa', 'u'), ('apo', 'apa', 'U'), ('apAr', 'apa', 'f'), ('apAr', 'apa', 'F'), ('apa', 'apa', ''),
@@ -92,7 +92,9 @@ def apply_forward_sandhi(prefix: str, word: str) -> str:
     elif p_end in ['a', 'A']:
         if w_start in ['a', 'A']: result = prefix[:-1] + 'A' + w_rest
         elif w_start in ['i', 'I']: result = prefix[:-1] + 'e' + w_rest
-        elif w_start in ['u', 'U']: result = prefix[:-1] + 'o' + w_rest
+        elif w_start in ['u', 'U']:
+            if prefix == 'pra' and word.startswith('Uh'): result = prefix[:-1] + 'O' + w_rest
+            else: result = prefix[:-1] + 'o' + w_rest
         elif w_start in ['f', 'F']: result = prefix[:-1] + 'Ar' + w_rest
         elif w_start == 'e': result = prefix[:-1] + 'e' + w_rest
         elif w_start == 'E': result = prefix[:-1] + 'E' + w_rest

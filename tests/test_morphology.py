@@ -477,6 +477,27 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if r.word_type == "tinanta" and "ud" in r.prefixes]
             self.assertTrue(len(valid) > 0)
 
+
+    def test_vartika_exception(self):
+        # Forward Vartika
+        self.assertEqual(apply_forward_sandhi("pra", "Uhate"), "prOhate")
+        
+        # Reverse Vartika Analyzer
+        from unittest.mock import patch, MagicMock
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall(*args, **kwargs):
+            c_args = mock_cursor.execute.call_args
+            if c_args and len(c_args[0]) > 1 and "Uhate" in c_args[0][1]:
+                return [{"form_slp1": "Uhate", "dhatu_id": "01.0744", "derivation": "shuddha", "prayoga": "kartari", "lakara": "alat", "purusha": 1, "vacana": 1, "details_json": None}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "tinanta_conns", [mock_conn]):
+            res = self.morph.analyze("prOhate")
+            valid = [r for r in res if "pra" in r.prefixes]
+            self.assertTrue(len(valid) > 0)
+
 class TestCLI(unittest.TestCase):
     @patch('sys.argv', ['sktmorph', 'analyze', 'praBavati'])
     def test_cli_analyze(self):
@@ -517,6 +538,11 @@ class TestCLI(unittest.TestCase):
                 cli.main()
 
     @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'tad', '--linga', 'pum'])
+
+    @patch('sys.argv', ['sktmorph', 'generate_pronoun', '--base', 'sarva', '--linga', 'stri'])
+    def test_cli_generate_pronoun_stri(self):
+        with patch('builtins.print'):
+            cli.main()
     def test_cli_generate_pronoun(self):
         with patch('builtins.print'):
             cli.main()
