@@ -316,6 +316,17 @@ class SktMorph:
 
                         for row in rows:
                             details = json.loads(row['details_json']) if row['details_json'] else None
+                            
+                            # KRDANTA PADA RESTRICTIONS
+                            if details and not row["pratyaya"].startswith("BAvakarma"):
+                                allowed_pada = details.get("pada", "U")
+                                for p in prefixes:
+                                    if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
+                                        allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
+                                        
+                                if allowed_pada == "P" and row["pratyaya"] in ["SAnac", "cAnaS", "kAnaC"]: continue
+                                if allowed_pada == "A" and row["pratyaya"] == "Satf": continue
+
                             results.append(MorphResult(
                                 word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
                                 word_type='krdanta', derivation=row['derivation'],
@@ -374,6 +385,16 @@ class SktMorph:
                                 for row in rows:
                                     if row["pratyaya"] in ['lyap', 'ktvA', 'tumun', 'RamuL', 'am']: continue
                                     details = json.loads(row["details_json"]) if row["details_json"] else None
+                                    
+                                    if details and not row["pratyaya"].startswith("BAvakarma"):
+                                        allowed_pada = details.get("pada", "U")
+                                        for p in p_prefixes:
+                                            if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
+                                                allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
+                                                
+                                        if allowed_pada == "P" and row["pratyaya"] in ["SAnac", "cAnaS", "kAnaC"]: continue
+                                        if allowed_pada == "A" and row["pratyaya"] == "Satf": continue
+
                                     results.append(MorphResult(
                                         word=word_slp1, prefixes=p_prefixes, dhatu=row["dhatu_id"],
                                         word_type="krdanta", derivation=row["derivation"],

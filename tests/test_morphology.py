@@ -508,6 +508,53 @@ class TestSktMorph(unittest.TestCase):
             valid = [r for r in res if "pra" in r.prefixes]
             self.assertTrue(len(valid) > 0)
 
+
+    def test_krdanta_pada_restrictions(self):
+        # Mocks DB returning jayamAna for 1st Gana (P) and 10th Gana (U)
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall(*args, **kwargs):
+            c_args = mock_cursor.execute.call_args
+            if c_args and len(c_args[0]) > 1 and "jayamAna" in c_args[0][1]:
+                return [
+                    {"form_slp1": "jayamAna", "dhatu_id": "01.0642", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": "{\"pada\": \"P\"}"},
+                    {"form_slp1": "jayamAna", "dhatu_id": "10.0324", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": "{\"pada\": \"U\"}"}
+                ]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            res = self.morph.analyze("jayamAna")
+            # Should reject 01.0642 because it is P, but keep 10.0324 because it is U!
+            valid = [r for r in res if r.word_type == "krdanta"]
+            self.assertTrue(len(valid) > 0)
+            self.assertTrue(all(r.dhatu == "10.0324" for r in valid))
+            
+            # Subanta Bridge Test (jayamAnaH)
+            res_sub = self.morph.analyze("jayamAnaH")
+            valid_sub = [r for r in res_sub if r.word_type == "krdanta"]
+            self.assertTrue(len(valid_sub) > 0)
+            self.assertTrue(all(r.dhatu != "01.0642" for r in valid_sub))
+
+
+    def test_krdanta_pada_restriction_assignment(self):
+        # Trigger Lines 325 and 393 by feeding it a prefix ("vi") matched with a restricted root ("09.0001")
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall(*args, **kwargs):
+            c_args = mock_cursor.execute.call_args
+            if c_args and len(c_args[0]) > 1 and "krIRAna" in c_args[0][1]:
+                return [{"form_slp1": "krIRAna", "dhatu_id": "09.0001", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": "{\"pada\": \"P\"}"}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            # Hits Line 325 (Direct Krdanta)
+            self.morph.analyze("vikrIRAna")
+            # Hits Line 393 (Subanta-to-Krdanta Bridge)
+            self.morph.analyze("vikrIRAnaH")
+
 class TestCLI(unittest.TestCase):
     @patch("sys.argv", ["sktmorph", "analyze", "praBavati"])
     def test_cli_analyze(self):

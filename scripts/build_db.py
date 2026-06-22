@@ -13,7 +13,18 @@ SHARDS = ['gana1', 'gana2_to_10']
 
 def to_slp1(text):
     if not text: return ""
+    # Converts Devanagari to SLP1 (Automatically ignores English letters/numbers)
     return transliterate(text, sanscript.DEVANAGARI, sanscript.SLP1)
+
+def to_slp1_recursive(data):
+    """Recursively traverses the JSON payload and converts all strings to SLP1."""
+    if isinstance(data, str):
+        return to_slp1(data)
+    elif isinstance(data, dict):
+        return {to_slp1(k): to_slp1_recursive(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [to_slp1_recursive(item) for item in data]
+    return data
 
 def get_shard(dhatu_id):
     return 'gana1' if dhatu_id.startswith('01.') else 'gana2_to_10'
@@ -52,7 +63,11 @@ def process_data_txt(conn):
     for item in data.get("data",[]):
         raw_id = item.get("i", "")
         dhatu_id = f"{raw_id[1:3]}.{raw_id[3:]}" if len(raw_id) == 7 else raw_id
-        conn.execute("INSERT OR REPLACE INTO dhatus VALUES (?, ?)", (dhatu_id, json.dumps(item, ensure_ascii=False)))
+        
+        # SLP1 Conversion happens here!
+        slp1_item = to_slp1_recursive(item)
+        
+        conn.execute("INSERT OR REPLACE INTO dhatus VALUES (?, ?)", (dhatu_id, json.dumps(slp1_item, ensure_ascii=False)))
     conn.commit()
 
 def process_tinanta_file(conn_dict, filepath, derivation, prayoga):
@@ -77,14 +92,14 @@ def process_krdanta_file(conn_dict, filepath, derivation):
         shard = get_shard(dhatu_id)
         cursor = conn_dict[shard].cursor()
         for pratyaya, forms_str in pratyayas.items():
-            for form in[f.strip() for f in forms_str.split(',') if f.strip()]:
+            for form in [f.strip() for f in forms_str.split(',') if f.strip()]:
                 f_slp1 = to_slp1(form)
                 if f_slp1:
                     cursor.execute("INSERT INTO krdantas VALUES (?, ?, ?, ?)",
                                    (dhatu_id, derivation, to_slp1(pratyaya), f_slp1))
 
 def main():
-    print("Building balanced Shard Databases (Split by Gana)...")
+    print("Building balanced Shard Databases (Fully converting all JSON to SLP1)...")
     conn_d, conn_k_dict, conn_t_dict = init_dbs()
     process_data_txt(conn_d)
     
@@ -98,7 +113,7 @@ def main():
     for conns in conn_k_dict.values(): conns.commit(); conns.close()
     for der in conn_t_dict.values():
         for conn in der.values(): conn.commit(); conn.close()
-    print("Successfully built and balanced all databases!")
+    print("Successfully built and converted all databases to SLP1!")
 
 if __name__ == "__main__":
     main()
