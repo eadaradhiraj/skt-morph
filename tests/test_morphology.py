@@ -555,6 +555,28 @@ class TestSktMorph(unittest.TestCase):
             # Hits Line 393 (Subanta-to-Krdanta Bridge)
             self.morph.analyze("vikrIRAnaH")
 
+
+    def test_sam_gam_pada_restriction(self):
+        # Mocks DB returning gacCamAna (P)
+        mock_conn = MagicMock()
+        mock_cursor = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+        def fake_fetchall(*args, **kwargs):
+            c_args = mock_cursor.execute.call_args
+            if c_args and len(c_args[0]) > 1 and "gacCamAna" in c_args[0][1]:
+                return [{"form_slp1": "gacCamAna", "dhatu_id": "01.1137", "derivation": "shuddha", "pratyaya": "SAnac", "details_json": "{\"pada\": \"P\"}"}]
+            return []
+        mock_cursor.fetchall.side_effect = fake_fetchall
+        
+        with patch.object(self.morph, "krdanta_conns", [mock_conn]):
+            # 1. Without prefix, should be rejected as Parasmaipada cannot take SAnac
+            res_bad = self.morph.analyze("gacCamAnaH", allowed_types=["krdanta"])
+            self.assertEqual(len(res_bad), 0)
+            
+            # 2. With sam prefix, 1.3.29 forces it to Atmanepada, so it should pass!
+            res_good = self.morph.analyze("saNgacCamAnaH", allowed_types=["krdanta"])
+            self.assertTrue(len(res_good) > 0)
+
 class TestCLI(unittest.TestCase):
     @patch("sys.argv", ["sktmorph", "analyze", "praBavati"])
     def test_cli_analyze(self):

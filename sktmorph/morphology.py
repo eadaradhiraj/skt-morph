@@ -30,7 +30,8 @@ PADA_RESTRICTIONS = {
     ("09.0001", "pari"): "A",
     ("09.0001", "ava"): "A",
     ("01.0631", "vi"): "A",
-    ("01.0631", "parA"): "A"
+    ("01.0631", "parA"): "A",
+    ("01.1137", "sam"): "A"
 }
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
@@ -247,16 +248,17 @@ class SktMorph:
         candidates = self.get_candidate_splits(word_slp1)
         results = []
 
+        def undouble(w):
+            for d, s in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]: w = w.replace(d, s)
+            for nc, cc in [('N','k'),('N','K'),('N','g'),('N','G'),('Y','c'),('Y','C'),('Y','j'),('Y','J'),('R','w'),('R','W'),('R','q'),('R','Q'),('n','t'),('n','T'),('n','d'),('n','D'),('m','p'),('m','P'),('m','b'),('m','B')]: w = w.replace(nc+cc, 'M'+cc)
+            return w
+
         for prefixes, base_word in candidates:
             if prefixes:
                 reconstructed = base_word
                 for p in reversed(prefixes):
                     reconstructed = apply_forward_sandhi(p, reconstructed)
                 if reconstructed != word_slp1:
-                    def undouble(w):
-                        for d, s in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]: w = w.replace(d, s)
-                        return w
-                        
                     satva_rec = reconstructed.replace('s', 'z').replace('sT', 'zW').replace('st', 'zw').replace('sn', 'zR')
                     if undouble(reconstructed) != undouble(word_slp1) and undouble(satva_rec) != undouble(word_slp1):
                         if undouble(reconstructed.replace('n', 'R')) != undouble(word_slp1) and undouble(satva_rec.replace('n', 'R')) != undouble(word_slp1):
@@ -351,9 +353,6 @@ class SktMorph:
                             for p in reversed(p_prefixes):
                                 reconstructed = apply_forward_sandhi(p, reconstructed)
                             if reconstructed != prati:
-                                def undouble(w):
-                                    for d, s in [('dD', 'D'), ('cC', 'C'), ('tT', 'T'), ('kK', 'K'), ('pP', 'P'), ('wW', 'W'), ('jJ', 'J')]: w = w.replace(d, s)
-                                    return w
                                 satva_rec = reconstructed.replace("s", "z").replace("sT", "zW").replace("st", "zw").replace("sn", "zR")
                                 if undouble(reconstructed) != undouble(prati) and undouble(satva_rec) != undouble(prati):
                                     if undouble(reconstructed.replace("n", "R")) != undouble(prati) and undouble(satva_rec.replace("n", "R")) != undouble(prati):
@@ -426,13 +425,13 @@ class SktMorph:
         try:
             from indic_transliteration import sanscript
             from indic_transliteration.sanscript import transliterate
-            slp1_query = transliterate(dhatu_query, sanscript.DEVANAGARI, sanscript.SLP1)
+            dev_query = transliterate(dhatu_query, sanscript.SLP1, sanscript.DEVANAGARI)
         except ImportError:
-            slp1_query = dhatu_query
+            dev_query = dhatu_query
 
         cursor = self.conn_dhatus.cursor()
         cursor.execute("SELECT dhatu_id FROM dhatus WHERE details_json LIKE ? OR details_json LIKE ?", 
-                       (f'%"{slp1_query}"%', f'%"dhatu": "{slp1_query}"%'))
+                       (f'%"{dev_query}"%', f'%"{dhatu_query}"%'))
         return [row['dhatu_id'] for row in cursor.fetchall()]
 
     def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 
