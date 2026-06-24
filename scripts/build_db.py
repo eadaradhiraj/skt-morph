@@ -13,11 +13,9 @@ SHARDS = ['gana1', 'gana2_to_10']
 
 def to_slp1(text):
     if not text: return ""
-    # Converts Devanagari to SLP1 (Automatically ignores English letters/numbers)
     return transliterate(text, sanscript.DEVANAGARI, sanscript.SLP1)
 
 def to_slp1_recursive(data):
-    """Recursively traverses the JSON payload and converts all strings to SLP1."""
     if isinstance(data, str):
         return to_slp1(data)
     elif isinstance(data, dict):
@@ -63,15 +61,31 @@ def process_data_txt(conn):
     for item in data.get("data",[]):
         raw_id = item.get("i", "")
         dhatu_id = f"{raw_id[1:3]}.{raw_id[3:]}" if len(raw_id) == 7 else raw_id
-        
-        # SLP1 Conversion happens here!
         slp1_item = to_slp1_recursive(item)
-        
         conn.execute("INSERT OR REPLACE INTO dhatus VALUES (?, ?)", (dhatu_id, json.dumps(slp1_item, ensure_ascii=False)))
     conn.commit()
 
+def convert_p_to_a_a_anta(form_p, lakara, cell_idx):
+    mapping = {
+        'plat': [('ti', 'te'), ('ataH', 'ete'), ('anti', 'ante'), ('si', 'se'), ('aTaH', 'eTe'), ('aTa', 'aDve'), ('Ami', 'e'), ('AvaH', 'Avahe'), ('AmaH', 'Amahe')],
+        'plrt': [('ti', 'te'), ('ataH', 'ete'), ('anti', 'ante'), ('si', 'se'), ('aTaH', 'eTe'), ('aTa', 'aDve'), ('Ami', 'e'), ('AvaH', 'Avahe'), ('AmaH', 'Amahe')],
+        'plot': [('atu', 'atAm'), ('atAm', 'etAm'), ('antu', 'antAm'), ('a', 'asva'), ('atam', 'eTAm'), ('ata', 'aDvam'), ('Ani', 'E'), ('Ava', 'AvahE'), ('Ama', 'AmahE')],
+        'plan': [('at', 'ata'), ('atAm', 'etAm'), ('an', 'anta'), ('aH', 'aTAH'), ('atam', 'eTAm'), ('ata', 'aDvam'), ('am', 'e'), ('Ava', 'Avahi'), ('Ama', 'Amahi')],
+        'pvidhilin': [('et', 'eta'), ('etAm', 'eyAtAm'), ('eyuH', 'eran'), ('eH', 'eTAH'), ('etam', 'eyATAm'), ('eta', 'eDvam'), ('eyam', 'eya'), ('eva', 'evahi'), ('ema', 'emahi')]
+    }
+    if lakara not in mapping: return None
+    p_suf, a_suf = mapping[lakara][cell_idx]
+    
+    if lakara == 'plot' and cell_idx == 3:
+        if form_p.endswith('tAt'): return form_p[:-3] + 'sva'
+        if form_p.endswith('hi'): return form_p[:-2] + 'sva'
+            
+    if form_p.endswith(p_suf): return form_p[:-len(p_suf)] + a_suf
+    return None
+
 def process_tinanta_file(conn_dict, filepath, derivation, prayoga):
     if derivation not in conn_dict: return
+    INJECT_A_ROOTS = {"01.1137", "01.0631", "01.1077"} # gam, ji, sTA
     with open(filepath, 'r', encoding='utf-8') as f: data = json.load(f)
     for dhatu_id, lakaras in data.items():
         shard = get_shard(dhatu_id)
@@ -85,8 +99,15 @@ def process_tinanta_file(conn_dict, filepath, derivation, prayoga):
                     if f_slp1:
                         cursor.execute("INSERT INTO tinantas VALUES (?, ?, ?, ?, ?, ?, ?)",
                                        (dhatu_id, derivation, prayoga, lakara, (i//3)+1, (i%3)+1, f_slp1))
+                        if prayoga == "kartari" and dhatu_id in INJECT_A_ROOTS:
+                            a_form = convert_p_to_a_a_anta(f_slp1, lakara, i)
+                            if a_form:
+                                a_lakara = "a" + lakara[1:]
+                                cursor.execute("INSERT INTO tinantas VALUES (?, ?, ?, ?, ?, ?, ?)",
+                                               (dhatu_id, derivation, prayoga, a_lakara, (i//3)+1, (i%3)+1, a_form))
 
 def process_krdanta_file(conn_dict, filepath, derivation):
+    INJECT_A_ROOTS = {"01.1137", "01.0631", "01.1077"}
     with open(filepath, 'r', encoding='utf-8') as f: data = json.load(f)
     for dhatu_id, pratyayas in data.items():
         shard = get_shard(dhatu_id)
@@ -97,6 +118,13 @@ def process_krdanta_file(conn_dict, filepath, derivation):
                 if f_slp1:
                     cursor.execute("INSERT INTO krdantas VALUES (?, ?, ?, ?)",
                                    (dhatu_id, derivation, to_slp1(pratyaya), f_slp1))
+                    
+                    # Inject SAnac (Atmanepada participle) using Satf as the base
+                    if to_slp1(pratyaya) == "Satf" and dhatu_id in INJECT_A_ROOTS:
+                        if f_slp1.endswith('at'):
+                            a_form = f_slp1[:-1] + 'mAna' # e.g. tizWat -> tizWamAna
+                            cursor.execute("INSERT INTO krdantas VALUES (?, ?, ?, ?)",
+                                           (dhatu_id, derivation, "SAnac", a_form))
 
 def main():
     print("Building balanced Shard Databases (Fully converting all JSON to SLP1)...")

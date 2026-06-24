@@ -31,7 +31,11 @@ PADA_RESTRICTIONS = {
     ("09.0001", "ava"): "A",
     ("01.0631", "vi"): "A",
     ("01.0631", "parA"): "A",
-    ("01.1137", "sam"): "A"
+    ("01.1137", "sam"): "U",
+    ("01.1077", "sam"): "A",
+    ("01.1077", "ava"): "A",
+    ("01.1077", "pra"): "A",
+    ("01.1077", "vi"): "A"
 }
 
 UPASARGA_SPLIT_RULES: List[Tuple[str, str, str]] =[
@@ -275,13 +279,19 @@ class SktMorph:
                             WHERE t.form_slp1 = ?
                         """, (base_word,))
                         for row in cursor.fetchall():
-                            allowed_pada = None
-                            for p in prefixes:
-                                if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
-                                    allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
-                            if allowed_pada == "A" and row["lakara"].startswith("p"): continue
-                            if allowed_pada == "P" and row["lakara"].startswith("a"): continue
                             details = json.loads(row['details_json']) if row['details_json'] else None
+
+                            allowed_pada = "U" if row["dhatu_id"] == "01.1077" else (details.get("pada", "U") if details else "U")
+
+                            for p in prefixes:
+
+                                if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
+
+                                    allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
+
+                            if allowed_pada == "A" and row["lakara"].startswith("p"): continue
+
+                            if allowed_pada == "P" and row["lakara"].startswith("a"): continue
                             results.append(MorphResult(
                                 word=word_slp1, prefixes=prefixes, dhatu=row['dhatu_id'],
                                 word_type='tinanta', derivation=row['derivation'],
@@ -321,7 +331,7 @@ class SktMorph:
                             
                             # KRDANTA PADA RESTRICTIONS
                             if details and not row["pratyaya"].startswith("BAvakarma"):
-                                allowed_pada = details.get("pada", "U")
+                                allowed_pada = "U" if row["dhatu_id"] == "01.1077" else (details.get("pada", "U") if details else "U")
                                 for p in prefixes:
                                     if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
                                         allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
@@ -386,7 +396,7 @@ class SktMorph:
                                     details = json.loads(row["details_json"]) if row["details_json"] else None
                                     
                                     if details and not row["pratyaya"].startswith("BAvakarma"):
-                                        allowed_pada = details.get("pada", "U")
+                                        allowed_pada = "U" if row["dhatu_id"] == "01.1077" else (details.get("pada", "U") if details else "U")
                                         for p in p_prefixes:
                                             if (row["dhatu_id"], p) in PADA_RESTRICTIONS:
                                                 allowed_pada = PADA_RESTRICTIONS[(row["dhatu_id"], p)]
