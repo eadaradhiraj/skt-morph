@@ -101,7 +101,7 @@ def extract_taddhita_rows(items: Iterable[dict]) -> List[Tuple[str, str, str, st
             rows.append((pratipadika, pratyaya, linga, stem, "data2"))
 
     vyutpatti_re = re.compile(r"\[\[(?:\d\.)?\d+\.\d+\.\d+\]\]")
-    vyutpatti_keywords = ("taddhita", "tva", "matup", "mayat", "Iya", "tA", "ini", "ana", "yat", "tal")
+    vyutpatti_keywords = ("taddhita", "tva", "matup", "mayat", "Iya", "tA", "ini", "ana", "yat", "tal", "thak", "itac")
     for item in items:
         vy = item.get("vyutpatti") or ""
         if not vy or not any(k in vy for k in vyutpatti_keywords):

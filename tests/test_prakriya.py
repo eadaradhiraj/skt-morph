@@ -42,6 +42,35 @@ class TestPrakriya(unittest.TestCase):
         self.assertEqual(len(steps), 16)
         self.assertEqual(steps[0]["kind"], "declension")
 
+    def test_fallback_prakriya_for_taddhita(self):
+        from sktmorph.prakriya import fallback_prakriya_for_parse
+
+        steps = fallback_prakriya_for_parse(
+            "rAmIkam", "taddhita", "rAma", "thak", "nap", "prathamA", stem="rAmIka"
+        )
+        self.assertEqual(steps[0]["step"], "rAma + thak")
+
+    def test_fallback_prakriya_for_subanta(self):
+        from sktmorph.prakriya import fallback_prakriya_for_parse
+
+        steps = fallback_prakriya_for_parse(
+            "rAmaH", "subanta", "rAma", None, "pum", "prathamA"
+        )
+        self.assertEqual(steps[1]["step"], "rAmaH")
+
+    def test_fallback_prakriya_for_sarvanama(self):
+        from sktmorph.prakriya import fallback_prakriya_for_parse
+
+        steps = fallback_prakriya_for_parse(
+            "saH", "sarvanama", "tad", None, "pum", "prathamA"
+        )
+        self.assertIn("tad", steps[0]["step"])
+
+    def test_fallback_prakriya_returns_none(self):
+        from sktmorph.prakriya import fallback_prakriya_for_parse
+
+        self.assertIsNone(fallback_prakriya_for_parse("x", "tinanta", None, None, None, None))
+
 
 if __name__ == "__main__":
     unittest.main()

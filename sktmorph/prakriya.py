@@ -13,6 +13,8 @@ SUTRA_TADDHITA = {
     "tA": ["4.1.15", "7.3.114"],
     "ini": ["5.3.71"],
     "ana": ["5.3.72"],
+    "thak": ["5.3.70", "4.4.72"],
+    "itac": ["4.4.62", "7.2.115"],
 }
 
 SUTRA_DECLENSION = ["4.1.2", "7.1.12"]
@@ -75,3 +77,29 @@ def merge_traces(*traces: Optional[List[Dict[str, Any]]]) -> List[Dict[str, Any]
         if trace:
             merged.extend(trace)
     return merged
+
+
+def fallback_prakriya_for_parse(
+    word: str,
+    word_type: str,
+    pratipadika: Optional[str],
+    pratyaya: Optional[str],
+    linga: Optional[str],
+    vibhakti: Optional[str],
+    stem: Optional[str] = None,
+) -> Optional[List[Dict[str, Any]]]:
+    """Pedagogical fallback when shabda DB has no stored trace."""
+    if word_type == "taddhita" and pratipadika and pratyaya and stem:
+        return trace_taddhita_derivation(pratipadika, pratyaya, stem)
+    if word_type in ("subanta", "sarvanama", "taddhita") and pratipadika and vibhakti:
+        label = pratipadika if word_type == "sarvanama" else (stem or pratipadika)
+        return [
+            {
+                "step": f"{label} ({vibhakti})",
+                "sutras": SUTRA_DECLENSION,
+                "kind": "declension",
+                "vibhakti": vibhakti,
+            },
+            {"step": word, "sutras": SUTRA_SANDHI, "kind": "form"},
+        ]
+    return None

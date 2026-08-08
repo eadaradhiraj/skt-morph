@@ -35,6 +35,10 @@ PRONOUN_CASES = [
     ("ena", "nap", ["etat", "ete", "etAni"], ["etat", "ete", "etAni"], ["etena", "etAByAm", "etEBiH"]),
     ("eka", "pum", ["ekaH", "ekO", "eke"], ["ekam", "ekO", "ekAn"], ["ekena", "ekAByAm", "ekEBiH"]),
     ("sva", "pum", ["svaH", "svO", "sve"], ["svam", "svO", "svAn"], ["svena", "svAByAm", "svEBiH"]),
+    ("traya", "pum", ["trayaH", "trayO", "trayaH"], ["trayam", "trayO", "trIn"], ["tribhiH", "tribhyAm", "tribhiH"]),
+    ("catur", "pum", ["catvAraH", "catvArO", "catvAraH"], ["caturam", "catvArO", "catvARi"], ["caturBiH", "caturByAm", "caturBiH"]),
+    ("anya", "pum", ["anyaH", "anyO", "anye"], ["anyam", "anyO", "anyAn"], ["anyena", "anyAByAm", "anyEH"]),
+    ("purva", "pum", ["purvaH", "purvO", "purve"], ["purvam", "purvO", "purvAn"], ["purveRa", "purvAByAm", "purvEH"]),
 ]
 
 ANALYZE_CASES = [
@@ -62,7 +66,11 @@ class TestSarvanamaGenerationComprehensive(unittest.TestCase):
         self.gen = SarvanamaGenerator()
 
     def test_all_pronoun_paradigms_defined(self):
-        bases = {"tad", "kim", "asmad", "yuzmad", "sarva", "idam", "etad", "yad", "ubha", "ena", "eka", "dvi", "sva", "am"}
+        bases = {
+            "tad", "kim", "asmad", "yuzmad", "sarva", "idam", "etad", "yad",
+            "ubha", "ena", "eka", "dvi", "sva", "am",
+            "traya", "catur", "purva", "para", "apara", "anya",
+        }
         defined = {base for base, _ in PRONOUNS.keys()}
         self.assertTrue(bases.issubset(defined))
 

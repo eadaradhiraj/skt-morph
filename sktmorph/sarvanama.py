@@ -47,6 +47,30 @@ PRONOUNS = {
     ('sva', 'nap'): [['svam', 'sve', 'svAni'], ['svam', 'sve', 'svAni'], ['svena', 'svAByAm', 'svEBiH'], ['svasmE', 'svAByAm', 'sveByaH'], ['svasmAt', 'svAByAm', 'sveByaH'], ['svasya', 'svayoH', 'svezAm'], ['svasmin', 'svayoH', 'svezu']],
 
     ('am', 'any'): [['am', 'am', 'am'], ['am', 'am', 'am'], ['am', 'am', 'am'], ['am', 'am', 'am'], ['am', 'am', 'am'], ['am', 'am', 'am'], ['am', 'am', 'am']],
+
+    ('traya', 'pum'): [['trayaH', 'trayO', 'trayaH'], ['trayam', 'trayO', 'trIn'], ['tribhiH', 'tribhyAm', 'tribhiH'], ['tribhyaH', 'tribhyAm', 'tribhyaH'], ['tribhyaH', 'tribhyAm', 'tribhyaH'], ['trayasya', 'trayoH', 'trayARAm'], ['trizu', 'trizu', 'trizu']],
+    ('traya', 'stri'): [['tisrA', 'tisro', 'tisraH'], ['tisrAm', 'tisro', 'tisraH'], ['tisrbhiH', 'tisrbhyAm', 'tisrbhiH'], ['tisrbhyaH', 'tisrbhyAm', 'tisrbhyaH'], ['tisrbhyaH', 'tisrbhyAm', 'tisrbhyaH'], ['tisrasya', 'tisroH', 'tisrARAm'], ['tisrizu', 'tisrizu', 'tisrizu']],
+    ('traya', 'nap'): [['trayam', 'trIRi', 'trIRi'], ['trayam', 'trIRi', 'trIRi'], ['tribhiH', 'tribhyAm', 'tribhiH'], ['tribhyaH', 'tribhyAm', 'tribhyaH'], ['tribhyaH', 'tribhyAm', 'tribhyaH'], ['trayasya', 'trayoH', 'trayARAm'], ['trizu', 'trizu', 'trizu']],
+
+    ('catur', 'pum'): [['catvAraH', 'catvArO', 'catvAraH'], ['caturam', 'catvArO', 'catvARi'], ['caturBiH', 'caturByAm', 'caturBiH'], ['caturByaH', 'caturByAm', 'caturByaH'], ['caturByaH', 'caturByAm', 'caturByaH'], ['caturasya', 'caturNoH', 'caturARAm'], ['caturzu', 'caturzu', 'caturzu']],
+    ('catur', 'stri'): [['catasrA', 'catasro', 'catasraH'], ['catasrAm', 'catasro', 'catasraH'], ['catasrbhiH', 'catasrbhyAm', 'catasrbhiH'], ['catasrbhyaH', 'catasrbhyAm', 'catasrbhyaH'], ['catasrbhyaH', 'catasrbhyAm', 'catasrbhyaH'], ['catasrasya', 'catasroH', 'catasrARAm'], ['catasrizu', 'catasrizu', 'catasrizu']],
+    ('catur', 'nap'): [['catur', 'catvArI', 'catvARi'], ['catur', 'catvArI', 'catvARi'], ['caturBiH', 'caturByAm', 'caturBiH'], ['caturByaH', 'caturByAm', 'caturByaH'], ['caturByaH', 'caturByAm', 'caturByaH'], ['caturasya', 'caturNoH', 'caturARAm'], ['caturzu', 'caturzu', 'caturzu']],
+
+    ('purva', 'pum'): [['purvaH', 'purvO', 'purve'], ['purvam', 'purvO', 'purvAn'], ['purveRa', 'purvAByAm', 'purvEH'], ['purvasmE', 'purvAByAm', 'purveByaH'], ['purvasmAt', 'purvAByAm', 'purveByaH'], ['purvasya', 'purvayoH', 'purvezAm'], ['purvasmin', 'purvayoH', 'purvezu'], ['purva', 'purvO', 'purve']],
+    ('purva', 'stri'): [['purvA', 'purve', 'purvAH'], ['purvAm', 'purve', 'purvAH'], ['purvayA', 'purvAByAm', 'purvABiH'], ['purvasyE', 'purvAByAm', 'purvAByaH'], ['purvasyAH', 'purvAByAm', 'purvAByaH'], ['purvasyAH', 'purvayoH', 'purvAsAm'], ['purvasyAm', 'purvayoH', 'purvAzu'], ['purve', 'purve', 'purvAH']],
+    ('purva', 'nap'): [['purvam', 'purve', 'purvARi'], ['purvam', 'purve', 'purvARi'], ['purveRa', 'purvAByAm', 'purvEH'], ['purvasmE', 'purvAByAm', 'purveByaH'], ['purvasmAt', 'purvAByAm', 'purveByaH'], ['purvasya', 'purvayoH', 'purvezAm'], ['purvasmin', 'purvayoH', 'purvezu'], ['purva', 'purve', 'purvARi']],
+
+    ('para', 'pum'): [['paraH', 'parO', 'pare'], ['param', 'parO', 'parAn'], ['pareRa', 'parAByAm', 'parEH'], ['parasmE', 'parAByAm', 'pareByaH'], ['parasmAt', 'parAByAm', 'pareByaH'], ['parasya', 'parayoH', 'parezAm'], ['parasmin', 'parayoH', 'parezu'], ['para', 'parO', 'pare']],
+    ('para', 'stri'): [['parA', 'pare', 'parAH'], ['parAm', 'pare', 'parAH'], ['parayA', 'parAByAm', 'parABiH'], ['parasyE', 'parAByAm', 'parAByaH'], ['parasyAH', 'parAByAm', 'parAByaH'], ['parasyAH', 'parayoH', 'parAsAm'], ['parasyAm', 'parayoH', 'parAzu'], ['pare', 'pare', 'parAH']],
+    ('para', 'nap'): [['param', 'pare', 'parARi'], ['param', 'pare', 'parARi'], ['pareRa', 'parAByAm', 'parEH'], ['parasmE', 'parAByAm', 'pareByaH'], ['parasmAt', 'parAByAm', 'pareByaH'], ['parasya', 'parayoH', 'parezAm'], ['parasmin', 'parayoH', 'parezu'], ['para', 'pare', 'parARi']],
+
+    ('apara', 'pum'): [['aparaH', 'aparO', 'apare'], ['aparam', 'aparO', 'aparAn'], ['apareRa', 'aparAByAm', 'aparEH'], ['aparasmE', 'aparAByAm', 'apareByaH'], ['aparasmAt', 'aparAByAm', 'apareByaH'], ['aparasya', 'aparayoH', 'aparezAm'], ['aparasmin', 'aparayoH', 'aparezu'], ['apara', 'aparO', 'apare']],
+    ('apara', 'stri'): [['aparA', 'apare', 'aparAH'], ['aparAm', 'apare', 'aparAH'], ['aparayA', 'aparAByAm', 'aparABiH'], ['aparasyE', 'aparAByAm', 'aparAByaH'], ['aparasyAH', 'aparAByAm', 'aparAByaH'], ['aparasyAH', 'aparayoH', 'aparAsAm'], ['aparasyAm', 'aparayoH', 'aparAzu'], ['apare', 'apare', 'aparAH']],
+    ('apara', 'nap'): [['aparam', 'apare', 'aparARi'], ['aparam', 'apare', 'aparARi'], ['apareRa', 'aparAByAm', 'aparEH'], ['aparasmE', 'aparAByAm', 'apareByaH'], ['aparasmAt', 'aparAByAm', 'apareByaH'], ['aparasya', 'aparayoH', 'aparezAm'], ['aparasmin', 'aparayoH', 'aparezu'], ['apara', 'apare', 'aparARi']],
+
+    ('anya', 'pum'): [['anyaH', 'anyO', 'anye'], ['anyam', 'anyO', 'anyAn'], ['anyena', 'anyAByAm', 'anyEH'], ['anyasmE', 'anyAByAm', 'anyeByaH'], ['anyasmAt', 'anyAByAm', 'anyeByaH'], ['anyasya', 'anyayoH', 'anyezAm'], ['anyasmin', 'anyayoH', 'anyezu'], ['anya', 'anyO', 'anye']],
+    ('anya', 'stri'): [['anyA', 'anye', 'anyAH'], ['anyAm', 'anye', 'anyAH'], ['anyayA', 'anyAByAm', 'anyABiH'], ['anyasyE', 'anyAByAm', 'anyAByaH'], ['anyasyAH', 'anyAByAm', 'anyAByaH'], ['anyasyAH', 'anyayoH', 'anyAsAm'], ['anyasyAm', 'anyayoH', 'anyAzu'], ['anye', 'anye', 'anyAH']],
+    ('anya', 'nap'): [['anyam', 'anye', 'anyARi'], ['anyam', 'anye', 'anyARi'], ['anyena', 'anyAByAm', 'anyEH'], ['anyasmE', 'anyAByAm', 'anyeByaH'], ['anyasmAt', 'anyAByAm', 'anyeByaH'], ['anyasya', 'anyayoH', 'anyezAm'], ['anyasmin', 'anyayoH', 'anyezu'], ['anya', 'anye', 'anyARi']],
 }
 
 class SarvanamaGenerator:

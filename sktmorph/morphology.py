@@ -10,6 +10,7 @@ from .sarvanama import SarvanamaGenerator
 from .taddhita import TaddhitaGenerator
 from .shabda_db import ShabdaPrakriyaStore
 from .ranking import rank_results
+from .prakriya import fallback_prakriya_for_parse
 
 @dataclass
 class MorphResult:
@@ -450,6 +451,19 @@ class SktMorph:
             traces = self._shabda.lookup_form(r.word)
             if traces and not r.prakriya:
                 r.prakriya = traces[0]["steps"]
+            elif not r.prakriya:
+                stem = None
+                if r.word_type == "taddhita" and r.pratipadika and r.pratyaya:
+                    stem = self._taddhita.derive_stem(r.pratipadika, r.pratyaya, r.linga)
+                r.prakriya = fallback_prakriya_for_parse(
+                    r.word,
+                    r.word_type,
+                    r.pratipadika,
+                    r.pratyaya,
+                    r.linga,
+                    r.vibhakti,
+                    stem=stem,
+                )
 
         ranked = rank_results(unique_results)
         if not include_prakriya:
@@ -547,8 +561,22 @@ class SktMorph:
             }
         return gen.generate(pratipadika, linga)
 
-    def generate_sarvanama(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
-        return SarvanamaGenerator().generate(pratipadika, linga)
+    def generate_sarvanama(self, pratipadika: str, linga: str, include_prakriya: bool = False) -> Dict:
+        table = SarvanamaGenerator().generate(pratipadika, linga)
+        if not include_prakriya:
+            return table
+        return {
+            "pratipadika": pratipadika,
+            "linga": linga,
+            "declension": table,
+            "prakriya": [
+                {
+                    "step": f"{pratipadika} ({linga})",
+                    "sutras": ["1.1.27"],
+                    "kind": "sarvanama",
+                }
+            ],
+        }
 
     def generate_taddhita(self, pratipadika: str, pratyaya: str, linga: str,
                           include_prakriya: bool = False) -> Dict:

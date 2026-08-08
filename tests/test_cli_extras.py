@@ -59,6 +59,50 @@ class TestCLIDevanagariAndPrakriya(unittest.TestCase):
             cli._print_json({"word": "rAmaH"}, devanagari=True)
             mock_print.assert_called_once_with("DEVTEXT")
 
+    @patch("sys.argv", ["sktmorph", "analyze", "te", "--top", "1", "--json"])
+    def test_cli_analyze_top_json(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            raw = mock_print.call_args[0][0]
+            payload = json.loads(raw)
+            self.assertIsInstance(payload, dict)
+            self.assertNotIn(": ", raw)
+
+    @patch("sys.argv", ["sktmorph", "analyze", "te", "--top", "2", "--json"])
+    def test_cli_analyze_top_json_array(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            payload = json.loads(mock_print.call_args[0][0])
+            self.assertIsInstance(payload, list)
+            self.assertEqual(len(payload), 2)
+
+    @patch("sys.argv", ["sktmorph", "generate_verb", "--dhatu", "01.0001", "--lakara", "plat", "--purusha", "1", "--vacana", "1", "--prayoga", "karmani", "--derivation", "san"])
+    @patch("sktmorph.cli.SktMorph.generate_tinanta", return_value=["form"])
+    def test_cli_generate_verb_prayoga_derivation(self, mock_gen, *_mocks):
+        cli.main()
+        mock_gen.assert_called_once_with(
+            "01.0001", "plat", 1, 1, derivation="san", prayoga="karmani", prefixes=[]
+        )
+
+    @patch("sys.argv", ["sktmorph", "generate_krdanta", "--dhatu", "01.0001", "--pratyaya", "lyuw", "--derivation", "nich"])
+    @patch("sktmorph.cli.SktMorph.generate_krdanta", return_value=["form"])
+    def test_cli_generate_krdanta_derivation(self, mock_gen, *_mocks):
+        cli.main()
+        mock_gen.assert_called_once_with("01.0001", "lyuw", derivation="nich", prefixes=[])
+
+    @patch("sys.argv", ["sktmorph", "generate_pronoun", "--base", "tad", "--linga", "pum", "--with-prakriya"])
+    def test_cli_generate_pronoun_with_prakriya(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            payload = json.loads(mock_print.call_args[0][0])
+            self.assertIn("prakriya", payload)
+            self.assertIn("declension", payload)
+
+    def test_print_json_compact(self):
+        with patch("builtins.print") as mock_print:
+            cli._print_json({"a": 1}, compact=True)
+            self.assertEqual(mock_print.call_args[0][0], '{"a":1}')
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -20,6 +20,8 @@ PRATYAYA_ALIASES = {
     "ta": "tA",
     "ini": "ini",
     "ana": "ana",
+    "thak": "thak",
+    "itac": "itac",
 }
 
 SEED_ENTRIES = [
@@ -40,6 +42,8 @@ SEED_ENTRIES = [
     ("hari", "matup", "pum"),
     ("deva", "a", "pum"),
     ("putra", "ini", "pum"),
+    ("rAma", "thak", "pum"),
+    ("bala", "itac", "pum"),
 ]
 
 STEM_SUFFIXES: List[Tuple[str, str]] = [
@@ -54,6 +58,8 @@ STEM_SUFFIXES: List[Tuple[str, str]] = [
     ("vat", "matup"),
     ("mat", "matup"),
     ("ka", "ka"),
+    ("Ika", "thak"),
+    ("ita", "itac"),
 ]
 
 LINGA_MAP = {"pum": "pum", "stri": "stri", "nap": "nap", "P": "pum", "S": "stri", "N": "nap"}
@@ -122,6 +128,14 @@ def derive_stem_rule(pratipadika: str, pratyaya: str) -> Optional[str]:
         if pratipadika.endswith("a") and len(pratipadika) > 1:
             return pratipadika[:-1] + "Ana"
         return _append_suffix(pratipadika, "ana")
+    if pratyaya == "thak":
+        if pratipadika.endswith("a") and len(pratipadika) > 1:
+            return pratipadika[:-1] + "Ika"
+        return pratipadika + "Ika"
+    if pratyaya == "itac":
+        if pratipadika.endswith("a") and len(pratipadika) > 1:
+            return pratipadika[:-1] + "ita"
+        return pratipadika + "ita"
     return None
 
 
@@ -132,7 +146,7 @@ def split_taddhita_stem(stem: str) -> List[Tuple[str, str]]:
             continue
         base = stem[: -len(surface_suffix)]
         candidates = [base]
-        if pratyaya in ("tva", "tal", "mayat", "yat", "tA", "Iya", "ini", "ana"):
+        if pratyaya in ("tva", "tal", "mayat", "yat", "tA", "Iya", "ini", "ana", "thak", "itac"):
             if not base.endswith(("a", "A", "i", "I", "u", "U", "f", "F")):
                 candidates.append(base + "an")
             if base.endswith("a") and len(base) > 1:

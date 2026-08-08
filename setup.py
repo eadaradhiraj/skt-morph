@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="sktmorph",
-    version="0.1.0",
+    version="0.2.0",
     author="eadaradhiraj",
     description="Sanskrit Morphology Analyzer and Generator (SLP1)",
     packages=find_packages(exclude=["tests*", "scripts*", "data_raw*"]),

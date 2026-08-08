@@ -253,6 +253,12 @@ class TestSktMorph(unittest.TestCase):
         res = self.morph.generate_sarvanama('tad', 'pum')
         self.assertIn('prathamA', res)
 
+    def test_generate_sarvanama_with_prakriya(self):
+        res = self.morph.generate_sarvanama('tad', 'pum', include_prakriya=True)
+        self.assertIn('declension', res)
+        self.assertIn('prakriya', res)
+        self.assertEqual(res['pratipadika'], 'tad')
+
     def test_wildcard_lyap_resolution(self):
         mock_conn = MagicMock()
         mock_cursor = MagicMock()

@@ -22,9 +22,12 @@ def _payload_dict(payload: Dict[str, Any], with_prakriya: bool = False) -> Dict[
     return {key: value for key, value in payload.items() if key != "prakriya"}
 
 
-def _print_json(payload: Any, devanagari: bool = False) -> None:
-    indent = 2 if isinstance(payload, list) else 4
-    text = json.dumps(payload, ensure_ascii=False, indent=indent)
+def _print_json(payload: Any, devanagari: bool = False, compact: bool = False) -> None:
+    if compact:
+        text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    else:
+        indent = 2 if isinstance(payload, list) else 4
+        text = json.dumps(payload, ensure_ascii=False, indent=indent)
     if devanagari and has_devanagari_support():
         text = _devanagariize_json(text)
     print(text)
@@ -64,6 +67,18 @@ def main():
         action="store_true",
         help="Include prakriya derivation traces in output",
     )
+    analyze_parser.add_argument(
+        "--top",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Return at most N ranked analyses",
+    )
+    analyze_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit compact JSON (single object or array)",
+    )
     _add_io_flags(analyze_parser)
 
     gen_verb_parser = subparsers.add_parser("generate_verb", help="Generate a verb form")
@@ -72,12 +87,33 @@ def main():
     gen_verb_parser.add_argument("--purusha", type=int, required=True)
     gen_verb_parser.add_argument("--vacana", type=int, required=True)
     gen_verb_parser.add_argument("--prefixes", type=str, nargs="*", default=[])
+    gen_verb_parser.add_argument(
+        "--prayoga",
+        type=str,
+        default="kartari",
+        choices=["kartari", "karmani"],
+        help="Voice (kartari=active, karmani=middle/passive)",
+    )
+    gen_verb_parser.add_argument(
+        "--derivation",
+        type=str,
+        default="shuddha",
+        choices=["shuddha", "nich", "san", "yang", "yangluk"],
+        help="Derivation class for the verb form",
+    )
     _add_io_flags(gen_verb_parser)
 
     gen_krdanta_parser = subparsers.add_parser("generate_krdanta", help="Generate a krdanta (participle)")
     gen_krdanta_parser.add_argument("--dhatu", type=str, required=True)
     gen_krdanta_parser.add_argument("--pratyaya", type=str, required=True)
     gen_krdanta_parser.add_argument("--prefixes", type=str, nargs="*", default=[])
+    gen_krdanta_parser.add_argument(
+        "--derivation",
+        type=str,
+        default="shuddha",
+        choices=["shuddha", "nich", "san", "yang", "yangluk"],
+        help="Derivation class for the participle",
+    )
     _add_io_flags(gen_krdanta_parser)
 
     taddhita_choices = sorted(set(PRATYAYA_ALIASES.keys()))
@@ -106,6 +142,11 @@ def main():
     gen_pronoun_parser = subparsers.add_parser("generate_pronoun", help="Generate pronoun declensions")
     gen_pronoun_parser.add_argument("--base", type=str, required=True, choices=pronoun_choices)
     gen_pronoun_parser.add_argument("--linga", type=str, required=True, choices=["pum", "stri", "nap", "any"])
+    gen_pronoun_parser.add_argument(
+        "--with-prakriya",
+        action="store_true",
+        help="Include prakriya derivation traces in output",
+    )
     _add_io_flags(gen_pronoun_parser)
 
     args = parser.parse_args()
@@ -134,19 +175,40 @@ def main():
         word = maybe_to_slp1(args.word, devanagari=devanagari)
         results = morph.analyze(word, allowed_types=allowed_types, include_prakriya=args.with_prakriya)
 
+        if args.top is not None:
+            results = results[: args.top]
+
         if not results:
             print(f"No morphological data found for '{args.word}'.")
-        for res in results:
-            _print_json(_result_dict(res, args.with_prakriya), devanagari=devanagari)
+        elif args.json:
+            payloads = [_result_dict(res, args.with_prakriya) for res in results]
+            output = payloads[0] if len(payloads) == 1 else payloads
+            _print_json(output, devanagari=devanagari, compact=True)
+        else:
+            for res in results:
+                _print_json(_result_dict(res, args.with_prakriya), devanagari=devanagari)
 
     elif args.command == "generate_verb":
-        forms = morph.generate_tinanta(args.dhatu, args.lakara, args.purusha, args.vacana, prefixes=args.prefixes)
+        forms = morph.generate_tinanta(
+            args.dhatu,
+            args.lakara,
+            args.purusha,
+            args.vacana,
+            derivation=args.derivation,
+            prayoga=args.prayoga,
+            prefixes=args.prefixes,
+        )
         if devanagari:
             forms = [maybe_from_slp1(f, True) for f in forms]
         print(f"Generated Forms: {forms}")
 
     elif args.command == "generate_krdanta":
-        forms = morph.generate_krdanta(args.dhatu, args.pratyaya, prefixes=args.prefixes)
+        forms = morph.generate_krdanta(
+            args.dhatu,
+            args.pratyaya,
+            derivation=args.derivation,
+            prefixes=args.prefixes,
+        )
         if devanagari:
             forms = [maybe_from_slp1(f, True) for f in forms]
         print(f"Generated Forms: {forms}")
@@ -177,8 +239,10 @@ def main():
 
     elif args.command == "generate_pronoun":
         try:
-            table = morph.generate_sarvanama(args.base, args.linga)
-            _print_json(table, devanagari=devanagari)
+            result = morph.generate_sarvanama(
+                args.base, args.linga, include_prakriya=args.with_prakriya
+            )
+            _print_json(_payload_dict(result, args.with_prakriya), devanagari=devanagari)
         except NotImplementedError as e:
             print(f"Error: {e}")
             sys.exit(1)
