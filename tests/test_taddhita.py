@@ -57,6 +57,11 @@ STEM_DERIVATION_CASES = [
     ("deva", "itac", "devita"),
     ("rAjan", "thak", "rAjanIka"),
     ("budh", "itac", "budhita"),
+    ("rAma", "Tya", "rAmAya"),
+    ("deva", "Tyan", "devAya"),
+    ("deva", "Ca", "devIya"),
+    ("nara", "Ca", "narIya"),
+    ("senA", "Tya", "senAya"),
 ]
 
 # (pratipadika, pratyaya, linga, expected_stem, prathama_row)

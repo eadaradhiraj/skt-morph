@@ -22,6 +22,12 @@ PRATYAYA_ALIASES = {
     "ana": "ana",
     "thak": "thak",
     "itac": "itac",
+    "Tya": "Tya",
+    "tya": "Tya",
+    "Tyan": "Tyan",
+    "tyan": "Tyan",
+    "Ca": "Ca",
+    "ca": "Ca",
 }
 
 SEED_ENTRIES = [
@@ -44,6 +50,9 @@ SEED_ENTRIES = [
     ("putra", "ini", "pum"),
     ("rAma", "thak", "pum"),
     ("bala", "itac", "pum"),
+    ("rAma", "Tya", "pum"),
+    ("deva", "Tyan", "pum"),
+    ("nara", "Ca", "pum"),
 ]
 
 STEM_SUFFIXES: List[Tuple[str, str]] = [
@@ -60,6 +69,8 @@ STEM_SUFFIXES: List[Tuple[str, str]] = [
     ("ka", "ka"),
     ("Ika", "thak"),
     ("ita", "itac"),
+    ("Aya", "Tya"),
+    ("Aya", "Tyan"),
 ]
 
 LINGA_MAP = {"pum": "pum", "stri": "stri", "nap": "nap", "P": "pum", "S": "stri", "N": "nap"}
@@ -95,6 +106,14 @@ def _derive_iya(pratipadika: str) -> str:
     if pratipadika.endswith("A") and len(pratipadika) > 1:
         return pratipadika[:-1] + "Iya"
     return pratipadika + "Iya"
+
+
+def _derive_aya(pratipadika: str) -> str:
+    if pratipadika.endswith("a") and len(pratipadika) > 1:
+        return pratipadika[:-1] + "Aya"
+    if pratipadika.endswith("A") and len(pratipadika) > 1:
+        return pratipadika[:-1] + "Aya"
+    return pratipadika + "Aya"
 
 
 def derive_stem_rule(pratipadika: str, pratyaya: str) -> Optional[str]:
@@ -136,6 +155,10 @@ def derive_stem_rule(pratipadika: str, pratyaya: str) -> Optional[str]:
         if pratipadika.endswith("a") and len(pratipadika) > 1:
             return pratipadika[:-1] + "ita"
         return pratipadika + "ita"
+    if pratyaya in ("Tya", "Tyan"):
+        return _derive_aya(pratipadika)
+    if pratyaya == "Ca":
+        return _derive_iya(pratipadika)
     return None
 
 
@@ -146,7 +169,7 @@ def split_taddhita_stem(stem: str) -> List[Tuple[str, str]]:
             continue
         base = stem[: -len(surface_suffix)]
         candidates = [base]
-        if pratyaya in ("tva", "tal", "mayat", "yat", "tA", "Iya", "ini", "ana", "thak", "itac"):
+        if pratyaya in ("tva", "tal", "mayat", "yat", "tA", "Iya", "ini", "ana", "thak", "itac", "Tya", "Tyan", "Ca"):
             if not base.endswith(("a", "A", "i", "I", "u", "U", "f", "F")):
                 candidates.append(base + "an")
             if base.endswith("a") and len(base) > 1:

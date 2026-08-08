@@ -10,7 +10,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from sktmorph.taddhita import LINGA_MAP, derive_stem_rule, normalize_pratyaya, split_taddhita_stem
+from sktmorph.taddhita import LINGA_MAP, PRATYAYA_ALIASES, derive_stem_rule, normalize_pratyaya, split_taddhita_stem
 
 try:
     from indic_transliteration import sanscript
@@ -101,7 +101,10 @@ def extract_taddhita_rows(items: Iterable[dict]) -> List[Tuple[str, str, str, st
             rows.append((pratipadika, pratyaya, linga, stem, "data2"))
 
     vyutpatti_re = re.compile(r"\[\[(?:\d\.)?\d+\.\d+\.\d+\]\]")
-    vyutpatti_keywords = ("taddhita", "tva", "matup", "mayat", "Iya", "tA", "ini", "ana", "yat", "tal", "thak", "itac")
+    vyutpatti_keywords = (
+        "taddhita", "tva", "matup", "mayat", "Iya", "tA", "ini", "ana", "yat", "tal",
+        "thak", "itac", "Tya", "Tyan", "Ca", "tya", "tyan", "ca",
+    )
     for item in items:
         vy = item.get("vyutpatti") or ""
         if not vy or not any(k in vy for k in vyutpatti_keywords):
@@ -122,6 +125,35 @@ def extract_taddhita_rows(items: Iterable[dict]) -> List[Tuple[str, str, str, st
             if key not in seen:
                 seen.add(key)
                 rows.append((pratipadika, pratyaya, linga, stem, "vyutpatti"))
+
+    for row in extract_taddhita_heuristic_rows(word_set):
+        key = row[:4]
+        if key not in seen:
+            seen.add(key)
+            rows.append(row)
+    return rows
+
+
+def extract_taddhita_heuristic_rows(word_set: Set[str]) -> List[Tuple[str, str, str, str, str]]:
+    """Try every rule-based pratyaya against known pratipadikas."""
+    rows = []
+    seen = set()
+    pratyayas = sorted(set(PRATYAYA_ALIASES.values()))
+    for pratipadika in word_set:
+        for pratyaya in pratyayas:
+            stem = derive_stem_rule(pratipadika, pratyaya)
+            if not stem or stem not in word_set:
+                continue
+            key = (pratipadika, pratyaya, "pum", stem)
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append((pratipadika, pratyaya, "pum", stem, "heuristic"))
+            for linga in ("stri", "nap"):
+                alt_key = (pratipadika, pratyaya, linga, stem)
+                if alt_key not in seen:
+                    seen.add(alt_key)
+                    rows.append((pratipadika, pratyaya, linga, stem, "heuristic"))
     return rows
 
 

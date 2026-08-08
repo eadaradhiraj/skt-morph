@@ -62,6 +62,13 @@ class TestIngestShabda(unittest.TestCase):
             rows = ingest.extract_taddhita_rows(items)
         self.assertTrue(any(r[0] == "rAma" and r[1] == "matup" for r in rows))
 
+    def test_extract_heuristic_rows(self):
+        word_set = {"rAma", "rAmAya", "rAmatva"}
+        rows = ingest.extract_taddhita_heuristic_rows(word_set)
+        pratyayas = {r[1] for r in rows if r[0] == "rAma"}
+        self.assertIn("Tya", pratyayas)
+        self.assertIn("tva", pratyayas)
+
     def test_build_taddhita_db(self):
         items = [
             {"word": "राम", "linga": "P"},

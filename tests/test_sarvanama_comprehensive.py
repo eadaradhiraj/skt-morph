@@ -39,6 +39,9 @@ PRONOUN_CASES = [
     ("catur", "pum", ["catvAraH", "catvArO", "catvAraH"], ["caturam", "catvArO", "catvARi"], ["caturBiH", "caturByAm", "caturBiH"]),
     ("anya", "pum", ["anyaH", "anyO", "anye"], ["anyam", "anyO", "anyAn"], ["anyena", "anyAByAm", "anyEH"]),
     ("purva", "pum", ["purvaH", "purvO", "purve"], ["purvam", "purvO", "purvAn"], ["purveRa", "purvAByAm", "purvEH"]),
+    ("paJcan", "pum", ["paJcaH", "paJcO", "paJcaH"], ["paJcam", "paJcO", "paJcan"], ["paJcaBiH", "paJcaByAm", "paJcaBiH"]),
+    ("zaq", "pum", ["zaq", "zaqO", "zaq"], ["zaqam", "zaqO", "zaws"], ["zaqBiH", "zaqByAm", "zaqBiH"]),
+    ("saptan", "pum", ["saptaH", "saptO", "saptaH"], ["saptam", "saptO", "saptAn"], ["saptaBiH", "saptaByAm", "saptaBiH"]),
 ]
 
 ANALYZE_CASES = [
@@ -70,6 +73,7 @@ class TestSarvanamaGenerationComprehensive(unittest.TestCase):
             "tad", "kim", "asmad", "yuzmad", "sarva", "idam", "etad", "yad",
             "ubha", "ena", "eka", "dvi", "sva", "am",
             "traya", "catur", "purva", "para", "apara", "anya",
+            "paJcan", "zaq", "saptan", "azwan", "navan", "daSan",
         }
         defined = {base for base, _ in PRONOUNS.keys()}
         self.assertTrue(bases.issubset(defined))

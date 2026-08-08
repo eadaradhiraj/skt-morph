@@ -30,6 +30,7 @@ PARADIGMS = {
     ('i', 'stri'): [['iH', 'I', 'ayaH'], ['im', 'I', 'IH'],['yA', 'iByAm', 'iBiH'],['yE,aye', 'iByAm', 'iByaH'],['yAH,eH', 'iByAm', 'iByaH'],['yAH,eH', 'yoH', 'InAm'],['yAm,O', 'yoH', 'izu'], ['e', 'I', 'ayaH']],
     ('i', 'nap'): [['i', 'inI', 'Ini'], ['i', 'inI', 'Ini'],['inA', 'iByAm', 'iBiH'], ['ine', 'iByAm', 'iByaH'],['inaH', 'iByAm', 'iByaH'],['inaH', 'inoH', 'InAm'],['ini', 'inoH', 'izu'], ['i,e', 'inI', 'Ini']],
     ('I', 'stri'): [['I', 'yO', 'yaH'], ['Im', 'yO', 'IH'], ['yA', 'IByAm', 'IBiH'], ['yE', 'IByAm', 'IByaH'], ['yAH', 'IByAm', 'IByaH'], ['yAH', 'yoH', 'InAm'], ['yAm', 'yoH', 'Izu'], ['i', 'yO', 'yaH']],
+    ('I', 'pum'): [['I', 'yO', 'yaH'], ['Im', 'yO', 'In'], ['yA', 'IByAm', 'IBiH'], ['ye', 'IByAm', 'IByaH'], ['eH', 'IByAm', 'IByaH'], ['eH', 'yoH', 'InAm'], ['O', 'yoH', 'Izu'], ['i', 'yO', 'yaH']],
     ('u', 'pum'): [['uH', 'U', 'avaH'],['um', 'U', 'Un'], ['unA', 'uByAm', 'uBiH'],['ave', 'uByAm', 'uByaH'], ['oH', 'uByAm', 'uByaH'],['oH', 'voH', 'UnAm'], ['O', 'voH', 'uzu'],['o', 'U', 'avaH']],
     ('u', 'stri'): [['uH', 'U', 'avaH'],['um', 'U', 'UH'],['vA', 'uByAm', 'uBiH'],['vE,ave', 'uByAm', 'uByaH'],['vAH,oH', 'uByAm', 'uByaH'],['vAH,oH', 'voH', 'UnAm'], ['vAm,O', 'voH', 'uzu'],['o', 'U', 'avaH']],
     ('u', 'nap'): [['u', 'unI', 'Uni'],['u', 'unI', 'Uni'], ['unA', 'uByAm', 'uBiH'],['une', 'uByAm', 'uByaH'],['unaH', 'uByAm', 'uByaH'],['unaH', 'unoH', 'UnAm'], ['uni', 'unoH', 'uzu'],['u,o', 'unI', 'Uni']],

@@ -487,27 +487,45 @@ class SktMorph:
 
     def generate_tinanta(self, dhatu: str, lakara: str, purusha: int, vacana: int, 
                          derivation: str = 'shuddha', prayoga: str = 'kartari', 
-                         prefixes: List[str] = None) -> List[str]:
-        dhatu_ids = self.resolve_dhatu_ids(dhatu)
-        raw_forms = []
-        for d_id in dhatu_ids:
-            for conn in self.tinanta_conns:
-                try:
-                    cursor = conn.cursor()
-                    cursor.execute('''SELECT form_slp1 FROM tinantas 
-                                      WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
-                                      AND vacana = ? AND derivation = ? AND prayoga = ?''',
-                                   (d_id, lakara, purusha, vacana, derivation, prayoga))
-                    raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
-                except sqlite3.OperationalError: pass
-            
-        all_forms = []
-        for raw in raw_forms:
-            all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
-            
-        all_forms = sorted(list(set(all_forms)))
-        if not all_forms: return []
-        if not prefixes: return all_forms
+                         prefixes: List[str] = None, live: bool = True) -> List[str]:
+        from .engine.lakara import normalize_lakara
+
+        canonical, db_lakara = normalize_lakara(lakara)
+        all_forms: List[str] = []
+        if live:
+            from .engine.tinanta import LiveTinantaEngine
+            engine = LiveTinantaEngine(self.conn_dhatus)
+            queries = self.resolve_dhatu_ids(dhatu) or [dhatu]
+            for query in queries:
+                forms, _steps = engine.generate_all(
+                    query, canonical, purusha, vacana, derivation, prayoga
+                )
+                all_forms.extend(forms)
+            all_forms = sorted(list(set(all_forms)))
+
+        if not all_forms:
+            dhatu_ids = self.resolve_dhatu_ids(dhatu)
+            raw_forms = []
+            for d_id in dhatu_ids:
+                for conn in self.tinanta_conns:
+                    try:
+                        cursor = conn.cursor()
+                        cursor.execute('''SELECT form_slp1 FROM tinantas 
+                                          WHERE dhatu_id = ? AND lakara = ? AND purusha = ? 
+                                          AND vacana = ? AND derivation = ? AND prayoga = ?''',
+                                       (d_id, db_lakara, purusha, vacana, derivation, prayoga))
+                        raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
+                    except sqlite3.OperationalError:
+                        pass
+
+            for raw in raw_forms:
+                all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
+            all_forms = sorted(list(set(all_forms)))
+
+        if not all_forms:
+            return []
+        if not prefixes:
+            return all_forms
             
         final_forms = []
         for form in all_forms:
@@ -519,23 +537,34 @@ class SktMorph:
         return sorted(list(set(final_forms)))
 
     def generate_krdanta(self, dhatu: str, pratyaya: str, derivation: str = 'shuddha', 
-                         prefixes: List[str] = None) -> List[str]:
+                         prefixes: List[str] = None, live: bool = True) -> List[str]:
+        all_forms: List[str] = []
+        if live:
+            from .engine.krdanta import LiveKrdantaEngine
+            engine = LiveKrdantaEngine(self.conn_dhatus)
+            queries = self.resolve_dhatu_ids(dhatu) or [dhatu]
+            for query in queries:
+                forms, _steps = engine.generate_all(query, pratyaya, derivation)
+                all_forms.extend(forms)
+            all_forms = sorted(list(set(all_forms)))
+
+        db_forms: List[str] = []
         dhatu_ids = self.resolve_dhatu_ids(dhatu)
-        raw_forms = []
         for d_id in dhatu_ids:
             for conn in self.krdanta_conns:
                 try:
                     cursor = conn.cursor()
-                    cursor.execute('''SELECT form_slp1 FROM krdantas 
-                                      WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?''',
-                                   (d_id, pratyaya, derivation))
-                    raw_forms.extend([row['form_slp1'] for row in cursor.fetchall()])
-                except sqlite3.OperationalError: pass
-            
-        all_forms = []
-        for raw in raw_forms:
-            all_forms.extend([f.strip() for f in raw.replace(';', ',').split(',') if f.strip()])
-            
+                    cursor.execute(
+                        """SELECT form_slp1 FROM krdantas
+                           WHERE dhatu_id = ? AND pratyaya = ? AND derivation = ?""",
+                        (d_id, pratyaya, derivation),
+                    )
+                    db_forms.extend([row["form_slp1"] for row in cursor.fetchall()])
+                except sqlite3.OperationalError:
+                    pass
+        for raw in db_forms:
+            all_forms.extend([f.strip() for f in raw.replace(";", ",").split(",") if f.strip()])
+
         all_forms = sorted(list(set(all_forms)))
         if not all_forms: return []
         if not prefixes: return all_forms

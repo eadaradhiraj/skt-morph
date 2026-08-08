@@ -1,108 +1,127 @@
 # SktMorph: Sanskrit Morphology Analyzer & Generator
 
-A lightning-fast, offline Python tool to analyze and generate Sanskrit morphology (Verbs, Participles, and Nouns). It uses **SLP1** transliteration internally for high-speed algorithmic Sandhi processing and bundles pre-built SQLite databases of root and shabda forms.
+A lightning-fast, offline Python tool to analyze and generate Sanskrit morphology (Verbs, Participles, and Nouns). It uses **SLP1** transliteration internally for high-speed algorithmic Sandhi processing.
+
+## Architecture
+
+- **Live Pāṇinian engine** (`sktmorph/engine/`): derives tinanta forms by applying rules (guṇa, śap, endings, sandhi) with sūtra-tagged steps — **default for verb generation**.
+- **SQLite reference data**: dhātus, tinantas, krdantas, taddhitas, shabdaprakriya — used for analysis, fallback when a live rule is not yet implemented, and krdanta lookup.
+- **Rule-based shabda**: subanta, sarvanama, taddhita paradigms in Python.
+
+Bundled databases are committed directly (each shard **under 50 MB**). Check with:
+
+```bash
+python scripts/check_db_sizes.py
+```
 
 ## Features
-- **Tinanta (Verbs) & Krdanta (Participles)**: Full analysis and generation with multiple Upasargas (prefixes). Supports fetching by numeric ID (`01.0001`) or smart string matching (`BU`).
-- **Subanta (Nouns)**: Algorithmic declension for ajanta (`a, A, i, I, u, U, f`), halanta (`in, as, at, an, ad, c, z, us, is`), and agent stems (`DAtA` → `DAtf`).
-- **Sarvanama (Pronouns)**: `tad`, `kim`, `asmad`, `yuzmad`, `sarva`, `idam`, `etad`, `yad`, `ubha`, `ena`, `eka`, `dvi`, `sva`, `am`, `traya`, `catur`, `purva`, `para`, `apara`, `anya`.
-- **Taddhita (Nominal Derivatives)**: `tva`, `tal`, `matup`/`vat`, `mayat`, `ka`, `yat`, `a`, `Iya`, `tA`, `ini`, `ana`, `thak`, `itac` — with SQLite lookup plus rule-based fallback.
-- **Prakriyā traces**: Optional step-by-step derivation hints (`--with-prakriya`) from bundled shabda data and pedagogical rules.
-- **Parse ranking**: Analyses include a `confidence` score to surface the most likely parse first.
-- **Devanagari I/O**: Optional `--devanagari` on CLI commands when `indic-transliteration` is installed.
-- **100% Offline & Fast**: No API calls during analysis.
-- **100% Test Coverage**: Enforced via CI and `python scripts/check_coverage.py`.
+- **Live tinanta derivation**: all primary lakāras (`plat`, `plot`, `plrt`, `plan`, `pvidhilin`, `plit`) for gaṇas 1–10 (shuddha, kartari), plus ātmanepada (`alat`, …) for reduplicating and thematic roots
+- **Live kṛdanta derivation**: ~35 pratyayas (participles, gerunds, absolutives, etc.) with DB variant merge
+- **Tinanta & Krdanta analysis/generation**: SQLite-backed with live-first verb/participle generation
+- **Subanta, Sarvanama, Taddhita**: algorithmic + SQLite
+- **Prakriyā traces**: shabda DB + live engine steps + pedagogical fallbacks
+- **Parse ranking**, **Devanagari I/O**
 
 ## Installation
 
 ```bash
-pip install git+https://github.com/eadaradhiraj/skt-morph.git
+git clone git@github.com:eadaradhiraj/skt-morph.git
+cd skt-morph
+pip install -e ".[devanagari,dev]"
+python scripts/ensure_data.py
+python scripts/smoke_test.py
 ```
 
-Optional Devanagari support:
+Optional Devanagari: `pip install indic-transliteration` or `pip install -e ".[devanagari]"`
 
-```bash
-pip install indic-transliteration
-```
-
-## Command Line Usage (CLI)
-
-All commands accept SLP1 by default. Add `--devanagari` to read Devanagari input and print Devanagari output (requires `indic-transliteration`).
+## Command Line Usage
 
 ### Analyze
 
 ```bash
-python -m sktmorph analyze praBavati
+python -m sktmorph analyze rAmaH
 python -m sktmorph analyze rAmaH --with-prakriya
 python -m sktmorph analyze te --top 3 --json
-python -m sktmorph analyze rAmaH --devanagari --with-prakriya
-python -m sktmorph analyze rAmatvam --type taddhita    # filter: verb, noun, pronoun, participle, declension, taddhita
 ```
 
-Analysis results are ranked by `confidence` (highest first). Use `--with-prakriya` to include shabda/prakriyā steps when available. Use `--top N` to limit results and `--json` for compact JSON output (single object or array).
-
-### Generate
+### Generate verb (live engine by default)
 
 ```bash
-python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1 --prefixes vi
-python -m sktmorph generate_verb --dhatu 01.0001 --lakara plat --purusha 1 --vacana 1 --prayoga karmani --derivation san
-python -m sktmorph generate_krdanta --dhatu BU --pratyaya lyuw --prefixes anu --derivation shuddha
-python -m sktmorph generate_taddhita --pratipadika rAma --pratyaya tva --linga nap --with-prakriya
-python -m sktmorph generate_taddhita --pratipadika rAma --pratyaya thak --linga pum
-python -m sktmorph generate_taddhita --pratipadika bala --pratyaya itac --linga pum
-python -m sktmorph generate_noun --base vApU --linga pum --with-prakriya
-python -m sktmorph generate_pronoun --base traya --linga pum --with-prakriya
+python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1
+python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1 --with-prakriya --json
+python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1 --lookup-only
+python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1 --prefixes vi --json
 ```
 
-## Python API Usage
+Use `--lookup-only` to skip live derivation and read pre-built tinanta SQLite tables instead.
+
+### Other generators
+
+```bash
+python -m sktmorph generate_krdanta --dhatu BU --pratyaya lyuw --json
+python -m sktmorph generate_taddhita --pratipadika rAma --pratyaya Tya --linga pum --json
+python -m sktmorph generate_noun --base rAma --linga pum --with-prakriya
+python -m sktmorph generate_pronoun --base paJcan --linga pum
+```
+
+## Python API
 
 ```python
 from sktmorph.morphology import SktMorph
 
 morph = SktMorph()
 
-# Analyze (prakriyā omitted by default)
-results = morph.analyze("vyAkaroti")
-results = morph.analyze("rAmaH", include_prakriya=True)
+# Live derivation (default)
+forms = morph.generate_tinanta("BU", "plat", 1, 1)
 
-# Generate taddhita with optional prakriyā trace
-taddhita = morph.generate_taddhita("rAma", "tva", "nap", include_prakriya=True)
+# SQLite lookup fallback only
+forms = morph.generate_tinanta("BU", "plat", 1, 1, live=False)
 
-# Generate noun declension with prakriyā
-noun = morph.generate_subanta("rAma", "pum", include_prakriya=True)
-print(noun["declension"]["prathamA"])
-print(noun["prakriya"][:2])
-
-# Generate pronoun with prakriyā
-pronoun = morph.generate_sarvanama("traya", "pum", include_prakriya=True)
+# Live engine directly with prakriyā steps
+from sktmorph.engine import LiveTinantaEngine
+engine = LiveTinantaEngine(morph.conn_dhatus)
+form, steps = engine.generate("01.0001", "plat", 1, 1)
 ```
-
-### Analyze result fields
-
-Each `MorphResult` includes: `word_type`, `pratipadika`, `linga`, `vibhakti`, `vacana`, `confidence`, and optionally `prakriya` (when `include_prakriya=True`).
 
 ## Development
 
 ```bash
-pip install -e ".[devanagari]"
-pip install -r requirements-dev.txt
+pip install -e ".[devanagari,dev]"
+python scripts/check_db_sizes.py
+python scripts/validate_engine.py
+python scripts/validate_corpus.py
+python scripts/validate_krdanta.py
 python scripts/check_coverage.py
-python scripts/ensure_data.py
+python scripts/smoke_test.py
 ```
 
-CI runs on every push/PR to `main` (Python 3.9, 3.11, 3.12) via `.github/workflows/ci.yml`.
-
-## Building Databases
+### Building databases
 
 ```bash
-python scripts/build_db.py          # dhatus, tinantas, krdantas + shabda ingest
-python scripts/build_taddhita_db.py # seed taddhita rows only
-python scripts/ingest_shabda.py     # taddhita + shabdaprakriya from ashtadhyayi.com
-python scripts/ensure_data.py       # verify bundled SQLite files exist
-python scripts/check_coverage.py    # run tests with 100% coverage gate
+python scripts/build_db.py
+python scripts/ingest_shabda.py
+python scripts/ensure_data.py --strict
 ```
 
-Bundled `.sqlite` files under `sktmorph/data/` are the runtime source. After a fresh clone, run `python scripts/build_db.py` and `python scripts/ingest_shabda.py` if databases are missing. Large database files may warrant Git LFS for forks that regenerate data frequently.
+If any `.sqlite` file exceeds 50 MB, split it before committing:
+
+```bash
+python scripts/check_db_sizes.py
+```
+
+## Live engine roadmap
+
+| Area | Status |
+|------|--------|
+| Primary lakāras (`plat`–`pvidhilin`) gaṇas 1–10 | Live (sample dhātus: 0 mismatches) |
+| Perfect `plit` | Live (gaṇa 1; gaṇa 3 hu; thematic pattern) |
+| Gaṇa 3 reduplication | Live (`engine/redup.py` — hu, BI, hrI, pF, dA, …) |
+| Ātmanepada (`alat`, `alot`, `alang`, `alit`) | Live (gaṇa 3 I-stems; thematic otherwise) |
+| Live kṛdanta (~35 pratyayas) | Live + DB variant merge |
+| Full-corpus validation | `scripts/validate_corpus.py` |
+| Karmani, niç, san, yaṅ derivatives | Planned |
+| Subanta / taddhita live (beyond current rules) | Partial |
 
 ## Acknowledgments
-Morphological datasets for roots (Dhatus), conjugations (Tinantas), participles (Krdantas), and shabda/prakriyā forms were sourced from **[ashtadhyayi.com](https://ashtadhyayi.com/)**.
+
+Morphological datasets from **[ashtadhyayi.com](https://ashtadhyayi.com/)**. Live engine follows Pāṇinian rule ordering pedagogically; it is not a reimplementation of vidyut.

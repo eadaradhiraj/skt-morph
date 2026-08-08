@@ -71,6 +71,30 @@ PRONOUNS = {
     ('anya', 'pum'): [['anyaH', 'anyO', 'anye'], ['anyam', 'anyO', 'anyAn'], ['anyena', 'anyAByAm', 'anyEH'], ['anyasmE', 'anyAByAm', 'anyeByaH'], ['anyasmAt', 'anyAByAm', 'anyeByaH'], ['anyasya', 'anyayoH', 'anyezAm'], ['anyasmin', 'anyayoH', 'anyezu'], ['anya', 'anyO', 'anye']],
     ('anya', 'stri'): [['anyA', 'anye', 'anyAH'], ['anyAm', 'anye', 'anyAH'], ['anyayA', 'anyAByAm', 'anyABiH'], ['anyasyE', 'anyAByAm', 'anyAByaH'], ['anyasyAH', 'anyAByAm', 'anyAByaH'], ['anyasyAH', 'anyayoH', 'anyAsAm'], ['anyasyAm', 'anyayoH', 'anyAzu'], ['anye', 'anye', 'anyAH']],
     ('anya', 'nap'): [['anyam', 'anye', 'anyARi'], ['anyam', 'anye', 'anyARi'], ['anyena', 'anyAByAm', 'anyEH'], ['anyasmE', 'anyAByAm', 'anyeByaH'], ['anyasmAt', 'anyAByAm', 'anyeByaH'], ['anyasya', 'anyayoH', 'anyezAm'], ['anyasmin', 'anyayoH', 'anyezu'], ['anya', 'anye', 'anyARi']],
+
+    ('paJcan', 'pum'): [['paJcaH', 'paJcO', 'paJcaH'], ['paJcam', 'paJcO', 'paJcan'], ['paJcaBiH', 'paJcaByAm', 'paJcaBiH'], ['paJcaByaH', 'paJcaByAm', 'paJcaByaH'], ['paJcaByaH', 'paJcaByAm', 'paJcaByaH'], ['paJcasya', 'paJcoH', 'paJcAnAm'], ['paJcasu', 'paJcasu', 'paJcasu']],
+    ('paJcan', 'stri'): [['paYcI', 'paYco', 'paYcaH'], ['paYcIm', 'paYco', 'paYcaH'], ['paYcIBiH', 'paYcIByAm', 'paYcIBiH'], ['paYcIByaH', 'paYcIByAm', 'paYcIByaH'], ['paYcIByaH', 'paYcIByAm', 'paYcIByaH'], ['paYcIByaH', 'paYcoH', 'paYcInAm'], ['paYcIsu', 'paYcoH', 'paYcIsu']],
+    ('paJcan', 'nap'): [['paJcan', 'paJcAni', 'paJcAni'], ['paJcan', 'paJcAni', 'paJcAni'], ['paJcaBiH', 'paJcaByAm', 'paJcaBiH'], ['paJcaByaH', 'paJcaByAm', 'paJcaByaH'], ['paJcaByaH', 'paJcaByAm', 'paJcaByaH'], ['paJcasya', 'paJcoH', 'paJcAnAm'], ['paJcasu', 'paJcasu', 'paJcasu']],
+
+    ('zaq', 'pum'): [['zaq', 'zaqO', 'zaq'], ['zaqam', 'zaqO', 'zaws'], ['zaqBiH', 'zaqByAm', 'zaqBiH'], ['zaqByaH', 'zaqByAm', 'zaqByaH'], ['zaqByaH', 'zaqByAm', 'zaqByaH'], ['zaqasya', 'zaqNoH', 'zawsAm'], ['zaqzu', 'zaqzu', 'zaqzu']],
+    ('zaq', 'stri'): [['zaqI', 'zaqo', 'zaqaH'], ['zaqIm', 'zaqo', 'zaqaH'], ['zaqIBiH', 'zaqIByAm', 'zaqIBiH'], ['zaqIByaH', 'zaqIByAm', 'zaqIByaH'], ['zaqIByaH', 'zaqIByAm', 'zaqIByaH'], ['zaqIByaH', 'zaqoH', 'zaqInAm'], ['zaqIsu', 'zaqoH', 'zaqIsu']],
+    ('zaq', 'nap'): [['zaq', 'zaqRI', 'zaqRi'], ['zaq', 'zaqRI', 'zaqRi'], ['zaqBiH', 'zaqByAm', 'zaqBiH'], ['zaqByaH', 'zaqByAm', 'zaqByaH'], ['zaqByaH', 'zaqByAm', 'zaqByaH'], ['zaqasya', 'zaqNoH', 'zawsAm'], ['zaqzu', 'zaqzu', 'zaqzu']],
+
+    ('saptan', 'pum'): [['saptaH', 'saptO', 'saptaH'], ['saptam', 'saptO', 'saptAn'], ['saptaBiH', 'saptaByAm', 'saptaBiH'], ['saptaByaH', 'saptaByAm', 'saptaByaH'], ['saptaByaH', 'saptaByAm', 'saptaByaH'], ['saptasya', 'saptoH', 'saptAnAm'], ['saptasu', 'saptasu', 'saptasu']],
+    ('saptan', 'stri'): [['saptI', 'sapto', 'saptaH'], ['saptIm', 'sapto', 'saptaH'], ['saptIBiH', 'saptIByAm', 'saptIBiH'], ['saptIByaH', 'saptIByAm', 'saptIByaH'], ['saptIByaH', 'saptIByAm', 'saptIByaH'], ['saptIByaH', 'saptoH', 'saptInAm'], ['saptIsu', 'saptoH', 'saptIsu']],
+    ('saptan', 'nap'): [['sapta', 'saptAni', 'saptAni'], ['sapta', 'saptAni', 'saptAni'], ['saptaBiH', 'saptaByAm', 'saptaBiH'], ['saptaByaH', 'saptaByAm', 'saptaByaH'], ['saptaByaH', 'saptaByAm', 'saptaByaH'], ['saptasya', 'saptoH', 'saptAnAm'], ['saptasu', 'saptasu', 'saptasu']],
+
+    ('azwan', 'pum'): [['azwaH', 'azwO', 'azwaH'], ['azwam', 'azwO', 'azWAn'], ['azwaBiH', 'azwaByAm', 'azwaBiH'], ['azwaByaH', 'azwaByAm', 'azwaByaH'], ['azwaByaH', 'azwaByAm', 'azwaByaH'], ['azwasya', 'azwoH', 'azwAnAm'], ['azwasu', 'azwasu', 'azwasu']],
+    ('azwan', 'stri'): [['azwI', 'azwo', 'azwaH'], ['azwIm', 'azwo', 'azwaH'], ['azwIBiH', 'azwIByAm', 'azwIBiH'], ['azwIByaH', 'azwIByAm', 'azwIByaH'], ['azwIByaH', 'azwIByAm', 'azwIByaH'], ['azwIByaH', 'azwoH', 'azwInAm'], ['azwIsu', 'azwoH', 'azwIsu']],
+    ('azwan', 'nap'): [['azwan', 'azwAni', 'azwAni'], ['azwan', 'azwAni', 'azwAni'], ['azwaBiH', 'azwaByAm', 'azwaBiH'], ['azwaByaH', 'azwaByAm', 'azwaByaH'], ['azwaByaH', 'azwaByAm', 'azwaByaH'], ['azwasya', 'azwoH', 'azwAnAm'], ['azwasu', 'azwasu', 'azwasu']],
+
+    ('navan', 'pum'): [['navaH', 'navO', 'navaH'], ['navam', 'navO', 'navAn'], ['navaBiH', 'navaByAm', 'navaBiH'], ['navaByaH', 'navaByAm', 'navaByaH'], ['navaByaH', 'navaByAm', 'navaByaH'], ['navasya', 'navoH', 'navAnAm'], ['navasu', 'navasu', 'navasu']],
+    ('navan', 'stri'): [['navI', 'navo', 'navaH'], ['navIm', 'navo', 'navaH'], ['navIBiH', 'navIByAm', 'navIBiH'], ['navIByaH', 'navIByAm', 'navIByaH'], ['navIByaH', 'navIByAm', 'navIByaH'], ['navIByaH', 'navoH', 'navInAm'], ['navIsu', 'navoH', 'navIsu']],
+    ('navan', 'nap'): [['nava', 'navAni', 'navAni'], ['nava', 'navAni', 'navAni'], ['navaBiH', 'navaByAm', 'navaBiH'], ['navaByaH', 'navaByAm', 'navaByaH'], ['navaByaH', 'navaByAm', 'navaByaH'], ['navasya', 'navoH', 'navAnAm'], ['navasu', 'navasu', 'navasu']],
+
+    ('daSan', 'pum'): [['daSaH', 'daSO', 'daSaH'], ['daSam', 'daSO', 'daSAn'], ['daSaBiH', 'daSaByAm', 'daSaBiH'], ['daSaByaH', 'daSaByAm', 'daSaByaH'], ['daSaByaH', 'daSaByAm', 'daSaByaH'], ['daSasya', 'daSoH', 'daSAnAm'], ['daSasu', 'daSasu', 'daSasu']],
+    ('daSan', 'stri'): [['daSI', 'daSo', 'daSaH'], ['daSIm', 'daSo', 'daSaH'], ['daSIBiH', 'daSIByAm', 'daSIBiH'], ['daSIByaH', 'daSIByAm', 'daSIByaH'], ['daSIByaH', 'daSIByAm', 'daSIByaH'], ['daSIByaH', 'daSoH', 'daSInAm'], ['daSIsu', 'daSoH', 'daSIsu']],
+    ('daSan', 'nap'): [['daSa', 'daSAni', 'daSAni'], ['daSa', 'daSAni', 'daSAni'], ['daSaBiH', 'daSaByAm', 'daSaBiH'], ['daSaByaH', 'daSaByAm', 'daSaByaH'], ['daSaByaH', 'daSaByAm', 'daSaByaH'], ['daSasya', 'daSoH', 'daSAnAm'], ['daSasu', 'daSasu', 'daSasu']],
 }
 
 class SarvanamaGenerator:

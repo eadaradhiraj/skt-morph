@@ -24,6 +24,10 @@ class TestSubantaExpandedParadigms(unittest.TestCase):
         self.assertIn("prakriya", detail)
         self.assertEqual(len(detail["prakriya"]), 16)
 
+    def test_long_i_stem_pum(self):
+        table = self.gen.generate("karI", "pum")
+        self.assertEqual(table["prathamA"], ["karI", "karyO", "karyaH"])
+
 
 if __name__ == "__main__":
     unittest.main()

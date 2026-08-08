@@ -201,8 +201,8 @@ class TestSktMorph(unittest.TestCase):
         mock_cursor.execute.side_effect = sqlite3.OperationalError("Mock Error")
         
         with patch.object(self.morph, "tinanta_conns", [mock_conn]), patch.object(self.morph, "krdanta_conns", [mock_conn]):
-            self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1), [])
-            self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw"), [])
+            self.assertEqual(self.morph.generate_tinanta("01.0001", "plat", 1, 1, live=False), [])
+            self.assertEqual(self.morph.generate_krdanta("01.0001", "lyuw", live=False), [])
             res = self.morph.analyze("fakeWord")
             self.assertFalse(any(r.word_type in ["tinanta", "krdanta"] for r in res))
             
@@ -218,6 +218,14 @@ class TestSktMorph(unittest.TestCase):
     def test_generator_tinanta(self):
         forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, prefixes=['pra'])
         self.assertIn('praBavati', forms)
+
+    def test_generate_tinanta_live_default(self):
+        forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, live=True)
+        self.assertIn('Bavati', forms)
+
+    def test_generate_tinanta_lookup_only(self):
+        forms = self.morph.generate_tinanta('01.0001', 'plat', 1, 1, live=False)
+        self.assertTrue(len(forms) > 0)
 
     def test_generator_tinanta_edge_cases(self):
         self.assertEqual(self.morph.generate_tinanta('99.9999', 'plat', 1, 1), [])
@@ -237,7 +245,7 @@ class TestSktMorph(unittest.TestCase):
         mock_conn.cursor.return_value = mock_cursor
         mock_cursor.fetchall.return_value = [{"form_slp1": "Bavanam,BAvana;BUtvA"}]
         with patch.object(self.morph, 'krdanta_conns', [mock_conn]):
-            forms = self.morph.generate_krdanta("01.0001", "lyuw", prefixes=["anu"])
+            forms = self.morph.generate_krdanta("01.0001", "lyuw", prefixes=["anu"], live=False)
             self.assertEqual(forms, sorted(["anuBAvana", "anuBavanam", "anuBUtvA"]))
 
     def test_lyap_prefix_generator(self):
