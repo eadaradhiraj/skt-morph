@@ -1,9 +1,10 @@
 import unittest
 from unittest.mock import patch, MagicMock
+import json
 import sys
 import runpy
 import warnings
-from sktmorph.morphology import SktMorph, apply_forward_sandhi
+from sktmorph.morphology import SktMorph, apply_forward_sandhi, MorphResult
 from sktmorph import cli
 
 class TestSktMorph(unittest.TestCase):
@@ -577,6 +578,36 @@ class TestSktMorph(unittest.TestCase):
             res_good = self.morph.analyze("saNgacCamAnaH", allowed_types=["krdanta"])
             self.assertTrue(len(res_good) > 0)
 
+class TestCLIHelpers(unittest.TestCase):
+    def test_result_dict_strips_prakriya_by_default(self):
+        result = MorphResult(
+            word="rAmaH", prefixes=[], dhatu=None, word_type="subanta",
+            derivation=None, pratipadika="rAma", linga="pum",
+            vibhakti="prathamA", vacana=1,
+            prakriya=[{"step": "rAma + H"}],
+        )
+        data = cli._result_dict(result)
+        self.assertNotIn("prakriya", data)
+
+    def test_result_dict_keeps_prakriya_when_requested(self):
+        trace = [{"step": "rAma + H"}]
+        result = MorphResult(
+            word="rAmaH", prefixes=[], dhatu=None, word_type="subanta",
+            derivation=None, pratipadika="rAma", linga="pum",
+            vibhakti="prathamA", vacana=1, prakriya=trace,
+        )
+        data = cli._result_dict(result, with_prakriya=True)
+        self.assertEqual(data["prakriya"], trace)
+
+    def test_payload_dict_strips_prakriya_by_default(self):
+        payload = {"stem": "rAmatva", "prakriya": [{"step": "x"}]}
+        self.assertNotIn("prakriya", cli._payload_dict(payload))
+
+    def test_payload_dict_keeps_prakriya_when_requested(self):
+        payload = {"stem": "rAmatva", "prakriya": [{"step": "x"}]}
+        self.assertIs(cli._payload_dict(payload, with_prakriya=True), payload)
+
+
 class TestCLI(unittest.TestCase):
     @patch("sys.argv", ["sktmorph", "analyze", "praBavati"])
     def test_cli_analyze(self):
@@ -589,6 +620,34 @@ class TestCLI(unittest.TestCase):
     @patch("sys.argv", ["sktmorph", "analyze", "praBavati", "--type", "verb"])
     def test_cli_analyze_with_type(self):
         with patch("builtins.print"): cli.main()
+
+    @patch("sys.argv", ["sktmorph", "analyze", "rAmaH", "--with-prakriya"])
+    def test_cli_analyze_with_prakriya(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            payloads = [json.loads(call[0][0]) for call in mock_print.call_args_list]
+            self.assertTrue(any("prakriya" in p for p in payloads))
+
+    @patch("sys.argv", ["sktmorph", "analyze", "rAmaH"])
+    def test_cli_analyze_without_prakriya(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            payloads = [json.loads(call[0][0]) for call in mock_print.call_args_list]
+            self.assertTrue(all("prakriya" not in p for p in payloads))
+
+    @patch("sys.argv", ["sktmorph", "generate_taddhita", "--pratipadika", "rAma", "--pratyaya", "tva", "--linga", "nap", "--with-prakriya"])
+    def test_cli_generate_taddhita_with_prakriya(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            data = json.loads(mock_print.call_args[0][0])
+            self.assertIn("prakriya", data)
+
+    @patch("sys.argv", ["sktmorph", "generate_taddhita", "--pratipadika", "rAma", "--pratyaya", "tva", "--linga", "nap"])
+    def test_cli_generate_taddhita_without_prakriya(self):
+        with patch("builtins.print") as mock_print:
+            cli.main()
+            data = json.loads(mock_print.call_args[0][0])
+            self.assertNotIn("prakriya", data)
 
     @patch("sys.argv", ["sktmorph", "generate_verb", "--dhatu", "01.0001", "--lakara", "plat", "--purusha", "1", "--vacana", "1"])
     def test_cli_generate_verb(self):

@@ -1,73 +1,96 @@
 # SktMorph: Sanskrit Morphology Analyzer & Generator
 
-A lightning-fast, offline Python tool to analyze and generate Sanskrit morphology (Verbs, Participles, and Nouns). It uses **SLP1** transliteration for high-speed algorithmic Sandhi processing and bundles a pre-built SQLite database of root forms.
+A lightning-fast, offline Python tool to analyze and generate Sanskrit morphology (Verbs, Participles, and Nouns). It uses **SLP1** transliteration internally for high-speed algorithmic Sandhi processing and bundles pre-built SQLite databases of root and shabda forms.
 
 ## Features
 - **Tinanta (Verbs) & Krdanta (Participles)**: Full analysis and generation with multiple Upasargas (prefixes). Supports fetching by numeric ID (`01.0001`) or smart string matching (`BU`).
-- **Subanta (Nouns)**: Algorithmic declension generation supporting `a, A, i, u, f (ṛ)` ending nouns and halanta stems (`in, as, at`) in all genders, with accurate *Natva* Sandhi rules.
-- **Sarvanama (Pronouns)**: Specialized generator and analyzer for `tad`, `kim`, `asmad`, `yuzmad`, and `sarva`.
-- **Root Details**: Fetches Pāṇinian Dhatu details (Gana, Meaning, Pada) during analysis.
-- **100% Offline & Fast**: No API calls; relies on a bundled SQLite database.
-- **100% Test Coverage**: Rock-solid algorithmic foundation.
+- **Subanta (Nouns)**: Algorithmic declension for ajanta (`a, A, i, I, u, U, f`), halanta (`in, as, at, an, ad, c, z, us, is`), and agent stems (`DAtA` → `DAtf`).
+- **Sarvanama (Pronouns)**: `tad`, `kim`, `asmad`, `yuzmad`, `sarva`, `idam`, `etad`, `yad`, `ubha`, `ena`, `eka`, `dvi`, `sva`, `am`.
+- **Taddhita (Nominal Derivatives)**: `tva`, `tal`, `matup`/`vat`, `mayat`, `ka`, `yat`, `a`, `Iya`, `tA`, `ini`, `ana` — with SQLite lookup plus rule-based fallback.
+- **Prakriyā traces**: Optional step-by-step derivation hints (`--with-prakriya`) from bundled shabda data and pedagogical rules.
+- **Parse ranking**: Analyses include a `confidence` score to surface the most likely parse first.
+- **Devanagari I/O**: Optional `--devanagari` on CLI commands when `indic-transliteration` is installed.
+- **100% Offline & Fast**: No API calls during analysis.
+- **100% Test Coverage**: Enforced via `python scripts/check_coverage.py`.
 
 ## Installation
 
-You can install this package directly from GitHub:
 ```bash
 pip install git+https://github.com/eadaradhiraj/skt-morph.git
 ```
 
+Optional Devanagari support:
+
+```bash
+pip install indic-transliteration
+```
+
 ## Command Line Usage (CLI)
 
-The package provides a powerful CLI tool accessible via `python -m sktmorph`.
+All commands accept SLP1 by default. Add `--devanagari` to read Devanagari input and print Devanagari output (requires `indic-transliteration`).
 
-### 1. Analyze a Word
-Analyzes a combined word (with or without prefixes) and strips the Sandhi to find the root or noun stem.
+### Analyze
+
 ```bash
 python -m sktmorph analyze praBavati
-python -m sktmorph analyze rAmeRa
+python -m sktmorph analyze rAmaH --with-prakriya
+python -m sktmorph analyze rAmaH --devanagari --with-prakriya
+python -m sktmorph analyze rAmatvam --type taddhita    # filter: verb, noun, pronoun, participle, declension, taddhita
 ```
 
-### 2. Generate Verbs (Tinanta)
-Generates verbs by attaching optional prefixes to base roots.
-```bash
-python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1 --prefixes vi A
-```
+Analysis results are ranked by `confidence` (highest first). Use `--with-prakriya` to include shabda/prakriyā steps when available.
 
-### 3. Generate Participles (Krdanta)
-Generates participles by dynamically attaching prefixes to root forms.
+### Generate
+
 ```bash
+python -m sktmorph generate_verb --dhatu BU --lakara plat --purusha 1 --vacana 1 --prefixes vi
 python -m sktmorph generate_krdanta --dhatu BU --pratyaya lyuw --prefixes anu
-```
-
-### 4. Generate Nouns (Subanta) & Pronouns (Sarvanama)
-Generates the 24 declension forms for a given base and gender.
-```bash
-python -m sktmorph generate_noun --base hari --linga pum
-python -m sktmorph generate_pronoun --base asmad --linga any
+python -m sktmorph generate_taddhita --pratipadika rAma --pratyaya tva --linga nap --with-prakriya
+python -m sktmorph generate_taddhita --pratipadika rAma --pratyaya Iya --linga pum
+python -m sktmorph generate_noun --base vApU --linga pum --with-prakriya
+python -m sktmorph generate_pronoun --base eka --linga pum
+python -m sktmorph analyze rAmatvam --type taddhita
 ```
 
 ## Python API Usage
-
-You can easily import `SktMorph` into your own NLP projects.
 
 ```python
 from sktmorph.morphology import SktMorph
 
 morph = SktMorph()
 
-# 1. Analyze a Verb
-results = morph.analyze('vyAkaroti')
-for res in results:
-    if res.word_type == 'tinanta':
-        print(res.dhatu)            # '08.0010'
-        print(res.prefixes)         # ['vi', 'A']
-        print(res.dhatu_details)    # JSON dict of root meaning, gana, etc.
+# Analyze (prakriyā omitted by default)
+results = morph.analyze("vyAkaroti")
+results = morph.analyze("rAmaH", include_prakriya=True)
 
-# 2. Generate Noun Declensions
-noun_table = morph.generate_subanta('Pala', 'nap')
-print(noun_table['tfIyA'])          # ['Palena', 'PalAByAm', 'PalEH']
+# Generate taddhita with optional prakriyā trace
+taddhita = morph.generate_taddhita("rAma", "tva", "nap", include_prakriya=True)
+
+# Generate noun declension with prakriyā
+noun = morph.generate_subanta("rAma", "pum", include_prakriya=True)
+print(noun["declension"]["prathamA"])
+print(noun["prakriya"][:2])
+```
+
+### Analyze result fields
+
+Each `MorphResult` includes: `word_type`, `pratipadika`, `linga`, `vibhakti`, `vacana`, `confidence`, and optionally `prakriya` (when `include_prakriya=True`).
+
+## Development
+
+```bash
+pip install pytest coverage indic-transliteration
+python scripts/check_coverage.py
+```
+
+## Building Databases
+
+```bash
+python scripts/build_db.py          # dhatus, tinantas, krdantas + shabda ingest
+python scripts/build_taddhita_db.py   # seed taddhita rows only
+python scripts/ingest_shabda.py     # taddhita + shabdaprakriya from ashtadhyayi.com
+python scripts/check_coverage.py    # run tests with 100% coverage gate
 ```
 
 ## Acknowledgments
-The underlying morphological datasets for roots (Dhatus), conjugations (Tinantas), and participles (Krdantas) used to build the bundled database in this project were sourced from **[ashtadhyayi.com](https://ashtadhyayi.com/)**.
+Morphological datasets for roots (Dhatus), conjugations (Tinantas), participles (Krdantas), and shabda/prakriyā forms were sourced from **[ashtadhyayi.com](https://ashtadhyayi.com/)**.

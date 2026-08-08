@@ -17,4 +17,7 @@ setup(
         ],
     },
     python_requires=">=3.8",
+    extras_require={
+        "devanagari": ["indic-transliteration"],
+    },
 )

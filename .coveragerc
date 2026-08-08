@@ -3,6 +3,7 @@ source = sktmorph
 
 [report]
 show_missing = True
-omit = 
+fail_under = 100
+omit =
     tests/*
     setup.py

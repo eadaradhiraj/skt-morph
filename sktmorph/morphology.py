@@ -7,6 +7,9 @@ from dataclasses import dataclass
 from typing import List, Tuple, Dict, Any, Optional
 from .subanta import SubantaGenerator
 from .sarvanama import SarvanamaGenerator
+from .taddhita import TaddhitaGenerator
+from .shabda_db import ShabdaPrakriyaStore
+from .ranking import rank_results
 
 @dataclass
 class MorphResult:
@@ -24,6 +27,8 @@ class MorphResult:
     pratipadika: Optional[str] = None
     linga: Optional[str] = None
     vibhakti: Optional[str] = None
+    prakriya: Optional[List[Dict[str, Any]]] = None
+    confidence: Optional[float] = None
 
 PADA_RESTRICTIONS = {
     ("09.0001", "vi"): "A",
@@ -165,6 +170,9 @@ class SktMorph:
             c.execute(f"ATTACH DATABASE '{main_db}' AS ddb")
             self.krdanta_conns.append(c)
 
+        self._taddhita = TaddhitaGenerator(os.path.join(self.db_dir, 'taddhitas.sqlite'))
+        self._shabda = ShabdaPrakriyaStore(os.path.join(self.db_dir, 'shabdaprakriya.sqlite'))
+
     def _get_lyap_cache(self) -> Dict[str, List[sqlite3.Row]]:
         if hasattr(self, '_lyap_cache'): return self._lyap_cache
         self._lyap_cache = {}
@@ -248,7 +256,8 @@ class SktMorph:
             if s_c in word: return word.replace(s_c, d_c)
         return word
 
-    def analyze(self, word_slp1: str, allowed_types: Optional[List[str]] = None) -> List[MorphResult]:
+    def analyze(self, word_slp1: str, allowed_types: Optional[List[str]] = None,
+                include_prakriya: bool = False) -> List[MorphResult]:
         candidates = self.get_candidate_splits(word_slp1)
         results = []
 
@@ -346,7 +355,7 @@ class SktMorph:
                             ))
                     except sqlite3.OperationalError: pass
 
-        if not allowed_types or 'subanta' in allowed_types or 'krdanta' in allowed_types:
+        if not allowed_types or 'subanta' in allowed_types or 'krdanta' in allowed_types or 'taddhita' in allowed_types:
             for match in SubantaGenerator().analyze(word_slp1):
                 prati = match['pratipadika']
                 if not allowed_types or 'subanta' in allowed_types:
@@ -354,6 +363,14 @@ class SktMorph:
                         word=word_slp1, prefixes=[], dhatu=None, word_type='subanta', derivation=None,
                         pratipadika=prati, linga=match['linga'], vibhakti=match['vibhakti'], vacana=match['vacana']
                     ))
+
+                if not allowed_types or 'taddhita' in allowed_types:
+                    for td in self._taddhita.analyze_stem(prati):
+                        results.append(MorphResult(
+                            word=word_slp1, prefixes=[], dhatu=None, word_type='taddhita', derivation=None,
+                            pratipadika=td['pratipadika'], pratyaya=td['pratyaya'],
+                            linga=match['linga'], vibhakti=match['vibhakti'], vacana=match['vacana']
+                        ))
                 
                 if not allowed_types or 'krdanta' in allowed_types:
                     prati_splits = self.get_candidate_splits(prati)
@@ -428,7 +445,17 @@ class SktMorph:
             if key not in seen:
                 seen.add(key)
                 unique_results.append(r)
-        return unique_results
+
+        for r in unique_results:
+            traces = self._shabda.lookup_form(r.word)
+            if traces and not r.prakriya:
+                r.prakriya = traces[0]["steps"]
+
+        ranked = rank_results(unique_results)
+        if not include_prakriya:
+            for r in ranked:
+                r.prakriya = None
+        return ranked
 
     def resolve_dhatu_ids(self, dhatu_query: str) -> List[str]:
         if re.match(r'^\d{2}\.\d{4}$', dhatu_query): return [dhatu_query]
@@ -508,8 +535,23 @@ class SktMorph:
             
         return sorted(list(set(final_forms)))
 
-    def generate_subanta(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
-        return SubantaGenerator().generate(pratipadika, linga)
+    def generate_subanta(self, pratipadika: str, linga: str, include_prakriya: bool = False) -> Dict:
+        gen = SubantaGenerator()
+        if include_prakriya:
+            detail = gen.generate_with_prakriya(pratipadika, linga)
+            return {
+                "stem": detail["stem"],
+                "linga": detail["linga"],
+                "declension": detail["declension"],
+                "prakriya": detail["prakriya"],
+            }
+        return gen.generate(pratipadika, linga)
 
     def generate_sarvanama(self, pratipadika: str, linga: str) -> Dict[str, List[str]]:
         return SarvanamaGenerator().generate(pratipadika, linga)
+
+    def generate_taddhita(self, pratipadika: str, pratyaya: str, linga: str,
+                          include_prakriya: bool = False) -> Dict:
+        return self._taddhita.generate(
+            pratipadika, pratyaya, linga, include_prakriya=include_prakriya
+        )

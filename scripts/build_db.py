@@ -1,6 +1,7 @@
 import json
 import sqlite3
 import os
+import sys
 import glob
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
@@ -142,6 +143,16 @@ def main():
     for der in conn_t_dict.values():
         for conn in der.values(): conn.commit(); conn.close()
     print("Successfully built and converted all databases to SLP1!")
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    if script_dir not in sys.path:
+        sys.path.insert(0, script_dir)
+    try:
+        from ingest_shabda import ingest_all
+        stats = ingest_all(use_download=True)
+        print(f"Built shabda databases: {stats}")
+    except Exception as exc:
+        print(f"Warning: shabda ingest skipped or failed: {exc}")
 
 if __name__ == "__main__":
     main()

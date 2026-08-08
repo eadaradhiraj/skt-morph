@@ -28,6 +28,29 @@ class TestSubanta(unittest.TestCase):
         self.assertEqual(bhavat['prathamA'],['BavAn', 'BavantO', 'BavantaH'])
         self.assertEqual(bhavat['tfIyA'],['BavatA', 'BavadByAm', 'BavadBiH']) # Shows 't' -> 'd' sandhi logic
 
+        # 'an' ending (rAjan-type)
+        rajan = self.gen.generate('rAjan', 'pum')
+        self.assertEqual(rajan['prathamA'], ['rAjA', 'rAjAnO', 'rAjAnaH'])
+        self.assertEqual(rajan['tfIyA'], ['rAjYA', 'rAjaByAm', 'rAjaBiH'])
+
+        # 'c' ending (vAc-type)
+        vac = self.gen.generate('vAc', 'stri')
+        self.assertEqual(vac['prathamA'], ['vAg', 'vAcaH', 'vAcaH'])
+        self.assertEqual(vac['tfIyA'], ['vAcA', 'vAgByAm', 'vAgBiH'])
+
+        # 'ad' ending (pad-type)
+        pad = self.gen.generate('pad', 'nap')
+        self.assertEqual(pad['prathamA'], ['pad', 'padI', 'pAmSi'])
+        self.assertEqual(pad['saptamI'], ['padi', 'padoh', 'patsu'])
+
+        # 'z' ending (Siz-type)
+        siz = self.gen.generate('Siz', 'pum')
+        self.assertEqual(siz['prathamA'], ['SiH', 'SiqO', 'SiqaH'])
+
+        # 'at' neuter (jagat-type)
+        jagat = self.gen.generate('jagat', 'nap')
+        self.assertEqual(jagat['prathamA'], ['jagat', 'jagatI', 'jagAMsi'])
+
     def test_analyze_subanta(self):
         matches1 = self.gen.analyze('rAmeRa')
         self.assertTrue(any(m['pratipadika'] == 'rAma' and m['vibhakti'] == 'tfIyA' for m in matches1))
@@ -52,9 +75,8 @@ class TestSubanta(unittest.TestCase):
         self.assertEqual(nadi["zazWI"], ["nadyAH", "nadyoH", "nadInAm"])
 
     def test_unimplemented_and_edge_cases(self):
-        # 'vAc' (speech) is a c-anta which is not implemented yet
         with self.assertRaises(NotImplementedError):
-            self.gen.generate('vAc', 'stri')
+            self.gen.generate('vAc', 'pum')
         self.assertIsNone(self.gen.generate('', 'pum'))
 
 if __name__ == '__main__':
