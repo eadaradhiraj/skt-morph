@@ -25,6 +25,10 @@ def _plot_uses_ari(base: str) -> bool:
         return True
     if base.endswith("P") and "r" in base[:-1]:
         return True
+    if base.endswith("m") and "r" in base[:-1]:
+        return True
+    if base.endswith(("fmB", "amB")):
+        return True
     return False
 
 

@@ -6,6 +6,7 @@ from .phonology import (
     VOWEL_FINAL,
     apply_causative_grade,
     apply_guna_to_stem,
+    apply_vrddhi_to_stem,
     bidadi_lang_stem,
     bidadi_present_stem,
     bidadi_vidhilin_stem,
@@ -50,7 +51,9 @@ def conjugation_gana(gana: int, tags: str = "") -> int:
 
 def _g6_skip_future_guna(dhatu: str) -> bool:
     """Roots whose lṛṭ stem keeps the ungraded dhātu (cluster/uppercase patterns)."""
-    if any(ch in "UIA" for ch in dhatu[:-1]):
+    if "mP" in dhatu or "fM" in dhatu or "Mh" in dhatu:
+        return True
+    if any(ch in "IUA" for ch in dhatu[:-1]):
         return True
     if len(dhatu) <= 4 and len(dhatu) >= 3 and not dhatu.endswith(("d", "t", "D", "T")):
         if dhatu[0] in "uim" or dhatu[-1] in "cCjJ":
@@ -74,9 +77,7 @@ def _g6_future_suffix(graded: str) -> str:
     if graded.endswith("z"):
         return graded[:-1] + "kzya"
     if graded.endswith(("p", "P", "b", "B")):
-        if graded[-1].isupper():
-            return graded + "izya"
-        return graded + "sya"
+        return graded + "izya"
     if graded.endswith(("c", "C", "j", "J")):
         return graded + "izya"
     return graded + "izya"
@@ -97,12 +98,15 @@ def _append_step(steps: List[EngineStep], form: str, sutras: List[str], kind: st
 
 def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     """Gaṇa-1 future base before -sya/-izya (may differ from present base)."""
-    if dhatu.endswith("nv") and len(dhatu) >= 3:
+    if dhatu.endswith("nv") and len(dhatu) >= 4:
         return dhatu[:-2] + dhatu[-3] + "Rv"
     if dhatu == "guh":
         return "gUh"
     if dhatu in ("SrA", "jYA"):
         return dhatu[:-1] + "i"
+    vrddhi = apply_vrddhi_to_stem(dhatu)
+    if present_base == vrddhi and present_base != dhatu:
+        return dhatu
     if present_base == dhatu and guna != dhatu and dhatu.endswith(("Iv", "Uv")) and len(dhatu) > 3:
         return guna
     return present_base
@@ -119,7 +123,7 @@ def _g1_future_from_present(dhatu: str, present_stem: str, guna: str) -> str:
         return base + "izya"
     if base.endswith("e") and len(base) <= 2:
         return base + "zya"
-    if dhatu.endswith("nv"):
+    if dhatu.endswith("nv") and len(dhatu) >= 4:
         return base + "izya"
     return base + "izya"
 
@@ -133,7 +137,7 @@ def future_stem(
     """Derive lṛṭ stem (3.2.135 etc.)."""
     if present_stem and present_stem.endswith("Aya"):
         if dhatu.endswith("E"):
-            return present_stem[:-1] + "sy"
+            return present_stem[:-2] + "sy"
         return present_stem[:-1] + "izya"
     if present_stem and present_stem.endswith("aya"):
         return present_stem[:-1] + "izya"
