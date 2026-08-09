@@ -113,12 +113,16 @@ python scripts/check_db_sizes.py
 
 | Area | Status |
 |------|--------|
-| Primary lakāras (`plat`–`pvidhilin`) gaṇas 1–10 | Live (sample dhātus: 0 mismatches) |
+| Primary lakāras (`plat`–`pvidhilin`) gaṇas 1–10 | Live; **~82.9%** full-corpus match (`validate_corpus.py`, Aug 2026) |
+| Gaṇa 9 (R-infix vs n-infix) | Live via per-root n-infix set (`mI`, `sku`, …); default R-infix |
+| Gaṇa 10 causative vs thematic | Live via `nityaRic` tag routing |
+| BidAdi (`antarganas`) | Present `-aya-`; laṅ/vidhilin stems |
+| `-Aya-` presents (`gup`, `glE`, …) | Live (`thematic_aya_present_stem`) |
 | Perfect `plit` | Live (gaṇa 1; gaṇa 3 hu; thematic pattern) |
 | Gaṇa 3 reduplication | Live (`engine/redup.py` — hu, BI, hrI, pF, dA, …) |
 | Ātmanepada (`alat`, `alot`, `alang`, `alit`) | Live (gaṇa 3 I-stems; thematic otherwise) |
 | Live kṛdanta (~35 pratyayas) | Live + DB variant merge |
-| Full-corpus validation | `scripts/validate_corpus.py` |
+| Full-corpus validation | `python scripts/validate_corpus.py` — triage with `analyze_corpus_wrong.py` |
 | Karmani, niç, san, yaṅ derivatives | Planned |
 | Subanta / taddhita live (beyond current rules) | Partial |
 

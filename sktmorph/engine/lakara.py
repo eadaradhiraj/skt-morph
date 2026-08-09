@@ -71,3 +71,17 @@ def resolve_pada(db_lakara: str, root_pada: str) -> Optional[str]:
     if db_lakara.startswith("p"):
         return "P"
     return None
+
+
+def kartari_compatible(root_pada: str, lakara: str) -> bool:
+    """Whether tinanta engine should produce forms for this root/lakāra pair."""
+    _, db_lk = normalize_lakara(lakara)
+    if db_lk.startswith("a") or db_lk == "alit":
+        return root_pada in ("A", "U")
+    if db_lk == "plit":
+        return root_pada in ("P", "U")
+    if root_pada == "A":
+        return False
+    if root_pada == "P" and db_lk.startswith("a"):
+        return False
+    return True

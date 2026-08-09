@@ -2,11 +2,41 @@
 
 from typing import List, Optional
 
-from .phonology import apply_guna_to_stem, thematic_join
+from .phonology import apply_guna_to_stem, g9_r_lang_root, g9_uses_r_infix, thematic_join
 from .redup import GANA3, gana3_join_mode, gana3_weak_stem
 from .stems import AD_GANAS, CAUSATIVE_GANAS, N_GANA, NI_GANA, NU_GANAS, THEMATIC_GANAS, YA_GANA
 
 AD_T_INFLECT = frozenset({"ti", "taH", "si", "thaH", "tha", "tAt", "tAd", "tu", "tam", "ta"})
+_VOWEL = "aeiouAIUEO"
+
+
+def _plot_uses_ari(base: str) -> bool:
+    if base.endswith(("z", "Z", "r")):
+        return True
+    if base.endswith("reK"):
+        return True
+    if len(base) >= 3 and base[-3] == "r" and base.endswith(("AK", "aK")):
+        return True
+    if len(base) >= 2 and base[-2] == "r" and base[-1] not in _VOWEL and base[-1] not in "dDcCjJ":
+        return True
+    if "r" in base and base.endswith(("NK", "Ng", "nK")):
+        return True
+    if base.endswith("p") and "r" in base[:-1]:
+        return True
+    if base.endswith("P") and "r" in base[:-1]:
+        return True
+    return False
+
+
+def _thematic_lot_third(base: str, ending: str, gana: int) -> str:
+    if ending != "Ani":
+        return base + ending
+    if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
+        return base + "ARi"
+    if gana in THEMATIC_GANAS:
+        if base.endswith("ay") or _plot_uses_ari(base):
+            return base + "ARi"
+    return base + "Ani"
 
 
 def join_form(
@@ -19,8 +49,11 @@ def join_form(
     augment: Optional[str] = None,
     dhatu: Optional[str] = None,
     vacana: int = 1,
+    antarganas: Optional[str] = None,
 ) -> str:
-    form = _join_raw(stem, ending, gana, family, purusha, pada, dhatu, vacana)
+    form = _join_raw(
+        stem, ending, gana, family, purusha, pada, dhatu, vacana, antarganas
+    )
     if augment:
         if gana in AD_GANAS and family == "lang" and form and form[0] == "A":
             return form
@@ -42,6 +75,7 @@ def _join_raw(
     pada: str,
     dhatu: Optional[str] = None,
     vacana: int = 1,
+    antarganas: Optional[str] = None,
 ) -> str:
     if gana == GANA3 and dhatu:
         if family == "lit":
@@ -52,14 +86,14 @@ def _join_raw(
         if pada == "A" and family == "lat":
             return _join_gana3_a(stem, ending, purusha, vacana, dhatu)
         return _join_gana3_ad(stem, ending, family, purusha, pada, dhatu)
-    if gana in AD_GANAS:
-        return _join_ad(stem, ending, family)
     if gana in NU_GANAS:
         return _join_nu(stem, ending, gana, family, purusha, pada)
     if gana == N_GANA:
         return _join_n(stem, ending, family, purusha, pada)
     if gana == NI_GANA:
-        return _join_ni(stem, ending, family, purusha, pada)
+        return _join_ni(stem, ending, family, purusha, pada, antarganas, dhatu)
+    if gana in AD_GANAS:
+        return _join_ad(stem, ending, family, dhatu, purusha, vacana)
     if gana in THEMATIC_GANAS or gana in CAUSATIVE_GANAS or gana == YA_GANA:
         if family in ("lang", "vidhilin", "lit"):
             return stem + ending
@@ -67,6 +101,8 @@ def _join_raw(
             return thematic_join(stem, ending) if stem.endswith("a") else stem + ending
         if purusha == 3 and ending.startswith("A"):
             base = stem[:-1] if stem.endswith("a") else stem
+            if family == "lot" and ending == "Ani":
+                return _thematic_lot_third(base, ending, gana)
             return base + ending
         return thematic_join(stem, ending)
     return stem + ending
@@ -176,12 +212,88 @@ def _join_gana3_lit(stem: str, ending: str, purusha: int, vacana: int, dhatu: st
     return stem + ending
 
 
-def _join_ad(stem: str, ending: str, family: str) -> str:
+def _join_han(stem: str, ending: str, family: str, purusha: int, vacana: int) -> str:
+    """Irregular gaṇa-2 root han (7.4.1)."""
+    if family == "lat":
+        if ending == "taH":
+            return "hataH"
+        if ending in ("nti", "anti"):
+            return "Gnanti"
+        if ending == "si":
+            return "haMsi"
+        if ending in ("thaH", "TaH"):
+            return "haTaH"
+        if ending in ("tha", "Ta"):
+            return "haTa"
+        return stem + ending
+    if family == "lot":
+        if ending in ("tAt", "tAd"):
+            return "hat" + ending[1:]
+        if ending == "tu":
+            return "hantu"
+        if ending == "tAm":
+            return "hatAm"
+        if ending == "antu":
+            return "Gnantu"
+        if ending == "taH":
+            return "hataH"
+        if ending == "tam":
+            return "hatam"
+        if ending == "ta":
+            return "hata"
+        if ending == "Di" and purusha == 2 and vacana == 1:
+            return "jahi"
+        if ending in ("Ani", "Ava", "Ama"):
+            return "han" + ending
+        if ending in ("va", "ma") and purusha == 3:
+            return "hanA" + ending
+        return stem + ending
+    if family == "lang":
+        if ending == "aH" and purusha == 2 and vacana == 1:
+            return "ahanaH"
+        if ending in ("at", "ad") and purusha in (1, 2) and vacana == 1:
+            return "han"
+        if ending == "atAm":
+            return "hatAm"
+        if ending == "an":
+            return "Gnan"
+        if ending == "atam":
+            return "hatam"
+        if ending == "ata":
+            return "hata"
+        if ending == "am":
+            return "hanam"
+        if ending == "va":
+            return "hanva"
+        if ending == "ma":
+            return "hanma"
+        return stem + ending
+    return stem + ending
+
+
+def _join_ad(
+    stem: str,
+    ending: str,
+    family: str,
+    dhatu: Optional[str] = None,
+    purusha: int = 1,
+    vacana: int = 1,
+) -> str:
+    if dhatu == "han":
+        return _join_han(stem, ending, family, purusha, vacana)
+    if dhatu == "dviz":
+        if family == "lat" and ending == "anti":
+            return "dvez" + "anti"
+        if family == "lat" and ending == "si":
+            return "dvezw" + "i"
     if not ending:
         return stem
     if stem != "ad":
-        if family == "lrt" and stem.endswith(("zya", "tsya", "izya")) and ending[0] in "aA":
-            return stem[:-1] + ending
+        if family == "lrt" and stem.endswith(("zya", "tsya", "izya")):
+            if ending == "anti":
+                return stem[:-1] + "anti"
+            if ending[0] in "aA":
+                return stem[:-1] + ending
         return stem + ending
     if ending in AD_T_INFLECT:
         if ending == "thaH":
@@ -379,14 +491,108 @@ def _join_n(stem: str, ending: str, family: str, purusha: int, pada: str) -> str
     return thematic_join(stem, ending) if stem.endswith("a") else stem + ending
 
 
-def _join_ni(stem: str, ending: str, family: str, purusha: int, pada: str) -> str:
+def _join_ni_npattern(
+    stem: str,
+    ending: str,
+    family: str,
+    purusha: int,
+    pada: str,
+) -> str:
+    """Gaṇa-9 join without R-infix (mI, stI, …)."""
+    if family == "lrt":
+        if stem.endswith(("zya", "tsya")) and ending.startswith("A"):
+            return stem[:-1] + ending
+        return stem + ending
+    if family in ("lang", "vidhilin") and stem.endswith("R"):
+        root = stem[:-1]
+        if family == "lang":
+            if ending in ("At", "Ad"):
+                return root + "n" + ending
+            if ending == "ItAm":
+                return root + "nItAm"
+            if ending == "an":
+                return root + "nan"
+            if ending == "AH":
+                return root + "nAH"
+            if ending == "Itam":
+                return root + "nItam"
+            if ending == "Ita":
+                return root + "nIta"
+            if ending == "Am":
+                return root + "nAm"
+            if ending == "Iva":
+                return root + "nIva"
+            if ending == "Ima":
+                return root + "nIma"
+        return stem + ending
+    if not stem.endswith("nA"):
+        return stem + ending
+    root = stem[:-2]
+    if family == "lot":
+        if ending == "Atu":
+            return root + "nAtu"
+        if ending in ("ItAt", "ItAd"):
+            return root + "n" + "I" + ending[1:]
+        if ending == "ItAm":
+            return root + "nItAm"
+        if ending == "antu":
+            return root + "nantu"
+        if ending == "Ihi":
+            return root + "nIhi"
+        if ending == "Itam":
+            return root + "nItam"
+        if ending == "Ani":
+            return root + "nAni"
+        if ending in ("Ava", "Ama"):
+            return root + "n" + ending
+        if ending == "ta":
+            return root + "nIta"
+    if ending == "ti" and purusha == 1:
+        return stem[:-1] + "Ati"
+    if ending == "taH":
+        return root + "nItaH"
+    if ending == "nti":
+        return root + "nanti"
+    if ending == "si":
+        return stem[:-1] + "Asi"
+    if ending in ("TaH", "Ta"):
+        return root + "nI" + ending
+    if ending == "Ami":
+        return root + "nAmi"
+    if ending == "AvaH":
+        return root + "nIvaH"
+    if ending == "AmaH":
+        return root + "nImaH"
+    if ending == "te" and purusha == 1:
+        return root + "nIte"
+    if ending in ("ete", "ante", "se", "eTe", "aDve", "e", "Avahe", "Amahe"):
+        if ending.startswith("e") and ending not in ("ete", "eTe"):
+            return root + "n" + "e" if ending == "e" else root + "n" + ending
+        return root + "nI" + ending if not ending.startswith("e") else root + "n" + ending
+    return stem + ending
+
+
+def _join_ni(
+    stem: str,
+    ending: str,
+    family: str,
+    purusha: int,
+    pada: str,
+    antarganas: Optional[str] = None,
+    dhatu: Optional[str] = None,
+) -> str:
+    if dhatu and not g9_uses_r_infix(dhatu, antarganas or ""):
+        return _join_ni_npattern(stem, ending, family, purusha, pada)
+    if family == "lang" and stem.endswith("R"):
+        base = g9_r_lang_root(stem[:-1])
+        return base + "R" + ending
     if family == "lrt":
         if stem.endswith(("zya", "tsya")) and ending.startswith("A"):
             return stem[:-1] + ending
         return stem + ending
     if not stem.endswith("nA"):
         return stem + ending
-    root = stem[:-2]
+    root = g9_r_lang_root(stem[:-2])
     if family == "lang":
         if ending in ("At", "Ad"):
             return root + "R" + ending
@@ -458,8 +664,11 @@ def join_variants(
     augment: Optional[str] = None,
     dhatu: Optional[str] = None,
     vacana: int = 1,
+    antarganas: Optional[str] = None,
 ) -> List[str]:
     return [
-        join_form(stem, e, gana, family, purusha, pada, augment, dhatu, vacana)
+        join_form(
+            stem, e, gana, family, purusha, pada, augment, dhatu, vacana, antarganas
+        )
         for e in endings
     ]

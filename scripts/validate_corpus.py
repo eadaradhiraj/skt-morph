@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, ".")
 from scripts.validate_engine import LAKARAS, DATA, db_variants_for_cell, shard
-from sktmorph.engine.lakara import normalize_lakara
+from sktmorph.engine.lakara import kartari_compatible, normalize_lakara
 from sktmorph.engine.tinanta import LiveTinantaEngine
 
 EXTENDED_LAKARAS = LAKARAS + ["plit", "alat", "alot", "alang", "alit"]
@@ -24,15 +24,9 @@ def main() -> int:
         pada = details.get("pada") or "P"
         tc = sqlite3.connect(shard(did))
         for lak in lakaras:
+            if not kartari_compatible(pada, lak):
+                continue
             canon, db_lk = normalize_lakara(lak)
-            if lak.startswith("a") or lak == "alit":
-                if pada != "A":
-                    continue
-            elif pada == "A" and lak not in ("plit",):
-                if lak == "plit":
-                    pass
-                elif not lak.startswith("p"):
-                    continue
             trows = tc.execute(
                 """SELECT purusha, vacana, form_slp1 FROM tinantas
                    WHERE dhatu_id=? AND lakara=? AND derivation='shuddha'

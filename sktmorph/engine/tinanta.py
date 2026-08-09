@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from .endings import family_endings
 from .join import join_variants
 from .lakara import lakara_family, normalize_lakara
-from .stems import derive_stem
+from .stems import conjugation_gana, derive_stem
 from .steps import EngineStep
 
 
@@ -97,11 +97,22 @@ class LiveTinantaEngine:
         if root_pada == "A" and pada == "P" and prayoga == "kartari":
             return [], []
 
-        stem, augment, steps = derive_stem(info["dhatu"], info["gana"], family, derivation)
+        tags = info["raw"].get("tags", "") or ""
+        antarganas = info["raw"].get("antarganas", "") or ""
+        cgana = conjugation_gana(info["gana"], tags)
+
+        stem, augment, steps = derive_stem(
+            info["dhatu"],
+            info["gana"],
+            family,
+            derivation,
+            tags,
+            antarganas,
+        )
         if not stem:
             return [], steps
 
-        table = family_endings(family, prayoga, pada, info["gana"], info["dhatu"])
+        table = family_endings(family, prayoga, pada, cgana, info["dhatu"])
         if not table:
             return [], steps
 
@@ -113,13 +124,14 @@ class LiveTinantaEngine:
         forms = join_variants(
             stem,
             variants,
-            info["gana"],
+            cgana,
             family,
             purusha,
             pada,
             augment,
             info["dhatu"],
             vacana,
+            antarganas,
         )
         for form in forms:
             steps.append(
