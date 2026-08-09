@@ -57,6 +57,10 @@ def _g6_skip_future_guna(dhatu: str) -> bool:
         return True
     if "mB" in dhatu and dhatu[0].isupper():
         return True
+    if dhatu.endswith("uw"):
+        return True
+    if len(dhatu) == 3 and dhatu[0].isupper() and dhatu[2].isupper():
+        return True
     if dhatu.endswith(("ump", "mp")) and len(dhatu) <= 4:
         return True
     if len(dhatu) <= 4 and len(dhatu) >= 3 and not dhatu.endswith(("d", "t", "D", "T")):
@@ -95,6 +99,9 @@ def g6_future_stem(dhatu: str) -> str:
     """Gaṇa 6 lṛṭ stem with guṇa and consonant-specific suffix."""
     if dhatu.endswith("ajj"):
         return dhatu[0] + "arkzya"
+    if dhatu.endswith("fh"):
+        base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
+        return base[:-1] + "kzya"
     base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
     return _g6_future_suffix(base)
 
@@ -108,7 +115,7 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     """Gaṇa-1 future base before -sya/-izya (may differ from present base)."""
     if dhatu.endswith("nv") and len(dhatu) >= 4:
         if dhatu[0] == "r" or dhatu.endswith("fnv"):
-            return dhatu[:-2] + dhatu[-3] + "Rv"
+            return dhatu[:-2] + "Rv"
     if dhatu == "guh":
         return "gUh"
     if dhatu in ("SrA", "jYA"):
@@ -127,7 +134,10 @@ _G1_KZYA_ROOTS = frozenset({"Siz", "viz"})
 def _g1_future_from_present(dhatu: str, present_stem: str, guna: str) -> str:
     base = _g1_future_base(dhatu, present_stem[:-1], guna)
     if dhatu in _G1_KZYA_ROOTS:
-        return apply_guna_to_stem(dhatu) + "kzya"
+        graded = apply_guna_to_stem(dhatu)
+        return (graded[:-1] if graded.endswith("z") else graded) + "kzya"
+    if dhatu in ("SrA", "jYA"):
+        return base + "zya"
     if base.endswith("v"):
         return base + "izya"
     if base.endswith("e") and len(base) <= 2:
