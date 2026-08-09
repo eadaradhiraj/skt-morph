@@ -55,8 +55,12 @@ def _g6_skip_future_guna(dhatu: str) -> bool:
         return True
     if any(ch in "IUA" for ch in dhatu[:-1]):
         return True
+    if "mB" in dhatu and dhatu[0].isupper():
+        return True
+    if dhatu.endswith(("ump", "mp")) and len(dhatu) <= 4:
+        return True
     if len(dhatu) <= 4 and len(dhatu) >= 3 and not dhatu.endswith(("d", "t", "D", "T")):
-        if dhatu[0] in "uim" or dhatu[-1] in "cCjJ":
+        if dhatu[0] in "ui" or dhatu[-1] in "cCjJ":
             return True
     return False
 
@@ -76,6 +80,10 @@ def _g6_future_suffix(graded: str) -> str:
         return graded + "izya"
     if graded.endswith("z"):
         return graded[:-1] + "kzya"
+    if graded.endswith("fh"):
+        return graded[:-1] + "kzya"
+    if graded.endswith("ep"):
+        return graded + "sya"
     if graded.endswith(("p", "P", "b", "B")):
         return graded + "izya"
     if graded.endswith(("c", "C", "j", "J")):
@@ -99,7 +107,8 @@ def _append_step(steps: List[EngineStep], form: str, sutras: List[str], kind: st
 def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     """Gaṇa-1 future base before -sya/-izya (may differ from present base)."""
     if dhatu.endswith("nv") and len(dhatu) >= 4:
-        return dhatu[:-2] + dhatu[-3] + "Rv"
+        if dhatu[0] == "r" or dhatu.endswith("fnv"):
+            return dhatu[:-2] + dhatu[-3] + "Rv"
     if dhatu == "guh":
         return "gUh"
     if dhatu in ("SrA", "jYA"):
@@ -123,7 +132,7 @@ def _g1_future_from_present(dhatu: str, present_stem: str, guna: str) -> str:
         return base + "izya"
     if base.endswith("e") and len(base) <= 2:
         return base + "zya"
-    if dhatu.endswith("nv") and len(dhatu) >= 4:
+    if dhatu.endswith("nv") and len(dhatu) >= 4 and (dhatu[0] == "r" or dhatu.endswith("fnv")):
         return base + "izya"
     return base + "izya"
 
@@ -167,10 +176,13 @@ def future_stem(
         return guna[:-1] + "tsya"
     if gana == NI_GANA:
         if dhatu == "mI":
-            return "mAsy"
+            return "mAsya"
         if dhatu.endswith("mB"):
-            return dhatu + "izy"
-        return apply_guna_to_stem(dhatu) + "izy"
+            return dhatu + "izya"
+        graded = apply_guna_to_stem(dhatu)
+        if dhatu.endswith("I") and len(dhatu) <= 3:
+            return graded + "zya"
+        return graded + "izya"
     if gana == N_GANA and guna[-1:] in ("d", "D"):
         return guna[:-1] + "tsya"
     if guna.endswith("v"):

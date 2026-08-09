@@ -29,6 +29,10 @@ def _plot_uses_ari(base: str) -> bool:
         return True
     if base.endswith(("fmB", "amB")):
         return True
+    if base.endswith("kzy"):
+        return True
+    if len(base) >= 3 and "r" in base and base.endswith("zy"):
+        return True
     return False
 
 
@@ -38,7 +42,7 @@ def _thematic_lot_third(base: str, ending: str, gana: int) -> str:
     if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
         return base + "ARi"
     if gana in THEMATIC_GANAS:
-        if base.endswith("ay") or _plot_uses_ari(base):
+        if base.endswith(("Ay", "aya")) or _plot_uses_ari(base):
             return base + "ARi"
     return base + "Ani"
 
