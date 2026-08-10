@@ -82,6 +82,4 @@ def kartari_compatible(root_pada: str, lakara: str) -> bool:
         return root_pada in ("P", "U")
     if root_pada == "A":
         return False
-    if root_pada == "P" and db_lk.startswith("a"):
-        return False
     return True

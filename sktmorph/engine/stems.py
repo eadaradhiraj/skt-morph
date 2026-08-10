@@ -372,9 +372,7 @@ def derive_stem(
         return fstem, None, steps
 
     if family == "lrt":
-        g = apply_guna_to_stem(dhatu) if gana in (6, YA_GANA) else guna
-        if gana == 6 and g.endswith("d"):
-            g = g[:-1] + "t"
+        g = apply_guna_to_stem(dhatu) if gana in (YA_GANA,) else guna
         lrt_present = present_stem
         if aya_present and not bidadi and g:
             lrt_present = g + "a"

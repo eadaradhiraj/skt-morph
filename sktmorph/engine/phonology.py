@@ -167,10 +167,10 @@ def g9_n_lang_base(dhatu: str) -> str:
 
 def g9_r_lang_root(dhatu: str) -> str:
     """Root before R-infix for gaṇa-9 R-class laṅ/lot/lat."""
-    if dhatu.endswith("F") and len(dhatu) >= 2:
-        return dhatu[:-1] + "f"
     if dhatu == "SF":
         return "SIr"
+    if dhatu.endswith("F") and len(dhatu) >= 2:
+        return dhatu[:-1] + "f"
     if dhatu.endswith("I") and len(dhatu) == 2:
         return dhatu[0].lower() + "i"
     if dhatu == "F":

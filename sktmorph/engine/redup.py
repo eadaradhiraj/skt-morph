@@ -99,7 +99,4 @@ def gana3_weak_stem(dhatu: str, guna: str, ending: str, purusha: int) -> str:
 
 def gana3_perfect_stem(dhatu: str, guna: Optional[str] = None) -> str:
     g = guna or apply_guna_to_stem(dhatu)
-    prof = _profile(dhatu, g)
-    if prof.join == "nu":
-        return prof.present
-    return prof.present
+    return _profile(dhatu, g).present

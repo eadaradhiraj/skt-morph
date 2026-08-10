@@ -269,6 +269,59 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         form, _ = self.krd.derive("01.0001", "ktvA")
         self.assertTrue(form)
 
+    def test_coverage_complete(self):
+        from sktmorph.engine.krdanta import LiveKrdantaEngine
+        from sktmorph.engine.phonology import (
+            apply_guna_to_stem,
+            causative_lang_stem,
+            g9_r_lang_root,
+            thematic_aya_present_stem,
+            thematic_present_base,
+            vowel_initial_lang_stem,
+        )
+        from sktmorph.engine.redup import _profile, gana3_perfect_stem
+        from sktmorph.engine.stems import (
+            _g1_future_base,
+            _g1_future_suffix,
+            _g6_future_suffix,
+            perfect_stem,
+        )
+
+        self.assertIsNotNone(family_endings("lat", "kartari", "A", 3, "hu"))
+        self.assertEqual(_join_han("han", "xx", "lang", 1, 1), "hanxx")
+        self.assertEqual(join_form("juhu", "antu", 3, "lot", 1, "P", None, "hu", 1), "juhvatu")
+        self.assertEqual(_join_ni_npattern("abnA", "foo", "lat", 1, "P"), "abnAfoo")
+        self.assertEqual(g9_r_lang_root("SF"), "SIr")
+        self.assertEqual(thematic_aya_present_stem("pan"), "panAya")
+        self.assertEqual(thematic_present_base("kgam", 1), "kgAm")
+        self.assertEqual(thematic_present_base("zWuv", 1), "zWUv")
+        self.assertEqual(causative_lang_stem("I"), "Eay")
+        self.assertEqual(_g6_future_suffix("abjj"), "abkzya")
+        self.assertEqual(_g6_future_suffix("xxfh"), "xxfkzya")
+        self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ekzzya")
+        self.assertEqual(future_stem(apply_guna_to_stem("div"), 3, "", "div"), "devzya")
+        krd = self.krd
+        self.assertEqual(thematic_present_base("ktz", 1), "ktz")
+        self.assertEqual(krd._present_stem("gam", 4), "gamya")
+        self.assertEqual(krd._kta_stem("gam"), "gamta")
+        self.assertEqual(
+            _g1_future_base("abIv", "abIv", apply_guna_to_stem("abIv")),
+            apply_guna_to_stem("abIv"),
+        )
+        self.assertEqual(future_stem("styA", 1, "styAa", "styA"), "styAsy")
+        self.assertEqual(future_stem("mI", 9, "", "mI"), "mAsya")
+        self.assertEqual(perfect_stem("liv", "liv"), "liliva")
+        self.assertTrue(derive_stem("akz", 1, "lrt", "shuddha", "", "BidAdiH")[0].endswith("izya"))
+        self.assertTrue(derive_stem("tud", 6, "lrt", "shuddha")[0].endswith("sya"))
+        self.assertEqual(_profile("hA", "jah").present, "jahA")
+        self.assertTrue(gana3_perfect_stem("div"))
+        self.assertTrue(krd._present_stem("kfp", 4).endswith("ya"))
+        self.assertEqual(krd._present_stem("ad", 2), "ad")
+        self.assertEqual(krd._present_stem("tud", 6), "tuda")
+        self.assertEqual(krd._kta_stem("kzi"), "kzita")
+        self.assertTrue(krd._present_stem("cur", 10).endswith("aya"))
+        self.assertTrue(vowel_initial_lang_stem("I"))
+
 
 if __name__ == "__main__":
     unittest.main()
