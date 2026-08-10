@@ -409,7 +409,7 @@ def derive_stem(
             present_stem = dhatu
             _append_step(steps, present_stem, ["3.1.68"], "sap")
         else:
-            base = g6_present_base(dhatu) if cgana == 6 else thematic_present_base(dhatu, cgana, aupadeshik)
+            base = g6_plot_base(dhatu) if cgana == 6 else thematic_present_base(dhatu, cgana, aupadeshik)
             if base != dhatu:
                 _append_step(steps, base, ["7.2.115"], "guNa")
             present_stem = base + "a"

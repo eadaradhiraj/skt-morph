@@ -386,11 +386,18 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(thematic_present_base("kgam", 1), "kgAm")
         self.assertEqual(thematic_present_base("zWuv", 1), "zWUv")
         self.assertEqual(causative_lang_stem("I"), "Eay")
+        self.assertEqual(causative_lang_stem("ci"), "capay")
+        self.assertEqual(causative_lang_stem("Camp"), "cCamp")
+        self.assertEqual(causative_lang_stem("gup"), "gop")
+        self.assertEqual(join_form("capay", "at", 10, "lang", 1, "P", "a", "ci", 1), "acapayat")
         self.assertEqual(_g6_future_suffix("abjj"), "abkzya")
         self.assertEqual(_g6_future_suffix("xxfh"), "xxfhizya")
         self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ikzizya")
-        from sktmorph.engine.join import _g2_a_lat_join, _g2_u_lat_join, _g2_u_plot_join
+        from sktmorph.engine.join import _g2_a_lat_join, _g2_a_lang_join, _g2_u_lat_join, _g2_u_plot_join
 
+        self.assertEqual(_g2_a_lang_join("yA", "at"), "yAt")
+        self.assertEqual(join_form("yA", "at", 2, "lang", 1, "P", "a", "yA", 1), "ayAt")
+        self.assertEqual(join_form("SrA", "at", 2, "lang", 1, "P", "a", "SrA", 1), "aSrAt")
         self.assertEqual(_g2_u_lat_join("ru", "TaH", 2, 2), "ruTaH")
         self.assertIsNone(_g2_u_lat_join("gam", "ti", 1, 1))
         self.assertIsNone(_g2_u_lat_join("uru", "ti", 1, 1))
@@ -422,6 +429,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(join_form("kzip", "Ani", 6, "plot", 3, "P", None, "kzip", 1), "kzipARi")
         self.assertEqual(join_form("GUrR", "Ani", 6, "plot", 3, "P", None, "GUrR", 1), "GUrRAni")
         self.assertEqual(derive_stem("yu", 2, "lot", "shuddha")[0], "yu")
+        self.assertEqual(derive_stem("fz", 6, "lat", "shuddha")[0], "fza")
+        self.assertEqual(join_form("fza", "ti", 6, "plat", 1, "P", None, "fz", 1), "fzati")
         self.assertEqual(join_form("yu", "tAt", 2, "plot", 1, "P", None, "yu", 1), "yutAt")
         self.assertEqual(join_form("duh", "ti", 2, "lrt", 1, "P", None, "duh", 1), "Dokzyati")
         self.assertEqual(join_form("yo", "thaH", 2, "lrt", 2, "P", None, "yu", 1), "yavizythaH")

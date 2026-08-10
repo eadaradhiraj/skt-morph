@@ -200,6 +200,14 @@ def _g2_u_lat_join(
     return None
 
 
+def _g2_a_lang_join(dhatu: str, ending: str) -> Optional[str]:
+    if dhatu not in _G2_A_LAT_ROOTS:
+        return None
+    if ending in ("at", "ad"):
+        return dhatu[:-1] + "A" + ending[1:]
+    return None
+
+
 def _g2_a_lat_join(dhatu: str, ending: str, purusha: int, vacana: int) -> Optional[str]:
     if dhatu not in _G2_A_LAT_ROOTS:
         return None
@@ -512,7 +520,7 @@ def join_form(
                 return form
         if dhatu == "kfnv" and family == "lang":
             return form
-        if dhatu in _G1_A_FINAL and family == "lang":
+        if dhatu in _G1_A_FINAL and family == "lang" and gana == 1:
             return form
         if dhatu == "dviz" and family == "lang":
             return "a" + form
@@ -899,6 +907,10 @@ def _join_ad(
                     return "Eva"
                 if ending == "ma":
                     return "Ema"
+    if family == "lang" and dhatu:
+        joined = _g2_a_lang_join(dhatu, ending)
+        if joined is not None:
+            return joined
     if family == "lat" and dhatu:
         joined = _g2_u_lat_join(dhatu, ending, purusha, vacana)
         if joined is not None:

@@ -406,6 +406,20 @@ def g6_lang_stem(dhatu: str) -> Tuple[str, Optional[str]]:
 
 _CAUSATIVE_GUNA_AY = frozenset({"yam", "cap", "cah", "rah", "bal", "jYap"})
 
+_CAUSATIVE_LANG_BASE = {
+    "ci": "capay",
+    "jYA": "jYApay",
+    "kfp": "kalpay",
+    "Gf": "GAray",
+    "kFt": "kIrtay",
+    "cyu": "cyAvay",
+    "BU": "BAvay",
+    "lI": "lay",
+    "gUd": "gUrday",
+    "gup": "gop",
+    "uDras": "ODrAsay",
+}
+
 
 def lang_geminate_stem(dhatu: str, stem: str) -> str:
     """Initial consonant gemination in laṅ (Card → cCarday, Cand → cCand)."""
@@ -454,15 +468,26 @@ def causative_present_stem(dhatu: str) -> str:
 
 
 def _causative_lang_base(dhatu: str) -> str:
-    aya = _causative_aya_base(dhatu)
-    return aya[:-1] if aya.endswith("aya") else aya + "ay"
+    if dhatu in _CAUSATIVE_LANG_BASE:
+        return _CAUSATIVE_LANG_BASE[dhatu]
+    if len(dhatu) == 4 and dhatu[0] == "C" and dhatu[1] in "aA":
+        aya = _causative_aya_base(dhatu)
+        body = aya[:-3] if aya.endswith("aya") else dhatu
+        return dhatu[0].lower() + body
+    return _causative_aya_base(dhatu)[:-1]
 
 
 def causative_lang_stem(dhatu: str) -> str:
     """Laṅ stem for gaṇa-10 causative."""
+    if dhatu in _CAUSATIVE_LANG_BASE:
+        return _CAUSATIVE_LANG_BASE[dhatu]
     init = vowel_initial_lang_stem(dhatu)
     if init is not None:
         return init + "ay"
+    if len(dhatu) == 4 and dhatu[0] == "C" and dhatu[1] in "aA":
+        aya = _causative_aya_base(dhatu)
+        body = aya[:-3] if aya.endswith("aya") else dhatu
+        return dhatu[0].lower() + body
     stem = _causative_lang_base(dhatu)
     return lang_geminate_stem(dhatu, stem)
 
