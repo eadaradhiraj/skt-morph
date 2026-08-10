@@ -255,7 +255,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertTrue(future_stem("x", 7, None, "xD"))
         self.assertTrue(derive_stem("yam", 1, "lrt", "shuddha", "", "GawAdiH")[0].endswith("izya"))
         self.assertTrue(derive_stem("yam", 1, "lrt", "shuddha")[0].endswith("Msy"))
-        self.assertTrue(derive_stem("SrA", 1, "lrt", "shuddha")[0].endswith("zya"))
+        self.assertTrue(derive_stem("SrA", 1, "lrt", "shuddha")[0].endswith("zy"))
         self.assertTrue(derive_stem("kzi", 1, "lrt", "shuddha", "", "BidAdiH")[0].endswith("zya"))
         self.assertTrue(derive_stem("ji", 1, "lrt", "shuddha")[0].endswith("zya"))
         form, _ = self.krd.derive("04.0001", "ktvA")
@@ -301,13 +301,23 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(join_form("ro", "at", 2, "lang", 1, "P", "a", "ru", 1), "aravIt")
         self.assertEqual(join_form("rR", "at", 2, "lang", 1, "P", "a", "UrRu", 1), "OrRot")
         self.assertEqual(join_form("ro", "ti", 2, "lrt", 1, "P", None, "ru", 1), "ravizyati")
-        self.assertEqual(join_form("sozy", "ti", 2, "lrt", 1, "P", None, "su", 1), "sozyati")
+        self.assertEqual(join_form("srozy", "ti", 1, "lrt", 1, "P", None, "sru", 1), "srozyati")
+        self.assertEqual(join_form("raha", "Ani", 1, "lot", 3, "P", None, "rah", 1), "rahARi")
+        self.assertEqual(join_form("SrA", "ti", 1, "lat", 1, "P", None, "SrA", 1), "SrAti")
+        self.assertEqual(join_form("SrA", "at", 1, "lang", 1, "P", "a", "SrA", 1), "aSrAt")
+        self.assertEqual(join_form("SrA", "Ava", 1, "lang", 3, "P", "a", "SrA", 2), "aSrAva")
+        self.assertEqual(join_form("SrA", "Ami", 1, "lat", 3, "P", None, "SrA", 1), "SrAmi")
+        self.assertEqual(join_form("SrA", "Ani", 1, "lot", 3, "P", None, "SrA", 1), "SrARi")
+        self.assertEqual(join_form("SrA", "antu", 1, "lot", 1, "P", None, "SrA", 3), "SrAntu")
+        self.assertEqual(future_stem("SrA", 1, "SrA", "SrA"), "Srizy")
+        self.assertEqual(_g1_future_base("SrA", "SrA", "SrA"), "Sri")
+        self.assertEqual(join_form("Srizy", "TaH", 1, "lrt", 2, "P", None, "SrA", 2), "SrizyaTaH")
         self.assertEqual(thematic_present_base("sUrkzy", 1, "zUrkzya~"), "sUkzy")
         self.assertEqual(
             derive_stem("sUrkzy", 1, "lrt", "shuddha", "", "", "zUrkzya~")[0],
             "sUkzyizya",
         )
-        from sktmorph.engine.join import _g2_u_lang_join, _join_ad, _join_kfnv
+        from sktmorph.engine.join import _g2_u_lang_join, _join_ad, _join_g1_a_final, _join_kfnv
 
         self.assertIsNone(_g2_u_lang_join("gam", "at", 1, 1))
         self.assertIsNone(_g2_u_lang_join("ru", "xx", 1, 1))
@@ -315,7 +325,18 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(_join_kfnv("kfnv", "va", "lang", 1, 2), "akfRuva")
         self.assertEqual(_join_kfnv("kfnv", "ma", "lang", 2, 3), "akfRuma")
         self.assertEqual(_join_kfnv("kfnv", "tha", "lot", 2, 1), "kfRu")
-        self.assertEqual(_join_kfnv("kfnv", "xx", "lit", 1, 1), "kfnvxx")
+        self.assertEqual(_join_kfnv("kfnv", "ti", "lrt", 1, 1), "kfnvti")
+        self.assertEqual(join_form("sIda", "ti", 1, "lat", 1, "P", None, "sad", 1), "sIdati")
+        self.assertEqual(join_form("sId", "at", 1, "lang", 1, "P", "a", "sad", 1), "asIdat")
+        self.assertEqual(join_form("sId", "et", 1, "vidhilin", 1, "P", None, "sad", 1), "sIdet")
+        self.assertEqual(
+            derive_stem("mid", 1, "lat", "shuddha", "", "BidAdiH")[0],
+            "meda",
+        )
+        self.assertEqual(derive_stem("yaB", 1, "lrt", "shuddha")[0], "yapsya")
+        self.assertEqual(_join_g1_a_final("SrA", "va", "lang", 3), "aSrAva")
+        self.assertEqual(_join_g1_a_final("SrA", "ma", "lang", 3), "aSrAma")
+        self.assertEqual(join_form("jYA", "Ani", 1, "lot", 3, "P", None, "jYA", 1), "jYAni")
         self.assertEqual(_join_ad("testzy", "anti", "lrt", "xx", 1, 3), "testzyanti")
         self.assertEqual(_join_ad("testzy", "ti", "lrt", "xx", 1, 1), "testzyati")
         self.assertEqual(_join_ad("testzy", "Ami", "lrt", "xx", 3, 1), "testzyAmi")

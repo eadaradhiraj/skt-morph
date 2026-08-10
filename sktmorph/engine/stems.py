@@ -30,7 +30,9 @@ from .phonology import (
     vowel_initial_lang_stem,
     ya_present_base,
     _G1_AYA_PRESENT,
+    _G1_A_FINAL,
     _G1_NV_ROOTS,
+    _BIDADI_THEMATIC,
 )
 from .redup import (
     GANA3,
@@ -131,6 +133,10 @@ def _append_step(steps: List[EngineStep], form: str, sutras: List[str], kind: st
 
 def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     """Gaṇa-1 future base before -sya/-izya (may differ from present base)."""
+    if dhatu == "sad":
+        return dhatu
+    if dhatu == "yaB":
+        return "yap"
     if dhatu.endswith("nv") and len(dhatu) >= 4:
         if dhatu[0] == "r" or dhatu.endswith("fnv"):
             return dhatu[:-2] + "Rv"
@@ -188,6 +194,8 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
             return base[:-1] + "tsya"
         if base.endswith("s"):
             return base[:-1] + "tsya"
+    if dhatu == "yaB":
+        return base + "sya"
     if dhatu == "kzi":
         return apply_guna_to_stem(dhatu) + "zya"
     if dhatu.endswith("kz"):
@@ -200,9 +208,10 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
 
 
 def _g1_future_from_present(dhatu: str, present_stem: str, guna: str) -> str:
-    base = _g1_future_base(dhatu, present_stem[:-1], guna)
+    present_base = present_stem[:-1] if present_stem.endswith("a") else present_stem
+    base = _g1_future_base(dhatu, present_base, guna)
     if dhatu in ("SrA", "jYA"):
-        return base + "zya"
+        return base + "zy"
     if dhatu.endswith("nv") and len(dhatu) >= 4 and (dhatu[0] == "r" or dhatu.endswith("fnv")):
         return base + "izya"
     return _g1_future_suffix(base, dhatu)
@@ -229,6 +238,8 @@ def future_stem(
         return dhatu[:-1] + "avizy"
     if gana == 1 and dhatu.endswith("kz") and dhatu != "kzi":
         return dhatu + "izya"
+    if gana == 1 and dhatu in _G1_A_FINAL and present_stem:
+        return _g1_future_from_present(dhatu, present_stem, guna)
     if gana == 1 and present_stem and dhatu in _G1_AYA_PRESENT and present_stem.endswith("aya"):
         if dhatu.endswith(("e", "E")):
             body = present_stem[:-2]
@@ -327,7 +338,7 @@ def derive_stem(
 
     cgana = conjugation_gana(gana, tags)
     present_stem: Optional[str] = None
-    bidadi = cgana == 1 and is_bidadi(antarganas)
+    bidadi = cgana == 1 and is_bidadi(antarganas) and dhatu not in _BIDADI_THEMATIC
     aya_present = uses_aya_present(cgana, dhatu, antarganas)
 
     if aya_present:
@@ -346,6 +357,9 @@ def derive_stem(
         elif aya_stem:
             present_stem = aya_stem
             _append_step(steps, present_stem, ["3.1.33"], "yap")
+        elif dhatu in _G1_A_FINAL:
+            present_stem = dhatu
+            _append_step(steps, present_stem, ["3.1.68"], "sap")
         else:
             base = g6_present_base(dhatu) if cgana == 6 else thematic_present_base(dhatu, cgana, aupadeshik)
             if base != dhatu:
@@ -468,6 +482,9 @@ def derive_stem(
         if nv_stem and cgana == 1:
             _append_step(steps, nv_stem, ["7.3.84"], "lang_stem")
             return nv_stem, "a", steps
+        if dhatu in _G1_A_FINAL and cgana == 1:
+            _append_step(steps, dhatu, ["3.4.111"], "lang_stem")
+            return dhatu, "a", steps
         if gana in CAUSATIVE_GANAS and cgana == 10:
             init = vowel_initial_lang_stem(dhatu)
             if init is not None:
@@ -520,6 +537,10 @@ def derive_stem(
         if nv_vid and cgana == 1:
             _append_step(steps, nv_vid, ["7.3.84"], "vidhilin_stem")
             return nv_vid, None, steps
+        if dhatu in _G1_A_FINAL and cgana == 1:
+            root = dhatu[:-1]
+            _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
+            return root, None, steps
         if gana == YA_GANA and present_stem:
             root = present_stem[:-1] if present_stem.endswith("a") else present_stem
         elif cgana in THEMATIC_GANAS:

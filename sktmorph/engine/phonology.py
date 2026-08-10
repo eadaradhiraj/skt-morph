@@ -134,10 +134,14 @@ def yam_cc_future_stem(dhatu: str, antarganas: str) -> Optional[str]:
 
 
 _G1_AYA_PRESENT = frozenset({"ji", "Sri", "nI", "De", "jri"})
+_G1_A_FINAL = frozenset({"SrA", "jYA"})
 _G1_NV_ROOTS = frozenset({"Dinv"})
+_BIDADI_THEMATIC = frozenset({"mid"})
 
 
 def uses_aya_present(cgana: int, dhatu: str, antarganas: str) -> bool:
+    if dhatu in _BIDADI_THEMATIC:
+        return False
     return cgana == 1 and (
         is_bidadi(antarganas) or is_yajadi(antarganas) or dhatu in _G1_AYA_PRESENT
     )
@@ -234,8 +238,18 @@ def ya_present_base(dhatu: str) -> str:
     return dhatu
 
 
+def sad_present_base(dhatu: str) -> Optional[str]:
+    """Present base for sad (sīdati): a-strengthening to Id."""
+    if dhatu == "sad":
+        return "sId"
+    return None
+
+
 def g6_present_base(dhatu: str) -> str:
     """Gaṇa 6 present base before thematic -a."""
+    sp = sad_present_base(dhatu)
+    if sp is not None:
+        return sp
     if dhatu == "SuB":
         return apply_guna_to_stem(dhatu)
     if dhatu.endswith("U"):
@@ -339,6 +353,9 @@ def thematic_aya_present_stem(dhatu: str) -> Optional[str]:
 
 def thematic_present_base(dhatu: str, gana: int, aupadeshik: str = "") -> str:
     """Thematic present root before -a (gaṇa 1/6)."""
+    sp = sad_present_base(dhatu)
+    if sp is not None:
+        return sp
     if dhatu == "sUrkzy" and aupadeshik.startswith("z"):
         return "sUkzy"
     if gana == 1:

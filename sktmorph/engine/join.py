@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from .phonology import apply_guna_to_stem, g9_r_lang_root, g9_uses_r_infix, thematic_join
+from .phonology import apply_guna_to_stem, g9_r_lang_root, g9_uses_r_infix, thematic_join, _G1_A_FINAL
 from .redup import GANA3, gana3_join_mode, gana3_weak_stem
 from .stems import AD_GANAS, CAUSATIVE_GANAS, N_GANA, NI_GANA, NU_GANAS, THEMATIC_GANAS, YA_GANA
 
@@ -164,6 +164,55 @@ def _join_kfnv(
     return stem + ending
 
 
+def _join_g1_a_final(
+    stem: str,
+    ending: str,
+    family: str,
+    purusha: int,
+    dhatu: str = "",
+) -> str:
+    if family == "lang":
+        if ending in ("at", "ad"):
+            return "a" + stem + ending[1:]
+        if ending == "atAm":
+            return "a" + stem + "tAm"
+        if ending == "an":
+            return "a" + stem + "n"
+        if ending == "aH":
+            return "a" + stem + "H"
+        if ending == "atam":
+            return "a" + stem + "tam"
+        if ending == "ata":
+            return "a" + stem + "ta"
+        if ending == "am":
+            return "a" + stem + "m"
+        if ending == "va":
+            return "a" + stem + "va"
+        if ending == "ma":
+            return "a" + stem + "ma"
+        if ending == "Ava":
+            return "a" + stem + "va"
+        if ending == "Ama":
+            return "a" + stem + "ma"
+    if family == "lat" and purusha == 3:
+        if ending == "Ami":
+            return stem + "mi"
+        if ending == "AvaH":
+            return stem + "vaH"
+        if ending == "AmaH":
+            return stem + "maH"
+    if family == "lot":
+        if purusha == 1 and ending == "antu":
+            return stem[:-1] + "Antu"
+        if purusha == 3 and ending == "Ani":
+            if dhatu == "SrA":
+                return stem[:-1] + "ARi"
+            return stem[:-1] + "Ani"
+        if purusha == 3 and ending in ("Ava", "Ama"):
+            return stem + ending[1:]
+    return stem + ending
+
+
 def _plot_uses_ari(base: str) -> bool:
     if base.endswith(("z", "Z", "r")):
         return True
@@ -180,6 +229,12 @@ def _plot_uses_ari(base: str) -> bool:
     if base.endswith("P") and "r" in base[:-1]:
         return True
     if base.endswith("m") and "r" in base[:-1]:
+        return True
+    if base.endswith("Mh"):
+        return True
+    if base.endswith("h") and "r" in base[:-1]:
+        return True
+    if base.endswith("g") and "r" in base[:-1]:
         return True
     if base.endswith(("fmB", "amB")):
         return True
@@ -200,7 +255,7 @@ def _thematic_lot_third(base: str, ending: str, gana: int) -> str:
     if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
         return base + "ARi"
     if gana in THEMATIC_GANAS:
-        if (base.endswith("Ay") and len(base) <= 4) or base.endswith("aya") or _plot_uses_ari(base):
+        if base.endswith("aya") or (base.endswith("ay") and "r" in base[:-2]) or _plot_uses_ari(base):
             return base + "ARi"
     return base + "Ani"
 
@@ -226,6 +281,8 @@ def join_form(
         if dhatu and dhatu.endswith("u") and family == "lang" and dhatu not in ("i", "as"):
             return form
         if dhatu == "kfnv" and family == "lang":
+            return form
+        if dhatu in _G1_A_FINAL and family == "lang":
             return form
         if gana in AD_GANAS and family == "lang" and form and form[0] == "A":
             return form
@@ -271,11 +328,26 @@ def _join_raw(
             return _join_kfnv(stem, ending, family, purusha, vacana)
         if dhatu == "Dinv":
             return _join_dinv(stem, ending, family, purusha, vacana)
+        if dhatu in _G1_A_FINAL and family in ("lat", "lot", "lang", "vidhilin"):
+            return _join_g1_a_final(stem, ending, family, purusha, dhatu or "")
         if family in ("lang", "vidhilin", "lit"):
             if family == "lang" and stem.endswith("o") and ending in ("at", "ad"):
                 return stem + ending[1:]
             return stem + ending
         if family == "lrt":
+            if stem.endswith("zy") and not stem.endswith(("zya", "izya", "tsya")):
+                if ending == "ti":
+                    return stem + "ati"
+                if ending in ("nti", "anti"):
+                    return stem + "anti"
+                if ending == "taH":
+                    return stem + "ataH"
+                if ending == "si":
+                    return stem + "asi"
+                if ending in ("TaH", "Ta"):
+                    return stem + "a" + ending
+                if ending and ending[0] in "aA":
+                    return stem + ending
             if stem.endswith("sy") and not stem.endswith(("zya", "tsya", "izya")):
                 if ending and ending[0] in "aA":
                     return stem + ending
