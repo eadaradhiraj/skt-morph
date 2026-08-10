@@ -14,6 +14,48 @@ _G2_U_LAT_O = frozenset({"yu", "nu", "ku", "su", "dyu", "kzu", "snu", "kzRu", "U
 _G2_A_LAT_ROOTS = frozenset(
     {"yA", "vA", "BA", "snA", "SrA", "drA", "psA", "pA", "rA", "lA", "dA", "KyA", "prA", "mA"}
 )
+_G6_PLOT_ARI = frozenset(
+    {
+        "Cur",
+        "Dru",
+        "Gur",
+        "Kur",
+        "bfh",
+        "dfB",
+        "dfP",
+        "dfmP",
+        "dfp",
+        "fP",
+        "fh",
+        "fmP",
+        "fz",
+        "gF",
+        "kF",
+        "kfz",
+        "kur",
+        "kzi",
+        "kzip",
+        "kzur",
+        "miz",
+        "mur",
+        "pur",
+        "ri",
+        "riP",
+        "rih",
+        "sPar",
+        "sPur",
+        "stfMh",
+        "stfh",
+        "sur",
+        "tfMh",
+        "tfP",
+        "tfh",
+        "tfmP",
+        "tfp",
+        "vfh",
+    }
+)
+_G6_LOT_A_ENDINGS = frozenset({"tAt", "tAm", "tAd", "tu", "tam", "ta", "Di", "t"})
 
 
 def _g2_u_lat_join(
@@ -273,6 +315,25 @@ def _join_g1_a_final(
     return stem + ending
 
 
+def _g6_lot_join(
+    stem: str,
+    ending: str,
+    family: str,
+    purusha: int,
+    gana: int,
+    dhatu: Optional[str],
+) -> Optional[str]:
+    if gana != 6 or family not in ("lot", "plot") or stem.endswith("a"):
+        return None
+    if purusha == 3 and ending.startswith("A"):
+        if ending == "Ani":
+            return _thematic_lot_third(stem, ending, gana, dhatu)
+        return stem + ending
+    if ending in _G6_LOT_A_ENDINGS:
+        return stem + "a" + ending
+    return stem + ending
+
+
 def _plot_uses_ari(base: str) -> bool:
     if base.endswith(("z", "Z", "r")):
         return True
@@ -318,14 +379,14 @@ def _thematic_lot_third(
         return base + "ARi"
     if gana == YA_GANA:
         return base + "ARi"
-    if gana == 6 and dhatu != "GUrR":
+    if gana == 6 and dhatu in _G6_PLOT_ARI:
         return base + "ARi"
     if gana in THEMATIC_GANAS:
         if (
             base.endswith(("aya", "Aya"))
             or (base.endswith("ay") and "r" in base[:-2])
             or (base.endswith("Ay") and ("r" in base or "z" in base))
-            or _plot_uses_ari(base)
+            or (gana != 6 and _plot_uses_ari(base))
         ):
             return base + "ARi"
     return base + "Ani"
@@ -427,6 +488,10 @@ def _join_raw(
                     return stem + ending
                 return stem + "a" + ending
             return thematic_join(stem, ending) if stem.endswith("a") else stem + ending
+        if family in ("lot", "plot"):
+            g6j = _g6_lot_join(stem, ending, family, purusha, gana, dhatu)
+            if g6j is not None:
+                return g6j
         if purusha == 3 and ending.startswith("A"):
             base = stem[:-1] if stem.endswith("a") else stem
             if family in ("lot", "plot") and ending == "Ani":
@@ -753,6 +818,10 @@ def _join_ad(
             return body + "ati"
         if ending == "anti":
             return body + "anti"
+        if ending == "taH":
+            return body + "ataH" if body.endswith("zy") else body + ending
+        if ending == "si":
+            return body + "asi" if body.endswith("zy") else body + ending
         if ending and ending[0] in "aA":
             return body + ending
         return body + ending
@@ -828,6 +897,8 @@ def _join_ad(
                 return "dvekzyanti"
             if ending == "si":
                 return "dvekzyasi"
+            if ending and ending[0] in "A":
+                return "dvekzy" + ending
             if ending and (ending[0] in "aA" or ending in ("TaH", "Ta")):
                 return "dvekzya" + ending
         if family == "vidhilin" and ending.startswith("y"):
@@ -848,6 +919,12 @@ def _join_ad(
         if family == "lrt" and stem.endswith(("zya", "tsya", "izya")):
             if ending == "anti":
                 return stem[:-1] + "anti"
+            if ending == "taH":
+                return stem[:-1] + "ataH"
+            if ending == "si":
+                return stem[:-1] + "asi"
+            if ending == "ti":
+                return stem[:-1] + "ati"
             if ending[0] in "aA":
                 return stem[:-1] + ending
         return stem + ending

@@ -12,6 +12,7 @@ from .phonology import (
     bidadi_vidhilin_stem,
     causative_lang_stem,
     causative_present_stem,
+    g6_plot_base,
     g6_present_base,
     g6_lang_stem,
     g9_n_lang_base,
@@ -450,7 +451,13 @@ def derive_stem(
     else:
         return None, None, steps
 
-    if family in ("lat", "lot"):
+    if family == "lat":
+        return present_stem, None, steps
+    if family == "lot" and cgana == 6:
+        root = g6_plot_base(dhatu)
+        _append_step(steps, root, ["3.2.69"], "plot_stem")
+        return root, None, steps
+    if family == "lot":
         return present_stem, None, steps
 
     if bidadi:

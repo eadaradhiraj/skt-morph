@@ -91,6 +91,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(j("dvez", "Ani", 2, "lot", 3, "P", None, "dviz", 1), "dvezARi")
         self.assertEqual(j("dvez", "Ava", 2, "lot", 3, "P", None, "dviz", 2), "dvezAva")
         self.assertEqual(j("dvez", "Ama", 2, "lot", 3, "P", None, "dviz", 3), "dvezAma")
+        self.assertEqual(j("dvekzya", "Ami", 2, "lrt", 3, "P", None, "dviz", 1), "dvekzyAmi")
+        self.assertEqual(j("yavizya", "taH", 2, "lrt", 1, "P", None, "yu", 2), "yavizyataH")
         self.assertEqual(j("dvez", "zz", 2, "lat", 1, "P", None, "dviz", 1), "dvezzz")
 
     def test_gana3_and_n_gana_join_branches(self):
@@ -288,6 +290,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         from sktmorph.engine.phonology import (
             apply_guna_to_stem,
             causative_lang_stem,
+            g6_plot_base,
             g6_present_base,
             g6_lang_base,
             g6_lang_stem,
@@ -397,6 +400,17 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(g6_present_base("fcC"), "arcC")
         self.assertEqual(g6_lang_base("fa"), "fa")
         self.assertEqual(g6_lang_stem("fz")[0], "Arz")
+        self.assertEqual(g6_plot_base("fz"), "fz")
+        self.assertEqual(g6_plot_base("Brajj"), "Bfjj")
+        self.assertEqual(g6_plot_base("kF"), "kir")
+        self.assertEqual(g6_plot_base("vraSc"), "vfSc")
+        self.assertEqual(g6_plot_base("pracC"), "pfcC")
+        self.assertEqual(g6_plot_base("xxaSc"), "xxfSc")
+        self.assertEqual(derive_stem("fz", 6, "lot", "shuddha")[0], "fz")
+        self.assertEqual(join_form("fz", "tAt", 6, "plot", 1, "P", None, "fz", 1), "fzatAt")
+        self.assertEqual(join_form("tud", "Ani", 6, "plot", 3, "P", None, "tud", 1), "tudAni")
+        self.assertEqual(join_form("kzip", "Ani", 6, "plot", 3, "P", None, "kzip", 1), "kzipARi")
+        self.assertEqual(join_form("GUrR", "Ani", 6, "plot", 3, "P", None, "GUrR", 1), "GUrRAni")
         self.assertEqual(derive_stem("dfS", 1, "lrt", "shuddha")[0], "drakzya")
         self.assertEqual(derive_stem("nU", 6, "lang", "shuddha")[0], "nuv")
         self.assertEqual(future_stem(apply_guna_to_stem("div"), 3, "", "div"), "devzya")

@@ -299,6 +299,50 @@ def g6_present_base(dhatu: str) -> str:
     return dhatu
 
 
+_G6_PLOT_LANG = frozenset(
+    {
+        "Brajj",
+        "Kid",
+        "kft",
+        "lip",
+        "lup",
+        "majj",
+        "muc",
+        "piS",
+        "pracC",
+        "sic",
+        "stfMh",
+        "SuB",
+        "tvac",
+        "vid",
+    }
+)
+
+
+def g6_plot_base(dhatu: str) -> str:
+    """Gaṇa 6 periphrastic past (plot) stem before -atAt- etc."""
+    if dhatu.startswith("f") and len(dhatu) >= 2:
+        return dhatu
+    if dhatu.endswith("F"):
+        return dhatu[0] + "ir"
+    if dhatu == "iz":
+        return "icC"
+    if dhatu == "vicC":
+        return "vicCAy"
+    if dhatu == "vraSc":
+        return "vfSc"
+    if dhatu == "pracC":
+        return "pfcC"
+    if dhatu in _G6_PLOT_LANG:
+        return g6_lang_base(dhatu)
+    if dhatu in ("sPar", "sPal"):
+        return dhatu
+    if dhatu.endswith("Sc") and "a" in dhatu:
+        idx = dhatu.rfind("a")
+        return dhatu[:idx] + "f" + dhatu[idx + 1 :]
+    return g6_present_base(dhatu)
+
+
 def g6_lang_base(dhatu: str) -> str:
     """Gaṇa 6 laṅ stem before tin endings (may differ from present base)."""
     if dhatu == "Brajj":
