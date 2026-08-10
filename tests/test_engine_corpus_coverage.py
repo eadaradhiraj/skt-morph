@@ -83,8 +83,9 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         j = join_form
         self.assertEqual(j("hanizya", "anti", 2, "lrt", 3, "P", None, "han", 3), "hanizyanti")
         self.assertEqual(j("hanizya", "Ami", 2, "lrt", 3, "P", None, "han", 1), "hanizyAmi")
-        self.assertEqual(j("han", "aH", 2, "lang", 2, "P", None, "han", 1), "ahanaH")
-        self.assertEqual(j("dvez", "anti", 2, "lat", 1, "P", None, "dviz", 3), "dvezanti")
+        self.assertEqual(j("han", "aH", 2, "lang", 2, "P", None, "han", 1), "han")
+        self.assertEqual(j("han", "aH", 2, "lang", 2, "P", "a", "han", 1), "ahan")
+        self.assertEqual(j("dvez", "anti", 2, "lat", 1, "P", None, "dviz", 3), "dvizate")
         self.assertEqual(j("dvezw", "i", 2, "lat", 2, "P", None, "dviz", 1), "dvezwi")
 
     def test_gana3_and_n_gana_join_branches(self):
@@ -252,7 +253,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertTrue(_g1_future_base("rinv", "rinv", "rinv").endswith("Rv"))
         self.assertTrue(future_stem("x", 5, None, "xo"))
         self.assertTrue(future_stem("x", 7, None, "xD"))
-        self.assertTrue(derive_stem("yam", 1, "lrt", "shuddha")[0].endswith("Msya"))
+        self.assertTrue(derive_stem("yam", 1, "lrt", "shuddha", "", "GawAdiH")[0].endswith("izya"))
+        self.assertTrue(derive_stem("yam", 1, "lrt", "shuddha")[0].endswith("Msy"))
         self.assertTrue(derive_stem("SrA", 1, "lrt", "shuddha")[0].endswith("zya"))
         self.assertTrue(derive_stem("kzi", 1, "lrt", "shuddha", "", "BidAdiH")[0].endswith("zya"))
         self.assertTrue(derive_stem("ji", 1, "lrt", "shuddha")[0].endswith("zya"))
@@ -290,6 +292,10 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertIsNotNone(family_endings("lat", "kartari", "A", 3, "hu"))
         self.assertEqual(_join_han("han", "xx", "lang", 1, 1), "hanxx")
         self.assertEqual(join_form("juhu", "antu", 3, "lot", 1, "P", None, "hu", 1), "juhvatu")
+        self.assertEqual(join_form("Dino", "Di", 1, "lot", 2, "P", None, "Dinv", 1), "Dinu")
+        self.assertEqual(join_form("Dinvizya", "ati", 1, "lrt", 1, "P", None, "Dinv", 1), "Dinvizyati")
+        self.assertEqual(join_form("Dinu", "yAt", 1, "vidhilin", 1, "P", None, "Dinv", 1), "DinuyAt")
+        self.assertEqual(future_stem("x", 1, "xyAa", "xE"), "xyAsy")
         self.assertEqual(_join_ni_npattern("abnA", "foo", "lat", 1, "P"), "abnAfoo")
         self.assertEqual(g9_r_lang_root("SF"), "SIr")
         self.assertEqual(thematic_aya_present_stem("pan"), "panAya")
@@ -298,7 +304,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(causative_lang_stem("I"), "Eay")
         self.assertEqual(_g6_future_suffix("abjj"), "abkzya")
         self.assertEqual(_g6_future_suffix("xxfh"), "xxfkzya")
-        self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ekzzya")
+        self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ikzizya")
         self.assertEqual(future_stem(apply_guna_to_stem("div"), 3, "", "div"), "devzya")
         krd = self.krd
         self.assertEqual(thematic_present_base("ktz", 1), "ktz")

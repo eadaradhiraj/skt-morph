@@ -88,7 +88,46 @@ def is_yajadi(antarganas: str) -> bool:
     return "yajAdi" in (antarganas or "")
 
 
+def is_gawadi(antarganas: str) -> bool:
+    return "GawAdi" in (antarganas or "")
+
+
+def g1_nv_present_stem(dhatu: str) -> Optional[str]:
+    """Gaṇa-1 roots with n-infix present (Dinv → Dino)."""
+    if dhatu in _G1_NV_ROOTS:
+        return dhatu[:-2] + "no"
+    return None
+
+
+def g1_nv_vidhilin_stem(dhatu: str) -> Optional[str]:
+    if dhatu in _G1_NV_ROOTS:
+        return dhatu[:-2] + "nu"
+    return None
+
+
+def yam_cc_present_stem(dhatu: str, antarganas: str) -> Optional[str]:
+    """Anudātta yam/dA (yacCati), distinct from GawAdi yam (yamati)."""
+    if dhatu in ("yam", "dA") and not is_gawadi(antarganas):
+        return "yacCa"
+    return None
+
+
+def yam_cc_lang_stem(dhatu: str, antarganas: str) -> Optional[str]:
+    if dhatu in ("yam", "dA") and not is_gawadi(antarganas):
+        return "yacC"
+    return None
+
+
+def yam_cc_future_stem(dhatu: str, antarganas: str) -> Optional[str]:
+    if dhatu == "yam" and not is_gawadi(antarganas):
+        return "yaMsy"
+    if dhatu == "dA":
+        return "dAsy"
+    return None
+
+
 _G1_AYA_PRESENT = frozenset({"ji", "Sri", "nI", "De", "jri"})
+_G1_NV_ROOTS = frozenset({"Dinv"})
 
 
 def uses_aya_present(cgana: int, dhatu: str, antarganas: str) -> bool:
@@ -299,7 +338,7 @@ def thematic_present_base(dhatu: str, gana: int) -> str:
             return dhatu[:idx] + "I" + dhatu[idx + 1 :]
         if dhatu[idx] == "u":
             return dhatu[:idx] + "U" + dhatu[idx + 1 :]
-    if dhatu.startswith(("kzI", "kzU")):
+    if dhatu.startswith(("kzI", "kzU")) and dhatu.endswith(("Iv", "Uv")):
         return apply_guna_to_stem(dhatu)
     if len(dhatu) == 4 and dhatu[0] in "kgcjwqtp" and dhatu[2] == "a" and dhatu[3] in "mn":
         return apply_vrddhi_to_stem(dhatu)

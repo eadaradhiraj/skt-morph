@@ -33,6 +33,8 @@ def _plot_uses_ari(base: str) -> bool:
         return True
     if base.startswith("kz") and base.endswith("ay"):
         return True
+    if base.startswith("kz") and base.endswith("v"):
+        return True
     if len(base) >= 3 and "r" in base and base.endswith("zy"):
         return True
     return False
@@ -105,9 +107,17 @@ def _join_raw(
     if gana in AD_GANAS:
         return _join_ad(stem, ending, family, dhatu, purusha, vacana)
     if gana in THEMATIC_GANAS or gana in CAUSATIVE_GANAS or gana == YA_GANA:
+        if dhatu == "Dinv":
+            return _join_dinv(stem, ending, family, purusha, vacana)
         if family in ("lang", "vidhilin", "lit"):
+            if family == "lang" and stem.endswith("o") and ending in ("at", "ad"):
+                return stem + ending[1:]
             return stem + ending
         if family == "lrt":
+            if stem.endswith("sy") and not stem.endswith(("zya", "tsya", "izya")):
+                if ending and ending[0] in "aA":
+                    return stem + ending
+                return stem + "a" + ending
             return thematic_join(stem, ending) if stem.endswith("a") else stem + ending
         if purusha == 3 and ending.startswith("A"):
             base = stem[:-1] if stem.endswith("a") else stem
@@ -260,7 +270,7 @@ def _join_han(stem: str, ending: str, family: str, purusha: int, vacana: int) ->
         return stem + ending
     if family == "lang":
         if ending == "aH" and purusha == 2 and vacana == 1:
-            return "ahanaH"
+            return "han"
         if ending in ("at", "ad") and purusha in (1, 2) and vacana == 1:
             return "han"
         if ending == "atAm":
@@ -288,6 +298,97 @@ def _join_han(stem: str, ending: str, family: str, purusha: int, vacana: int) ->
     return stem + ending
 
 
+def _join_dinv(stem: str, ending: str, family: str, purusha: int, vacana: int) -> str:
+    """Gaṇa-1 Dinv present/imperative (Dino / Dinu / Din + v)."""
+    base = "Din"
+    if family == "lat":
+        if ending == "ti":
+            return base + "o" + ending
+        if ending == "taH":
+            return base + "u" + ending
+        if ending in ("nti", "anti"):
+            return base + "v" + "anti"
+        if ending == "si":
+            return base + "o" + "zi"
+        if ending in ("TaH", "thaH"):
+            return base + "u" + ending
+        if ending in ("Ta", "tha"):
+            return base + "u" + ending
+        if ending == "Ami":
+            return base + "o" + "mi"
+        if ending == "AvaH":
+            return base + "u" + "vaH"
+        if ending == "AmaH":
+            return base + "u" + "maH"
+    if family == "lot":
+        if ending in ("tAt", "tAd"):
+            return base + "u" + ending
+        if ending == "tu":
+            return base + "o" + ending
+        if ending == "tAm":
+            return base + "u" + ending
+        if ending == "Di" and purusha == 2:
+            return base + "u"
+        if ending == "antu":
+            return base + "v" + "antu"
+        if ending == "tam":
+            return base + "u" + ending
+        if ending == "ta":
+            return base + "u" + ending
+        if ending == "Ani":
+            return base + "av" + "Ani"
+        if ending == "Ava":
+            return base + "av" + "Ava"
+        if ending == "Ama":
+            return base + "av" + "Ama"
+    if family == "lang":
+        if ending in ("at", "ad"):
+            return base + "o" + ending[1:]
+        if ending == "atAm":
+            return base + "utAm"
+        if ending == "an":
+            return base + "v" + "an"
+        if ending == "aH" and purusha == 2:
+            return base + "o" + "H"
+        if ending == "atam":
+            return base + "utam"
+        if ending == "ata":
+            return base + "uta"
+        if ending == "am":
+            return base + "av" + "am"
+        if ending == "Ava":
+            return base + "u" + "va"
+        if ending == "Ama":
+            return base + "u" + "ma"
+    if family == "vidhilin":
+        if ending == "et":
+            return base + "uyAt"
+        if ending == "ed":
+            return base + "uyAd"
+        if ending == "etAm":
+            return base + "uyAtAm"
+        if ending == "eyuH":
+            return base + "uyuH"
+        if ending == "eH":
+            return base + "uyAH"
+        if ending == "etam":
+            return base + "uyAtam"
+        if ending == "eta":
+            return base + "uyAta"
+        if ending == "eyam":
+            return base + "uyAm"
+        if ending == "eva":
+            return base + "uyAva"
+        if ending == "ema":
+            return base + "uyAma"
+        if ending.startswith("y"):
+            return base + "u" + ending
+    if family == "lrt" and stem.endswith("izya"):
+        if ending and ending[0] in "aA":
+            return stem[:-1] + ending
+    return stem + ending
+
+
 def _join_ad(
     stem: str,
     ending: str,
@@ -296,13 +397,62 @@ def _join_ad(
     purusha: int = 1,
     vacana: int = 1,
 ) -> str:
+    if dhatu == "i":
+        if family == "lat" and ending == "si":
+            return stem + "zi"
+        if family == "lrt":
+            body = apply_guna_to_stem("i") + "zy"
+            if ending == "ti":
+                return body + "ati"
+            if ending and ending[0] in "aA":
+                return body + ending
+            return body + ending
+        if family == "lang":
+            if ending in ("at", "ad"):
+                return stem + ending[1:]
+            if ending == "aH" and purusha == 2:
+                return stem + "H"
+    if dhatu == "dviz":
+        if family == "lang" and ending in ("at", "ad", "aH"):
+            return "advew"
+        if family == "lat":
+            if ending == "ti":
+                return "dvezwi"
+            if ending == "taH":
+                return "dvizwaH"
+            if ending in ("nti", "anti"):
+                return "dvizate"
+            if ending == "si":
+                return "dvezw" + "i"
+            if ending == "i" and purusha == 2:
+                return "dvezw" + "i"
+            if ending in ("thaH", "TaH"):
+                return "dvizATe"
+            if ending in ("tha", "Ta"):
+                return "dviqQve"
+        if family == "lot":
+            if ending in ("tAt", "tAd"):
+                return "dvizw" + ending
+            if ending == "tu":
+                return "dvezwu"
+            if ending == "Di" and purusha == 2:
+                return "dviqQi"
+        if family == "lrt":
+            if ending == "ti":
+                return "dvekzyati"
+            if ending == "taH":
+                return "dvekzyataH"
+            if ending in ("nti", "anti"):
+                return "dvekzyanti"
+            if ending == "si":
+                return "dvekzyasi"
+            if ending and ending[0] in "aA":
+                return "dvekzy" + ending
+        if family == "vidhilin" and ending.startswith("y"):
+            return "dviz" + ending
+        return stem + ending
     if dhatu == "han":
         return _join_han(stem, ending, family, purusha, vacana)
-    if dhatu == "dviz":
-        if family == "lat" and ending == "anti":
-            return "dvez" + "anti"
-        if family == "lat" and ending == "si":
-            return "dvezw" + "i"
     if not ending:
         return stem
     if stem != "ad":

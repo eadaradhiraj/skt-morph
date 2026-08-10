@@ -18,12 +18,19 @@ from .phonology import (
     is_bidadi,
     is_yajadi,
     uses_aya_present,
+    g1_nv_present_stem,
+    g1_nv_vidhilin_stem,
+    yam_cc_future_stem,
+    yam_cc_lang_stem,
+    yam_cc_present_stem,
     lang_geminate_stem,
     _causative_lang_base,
     thematic_aya_present_stem,
     thematic_present_base,
     vowel_initial_lang_stem,
     ya_present_base,
+    _G1_AYA_PRESENT,
+    _G1_NV_ROOTS,
 )
 from .redup import (
     GANA3,
@@ -136,6 +143,27 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
 
 _G1_KZYA_ROOTS = frozenset({"Siz", "viz", "kruS", "ruh"})
 _G1_TSYA_ROOTS = frozenset({"sad", "Sad", "Gas", "SfD"})
+_G1_ZY_FUTURES = {
+    "sru": "srozy",
+    "su": "sozy",
+    "Sru": "Srozy",
+    "Dru": "Drozy",
+    "du": "dozy",
+    "dru": "drozy",
+    "tyaj": "tyakzy",
+    "skand": "skantsy",
+    "nam": "naMsy",
+}
+
+
+def _g1_special_lrt_stem(dhatu: str) -> Optional[str]:
+    if dhatu in _G1_ZY_FUTURES:
+        return _G1_ZY_FUTURES[dhatu]
+    if dhatu in _G1_NV_ROOTS:
+        return dhatu + "izya"
+    if dhatu.endswith("A") and 2 <= len(dhatu) <= 4 and dhatu not in ("SrA", "jYA"):
+        return dhatu + "sy"
+    return None
 
 
 def _g1_future_suffix(base: str, dhatu: str) -> str:
@@ -146,7 +174,7 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
             body = graded[:-1]
         return body + "kzya"
     if dhatu == "yam":
-        return base + "Msya"
+        return base + "izya"
     if dhatu in _G1_TSYA_ROOTS:
         if base.endswith(("d", "D")):
             return base[:-1] + "tsya"
@@ -155,9 +183,6 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
     if dhatu == "kzi":
         return apply_guna_to_stem(dhatu) + "zya"
     if dhatu.endswith("kz"):
-        g = apply_guna_to_stem(dhatu)
-        if g != dhatu:
-            return g + "zya"
         return dhatu + "izya"
     if base.endswith("v"):
         return base + "izya"
@@ -184,11 +209,22 @@ def future_stem(
     """Derive lṛṭ stem (3.2.135 etc.)."""
     if dhatu == "kzi":
         return apply_guna_to_stem(dhatu) + "zya"
-    if gana == 1 and dhatu.endswith("kz"):
-        g = apply_guna_to_stem(dhatu)
-        if g != dhatu:
-            return g + "zya"
+    if gana == 1:
+        special = _g1_special_lrt_stem(dhatu)
+        if special:
+            return special
+    if gana == 2 and dhatu == "i":
+        return apply_guna_to_stem(dhatu) + "zy"
+    if gana == 1 and dhatu.endswith("kz") and dhatu != "kzi":
         return dhatu + "izya"
+    if gana == 1 and present_stem and dhatu in _G1_AYA_PRESENT and present_stem.endswith("aya"):
+        if dhatu.endswith(("e", "E")):
+            body = present_stem[:-2]
+            return body[:-1] + "Asy"
+        if dhatu == "Sri":
+            return present_stem[:-1] + "izya"
+        if dhatu.endswith(("i", "I")):
+            return apply_guna_to_stem(dhatu) + "zya"
     if present_stem and present_stem.endswith("Aya"):
         if dhatu.endswith("E"):
             return present_stem[:-2] + "sy"
@@ -285,8 +321,16 @@ def derive_stem(
         present_stem = bidadi_present_stem(dhatu)
         _append_step(steps, present_stem, ["3.1.33"], "yap")
     elif cgana in THEMATIC_GANAS:
+        yam_stem = yam_cc_present_stem(dhatu, antarganas)
+        nv_stem = g1_nv_present_stem(dhatu)
         aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
-        if aya_stem:
+        if yam_stem:
+            present_stem = yam_stem
+            _append_step(steps, present_stem, ["7.2.9"], "samprasaran")
+        elif nv_stem:
+            present_stem = nv_stem
+            _append_step(steps, present_stem, ["7.3.84"], "nv_stem")
+        elif aya_stem:
             present_stem = aya_stem
             _append_step(steps, present_stem, ["3.1.33"], "yap")
         else:
@@ -333,12 +377,14 @@ def derive_stem(
 
     if bidadi:
         if family == "lrt":
-            graded = apply_guna_to_stem(dhatu)
-            if dhatu == "kzi":
-                fstem = graded + "zya"
+            if dhatu == "guh":
+                fstem = "gUhizya"
+            elif dhatu == "kzi":
+                fstem = apply_guna_to_stem(dhatu) + "zya"
             elif dhatu.endswith("kz"):
-                fstem = graded + "zya" if graded != dhatu else dhatu + "izya"
+                fstem = dhatu + "izya"
             else:
+                graded = apply_guna_to_stem(dhatu)
                 fstem = graded + ("izya" if len(graded) >= 3 else "zya")
             _append_step(steps, fstem, ["3.2.135"], "lrt")
             return fstem, None, steps
@@ -371,10 +417,21 @@ def derive_stem(
         _append_step(steps, fstem, ["3.2.135"], "lrt")
         return fstem, None, steps
 
+    yam_fut = yam_cc_future_stem(dhatu, antarganas)
+    if family == "lrt" and yam_fut:
+        _append_step(steps, yam_fut, ["3.2.135"], "lrt")
+        return yam_fut, None, steps
+
+    if family == "lrt" and gana == 1:
+        special = _g1_special_lrt_stem(dhatu)
+        if special and dhatu not in _G1_AYA_PRESENT:
+            _append_step(steps, special, ["3.2.135"], "lrt")
+            return special, None, steps
+
     if family == "lrt":
         g = apply_guna_to_stem(dhatu) if gana in (YA_GANA,) else guna
         lrt_present = present_stem
-        if aya_present and not bidadi and g:
+        if aya_present and not bidadi and g and dhatu not in _G1_AYA_PRESENT:
             lrt_present = g + "a"
         fstem = future_stem(
             g,
@@ -386,6 +443,14 @@ def derive_stem(
         return fstem, None, steps
 
     if family == "lang":
+        yam_lang = yam_cc_lang_stem(dhatu, antarganas)
+        if yam_lang and cgana == 1:
+            _append_step(steps, yam_lang, ["7.2.9"], "lang_stem")
+            return yam_lang, "a", steps
+        nv_stem = g1_nv_present_stem(dhatu)
+        if nv_stem and cgana == 1:
+            _append_step(steps, nv_stem, ["7.3.84"], "lang_stem")
+            return nv_stem, "a", steps
         if gana in CAUSATIVE_GANAS and cgana == 10:
             init = vowel_initial_lang_stem(dhatu)
             if init is not None:
@@ -430,6 +495,14 @@ def derive_stem(
         return root, "a", steps
 
     if family == "vidhilin":
+        yam_vid = yam_cc_lang_stem(dhatu, antarganas)
+        if yam_vid and cgana == 1:
+            _append_step(steps, yam_vid, ["7.2.9"], "vidhilin_stem")
+            return yam_vid, None, steps
+        nv_vid = g1_nv_vidhilin_stem(dhatu)
+        if nv_vid and cgana == 1:
+            _append_step(steps, nv_vid, ["7.3.84"], "vidhilin_stem")
+            return nv_vid, None, steps
         if gana == YA_GANA and present_stem:
             root = present_stem[:-1] if present_stem.endswith("a") else present_stem
         elif cgana in THEMATIC_GANAS:
