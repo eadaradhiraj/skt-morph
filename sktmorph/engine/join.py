@@ -255,7 +255,11 @@ def _thematic_lot_third(base: str, ending: str, gana: int) -> str:
     if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
         return base + "ARi"
     if gana in THEMATIC_GANAS:
-        if base.endswith("aya") or (base.endswith("ay") and "r" in base[:-2]) or _plot_uses_ari(base):
+        if (
+            base.endswith(("aya", "Aya", "Ay"))
+            or (base.endswith("ay") and "r" in base[:-2])
+            or _plot_uses_ari(base)
+        ):
             return base + "ARi"
     return base + "Ani"
 
@@ -357,7 +361,7 @@ def _join_raw(
             return thematic_join(stem, ending) if stem.endswith("a") else stem + ending
         if purusha == 3 and ending.startswith("A"):
             base = stem[:-1] if stem.endswith("a") else stem
-            if family == "lot" and ending == "Ani":
+            if family in ("lot", "plot") and ending == "Ani":
                 return _thematic_lot_third(base, ending, gana)
             return base + ending
         return thematic_join(stem, ending)
@@ -733,6 +737,12 @@ def _join_ad(
                 return "dvizwam"
             if ending == "ta":
                 return "dvizwa"
+            if ending == "Ani":
+                return "dvezARi"
+            if ending == "Ava":
+                return "dvezAva"
+            if ending == "Ama":
+                return "dvezAma"
         if family == "lrt":
             if ending == "ti":
                 return "dvekzyati"

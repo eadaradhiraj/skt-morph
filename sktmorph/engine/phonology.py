@@ -244,6 +244,8 @@ def sad_present_base(dhatu: str) -> Optional[str]:
         return "sId"
     if dhatu == "guh":
         return "gUh"
+    if dhatu == "pA":
+        return "pib"
     return None
 
 
@@ -320,9 +322,6 @@ def _causative_aya_base(dhatu: str) -> str:
 
 def causative_present_stem(dhatu: str) -> str:
     """Present/imperative stem for gaṇa-10 causative (-aya-)."""
-    init = vowel_initial_lang_stem(dhatu)
-    if init is not None:
-        return init + "aya"
     return _causative_aya_base(dhatu)
 
 

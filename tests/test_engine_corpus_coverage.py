@@ -88,6 +88,9 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(j("dvez", "anti", 2, "lat", 1, "P", None, "dviz", 3), "dvizanti")
         self.assertEqual(j("dvez", "si", 2, "lat", 2, "P", None, "dviz", 1), "dvekzi")
         self.assertEqual(j("dvez", "at", 2, "lang", 1, "P", "a", "dviz", 1), "advew")
+        self.assertEqual(j("dvez", "Ani", 2, "lot", 3, "P", None, "dviz", 1), "dvezARi")
+        self.assertEqual(j("dvez", "Ava", 2, "lot", 3, "P", None, "dviz", 2), "dvezAva")
+        self.assertEqual(j("dvez", "Ama", 2, "lot", 3, "P", None, "dviz", 3), "dvezAma")
 
     def test_gana3_and_n_gana_join_branches(self):
         j = join_form
@@ -336,6 +339,14 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         )
         self.assertEqual(derive_stem("yaB", 1, "lrt", "shuddha")[0], "yapsya")
         self.assertEqual(derive_stem("sfp", 1, "lrt", "shuddha")[0], "sarpsya")
+        self.assertEqual(derive_stem("tap", 1, "lrt", "shuddha")[0], "tapsya")
+        self.assertEqual(derive_stem("pA", 1, "lat", "shuddha")[0], "piba")
+        self.assertEqual(_g1_future_base("pA", "pib", "pA"), "pib")
+        self.assertEqual(
+            derive_stem("Urj", 10, "lat", "shuddha", "nityaRic")[0],
+            "Urjaya",
+        )
+        self.assertEqual(join_form("drAya", "Ani", 1, "plot", 3, "P", None, "drE", 1), "drAyARi")
         self.assertEqual(
             derive_stem("med", 1, "lat", "shuddha", "", "BidAdiH")[0],
             "meda",

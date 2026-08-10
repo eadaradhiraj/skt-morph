@@ -135,10 +135,14 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     """Gaṇa-1 future base before -sya/-izya (may differ from present base)."""
     if dhatu == "sad":
         return dhatu
+    if dhatu == "pA":
+        return "pib"
     if dhatu == "yaB":
         return "yap"
     if dhatu == "sfp":
         return "sarp"
+    if dhatu == "tap":
+        return "tap"
     if dhatu.endswith("nv") and len(dhatu) >= 4:
         if dhatu[0] == "r" or dhatu.endswith("fnv"):
             return dhatu[:-2] + "Rv"
@@ -196,7 +200,7 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
             return base[:-1] + "tsya"
         if base.endswith("s"):
             return base[:-1] + "tsya"
-    if dhatu in ("yaB", "sfp"):
+    if dhatu in ("yaB", "sfp", "tap"):
         return base + "sya"
     if dhatu == "kzi":
         return apply_guna_to_stem(dhatu) + "zya"
