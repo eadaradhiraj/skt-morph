@@ -280,6 +280,12 @@ def thematic_present_base(dhatu: str, gana: int) -> str:
     """Thematic present root before -a (gaṇa 1/6)."""
     if gana == 6:
         return dhatu
+    if "W" in dhatu and len(dhatu) > 3 and dhatu.endswith(("iv", "Iv", "uv", "Uv")):
+        idx = len(dhatu) - 2
+        if dhatu[idx] == "i":
+            return dhatu[:idx] + "I" + dhatu[idx + 1 :]
+        if dhatu[idx] == "u":
+            return dhatu[:idx] + "U" + dhatu[idx + 1 :]
     if len(dhatu) == 4 and dhatu[0] in "kgcjwqtp" and dhatu[2] == "a" and dhatu[3] in "mn":
         return apply_vrddhi_to_stem(dhatu)
     for idx in range(len(dhatu) - 1, -1, -1):

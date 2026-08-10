@@ -97,6 +97,8 @@ def _g6_future_suffix(graded: str) -> str:
 
 def g6_future_stem(dhatu: str) -> str:
     """Gaṇa 6 lṛṭ stem with guṇa and consonant-specific suffix."""
+    if dhatu == "kzi":
+        return apply_guna_to_stem(dhatu) + "zya"
     if dhatu.endswith("ajj"):
         return dhatu[0] + "arkzya"
     if dhatu.endswith("fh"):
@@ -116,6 +118,8 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     if dhatu.endswith("nv") and len(dhatu) >= 4:
         if dhatu[0] == "r" or dhatu.endswith("fnv"):
             return dhatu[:-2] + "Rv"
+    if "W" in dhatu and len(dhatu) > 3 and dhatu.endswith(("iv", "Iv", "uv", "Uv")):
+        return apply_guna_to_stem(dhatu)
     if dhatu == "guh":
         return "gUh"
     if dhatu in ("SrA", "jYA"):
@@ -146,8 +150,13 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
             return base[:-1] + "tsya"
         if base.endswith("s"):
             return base[:-1] + "tsya"
-    if dhatu.endswith("kz") and len(dhatu) <= 5:
-        return base + "zya"
+    if dhatu == "kzi":
+        return apply_guna_to_stem(dhatu) + "zya"
+    if dhatu.endswith("kz"):
+        g = apply_guna_to_stem(dhatu)
+        if g != dhatu:
+            return g + "zya"
+        return dhatu[:-1] + "zy"
     if base.endswith("v"):
         return base + "izya"
     if base.endswith("e") and len(base) <= 2:
@@ -171,10 +180,19 @@ def future_stem(
     dhatu: str = "",
 ) -> str:
     """Derive lṛṭ stem (3.2.135 etc.)."""
+    if dhatu == "kzi":
+        return apply_guna_to_stem(dhatu) + "zya"
+    if gana == 1 and dhatu.endswith("kz"):
+        g = apply_guna_to_stem(dhatu)
+        if g != dhatu:
+            return g + "zya"
+        return dhatu[:-1] + "zy"
     if present_stem and present_stem.endswith("Aya"):
         if dhatu.endswith("E"):
             return present_stem[:-2] + "sy"
         return present_stem[:-1] + "izya"
+    if present_stem and present_stem.endswith("yAa"):
+        return present_stem[:-1] + "sy"
     if present_stem and present_stem.endswith("aya"):
         return present_stem[:-1] + "izya"
     if present_stem and present_stem.endswith("ya"):
@@ -313,7 +331,12 @@ def derive_stem(
     if bidadi:
         if family == "lrt":
             graded = apply_guna_to_stem(dhatu)
-            fstem = graded + ("izya" if len(graded) >= 3 else "zya")
+            if dhatu == "kzi":
+                fstem = graded + "zya"
+            elif dhatu.endswith("kz"):
+                fstem = graded + "zya" if graded != dhatu else dhatu[:-1] + "zy"
+            else:
+                fstem = graded + ("izya" if len(graded) >= 3 else "zya")
             _append_step(steps, fstem, ["3.2.135"], "lrt")
             return fstem, None, steps
         if family == "lang":
