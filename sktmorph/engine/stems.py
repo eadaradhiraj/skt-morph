@@ -161,6 +161,7 @@ _G1_ZY_FUTURES = {
     "skand": "skantsy",
     "nam": "naMsy",
 }
+_G2_U_LRT_OZY = frozenset({"su", "tu", "dyu", "ku", "stu"})
 
 
 def _g1_special_lrt_stem(dhatu: str) -> Optional[str]:
@@ -222,6 +223,10 @@ def future_stem(
             return special
     if gana == 2 and dhatu == "i":
         return apply_guna_to_stem(dhatu) + "zy"
+    if gana == 2 and dhatu.endswith("u"):
+        if dhatu in _G2_U_LRT_OZY:
+            return apply_guna_to_stem(dhatu) + "zy"
+        return dhatu[:-1] + "avizy"
     if gana == 1 and dhatu.endswith("kz") and dhatu != "kzi":
         return dhatu + "izya"
     if gana == 1 and present_stem and dhatu in _G1_AYA_PRESENT and present_stem.endswith("aya"):
@@ -304,6 +309,7 @@ def derive_stem(
     derivation: str,
     tags: str = "",
     antarganas: str = "",
+    aupadeshik: str = "",
 ) -> Tuple[Optional[str], Optional[str], List[EngineStep]]:
     """
     Return (stem, augment, steps).
@@ -341,7 +347,7 @@ def derive_stem(
             present_stem = aya_stem
             _append_step(steps, present_stem, ["3.1.33"], "yap")
         else:
-            base = g6_present_base(dhatu) if cgana == 6 else thematic_present_base(dhatu, cgana)
+            base = g6_present_base(dhatu) if cgana == 6 else thematic_present_base(dhatu, cgana, aupadeshik)
             if base != dhatu:
                 _append_step(steps, base, ["7.2.115"], "guNa")
             present_stem = base + "a"
@@ -434,6 +440,10 @@ def derive_stem(
         if special and dhatu not in _G1_AYA_PRESENT:
             _append_step(steps, special, ["3.2.135"], "lrt")
             return special, None, steps
+        if dhatu == "sUrkzy" and aupadeshik.startswith("z"):
+            fstem = "sUkzyizya"
+            _append_step(steps, fstem, ["3.2.135"], "lrt")
+            return fstem, None, steps
 
     if family == "lrt":
         g = apply_guna_to_stem(dhatu) if gana in (YA_GANA,) else guna
@@ -482,7 +492,7 @@ def derive_stem(
                 if init is not None:
                     _append_step(steps, init, ["7.2.115"], "lang_stem")
                     return init, None, steps
-                root = thematic_present_base(dhatu, cgana)
+                root = thematic_present_base(dhatu, cgana, aupadeshik)
         elif gana == GANA3:
             root = gana3_lang_stem(dhatu, guna)
         elif gana in NU_GANAS:
@@ -514,7 +524,7 @@ def derive_stem(
             root = present_stem[:-1] if present_stem.endswith("a") else present_stem
         elif cgana in THEMATIC_GANAS:
             aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
-            root = aya_stem[:-1] if aya_stem else thematic_present_base(dhatu, cgana)
+            root = aya_stem[:-1] if aya_stem else thematic_present_base(dhatu, cgana, aupadeshik)
         elif gana == GANA3:
             root = gana3_vidhilin_stem(dhatu, guna)
         elif gana in NU_GANAS:
@@ -531,7 +541,7 @@ def derive_stem(
         elif gana in CAUSATIVE_GANAS and cgana == 10:
             root = _causative_lang_base(dhatu)
         else:
-            root = guna if cgana not in THEMATIC_GANAS else thematic_present_base(dhatu, cgana)
+            root = guna if cgana not in THEMATIC_GANAS else thematic_present_base(dhatu, cgana, aupadeshik)
         _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
         return root, None, steps
 
@@ -543,7 +553,7 @@ def derive_stem(
     if family == "lit":
         grade = (
             apply_guna_to_stem(dhatu)
-            if cgana in THEMATIC_GANAS and thematic_present_base(dhatu, cgana) != dhatu
+            if cgana in THEMATIC_GANAS and thematic_present_base(dhatu, cgana, aupadeshik) != dhatu
             else (guna if cgana not in THEMATIC_GANAS else dhatu)
         )
         pstem = perfect_stem(dhatu, grade)

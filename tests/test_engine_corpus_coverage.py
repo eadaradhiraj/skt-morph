@@ -295,6 +295,30 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(join_form("Dino", "Di", 1, "lot", 2, "P", None, "Dinv", 1), "Dinu")
         self.assertEqual(join_form("Dinvizya", "ati", 1, "lrt", 1, "P", None, "Dinv", 1), "Dinvizyati")
         self.assertEqual(join_form("Dinu", "yAt", 1, "vidhilin", 1, "P", None, "Dinv", 1), "DinuyAt")
+        self.assertEqual(join_form("kfnva", "ti", 1, "lat", 1, "P", None, "kfnv", 1), "kfRoti")
+        self.assertEqual(join_form("kfnv", "at", 1, "lang", 1, "P", "a", "kfnv", 1), "akfRot")
+        self.assertEqual(join_form("yo", "at", 2, "lang", 1, "P", "a", "yu", 1), "ayOt")
+        self.assertEqual(join_form("ro", "at", 2, "lang", 1, "P", "a", "ru", 1), "aravIt")
+        self.assertEqual(join_form("rR", "at", 2, "lang", 1, "P", "a", "UrRu", 1), "OrRot")
+        self.assertEqual(join_form("ro", "ti", 2, "lrt", 1, "P", None, "ru", 1), "ravizyati")
+        self.assertEqual(join_form("sozy", "ti", 2, "lrt", 1, "P", None, "su", 1), "sozyati")
+        self.assertEqual(thematic_present_base("sUrkzy", 1, "zUrkzya~"), "sUkzy")
+        self.assertEqual(
+            derive_stem("sUrkzy", 1, "lrt", "shuddha", "", "", "zUrkzya~")[0],
+            "sUkzyizya",
+        )
+        from sktmorph.engine.join import _g2_u_lang_join, _join_ad, _join_kfnv
+
+        self.assertIsNone(_g2_u_lang_join("gam", "at", 1, 1))
+        self.assertIsNone(_g2_u_lang_join("ru", "xx", 1, 1))
+        self.assertIsNone(_g2_u_lang_join("su", "xx", 1, 1))
+        self.assertEqual(_join_kfnv("kfnv", "va", "lang", 1, 2), "akfRuva")
+        self.assertEqual(_join_kfnv("kfnv", "ma", "lang", 2, 3), "akfRuma")
+        self.assertEqual(_join_kfnv("kfnv", "tha", "lot", 2, 1), "kfRu")
+        self.assertEqual(_join_kfnv("kfnv", "xx", "lit", 1, 1), "kfnvxx")
+        self.assertEqual(_join_ad("testzy", "anti", "lrt", "xx", 1, 3), "testzyanti")
+        self.assertEqual(_join_ad("testzy", "ti", "lrt", "xx", 1, 1), "testzyati")
+        self.assertEqual(_join_ad("testzy", "Ami", "lrt", "xx", 3, 1), "testzyAmi")
         self.assertEqual(future_stem("x", 1, "xyAa", "xE"), "xyAsy")
         self.assertEqual(_join_ni_npattern("abnA", "foo", "lat", 1, "P"), "abnAfoo")
         self.assertEqual(g9_r_lang_root("SF"), "SIr")

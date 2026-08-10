@@ -108,6 +108,7 @@ class LiveTinantaEngine:
             derivation,
             tags,
             antarganas,
+            info["raw"].get("aupadeshik", "") or "",
         )
         if not stem:
             return [], steps

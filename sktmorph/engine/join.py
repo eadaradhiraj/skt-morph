@@ -8,6 +8,160 @@ from .stems import AD_GANAS, CAUSATIVE_GANAS, N_GANA, NI_GANA, NU_GANAS, THEMATI
 
 AD_T_INFLECT = frozenset({"ti", "taH", "si", "thaH", "tha", "tAt", "tAd", "tu", "tam", "ta"})
 _VOWEL = "aeiouAIUEO"
+_G2_U_LANG_AVIT = frozenset({"ru", "tu", "stu"})
+_G2_U_LANG_OZY_LRT = frozenset({"su", "tu", "dyu", "ku", "stu"})
+
+
+def _g2_u_lang_body(dhatu: str) -> str:
+    if dhatu == "UrRu":
+        return dhatu[1:-1]
+    if dhatu in _G2_U_LANG_AVIT:
+        return dhatu[0] if len(dhatu) == 2 else dhatu[:-1]
+    return dhatu[:-1]
+
+
+def _g2_u_lang_prefix(dhatu: str) -> str:
+    return "O" if dhatu == "UrRu" else "a"
+
+
+def _g2_u_lang_join(
+    dhatu: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    if not dhatu.endswith("u") or dhatu in ("i", "as"):
+        return None
+    body = _g2_u_lang_body(dhatu)
+    prefix = _g2_u_lang_prefix(dhatu)
+    if dhatu in _G2_U_LANG_AVIT:
+        if purusha == 1 and vacana == 1 and ending in ("at", "ad"):
+            return prefix + body + "avI" + ending[1:]
+        if purusha == 1 and vacana == 2 and ending == "atAm":
+            return prefix + body + "utAm"
+        if purusha == 1 and vacana == 3 and ending == "an":
+            return prefix + body + "uvan"
+        if purusha == 2 and vacana == 1 and ending == "aH":
+            return prefix + body + "avIH"
+        if purusha == 2 and vacana == 2 and ending == "atam":
+            return prefix + body + "utam"
+        if purusha == 2 and vacana == 3 and ending == "ata":
+            return prefix + body + "uta"
+        if purusha == 3 and vacana == 1 and ending == "am":
+            return prefix + body + "avam"
+        if purusha == 3 and vacana == 2 and ending == "va":
+            return prefix + body + "uva"
+        if purusha == 3 and vacana == 3 and ending == "ma":
+            return prefix + body + "uma"
+        return None
+    ot_vowel = "o" if dhatu == "UrRu" else "O"
+    if purusha == 1 and vacana == 1 and ending in ("at", "ad"):
+        return prefix + body + ot_vowel + ending[1:]
+    if purusha == 1 and vacana == 2 and ending == "atAm":
+        return prefix + body + "utAm"
+    if purusha == 1 and vacana == 3 and ending == "an":
+        return prefix + body + "uvan"
+    if purusha == 2 and vacana == 1 and ending == "aH":
+        return prefix + body + ot_vowel + "H"
+    if purusha == 2 and vacana == 2 and ending == "atam":
+        return prefix + body + "utam"
+    if purusha == 2 and vacana == 3 and ending == "ata":
+        return prefix + body + "uta"
+    if purusha == 3 and vacana == 1 and ending == "am":
+        return prefix + body + "avam"
+    if purusha == 3 and vacana == 2 and ending == "va":
+        return prefix + body + "uva"
+    if purusha == 3 and vacana == 3 and ending == "ma":
+        return prefix + body + "uma"
+    return None
+
+
+def _kfnv_vowel(purusha: int, vacana: int, family: str) -> str:
+    if family == "lot":
+        if purusha == 3:
+            return "a"
+        if purusha == 1 and vacana == 3:
+            return "v"
+        return "u"
+    if family == "vidhilin":
+        return "u"
+    if family == "lang" and purusha == 3 and vacana == 1:
+        return "a"
+    if purusha == 1 and vacana == 3:
+        return "v"
+    if vacana in (2, 3):
+        return "u"
+    return "o"
+
+
+def _kfnv_stem(purusha: int, vacana: int, family: str) -> str:
+    return "kfR" + _kfnv_vowel(purusha, vacana, family)
+
+
+def _join_kfnv(
+    stem: str,
+    ending: str,
+    family: str,
+    purusha: int,
+    vacana: int,
+) -> str:
+    base = _kfnv_stem(purusha, vacana, family)
+    if family == "lang":
+        if ending in ("at", "ad"):
+            return "a" + base + ending[1:]
+        if ending == "atAm":
+            return "a" + base + "tAm"
+        if ending == "an":
+            return "a" + base + "an"
+        if ending == "aH":
+            return "a" + base + "H"
+        if ending == "atam":
+            return "a" + base + "tam"
+        if ending == "ata":
+            return "a" + base + "ta"
+        if ending == "am":
+            return "a" + base + "vam"
+        if ending == "va":
+            return "a" + base + "va"
+        if ending == "ma":
+            return "a" + base + "ma"
+        if ending == "Ava":
+            return "a" + _kfnv_stem(3, 2, family) + "va"
+        if ending == "Ama":
+            return "a" + _kfnv_stem(3, 3, family) + "ma"
+    if family == "vidhilin":
+        vidhi = {
+            "et": "yAt",
+            "ed": "yAd",
+            "etAm": "yAtAm",
+            "eyuH": "yuH",
+            "eH": "yAH",
+            "etam": "yAtam",
+            "eta": "yAta",
+            "eyam": "yAm",
+            "eva": "yAva",
+            "ema": "yAma",
+        }
+        return base + vidhi.get(ending, ending)
+    if family == "lot":
+        if purusha == 2 and vacana == 1 and ending == "tha":
+            return base
+        if ending in ("Ani", "Ava", "Ama"):
+            return base + "v" + ending
+        return base + ending
+    if family == "lat":
+        if ending == "si":
+            return "kfRo" + "zi"
+        if ending == "nti":
+            return base + "anti"
+        if ending == "Ami":
+            return _kfnv_stem(3, 1, family) + "mi"
+        if ending == "AvaH":
+            return _kfnv_stem(3, 2, family) + "vaH"
+        if ending == "AmaH":
+            return _kfnv_stem(3, 3, family) + "maH"
+        return base + ending
+    return stem + ending
 
 
 def _plot_uses_ari(base: str) -> bool:
@@ -69,6 +223,10 @@ def join_form(
     if augment:
         if dhatu == "i" and family == "lang":
             return form
+        if dhatu and dhatu.endswith("u") and family == "lang" and dhatu not in ("i", "as"):
+            return form
+        if dhatu == "kfnv" and family == "lang":
+            return form
         if gana in AD_GANAS and family == "lang" and form and form[0] == "A":
             return form
         if gana in AD_GANAS and form and form[0] in "aeiouAIUEO":
@@ -109,6 +267,8 @@ def _join_raw(
     if gana in AD_GANAS:
         return _join_ad(stem, ending, family, dhatu, purusha, vacana)
     if gana in THEMATIC_GANAS or gana in CAUSATIVE_GANAS or gana == YA_GANA:
+        if dhatu == "kfnv" and family in ("lat", "lot", "lang", "vidhilin"):
+            return _join_kfnv(stem, ending, family, purusha, vacana)
         if dhatu == "Dinv":
             return _join_dinv(stem, ending, family, purusha, vacana)
         if family in ("lang", "vidhilin", "lit"):
@@ -431,6 +591,22 @@ def _join_ad(
                     return "Eva"
                 if ending == "ma":
                     return "Ema"
+    if dhatu and dhatu.endswith("u") and dhatu not in ("i",) and family == "lrt":
+        if dhatu in _G2_U_LANG_OZY_LRT:
+            body = apply_guna_to_stem(dhatu) + "zy"
+        else:
+            body = dhatu[:-1] + "avizy"
+        if ending == "ti":
+            return body + "ati"
+        if ending == "anti":
+            return body + "anti"
+        if ending and ending[0] in "aA":
+            return body + ending
+        return body + ending
+    if family == "lang" and dhatu and dhatu.endswith("u") and dhatu not in ("i", "as"):
+        joined = _g2_u_lang_join(dhatu, ending, purusha, vacana)
+        if joined is not None:
+            return joined
     if dhatu == "dviz":
         if family == "lang" and ending in ("at", "ad", "aH"):
             return "advew"
@@ -475,6 +651,13 @@ def _join_ad(
     if not ending:
         return stem
     if stem != "ad":
+        if family == "lrt" and stem.endswith("zy") and not stem.endswith(("zya", "izya", "tsya")):
+            if ending == "ti":
+                return stem + "ati"
+            if ending == "anti":
+                return stem + "anti"
+            if ending and ending[0] in "aA":
+                return stem + ending
         if family == "lrt" and stem.endswith(("zya", "tsya", "izya")):
             if ending == "anti":
                 return stem[:-1] + "anti"

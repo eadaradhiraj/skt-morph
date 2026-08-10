@@ -337,8 +337,10 @@ def thematic_aya_present_stem(dhatu: str) -> Optional[str]:
     return None
 
 
-def thematic_present_base(dhatu: str, gana: int) -> str:
+def thematic_present_base(dhatu: str, gana: int, aupadeshik: str = "") -> str:
     """Thematic present root before -a (gaṇa 1/6)."""
+    if dhatu == "sUrkzy" and aupadeshik.startswith("z"):
+        return "sUkzy"
     if gana == 1:
         rv = g1_rv_nv_present_base(dhatu)
         if rv:
