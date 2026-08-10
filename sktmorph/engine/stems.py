@@ -28,6 +28,7 @@ from .phonology import (
     lang_geminate_stem,
     _causative_lang_base,
     _CAUSATIVE_LANG_BASE,
+    _CAUSATIVE_LANG_NO_AUG,
     thematic_aya_present_stem,
     thematic_present_base,
     vowel_initial_lang_stem,
@@ -558,8 +559,9 @@ def derive_stem(
                 _append_step(steps, root, ["3.4.111"], "lang_stem")
                 return root, None, steps
             root = causative_lang_stem(dhatu)
+            lang_aug = None if dhatu in _CAUSATIVE_LANG_NO_AUG else "a"
             _append_step(steps, root, ["3.4.111"], "lang_stem")
-            return root, "a", steps
+            return root, lang_aug, steps
         elif gana == YA_GANA:
             init = vowel_initial_lang_stem(dhatu)
             if init is not None:

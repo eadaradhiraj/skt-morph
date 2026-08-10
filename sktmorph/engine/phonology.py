@@ -247,6 +247,10 @@ def ya_present_base(dhatu: str) -> str:
     """Gaṇa 4 root before -ya."""
     if dhatu in _YA_PRESENT_SPECIAL:
         return _YA_PRESENT_SPECIAL[dhatu]
+    if dhatu.endswith("iv"):
+        return dhatu[:-2] + "I" + "v"
+    if dhatu.endswith(("as", "am", "ah")):
+        return dhatu
     if dhatu.endswith("MS"):
         return dhatu[:-2] + "S"
     for idx in range(len(dhatu) - 2, -1, -1):
@@ -429,7 +433,12 @@ _CAUSATIVE_LANG_BASE = {
     "gup": "gop",
     "uDras": "ODrAsay",
     "Card": "cCarday",
+    "raMh": "raNg",
+    "mfj": "mArj",
 }
+
+_CAUSATIVE_LANG_NO_AUG = frozenset({"uDras", "Una", "anDa", "aMsa", "aNka", "aNga"})
+_G10_LANG_KEEP_AY = frozenset({"jYA", "Card", "uDras"})
 
 
 def lang_geminate_stem(dhatu: str, stem: str) -> str:
@@ -485,6 +494,10 @@ def _causative_lang_base(dhatu: str) -> str:
         aya = _causative_aya_base(dhatu)
         body = aya[:-3] if aya.endswith("aya") else dhatu
         return dhatu[0].lower() + body
+    if len(dhatu) == 3 and dhatu[0] == "C":
+        aya = _causative_aya_base(dhatu)
+        body = aya[:-3] if aya.endswith("aya") else dhatu
+        return dhatu[0].lower() + body
     return _causative_aya_base(dhatu)[:-1]
 
 
@@ -496,6 +509,10 @@ def causative_lang_stem(dhatu: str) -> str:
     if init is not None:
         return init + "ay"
     if len(dhatu) == 4 and dhatu[0] == "C" and dhatu[1] in "aA":
+        aya = _causative_aya_base(dhatu)
+        body = aya[:-3] if aya.endswith("aya") else dhatu
+        return dhatu[0].lower() + body
+    if len(dhatu) == 3 and dhatu[0] == "C":
         aya = _causative_aya_base(dhatu)
         body = aya[:-3] if aya.endswith("aya") else dhatu
         return dhatu[0].lower() + body

@@ -2,7 +2,15 @@
 
 from typing import List, Optional
 
-from .phonology import apply_guna_to_stem, g9_r_lang_root, g9_uses_r_infix, thematic_join, _G1_A_FINAL
+from .phonology import (
+    apply_guna_to_stem,
+    g9_r_lang_root,
+    g9_uses_r_infix,
+    thematic_join,
+    _G1_A_FINAL,
+    _G10_LANG_KEEP_AY,
+    _CAUSATIVE_LANG_NO_AUG,
+)
 from .redup import GANA3, gana3_join_mode, gana3_weak_stem
 from .stems import AD_GANAS, CAUSATIVE_GANAS, N_GANA, NI_GANA, NU_GANAS, THEMATIC_GANAS, YA_GANA
 
@@ -198,6 +206,34 @@ def _g2_u_lat_join(
         return body + "Omi"
     if ending in ("vaH", "maH") and purusha == 3:
         return body + "u" + ending
+    return None
+
+
+_G10_LANG_DROP_AY = frozenset({"pF", "vf", "jF", "DU"})
+_G10_LANG_AYAT = frozenset({"Cada", "Cuw", "Ceda", "Cidra"})
+
+
+def _g10_uses_drop_ay(dhatu: str) -> bool:
+    return dhatu in _G10_LANG_DROP_AY
+
+
+def _g10_lang_join(dhatu: str, stem: str, ending: str) -> Optional[str]:
+    if dhatu == "ci" and stem.endswith("ay"):
+        return stem[:-3] + "y" + ending
+    if dhatu in _G10_LANG_KEEP_AY:
+        return stem + ending
+    if dhatu in _CAUSATIVE_LANG_NO_AUG and stem.endswith("ay"):
+        body = stem[:-2]
+        return body + "y" + ending
+    if stem.endswith("ay") and _g10_uses_drop_ay(dhatu):
+        body = stem[:-2]
+        if body and body[-1] in _VOWEL:
+            return body + "y" + ending
+        return body + ending
+    if dhatu in _G10_LANG_AYAT and ending.startswith("a"):
+        return stem + "ay" + ending
+    if stem.endswith("ay"):
+        return stem + ending
     return None
 
 
@@ -543,8 +579,6 @@ def _thematic_lot_third(
         return base + ending
     if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
         return base + "ARi"
-    if gana == YA_GANA:
-        return base + "ARi"
     if gana == 6 and dhatu in _G6_PLOT_ARI:
         return base + "ARi"
     if dhatu in _G1_PLOT_ARI:
@@ -587,6 +621,8 @@ def join_form(
             return form
         if dhatu == "dviz" and family == "lang":
             return "a" + form
+        if gana in CAUSATIVE_GANAS and family == "lang" and dhatu in _CAUSATIVE_LANG_NO_AUG:
+            return form
         if gana in AD_GANAS and family == "lang" and form and form[0] == "A":
             return form
         if gana in AD_GANAS and form and form[0] in "aeiouAIUEO":
@@ -631,10 +667,13 @@ def _join_raw(
             return _join_kfnv(stem, ending, family, purusha, vacana)
         if dhatu == "Dinv":
             return _join_dinv(stem, ending, family, purusha, vacana)
-        if dhatu in _G1_A_FINAL and family in ("lat", "lot", "lang", "vidhilin"):
+        if dhatu in _G1_A_FINAL and gana == 1 and family in ("lat", "lot", "lang", "vidhilin"):
             return _join_g1_a_final(stem, ending, family, purusha, dhatu or "")
         if family in ("lang", "vidhilin", "lit"):
             if family == "lang":
+                joined = _g10_lang_join(dhatu or "", stem, ending)
+                if joined is not None:
+                    return joined
                 joined = _g1_f_lang_join(dhatu or "", stem, ending)
                 if joined is not None:
                     return joined

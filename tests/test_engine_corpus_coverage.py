@@ -254,6 +254,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertIsNotNone(family_endings("lat", "kartari", "A", 5))
         self.assertTrue(g9_uses_n_infix("mI", ""))
         self.assertTrue(ya_present_base("dIv"))
+        self.assertEqual(ya_present_base("div"), "dIv")
+        self.assertEqual(ya_present_base("snas"), "snas")
         self.assertTrue(lang_geminate_stem("cur", "cora"))
         self.assertTrue(apply_causative_grade("cur"))
         self.assertTrue(gana3_present_stem("hu", "hu"))
@@ -304,6 +306,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             vowel_initial_lang_stem,
         )
         from sktmorph.engine.join import (
+            _g10_lang_join,
+            _g10_uses_drop_ay,
             _g1_f_lang_join,
             _g2_a_lat_join,
             _g2_a_lang_join,
@@ -400,7 +404,26 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(causative_lang_stem("ci"), "capay")
         self.assertEqual(causative_lang_stem("Camp"), "cCamp")
         self.assertEqual(causative_lang_stem("gup"), "gop")
-        self.assertEqual(join_form("capay", "at", 10, "lang", 1, "P", "a", "ci", 1), "acapayat")
+        self.assertEqual(join_form("capay", "at", 10, "lang", 1, "P", "a", "ci", 1), "acayat")
+        self.assertEqual(join_form("paray", "at", 10, "lang", 1, "P", "a", "pF", 10), "aparat")
+        self.assertEqual(join_form("coray", "at", 10, "lang", 1, "P", "a", "cur", 10), "acorayat")
+        self.assertEqual(join_form("cCad", "at", 10, "lang", 1, "P", "a", "Cada", 10), "acCadayat")
+        self.assertEqual(causative_lang_stem("Cfd"), "cCard")
+        self.assertEqual(_causative_lang_base("Cfp"), "cCarp")
+        self.assertEqual(_g10_lang_join("ci", "capay", "at"), "cayat")
+        self.assertEqual(_g10_lang_join("cur", "coray", "at"), "corayat")
+        self.assertEqual(_g10_lang_join("vf", "varay", "at"), "varat")
+        self.assertTrue(_g10_uses_drop_ay("pF"))
+        self.assertFalse(_g10_uses_drop_ay("cur"))
+        self.assertEqual(_g10_lang_join("Una", "Onaay", "at"), "Onayat")
+        self.assertEqual(_g10_lang_join("Cada", "cCad", "at"), "cCadayat")
+        self.assertEqual(_g10_lang_join("Cad", "cCad", "at"), None)
+        self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", None, "uDras", 10), "ODrAsayat")
+        self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", "a", "uDras", 10), "ODrAsayat")
+        from unittest.mock import patch
+
+        with patch("sktmorph.engine.join._G10_LANG_DROP_AY", frozenset({"mI"})):
+            self.assertEqual(_g10_lang_join("mI", "mIay", "at"), "mIyat")
         self.assertEqual(derive_stem("ci", 10, "lang", "shuddha")[0], "capay")
         self.assertEqual(join_form("go", "at", 1, "lang", 1, "P", "a", "go", 1), "agot")
         self.assertEqual(_g2_a_lang_join("yA", "tAm"), "yAtAm")
