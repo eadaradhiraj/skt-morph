@@ -137,6 +137,7 @@ _G1_AYA_PRESENT = frozenset({"ji", "Sri", "nI", "De", "jri"})
 _G1_A_FINAL = frozenset({"SrA", "jYA"})
 _G1_NV_ROOTS = frozenset({"Dinv"})
 _BIDADI_THEMATIC = frozenset({"mid", "med", "meD", "vap", "vas", "tF", "guh"})
+_YA_THEMATIC = frozenset({"tras", "Bram", "yas"})
 
 
 def uses_aya_present(cgana: int, dhatu: str, antarganas: str) -> bool:
@@ -246,6 +247,10 @@ def sad_present_base(dhatu: str) -> Optional[str]:
         return "gUh"
     if dhatu == "pA":
         return "pib"
+    if dhatu == "GrA":
+        return "jiGr"
+    if dhatu == "saYj":
+        return "saj"
     return None
 
 

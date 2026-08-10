@@ -722,7 +722,7 @@ def _join_ad(
                 return "dvizvaH"
             if ending == "maH":
                 return "dvizmaH"
-        if family == "lot":
+        if family in ("lot", "plot"):
             if ending in ("tAt", "tAd"):
                 return "dvizw" + ending
             if ending == "tu":
@@ -737,12 +737,13 @@ def _join_ad(
                 return "dvizwam"
             if ending == "ta":
                 return "dvizwa"
-            if ending == "Ani":
-                return "dvezARi"
-            if ending == "Ava":
-                return "dvezAva"
-            if ending == "Ama":
-                return "dvezAma"
+            if purusha == 3:
+                if ending == "Ani":
+                    return "dvezARi"
+                if ending in ("Ava", "va"):
+                    return "dvezAva"
+                if ending in ("Ama", "ma"):
+                    return "dvezAma"
         if family == "lrt":
             if ending == "ti":
                 return "dvekzyati"

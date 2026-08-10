@@ -33,6 +33,7 @@ from .phonology import (
     _G1_A_FINAL,
     _G1_NV_ROOTS,
     _BIDADI_THEMATIC,
+    _YA_THEMATIC,
 )
 from .redup import (
     GANA3,
@@ -118,10 +119,19 @@ def g6_future_stem(dhatu: str) -> str:
     if dhatu.endswith("ajj"):
         return dhatu[0] + "arkzya"
     if dhatu.endswith("fh"):
-        base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
+        base = apply_guna_to_stem(dhatu)
+        if base.endswith("rh"):
+            return base[:-1] + "kzya"
         return base + "izya"
     if dhatu in _G6_NO_FUTURE_GUNA:
         return _g6_future_suffix(dhatu)
+    graded_u = apply_guna_to_stem(dhatu)
+    if (
+        len(dhatu) == 3
+        and graded_u != dhatu
+        and (dhatu[1] == "U" or (len(dhatu) > 2 and dhatu[2].isupper()))
+    ):
+        return graded_u + "izya"
     base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
     return _g6_future_suffix(base)
 
@@ -160,7 +170,7 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     return present_base
 
 
-_G1_KZYA_ROOTS = frozenset({"Siz", "viz", "kruS", "ruh"})
+_G1_KZYA_ROOTS = frozenset({"Siz", "viz", "kruS", "ruh", "saYj"})
 _G1_TSYA_ROOTS = frozenset({"sad", "Sad", "Gas", "SfD"})
 _G1_ZY_FUTURES = {
     "sru": "srozy",
@@ -188,6 +198,8 @@ def _g1_special_lrt_stem(dhatu: str) -> Optional[str]:
 
 def _g1_future_suffix(base: str, dhatu: str) -> str:
     if dhatu in _G1_KZYA_ROOTS:
+        if dhatu == "saYj":
+            return "saNkzy"
         graded = apply_guna_to_stem(dhatu)
         body = graded[:-1] if graded.endswith(("S", "h", "z")) else graded
         if dhatu.endswith("uS"):
@@ -373,9 +385,13 @@ def derive_stem(
             present_stem = base + "a"
             _append_step(steps, present_stem, ["3.1.68", "3.1.69"], "sap")
     elif cgana == YA_GANA:
-        ya_base = ya_present_base(dhatu)
-        present_stem = ya_base + "ya"
-        _append_step(steps, present_stem, ["3.1.33"], "yap")
+        if dhatu in _YA_THEMATIC:
+            present_stem = dhatu + "a"
+            _append_step(steps, present_stem, ["3.1.68", "3.1.69"], "sap")
+        else:
+            ya_base = ya_present_base(dhatu)
+            present_stem = ya_base + "ya"
+            _append_step(steps, present_stem, ["3.1.33"], "yap")
     elif gana == GANA3:
         present_stem = gana3_present_stem(dhatu, guna)
         _append_step(steps, present_stem, ["6.1.1", "3.1.3"], "redup")
@@ -503,7 +519,7 @@ def derive_stem(
             if init is not None:
                 _append_step(steps, init, ["3.4.111"], "lang_stem")
                 return init, None, steps
-            root = ya_present_base(dhatu)
+            root = dhatu if dhatu in _YA_THEMATIC else ya_present_base(dhatu)
         elif cgana in THEMATIC_GANAS:
             aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
             if aya_stem:

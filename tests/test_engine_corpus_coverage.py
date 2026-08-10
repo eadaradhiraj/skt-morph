@@ -91,6 +91,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(j("dvez", "Ani", 2, "lot", 3, "P", None, "dviz", 1), "dvezARi")
         self.assertEqual(j("dvez", "Ava", 2, "lot", 3, "P", None, "dviz", 2), "dvezAva")
         self.assertEqual(j("dvez", "Ama", 2, "lot", 3, "P", None, "dviz", 3), "dvezAma")
+        self.assertEqual(j("dvez", "zz", 2, "lat", 1, "P", None, "dviz", 1), "dvezzz")
 
     def test_gana3_and_n_gana_join_branches(self):
         j = join_form
@@ -240,6 +241,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         from sktmorph.engine.stems import (
             _g1_future_base,
             _g6_future_suffix,
+            _g6_skip_future_guna,
             g6_future_stem,
         )
 
@@ -252,7 +254,12 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertTrue(apply_causative_grade("cur"))
         self.assertTrue(gana3_present_stem("hu", "hu"))
         self.assertTrue(_g6_future_suffix("xxD"))
-        self.assertTrue(g6_future_stem("xxfh").endswith("izya"))
+        self.assertTrue(g6_future_stem("xxfh").endswith("kzya"))
+        from unittest.mock import patch
+
+        with patch("sktmorph.engine.stems.apply_guna_to_stem", return_value="xxfh"):
+            self.assertTrue(g6_future_stem("abcfh").endswith("izya"))
+        self.assertTrue(_g6_skip_future_guna("KuR"))
         self.assertTrue(_g1_future_base("guh", "guha", "guh"))
         self.assertTrue(_g1_future_base("rinv", "rinv", "rinv").endswith("Rv"))
         self.assertTrue(future_stem("x", 5, None, "xo"))
@@ -352,6 +359,12 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             "meda",
         )
         self.assertTrue(derive_stem("ve", 1, "lrt", "shuddha", "", "BidAdiH")[0].endswith("zya"))
+        self.assertEqual(derive_stem("GrA", 1, "lat", "shuddha")[0], "jiGra")
+        self.assertEqual(derive_stem("saYj", 1, "lat", "shuddha")[0], "saja")
+        self.assertEqual(derive_stem("saYj", 1, "lrt", "shuddha")[0], "saNkzy")
+        self.assertEqual(derive_stem("tras", 4, "lat", "shuddha")[0], "trasa")
+        self.assertEqual(derive_stem("GuR", 6, "lrt", "shuddha")[0], "GoRizya")
+        self.assertEqual(derive_stem("vfh", 6, "lrt", "shuddha")[0], "varkzya")
         self.assertEqual(_join_g1_a_final("SrA", "va", "lang", 3), "aSrAva")
         self.assertEqual(_join_g1_a_final("SrA", "ma", "lang", 3), "aSrAma")
         self.assertEqual(join_form("jYA", "Ani", 1, "lot", 3, "P", None, "jYA", 1), "jYAni")
