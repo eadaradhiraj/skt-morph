@@ -278,6 +278,13 @@ def _join_han(stem: str, ending: str, family: str, purusha: int, vacana: int) ->
         if ending == "ma":
             return "hanma"
         return stem + ending
+    if family == "lrt":
+        if stem.endswith(("zya", "tsya", "izya")):
+            if ending == "anti":
+                return stem[:-1] + "anti"
+            if ending and ending[0] in "aA":
+                return stem[:-1] + ending
+        return stem + ending
     return stem + ending
 
 

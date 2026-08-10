@@ -113,7 +113,7 @@ python scripts/check_db_sizes.py
 
 | Area | Status |
 |------|--------|
-| Primary lakāras (`plat`–`pvidhilin`) gaṇas 1–10 | Live; **~84.2%** full-corpus match (`validate_corpus.py`, 64,692 / 76,833 cells) |
+| Primary lakāras (`plat`–`pvidhilin`) gaṇas 1–10 | Live; **~84.9%** full-corpus match (`validate_corpus.py`, 65,196 / 76,833 cells) |
 | Gaṇa 9 (R-infix vs n-infix) | Live via per-root n-infix set (`mI`, `sku`, …); default R-infix |
 | Gaṇa 10 causative vs thematic | Live via `nityaRic` tag routing |
 | BidAdi (`antarganas`) | Present `-aya-`; laṅ/vidhilin stems |

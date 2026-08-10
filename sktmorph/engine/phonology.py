@@ -63,25 +63,38 @@ def vowel_initial_lang_stem(dhatu: str) -> Optional[str]:
 
 
 def bidadi_present_stem(dhatu: str) -> str:
-    if dhatu.endswith(("i", "I", "u", "U")):
+    if dhatu.endswith(("i", "I", "u", "U", "e", "E")):
         return dhatu[:-1] + "aya"
     return dhatu + "ya"
 
 
 def bidadi_lang_stem(dhatu: str) -> str:
-    if dhatu.endswith(("i", "I", "u", "U")):
+    if dhatu.endswith(("i", "I", "u", "U", "e", "E")):
         return dhatu[:-1] + "ay"
     return dhatu + "ay"
 
 
 def bidadi_vidhilin_stem(dhatu: str) -> str:
-    if dhatu.endswith(("i", "I", "u", "U")):
+    if dhatu.endswith(("i", "I", "u", "U", "e", "E")):
         return dhatu[:-1] + "ay"
     return dhatu + "ay"
 
 
 def is_bidadi(antarganas: str) -> bool:
     return "BidAdi" in (antarganas or "")
+
+
+def is_yajadi(antarganas: str) -> bool:
+    return "yajAdi" in (antarganas or "")
+
+
+_G1_AYA_PRESENT = frozenset({"ji", "Sri", "nI", "De", "jri"})
+
+
+def uses_aya_present(cgana: int, dhatu: str, antarganas: str) -> bool:
+    return cgana == 1 and (
+        is_bidadi(antarganas) or is_yajadi(antarganas) or dhatu in _G1_AYA_PRESENT
+    )
 
 
 _G9_N_INFIX = frozenset(
@@ -286,6 +299,8 @@ def thematic_present_base(dhatu: str, gana: int) -> str:
             return dhatu[:idx] + "I" + dhatu[idx + 1 :]
         if dhatu[idx] == "u":
             return dhatu[:idx] + "U" + dhatu[idx + 1 :]
+    if dhatu.startswith(("kzI", "kzU")):
+        return apply_guna_to_stem(dhatu)
     if len(dhatu) == 4 and dhatu[0] in "kgcjwqtp" and dhatu[2] == "a" and dhatu[3] in "mn":
         return apply_vrddhi_to_stem(dhatu)
     for idx in range(len(dhatu) - 1, -1, -1):
