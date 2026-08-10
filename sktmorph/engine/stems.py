@@ -137,6 +137,8 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
         return dhatu
     if dhatu == "yaB":
         return "yap"
+    if dhatu == "sfp":
+        return "sarp"
     if dhatu.endswith("nv") and len(dhatu) >= 4:
         if dhatu[0] == "r" or dhatu.endswith("fnv"):
             return dhatu[:-2] + "Rv"
@@ -194,7 +196,7 @@ def _g1_future_suffix(base: str, dhatu: str) -> str:
             return base[:-1] + "tsya"
         if base.endswith("s"):
             return base[:-1] + "tsya"
-    if dhatu == "yaB":
+    if dhatu in ("yaB", "sfp"):
         return base + "sya"
     if dhatu == "kzi":
         return apply_guna_to_stem(dhatu) + "zya"
@@ -404,9 +406,7 @@ def derive_stem(
 
     if bidadi:
         if family == "lrt":
-            if dhatu == "guh":
-                fstem = "gUhizya"
-            elif dhatu == "kzi":
+            if dhatu == "kzi":
                 fstem = apply_guna_to_stem(dhatu) + "zya"
             elif dhatu.endswith("kz"):
                 fstem = dhatu + "izya"

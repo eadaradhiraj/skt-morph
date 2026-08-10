@@ -136,7 +136,7 @@ def yam_cc_future_stem(dhatu: str, antarganas: str) -> Optional[str]:
 _G1_AYA_PRESENT = frozenset({"ji", "Sri", "nI", "De", "jri"})
 _G1_A_FINAL = frozenset({"SrA", "jYA"})
 _G1_NV_ROOTS = frozenset({"Dinv"})
-_BIDADI_THEMATIC = frozenset({"mid"})
+_BIDADI_THEMATIC = frozenset({"mid", "med", "meD", "vap", "vas", "tF", "guh"})
 
 
 def uses_aya_present(cgana: int, dhatu: str, antarganas: str) -> bool:
@@ -242,6 +242,8 @@ def sad_present_base(dhatu: str) -> Optional[str]:
     """Present base for sad (sīdati): a-strengthening to Id."""
     if dhatu == "sad":
         return "sId"
+    if dhatu == "guh":
+        return "gUh"
     return None
 
 

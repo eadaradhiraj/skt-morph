@@ -85,8 +85,9 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(j("hanizya", "Ami", 2, "lrt", 3, "P", None, "han", 1), "hanizyAmi")
         self.assertEqual(j("han", "aH", 2, "lang", 2, "P", None, "han", 1), "han")
         self.assertEqual(j("han", "aH", 2, "lang", 2, "P", "a", "han", 1), "ahan")
-        self.assertEqual(j("dvez", "anti", 2, "lat", 1, "P", None, "dviz", 3), "dvizate")
-        self.assertEqual(j("dvezw", "i", 2, "lat", 2, "P", None, "dviz", 1), "dvezwi")
+        self.assertEqual(j("dvez", "anti", 2, "lat", 1, "P", None, "dviz", 3), "dvizanti")
+        self.assertEqual(j("dvez", "si", 2, "lat", 2, "P", None, "dviz", 1), "dvekzi")
+        self.assertEqual(j("dvez", "at", 2, "lang", 1, "P", "a", "dviz", 1), "advew")
 
     def test_gana3_and_n_gana_join_branches(self):
         j = join_form
@@ -334,6 +335,12 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             "meda",
         )
         self.assertEqual(derive_stem("yaB", 1, "lrt", "shuddha")[0], "yapsya")
+        self.assertEqual(derive_stem("sfp", 1, "lrt", "shuddha")[0], "sarpsya")
+        self.assertEqual(
+            derive_stem("med", 1, "lat", "shuddha", "", "BidAdiH")[0],
+            "meda",
+        )
+        self.assertTrue(derive_stem("ve", 1, "lrt", "shuddha", "", "BidAdiH")[0].endswith("zya"))
         self.assertEqual(_join_g1_a_final("SrA", "va", "lang", 3), "aSrAva")
         self.assertEqual(_join_g1_a_final("SrA", "ma", "lang", 3), "aSrAma")
         self.assertEqual(join_form("jYA", "Ani", 1, "lot", 3, "P", None, "jYA", 1), "jYAni")

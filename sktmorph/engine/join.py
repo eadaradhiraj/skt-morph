@@ -284,6 +284,8 @@ def join_form(
             return form
         if dhatu in _G1_A_FINAL and family == "lang":
             return form
+        if dhatu == "dviz" and family == "lang":
+            return "a" + form
         if gana in AD_GANAS and family == "lang" and form and form[0] == "A":
             return form
         if gana in AD_GANAS and form and form[0] in "aeiouAIUEO":
@@ -680,30 +682,57 @@ def _join_ad(
         if joined is not None:
             return joined
     if dhatu == "dviz":
-        if family == "lang" and ending in ("at", "ad", "aH"):
-            return "advew"
+        if family == "lang":
+            if ending in ("at", "ad", "aH"):
+                return "dvew"
+            if ending == "atAm":
+                return "dvizwAm"
+            if ending == "an":
+                return "dvizan"
+            if ending == "atam":
+                return "dvizwam"
+            if ending == "ata":
+                return "dvizwa"
+            if ending == "am":
+                return "dvezam"
+            if ending == "va":
+                return "dvizva"
+            if ending == "ma":
+                return "dvizma"
         if family == "lat":
             if ending == "ti":
                 return "dvezwi"
             if ending == "taH":
                 return "dvizwaH"
             if ending in ("nti", "anti"):
-                return "dvizate"
+                return "dvizanti"
             if ending == "si":
-                return "dvezw" + "i"
-            if ending == "i" and purusha == 2:
-                return "dvezw" + "i"
+                return "dvekzi"
             if ending in ("thaH", "TaH"):
-                return "dvizATe"
+                return "dvizWaH"
             if ending in ("tha", "Ta"):
-                return "dviqQve"
+                return "dvizWa"
+            if ending == "mi":
+                return "dvezmi"
+            if ending == "vaH":
+                return "dvizvaH"
+            if ending == "maH":
+                return "dvizmaH"
         if family == "lot":
             if ending in ("tAt", "tAd"):
                 return "dvizw" + ending
             if ending == "tu":
                 return "dvezwu"
+            if ending == "tAm":
+                return "dvizwAm"
+            if ending == "antu":
+                return "dvizantu"
             if ending == "Di" and purusha == 2:
                 return "dviqQi"
+            if ending == "tam":
+                return "dvizwam"
+            if ending == "ta":
+                return "dvizwa"
         if family == "lrt":
             if ending == "ti":
                 return "dvekzyati"
@@ -713,8 +742,8 @@ def _join_ad(
                 return "dvekzyanti"
             if ending == "si":
                 return "dvekzyasi"
-            if ending and ending[0] in "aA":
-                return "dvekzy" + ending
+            if ending and (ending[0] in "aA" or ending in ("TaH", "Ta")):
+                return "dvekzya" + ending
         if family == "vidhilin" and ending.startswith("y"):
             return "dviz" + ending
         return stem + ending
