@@ -56,6 +56,103 @@ _G6_PLOT_ARI = frozenset(
     }
 )
 _G6_LOT_A_ENDINGS = frozenset({"tAt", "tAm", "tAd", "tu", "tam", "ta", "Di", "t"})
+_G2_IH_PLOT = {
+    "duh": ("dugD", "dogD", "doh"),
+    "dih": ("digD", "degD", "deh"),
+    "lih": ("lIQ", "leQ", "leh"),
+}
+_G2_IH_LRT = {
+    "duh": "Dok",
+    "dih": "Dek",
+    "lih": "lek",
+}
+
+
+def _g2_u_plot_body(dhatu: str) -> str:
+    if dhatu in _G2_U_LANG_AVIT:
+        return dhatu[0] if len(dhatu) == 2 else dhatu[:-1]
+    return dhatu[:-1]
+
+
+def _g2_u_plot_join(
+    dhatu: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    if dhatu in _G2_IH_PLOT:
+        stem, tu_stem, guna = _G2_IH_PLOT[dhatu]
+        if ending in ("tAt", "tAd"):
+            return stem + ending[1:]
+        if ending == "tu" and purusha == 1 and vacana == 1:
+            return tu_stem + "u"
+        if ending == "tAm":
+            return stem + "Am"
+        if ending == "antu":
+            return dhatu + "antu"
+        if ending == "Di" and purusha == 2 and vacana == 1:
+            return stem + "i"
+        if ending == "tam":
+            return stem + "am"
+        if ending == "ta":
+            return stem + "a"
+        if purusha == 3:
+            if ending == "Ani":
+                return guna + "Ani"
+            if ending == "Ava":
+                return guna + "Ava"
+            if ending == "Ama":
+                return guna + "Ama"
+        return None
+    if not dhatu.endswith("u") or dhatu in ("i", "as"):
+        return None
+    body = _g2_u_plot_body(dhatu)
+    ot = "O" if dhatu == "UrRu" else apply_guna_to_stem(dhatu)[-1]
+    if dhatu in _G2_U_LANG_AVIT:
+        if ending == "tu" and purusha == 1 and vacana == 1:
+            return body + "avItu"
+        if ending in ("tAt", "tAd"):
+            return body + "ut" + ending[1:]
+        if ending == "tAm":
+            return body + "utAm"
+        if ending == "antu":
+            return body + "uvantu"
+        if ending == "Di" and purusha == 2 and vacana == 1:
+            return body + "uhi"
+        if ending == "tam":
+            return body + "utam"
+        if ending == "ta":
+            return body + "uta"
+        if purusha == 3:
+            if ending == "Ani":
+                return body + "avARi"
+            if ending == "Ava":
+                return body + "avAva"
+            if ending == "Ama":
+                return body + "avAma"
+        return None
+    if ending in ("tAt", "tAd"):
+        return body + "ut" + ending[1:]
+    if ending == "tu" and purusha == 1 and vacana == 1:
+        return body + ot + "tu"
+    if ending == "tAm":
+        return body + "utAm"
+    if ending == "antu":
+        return body + "uvantu"
+    if ending == "Di" and purusha == 2 and vacana == 1:
+        return body + "uhi"
+    if ending == "tam":
+        return body + "utam"
+    if ending == "ta":
+        return body + "uta"
+    if purusha == 3:
+        if ending == "Ani":
+            return body + "avAni"
+        if ending == "Ava":
+            return body + "avAva"
+        if ending == "Ama":
+            return body + "avAma"
+    return None
 
 
 def _g2_u_lat_join(
@@ -809,6 +906,24 @@ def _join_ad(
         joined = _g2_a_lat_join(dhatu, ending, purusha, vacana)
         if joined is not None:
             return joined
+    if family in ("lot", "plot") and dhatu:
+        joined = _g2_u_plot_join(dhatu, ending, purusha, vacana)
+        if joined is not None:
+            return joined
+    if dhatu in _G2_IH_LRT and family == "lrt":
+        body = _G2_IH_LRT[dhatu]
+        if ending == "ti":
+            return body + "zyati"
+        if ending == "taH":
+            return body + "zyataH"
+        if ending == "anti":
+            return body + "zyanti"
+        if ending == "si":
+            return body + "zyasi"
+        if ending in ("TaH", "Ta"):
+            return body + "zya" + ending
+        if ending and ending[0] in "A":
+            return body + "zy" + ending
     if dhatu and dhatu.endswith("u") and dhatu not in ("i",) and family == "lrt":
         if dhatu in _G2_U_LANG_OZY_LRT:
             body = apply_guna_to_stem(dhatu) + "zy"
@@ -822,6 +937,8 @@ def _join_ad(
             return body + "ataH" if body.endswith("zy") else body + ending
         if ending == "si":
             return body + "asi" if body.endswith("zy") else body + ending
+        if ending in ("TaH", "Ta"):
+            return body + "a" + ending if body.endswith("zy") else body + ending
         if ending and ending[0] in "aA":
             return body + ending
         return body + ending

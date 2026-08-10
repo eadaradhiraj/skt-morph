@@ -93,6 +93,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(j("dvez", "Ama", 2, "lot", 3, "P", None, "dviz", 3), "dvezAma")
         self.assertEqual(j("dvekzya", "Ami", 2, "lrt", 3, "P", None, "dviz", 1), "dvekzyAmi")
         self.assertEqual(j("yavizya", "taH", 2, "lrt", 1, "P", None, "yu", 2), "yavizyataH")
+        self.assertEqual(j("yavizy", "TaH", 2, "lrt", 2, "P", None, "yu", 2), "yavizyaTaH")
         self.assertEqual(j("dvez", "zz", 2, "lat", 1, "P", None, "dviz", 1), "dvezzz")
 
     def test_gana3_and_n_gana_join_branches(self):
@@ -388,13 +389,22 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(_g6_future_suffix("abjj"), "abkzya")
         self.assertEqual(_g6_future_suffix("xxfh"), "xxfhizya")
         self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ikzizya")
-        from sktmorph.engine.join import _g2_a_lat_join, _g2_u_lat_join
+        from sktmorph.engine.join import _g2_a_lat_join, _g2_u_lat_join, _g2_u_plot_join
 
         self.assertEqual(_g2_u_lat_join("ru", "TaH", 2, 2), "ruTaH")
         self.assertIsNone(_g2_u_lat_join("gam", "ti", 1, 1))
         self.assertIsNone(_g2_u_lat_join("uru", "ti", 1, 1))
         self.assertEqual(_g2_u_lat_join("yu", "TaH", 2, 2), "yuTaH")
         self.assertEqual(_g2_u_lat_join("yu", "mi", 1, 1), "yOmi")
+        self.assertEqual(_g2_u_plot_join("yu", "tAt", 1, 1), "yutAt")
+        self.assertEqual(_g2_u_plot_join("duh", "tAt", 1, 1), "dugDAt")
+        self.assertEqual(_g2_u_plot_join("duh", "Ava", 3, 2), "dohAva")
+        self.assertEqual(_g2_u_plot_join("duh", "Ama", 3, 3), "dohAma")
+        self.assertEqual(_g2_u_plot_join("ru", "tu", 1, 1), "ravItu")
+        self.assertEqual(_g2_u_plot_join("ru", "Ava", 3, 2), "ravAva")
+        self.assertEqual(_g2_u_plot_join("ru", "Ama", 3, 3), "ravAma")
+        self.assertEqual(_g2_u_plot_join("yu", "Ava", 3, 2), "yavAva")
+        self.assertEqual(_g2_u_plot_join("yu", "Ama", 3, 3), "yavAma")
         self.assertEqual(_g2_a_lat_join("yA", "TaH", 2, 2), "yATaH")
         self.assertEqual(thematic_present_base("tud", 6), "tud")
         self.assertEqual(g6_present_base("fcC"), "arcC")
@@ -411,6 +421,10 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(join_form("tud", "Ani", 6, "plot", 3, "P", None, "tud", 1), "tudAni")
         self.assertEqual(join_form("kzip", "Ani", 6, "plot", 3, "P", None, "kzip", 1), "kzipARi")
         self.assertEqual(join_form("GUrR", "Ani", 6, "plot", 3, "P", None, "GUrR", 1), "GUrRAni")
+        self.assertEqual(derive_stem("yu", 2, "lot", "shuddha")[0], "yu")
+        self.assertEqual(join_form("yu", "tAt", 2, "plot", 1, "P", None, "yu", 1), "yutAt")
+        self.assertEqual(join_form("duh", "ti", 2, "lrt", 1, "P", None, "duh", 1), "Dokzyati")
+        self.assertEqual(join_form("yo", "thaH", 2, "lrt", 2, "P", None, "yu", 1), "yavizythaH")
         self.assertEqual(derive_stem("dfS", 1, "lrt", "shuddha")[0], "drakzya")
         self.assertEqual(derive_stem("nU", 6, "lang", "shuddha")[0], "nuv")
         self.assertEqual(future_stem(apply_guna_to_stem("div"), 3, "", "div"), "devzya")

@@ -457,6 +457,10 @@ def derive_stem(
         root = g6_plot_base(dhatu)
         _append_step(steps, root, ["3.2.69"], "plot_stem")
         return root, None, steps
+    if family == "lot" and gana in AD_GANAS and dhatu not in ("i", "as"):
+        if dhatu.endswith("u") or dhatu in ("duh", "dih", "lih"):
+            _append_step(steps, dhatu, ["3.1.3"], "plot_stem")
+            return dhatu, None, steps
     if family == "lot":
         return present_stem, None, steps
 
