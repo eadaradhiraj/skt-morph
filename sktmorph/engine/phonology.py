@@ -553,6 +553,50 @@ def causative_vidhilin_stem(dhatu: str, tags: str = "") -> str:
     return aya
 
 
+_G9_VIDHILIN_BASE = {
+    "F": "fRI",
+    "Kac": "KacYI",
+    "Kav": "KOnI",
+    "grah": "gfhRI",
+    "svF": "svUrRI",
+}
+
+
+def g2_vidhilin_stem(dhatu: str) -> str:
+    """Gaṇa-2 vidhilin stem (often the dhātu, not guṇa)."""
+    if dhatu in ("duh", "dih", "lih", "i", "as", "brU", "vI"):
+        if dhatu == "as":
+            return "s"
+        return dhatu
+    if dhatu.endswith("u") and dhatu not in ("i", "as"):
+        return dhatu
+    return apply_guna_to_stem(dhatu)
+
+
+def g6_vidhilin_stem(dhatu: str) -> str:
+    """Gaṇa-6 vidhilin stem (plot-style, not present ar- strengthening)."""
+    if dhatu == "Dru":
+        return "Dru"
+    return g6_plot_base(dhatu)
+
+
+def g9_vidhilin_stem(dhatu: str, antarganas: str = "") -> str:
+    """Gaṇa-9 vidhilin stem before -yAt- etc."""
+    if dhatu in _G9_VIDHILIN_BASE:
+        return _G9_VIDHILIN_BASE[dhatu]
+    if g9_uses_n_infix(dhatu, antarganas):
+        if dhatu.endswith("I") and len(dhatu) == 2:
+            return dhatu[0] + "InI"
+        if dhatu == "DU":
+            return "DunI"
+        if "n" in dhatu[1:]:
+            idx = dhatu.rfind("n")
+            return dhatu[:idx] + dhatu[idx + 1 :] + "nI"
+        base = g9_n_lang_base(dhatu)
+        return (base + "I") if base.endswith("n") else (base + "nI")
+    return g9_r_lang_root(dhatu) + "RI"
+
+
 def thematic_aya_present_stem(dhatu: str) -> Optional[str]:
     """Present stems with long A in -Aya- (e.g. gopAyati, glAyati)."""
     if dhatu.endswith("E"):

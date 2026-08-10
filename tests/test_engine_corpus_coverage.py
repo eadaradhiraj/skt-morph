@@ -294,8 +294,11 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             apply_guna_to_stem,
             causative_lang_stem,
             causative_vidhilin_stem,
-            g6_plot_base,
+            g2_vidhilin_stem,
             g6_present_base,
+            g6_vidhilin_stem,
+            g9_vidhilin_stem,
+            g6_plot_base,
             g6_lang_base,
             g6_lang_stem,
             g9_r_lang_root,
@@ -443,6 +446,28 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             self.assertEqual(_g10_vidhilin_join("Cand", "Canday", "et"), "Candayet")
         with patch("sktmorph.engine.phonology._causative_aya_base", return_value="xy"):
             self.assertEqual(causative_vidhilin_stem("zz"), "xy")
+        self.assertEqual(g2_vidhilin_stem("ru"), "ru")
+        self.assertEqual(g2_vidhilin_stem("as"), "s")
+        self.assertEqual(g2_vidhilin_stem("han"), "han")
+        self.assertEqual(g6_vidhilin_stem("fz"), "fz")
+        self.assertEqual(g6_vidhilin_stem("Dru"), "Dru")
+        self.assertEqual(g9_vidhilin_stem("kF"), "kfRI")
+        self.assertEqual(g9_vidhilin_stem("mI"), "mInI")
+        self.assertEqual(g9_vidhilin_stem("banD"), "baDnI")
+        self.assertEqual(g9_vidhilin_stem("Kav"), "KOnI")
+        self.assertEqual(g9_vidhilin_stem("F"), "fRI")
+        self.assertEqual(join_form("ru", "yAt", 2, "vidhilin", 1, "P", None, "ru", 2), "ruyAt")
+        self.assertEqual(join_form("Bfjj", "et", 6, "vidhilin", 1, "P", None, "Brajj", 6), "Bfjjet")
+        self.assertEqual(g6_present_base("SuB"), "SoB")
+        self.assertEqual(g6_present_base("Dru"), "Drav")
+        self.assertEqual(g6_present_base("muc"), "muc")
+        self.assertEqual(g6_present_base("kF"), "kar")
+        self.assertEqual(g6_present_base("fz"), "arz")
+        self.assertEqual(g6_present_base("Brajj"), "BrBfjj")
+        self.assertEqual(g6_present_base("vraSc"), "vrfSc")
+        self.assertEqual(g6_present_base("tvac"), "tic")
+        self.assertEqual(derive_stem("hu", 3, "vidhilin", "shuddha")[0], "juhuy")
+        self.assertEqual(derive_stem("dA", 3, "vidhilin", "shuddha")[0], "dad")
         self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", None, "uDras", 10), "ODrAsayat")
         self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", "a", "uDras", 10), "ODrAsayat")
         with patch("sktmorph.engine.join._G10_LANG_DROP_AY", frozenset({"mI"})):

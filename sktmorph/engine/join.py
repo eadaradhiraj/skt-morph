@@ -756,6 +756,8 @@ def _join_raw(
                 joined = _g10_vidhilin_join(dhatu or "", stem, ending)
                 if joined is not None:
                     return joined
+            if family == "vidhilin" and gana == 6 and stem.endswith("jj") and ending.startswith("e"):
+                return stem[:-1] + "j" + ending
             if family == "lang" and stem.endswith("o") and ending in ("at", "ad"):
                 return stem + ending[1:]
             return stem + ending

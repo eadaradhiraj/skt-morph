@@ -15,7 +15,10 @@ from .phonology import (
     causative_present_stem,
     g6_plot_base,
     g6_present_base,
+    g6_vidhilin_stem,
     g6_lang_stem,
+    g2_vidhilin_stem,
+    g9_vidhilin_stem,
     g9_n_lang_base,
     g9_uses_n_infix,
     is_bidadi,
@@ -621,27 +624,29 @@ def derive_stem(
             root = causative_vidhilin_stem(dhatu, tags)
             _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
             return root, None, steps
+        if gana == GANA3:
+            root = gana3_vidhilin_stem(dhatu, guna)
+            _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
+            return root, None, steps
+        if gana in AD_GANAS:
+            root = g2_vidhilin_stem(dhatu)
+            _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
+            return root, None, steps
         if gana == YA_GANA and present_stem:
             root = present_stem[:-1] if present_stem.endswith("a") else present_stem
         elif cgana in THEMATIC_GANAS:
             aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
             if cgana == 6:
-                root = g6_present_base(dhatu)
+                root = g6_vidhilin_stem(dhatu)
             elif aya_stem:
                 root = aya_stem[:-1]
             else:
                 root = thematic_present_base(dhatu, cgana, aupadeshik)
-        elif gana == GANA3:
-            root = gana3_vidhilin_stem(dhatu, guna)
         elif gana in NU_GANAS:
             base = present_stem[:-1] if present_stem and present_stem.endswith("u") else dhatu
             root = base + "uy"
         elif gana == NI_GANA:
-            if g9_uses_n_infix(dhatu, antarganas):
-                base = g9_n_lang_base(dhatu)
-                root = (base + "I") if base.endswith("n") else (base + "nI")
-            else:
-                root = dhatu + "RI"
+            root = g9_vidhilin_stem(dhatu, antarganas)
         elif gana == N_GANA and dhatu.endswith("D"):
             root = dhatu[:-1] + "nD"
         else:
