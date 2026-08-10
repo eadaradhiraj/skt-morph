@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 VOWEL_FINAL = frozenset("aeiouAIUEOfF")
 
@@ -297,6 +297,67 @@ def g6_present_base(dhatu: str) -> str:
     if len(dhatu) == 4 and dhatu[2] in "aA":
         return dhatu[0] + "i" + dhatu[3]
     return dhatu
+
+
+def g6_lang_base(dhatu: str) -> str:
+    """Gaṇa 6 laṅ stem before tin endings (may differ from present base)."""
+    if dhatu == "Brajj":
+        return "Bfjj"
+    if dhatu == "majj":
+        return "majj"
+    if dhatu == "SuB":
+        return "SuB"
+    if dhatu == "iz":
+        return "EcC"
+    if dhatu.endswith("F"):
+        return dhatu[0] + "ir"
+    if dhatu.startswith("f"):
+        graded = apply_guna_to_stem(dhatu)
+        if graded.startswith("ar"):
+            return "A" + graded[1:]
+        return graded
+    if dhatu.endswith("Sc") and "a" in dhatu:
+        idx = dhatu.rfind("a")
+        return dhatu[:idx] + "f" + dhatu[idx + 1 :]
+    if dhatu == "pracC":
+        return "prafcC"
+    if dhatu == "stfMh":
+        return "stfh"
+    if dhatu == "tvac":
+        return "tvac"
+    if len(dhatu) == 4 and dhatu.startswith("sP"):
+        return dhatu
+    if dhatu == "vid":
+        return "vind"
+    if dhatu == "muc":
+        return "muYc"
+    if dhatu == "lup":
+        return "lump"
+    if dhatu == "lip":
+        return "limp"
+    if dhatu == "sic":
+        return "siYc"
+    if dhatu == "kft":
+        return "kfnt"
+    if dhatu == "Kid":
+        return "Kind"
+    if dhatu == "piS":
+        return "piMS"
+    return g6_present_base(dhatu)
+
+
+def g6_lang_stem(dhatu: str) -> Tuple[str, Optional[str]]:
+    """Gaṇa 6 laṅ (stem, augment). Augment is None when merged into the stem."""
+    if dhatu and dhatu[0] in "uU":
+        init = vowel_initial_lang_stem(dhatu)
+        if init is not None:
+            return init, None
+    if dhatu.startswith("f") or dhatu == "iz":
+        return g6_lang_base(dhatu), None
+    init = vowel_initial_lang_stem(dhatu)
+    if init is not None and dhatu[0] in "iI":
+        return init, None
+    return g6_lang_base(dhatu), "a"
 
 
 _CAUSATIVE_GUNA_AY = frozenset({"yam", "cap", "cah", "rah", "bal", "jYap"})

@@ -13,6 +13,7 @@ from .phonology import (
     causative_lang_stem,
     causative_present_stem,
     g6_present_base,
+    g6_lang_stem,
     g9_n_lang_base,
     g9_uses_n_infix,
     is_bidadi,
@@ -548,11 +549,16 @@ def derive_stem(
                 _append_step(steps, init, ["3.4.111"], "lang_stem")
                 return init, None, steps
             root = dhatu if dhatu in _YA_THEMATIC else ya_present_base(dhatu)
+        elif cgana == 6:
+            root, lang_aug = g6_lang_stem(dhatu)
+            root = lang_geminate_stem(dhatu, root)
+            if len(dhatu) >= 3 and dhatu[0] == "C" and dhatu[1] not in "aA":
+                root = "c" + root
+            _append_step(steps, root, ["3.4.111"], "lang_stem")
+            return root, lang_aug, steps
         elif cgana in THEMATIC_GANAS:
             aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
-            if cgana == 6:
-                root = g6_present_base(dhatu)
-            elif aya_stem:
+            if aya_stem:
                 root = aya_stem[:-1]
             else:
                 init = vowel_initial_lang_stem(dhatu)
@@ -575,8 +581,6 @@ def derive_stem(
         else:
             root = guna
         root = lang_geminate_stem(dhatu, root)
-        if gana == 6 and len(dhatu) >= 3 and dhatu[0] == "C" and dhatu[1] not in "aA":
-            root = "c" + root
         _append_step(steps, root, ["3.4.111"], "lang_stem")
         return root, "a", steps
 

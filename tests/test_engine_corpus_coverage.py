@@ -289,6 +289,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             apply_guna_to_stem,
             causative_lang_stem,
             g6_present_base,
+            g6_lang_base,
+            g6_lang_stem,
             g9_r_lang_root,
             thematic_aya_present_stem,
             thematic_present_base,
@@ -393,6 +395,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(_g2_a_lat_join("yA", "TaH", 2, 2), "yATaH")
         self.assertEqual(thematic_present_base("tud", 6), "tud")
         self.assertEqual(g6_present_base("fcC"), "arcC")
+        self.assertEqual(g6_lang_base("fa"), "fa")
+        self.assertEqual(g6_lang_stem("fz")[0], "Arz")
         self.assertEqual(derive_stem("dfS", 1, "lrt", "shuddha")[0], "drakzya")
         self.assertEqual(derive_stem("nU", 6, "lang", "shuddha")[0], "nuv")
         self.assertEqual(future_stem(apply_guna_to_stem("div"), 3, "", "div"), "devzya")

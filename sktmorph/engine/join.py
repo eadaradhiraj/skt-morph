@@ -309,12 +309,16 @@ def _plot_uses_ari(base: str) -> bool:
     return False
 
 
-def _thematic_lot_third(base: str, ending: str, gana: int) -> str:
+def _thematic_lot_third(
+    base: str, ending: str, gana: int, dhatu: Optional[str] = None
+) -> str:
     if ending != "Ani":
         return base + ending
     if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
         return base + "ARi"
     if gana == YA_GANA:
+        return base + "ARi"
+    if gana == 6 and dhatu != "GUrR":
         return base + "ARi"
     if gana in THEMATIC_GANAS:
         if (
@@ -346,7 +350,8 @@ def join_form(
         if dhatu == "i" and family == "lang":
             return form
         if dhatu and dhatu.endswith("u") and family == "lang" and dhatu not in ("i", "as"):
-            return form
+            if gana in AD_GANAS:
+                return form
         if dhatu == "kfnv" and family == "lang":
             return form
         if dhatu in _G1_A_FINAL and family == "lang":
@@ -425,7 +430,7 @@ def _join_raw(
         if purusha == 3 and ending.startswith("A"):
             base = stem[:-1] if stem.endswith("a") else stem
             if family in ("lot", "plot") and ending == "Ani":
-                return _thematic_lot_third(base, ending, gana)
+                return _thematic_lot_third(base, ending, gana, dhatu)
             return base + ending
         return thematic_join(stem, ending)
     return stem + ending
