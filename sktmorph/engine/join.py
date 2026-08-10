@@ -10,6 +10,66 @@ AD_T_INFLECT = frozenset({"ti", "taH", "si", "thaH", "tha", "tAt", "tAd", "tu", 
 _VOWEL = "aeiouAIUEO"
 _G2_U_LANG_AVIT = frozenset({"ru", "tu", "stu"})
 _G2_U_LANG_OZY_LRT = frozenset({"su", "tu", "dyu", "ku", "stu"})
+_G2_U_LAT_O = frozenset({"yu", "nu", "ku", "su", "dyu", "kzu", "snu", "kzRu", "UrRu"})
+_G2_A_LAT_ROOTS = frozenset(
+    {"yA", "vA", "BA", "snA", "SrA", "drA", "psA", "pA", "rA", "lA", "dA", "KyA", "prA", "mA"}
+)
+
+
+def _g2_u_lat_join(
+    dhatu: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    if not dhatu.endswith("u") or dhatu in ("i", "as"):
+        return None
+    if dhatu in _G2_U_LANG_AVIT:
+        body = dhatu[0] if len(dhatu) == 2 else dhatu[:-1]
+        if ending == "ti":
+            return body + "avIti"
+        if ending == "taH":
+            return body + "utaH"
+        if ending == "anti":
+            return body + "uvanti"
+        if ending == "si":
+            return body + "uze"
+        if ending in ("TaH", "Ta"):
+            return body + "u" + ending
+        if ending == "mi":
+            return body + "Omi"
+        if ending in ("vaH", "maH"):
+            return body + "u" + ending
+        return None
+    if dhatu not in _G2_U_LAT_O and not (len(dhatu) == 2 and dhatu.endswith("u")):
+        return None
+    body = dhatu[:-1]
+    if ending == "ti" and purusha == 1 and vacana == 1:
+        return body + "Oti"
+    if ending == "taH" and purusha == 1 and vacana == 2:
+        return body + "utaH"
+    if ending == "anti" and purusha == 1 and vacana == 3:
+        return body + "uvanti"
+    if ending == "si" and purusha == 2 and vacana == 1:
+        return body + "uze"
+    if ending in ("TaH", "Ta") and purusha == 2:
+        return body + "u" + ending
+    if ending == "mi" and purusha == 1 and vacana == 1:
+        return body + "Omi"
+    if ending in ("vaH", "maH") and purusha == 3:
+        return body + "u" + ending
+    return None
+
+
+def _g2_a_lat_join(dhatu: str, ending: str, purusha: int, vacana: int) -> Optional[str]:
+    if dhatu not in _G2_A_LAT_ROOTS:
+        return None
+    body = dhatu[0]
+    if ending == "anti" and purusha == 1 and vacana == 3:
+        return body + "Anti"
+    if ending in ("TaH", "Ta") and purusha == 2 and vacana == 2:
+        return body + "AT" + ending[1:]
+    return None
 
 
 def _g2_u_lang_body(dhatu: str) -> str:
@@ -672,6 +732,13 @@ def _join_ad(
                     return "Eva"
                 if ending == "ma":
                     return "Ema"
+    if family == "lat" and dhatu:
+        joined = _g2_u_lat_join(dhatu, ending, purusha, vacana)
+        if joined is not None:
+            return joined
+        joined = _g2_a_lat_join(dhatu, ending, purusha, vacana)
+        if joined is not None:
+            return joined
     if dhatu and dhatu.endswith("u") and dhatu not in ("i",) and family == "lrt":
         if dhatu in _G2_U_LANG_OZY_LRT:
             body = apply_guna_to_stem(dhatu) + "zy"

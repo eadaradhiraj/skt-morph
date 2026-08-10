@@ -286,6 +286,8 @@ def g6_present_base(dhatu: str) -> str:
     if dhatu.endswith(("F", "f")):
         graded = apply_guna_to_stem(dhatu)
         return graded if graded != dhatu else dhatu
+    if dhatu.startswith("f") and len(dhatu) >= 2:
+        return apply_guna_to_stem(dhatu)
     if "jj" in dhatu and "a" in dhatu:
         idx = dhatu.index("a")
         return dhatu[:idx] + "Bf" + dhatu[idx + 1 :]

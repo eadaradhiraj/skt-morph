@@ -193,6 +193,22 @@ _G1_ZY_FUTURES = {
     "skand": "skantsy",
     "nam": "naMsy",
 }
+_G1_LRT_STEMS = {
+    "dfS": "drakzya",
+    "daMS": "daNkzya",
+    "kfz": "karkzya",
+    "dah": "Dakzya",
+    "mih": "mekzya",
+    "pac": "pakzya",
+    "Baj": "Bakzya",
+    "raYj": "raNkzya",
+    "tviz": "tvekzya",
+    "yaj": "yakzya",
+    "vap": "vapsya",
+    "vah": "vakzya",
+    "vas": "vatsya",
+    "Sap": "Sapsya",
+}
 _G2_U_LRT_OZY = frozenset({"su", "tu", "dyu", "ku", "stu"})
 
 
@@ -207,6 +223,8 @@ def _g1_special_lrt_stem(dhatu: str) -> Optional[str]:
 
 
 def _g1_future_suffix(base: str, dhatu: str) -> str:
+    if dhatu in _G1_LRT_STEMS:
+        return _G1_LRT_STEMS[dhatu]
     if dhatu in _G1_KZYA_ROOTS:
         if dhatu == "saYj":
             return "saNkzy"
@@ -532,7 +550,9 @@ def derive_stem(
             root = dhatu if dhatu in _YA_THEMATIC else ya_present_base(dhatu)
         elif cgana in THEMATIC_GANAS:
             aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
-            if aya_stem:
+            if cgana == 6:
+                root = g6_present_base(dhatu)
+            elif aya_stem:
                 root = aya_stem[:-1]
             else:
                 init = vowel_initial_lang_stem(dhatu)
@@ -555,6 +575,8 @@ def derive_stem(
         else:
             root = guna
         root = lang_geminate_stem(dhatu, root)
+        if gana == 6 and len(dhatu) >= 3 and dhatu[0] == "C" and dhatu[1] not in "aA":
+            root = "c" + root
         _append_step(steps, root, ["3.4.111"], "lang_stem")
         return root, "a", steps
 
@@ -575,7 +597,12 @@ def derive_stem(
             root = present_stem[:-1] if present_stem.endswith("a") else present_stem
         elif cgana in THEMATIC_GANAS:
             aya_stem = thematic_aya_present_stem(dhatu) if cgana == 1 else None
-            root = aya_stem[:-1] if aya_stem else thematic_present_base(dhatu, cgana, aupadeshik)
+            if cgana == 6:
+                root = g6_present_base(dhatu)
+            elif aya_stem:
+                root = aya_stem[:-1]
+            else:
+                root = thematic_present_base(dhatu, cgana, aupadeshik)
         elif gana == GANA3:
             root = gana3_vidhilin_stem(dhatu, guna)
         elif gana in NU_GANAS:
