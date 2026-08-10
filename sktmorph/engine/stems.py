@@ -123,28 +123,45 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
     vrddhi = apply_vrddhi_to_stem(dhatu)
     if present_base == vrddhi and present_base != dhatu:
         return dhatu
-    if present_base == dhatu and guna != dhatu and dhatu.endswith(("Iv", "Uv")) and len(dhatu) > 3:
+    if present_base == dhatu and guna != dhatu and dhatu.endswith(("Iv", "Uv")) and len(dhatu) > 3 and "W" not in dhatu:
         return guna
     return present_base
 
 
-_G1_KZYA_ROOTS = frozenset({"Siz", "viz"})
+_G1_KZYA_ROOTS = frozenset({"Siz", "viz", "kruS", "ruh"})
+_G1_TSYA_ROOTS = frozenset({"sad", "Sad", "Gas", "SfD"})
 
 
-def _g1_future_from_present(dhatu: str, present_stem: str, guna: str) -> str:
-    base = _g1_future_base(dhatu, present_stem[:-1], guna)
+def _g1_future_suffix(base: str, dhatu: str) -> str:
     if dhatu in _G1_KZYA_ROOTS:
         graded = apply_guna_to_stem(dhatu)
-        return (graded[:-1] if graded.endswith("z") else graded) + "kzya"
-    if dhatu in ("SrA", "jYA"):
+        body = graded[:-1] if graded.endswith(("S", "h", "z")) else graded
+        if dhatu.endswith("uS"):
+            body = graded[:-1]
+        return body + "kzya"
+    if dhatu == "yam":
+        return base + "Msya"
+    if dhatu in _G1_TSYA_ROOTS:
+        if base.endswith(("d", "D")):
+            return base[:-1] + "tsya"
+        if base.endswith("s"):
+            return base[:-1] + "tsya"
+    if dhatu.endswith("kz") and len(dhatu) <= 5:
         return base + "zya"
     if base.endswith("v"):
         return base + "izya"
     if base.endswith("e") and len(base) <= 2:
         return base + "zya"
+    return base + "izya"
+
+
+def _g1_future_from_present(dhatu: str, present_stem: str, guna: str) -> str:
+    base = _g1_future_base(dhatu, present_stem[:-1], guna)
+    if dhatu in ("SrA", "jYA"):
+        return base + "zya"
     if dhatu.endswith("nv") and len(dhatu) >= 4 and (dhatu[0] == "r" or dhatu.endswith("fnv")):
         return base + "izya"
-    return base + "izya"
+    return _g1_future_suffix(base, dhatu)
 
 
 def future_stem(
@@ -295,7 +312,8 @@ def derive_stem(
 
     if bidadi:
         if family == "lrt":
-            fstem = apply_guna_to_stem(dhatu) + "zya"
+            graded = apply_guna_to_stem(dhatu)
+            fstem = graded + ("izya" if len(graded) >= 3 else "zya")
             _append_step(steps, fstem, ["3.2.135"], "lrt")
             return fstem, None, steps
         if family == "lang":
@@ -386,7 +404,11 @@ def derive_stem(
             base = present_stem[:-1] if present_stem and present_stem.endswith("u") else dhatu
             root = base + "uy"
         elif gana == NI_GANA:
-            root = dhatu + "RI"
+            if g9_uses_n_infix(dhatu, antarganas):
+                base = g9_n_lang_base(dhatu)
+                root = (base + "I") if base.endswith("n") else (base + "nI")
+            else:
+                root = dhatu + "RI"
         elif gana == N_GANA and dhatu.endswith("D"):
             root = dhatu[:-1] + "nD"
         elif gana in CAUSATIVE_GANAS and cgana == 10:
