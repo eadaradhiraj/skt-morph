@@ -92,6 +92,13 @@ def is_gawadi(antarganas: str) -> bool:
     return "GawAdi" in (antarganas or "")
 
 
+def g1_rv_nv_present_base(dhatu: str) -> Optional[str]:
+    """Gaṇa-1 r…nv roots with ṛ-vṛddhi present base (rinv → riRv)."""
+    if dhatu.endswith("nv") and len(dhatu) >= 4 and dhatu[0] == "r":
+        return dhatu[:-2] + "Rv"
+    return None
+
+
 def g1_nv_present_stem(dhatu: str) -> Optional[str]:
     """Gaṇa-1 roots with n-infix present (Dinv → Dino)."""
     if dhatu in _G1_NV_ROOTS:
@@ -229,6 +236,8 @@ def ya_present_base(dhatu: str) -> str:
 
 def g6_present_base(dhatu: str) -> str:
     """Gaṇa 6 present base before thematic -a."""
+    if dhatu == "SuB":
+        return apply_guna_to_stem(dhatu)
     if dhatu.endswith("U"):
         return dhatu[:-1] + "uv"
     if dhatu.endswith("u"):
@@ -330,6 +339,10 @@ def thematic_aya_present_stem(dhatu: str) -> Optional[str]:
 
 def thematic_present_base(dhatu: str, gana: int) -> str:
     """Thematic present root before -a (gaṇa 1/6)."""
+    if gana == 1:
+        rv = g1_rv_nv_present_base(dhatu)
+        if rv:
+            return rv
     if gana == 6:
         return dhatu
     if "W" in dhatu and len(dhatu) > 3 and dhatu.endswith(("iv", "Iv", "uv", "Uv")):

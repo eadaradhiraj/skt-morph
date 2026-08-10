@@ -94,7 +94,7 @@ def _g6_future_suffix(graded: str) -> str:
     if graded.endswith("z"):
         return graded[:-1] + "kzya"
     if graded.endswith("fh"):
-        return graded[:-1] + "kzya"
+        return graded + "izya"
     if graded.endswith("ep"):
         return graded + "sya"
     if graded.endswith(("p", "P", "b", "B")):
@@ -104,15 +104,22 @@ def _g6_future_suffix(graded: str) -> str:
     return graded + "izya"
 
 
+_G6_NO_FUTURE_GUNA = frozenset({"Cur"})
+
+
 def g6_future_stem(dhatu: str) -> str:
     """Gaṇa 6 lṛṭ stem with guṇa and consonant-specific suffix."""
     if dhatu == "kzi":
         return apply_guna_to_stem(dhatu) + "zya"
+    if dhatu == "SuB":
+        return apply_guna_to_stem(dhatu) + "izya"
     if dhatu.endswith("ajj"):
         return dhatu[0] + "arkzya"
     if dhatu.endswith("fh"):
         base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
-        return base[:-1] + "kzya"
+        return base + "izya"
+    if dhatu in _G6_NO_FUTURE_GUNA:
+        return _g6_future_suffix(dhatu)
     base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
     return _g6_future_suffix(base)
 

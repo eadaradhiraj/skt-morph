@@ -67,6 +67,8 @@ def join_form(
         stem, ending, gana, family, purusha, pada, dhatu, vacana, antarganas
     )
     if augment:
+        if dhatu == "i" and family == "lang":
+            return form
         if gana in AD_GANAS and family == "lang" and form and form[0] == "A":
             return form
         if gana in AD_GANAS and form and form[0] in "aeiouAIUEO":
@@ -408,10 +410,27 @@ def _join_ad(
                 return body + ending
             return body + ending
         if family == "lang":
-            if ending in ("at", "ad"):
-                return stem + ending[1:]
-            if ending == "aH" and purusha == 2:
-                return stem + "H"
+            if purusha == 1:
+                if ending in ("at", "ad"):
+                    return "E" + ending[1:]
+                if ending == "atAm":
+                    return "EtAm"
+                if ending == "an":
+                    return "Ayan"
+            if purusha == 2:
+                if ending == "aH":
+                    return "EH"
+                if ending == "atam":
+                    return "Etam"
+                if ending == "ata":
+                    return "Eta"
+            if purusha == 3:
+                if ending == "am":
+                    return "Ayam"
+                if ending == "va":
+                    return "Eva"
+                if ending == "ma":
+                    return "Ema"
     if dhatu == "dviz":
         if family == "lang" and ending in ("at", "ad", "aH"):
             return "advew"

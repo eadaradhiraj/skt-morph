@@ -248,7 +248,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertTrue(apply_causative_grade("cur"))
         self.assertTrue(gana3_present_stem("hu", "hu"))
         self.assertTrue(_g6_future_suffix("xxD"))
-        self.assertTrue(g6_future_stem("xxfh").endswith("kzya"))
+        self.assertTrue(g6_future_stem("xxfh").endswith("izya"))
         self.assertTrue(_g1_future_base("guh", "guha", "guh"))
         self.assertTrue(_g1_future_base("rinv", "rinv", "rinv").endswith("Rv"))
         self.assertTrue(future_stem("x", 5, None, "xo"))
@@ -303,7 +303,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(thematic_present_base("zWuv", 1), "zWUv")
         self.assertEqual(causative_lang_stem("I"), "Eay")
         self.assertEqual(_g6_future_suffix("abjj"), "abkzya")
-        self.assertEqual(_g6_future_suffix("xxfh"), "xxfkzya")
+        self.assertEqual(_g6_future_suffix("xxfh"), "xxfhizya")
         self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ikzizya")
         self.assertEqual(future_stem(apply_guna_to_stem("div"), 3, "", "div"), "devzya")
         krd = self.krd
