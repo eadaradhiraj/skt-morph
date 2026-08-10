@@ -229,13 +229,29 @@ def g9_r_lang_root(dhatu: str) -> str:
     return dhatu
 
 
+_YA_PRESENT_SPECIAL = {
+    "jF": "jIr",
+    "JF": "JIr",
+    "raYj": "raj",
+    "vyaD": "viD",
+    "mid": "med",
+    "klam": "klA",
+    "So": "S",
+    "Co": "C",
+    "so": "s",
+    "do": "d",
+}
+
+
 def ya_present_base(dhatu: str) -> str:
-    """Gaṇa 4 root before -ya (lengthen i only, not u/ṛ)."""
-    for idx in range(len(dhatu) - 1, -1, -1):
-        if dhatu[idx] == "i":
-            return dhatu[:idx] + "I" + dhatu[idx + 1 :]
-        if dhatu[idx] == "I":
-            return dhatu
+    """Gaṇa 4 root before -ya."""
+    if dhatu in _YA_PRESENT_SPECIAL:
+        return _YA_PRESENT_SPECIAL[dhatu]
+    if dhatu.endswith("MS"):
+        return dhatu[:-2] + "S"
+    for idx in range(len(dhatu) - 2, -1, -1):
+        if dhatu[idx] == "a" and dhatu[idx + 1] not in VOWEL_FINAL:
+            return dhatu[:idx] + "A" + dhatu[idx + 1 :]
     return dhatu
 
 

@@ -254,10 +254,13 @@ def _thematic_lot_third(base: str, ending: str, gana: int) -> str:
         return base + ending
     if gana in CAUSATIVE_GANAS and base.endswith("ay") and "r" in base[:-2]:
         return base + "ARi"
+    if gana == YA_GANA:
+        return base + "ARi"
     if gana in THEMATIC_GANAS:
         if (
-            base.endswith(("aya", "Aya", "Ay"))
+            base.endswith(("aya", "Aya"))
             or (base.endswith("ay") and "r" in base[:-2])
+            or (base.endswith("Ay") and ("r" in base or "z" in base))
             or _plot_uses_ari(base)
         ):
             return base + "ARi"

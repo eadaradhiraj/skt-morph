@@ -63,6 +63,10 @@ def conjugation_gana(gana: int, tags: str = "") -> int:
 
 def _g6_skip_future_guna(dhatu: str) -> bool:
     """Roots whose lṛṭ stem keeps the ungraded dhātu (cluster/uppercase patterns)."""
+    if dhatu.endswith("uq") or dhatu == "qip":
+        return True
+    if dhatu.startswith("f") and len(dhatu) >= 2:
+        return True
     if "mP" in dhatu or "fM" in dhatu or "Mh" in dhatu:
         return True
     if any(ch in "IUA" for ch in dhatu[:-1]):
@@ -70,8 +74,6 @@ def _g6_skip_future_guna(dhatu: str) -> bool:
     if "mB" in dhatu and dhatu[0].isupper():
         return True
     if dhatu.endswith("uw"):
-        return True
-    if len(dhatu) == 3 and dhatu[0].isupper() and dhatu[2].isupper():
         return True
     if dhatu.endswith(("ump", "mp")) and len(dhatu) <= 4:
         return True
@@ -85,6 +87,8 @@ def _g6_future_suffix(graded: str) -> str:
     if graded.endswith("S"):
         return graded[:-1] + "kzya"
     if graded.endswith("Sc"):
+        return graded[:-2] + "kzya"
+    if graded.endswith("cC"):
         return graded[:-2] + "kzya"
     if graded.endswith(("jj", "JJ")):
         return graded[:-2] + "kzya"
@@ -116,22 +120,28 @@ def g6_future_stem(dhatu: str) -> str:
         return apply_guna_to_stem(dhatu) + "zya"
     if dhatu == "SuB":
         return apply_guna_to_stem(dhatu) + "izya"
+    if dhatu == "majj":
+        return "maNkzy"
     if dhatu.endswith("ajj"):
         return dhatu[0] + "arkzya"
+    if dhatu == "sfj":
+        return dhatu[0] + "rakzya"
+    if dhatu.endswith("U"):
+        return dhatu[:-1] + "uvizya"
+    if len(dhatu) == 2 and dhatu[-1] in "ui":
+        if dhatu == "gu":
+            return dhatu + "zya"
+        return apply_guna_to_stem(dhatu) + "zya"
+    if dhatu == "Dru":
+        return dhatu + "zya"
     if dhatu.endswith("fh"):
-        base = apply_guna_to_stem(dhatu)
-        if base.endswith("rh"):
-            return base[:-1] + "kzya"
-        return base + "izya"
+        return apply_guna_to_stem(dhatu) + "izya"
     if dhatu in _G6_NO_FUTURE_GUNA:
         return _g6_future_suffix(dhatu)
-    graded_u = apply_guna_to_stem(dhatu)
-    if (
-        len(dhatu) == 3
-        and graded_u != dhatu
-        and (dhatu[1] == "U" or (len(dhatu) > 2 and dhatu[2].isupper()))
-    ):
-        return graded_u + "izya"
+    if len(dhatu) == 3 and dhatu[1] in "uU" and dhatu[0].isupper() and dhatu[2].isupper():
+        graded_u = apply_guna_to_stem(dhatu)
+        if graded_u != dhatu:
+            return graded_u + "izya"
     base = dhatu if _g6_skip_future_guna(dhatu) else apply_guna_to_stem(dhatu)
     return _g6_future_suffix(base)
 

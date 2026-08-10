@@ -148,6 +148,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertTrue(g6_present_base("tud"))
         self.assertTrue(_g6_skip_future_guna("ump"))
         self.assertTrue(g6_future_stem("ajj").endswith("kzya"))
+        self.assertEqual(g6_future_stem("majj"), "maNkzy")
         self.assertTrue(apply_vrddhi_to_stem("BU"))
         self.assertTrue(thematic_aya_present_stem("glE"))
         self.assertTrue(g9_n_lang_base("mI"))
@@ -254,12 +255,12 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertTrue(apply_causative_grade("cur"))
         self.assertTrue(gana3_present_stem("hu", "hu"))
         self.assertTrue(_g6_future_suffix("xxD"))
-        self.assertTrue(g6_future_stem("xxfh").endswith("kzya"))
+        self.assertTrue(g6_future_stem("xxfh").endswith("izya"))
         from unittest.mock import patch
 
         with patch("sktmorph.engine.stems.apply_guna_to_stem", return_value="xxfh"):
             self.assertTrue(g6_future_stem("abcfh").endswith("izya"))
-        self.assertTrue(_g6_skip_future_guna("KuR"))
+        self.assertTrue(_g6_skip_future_guna("umB"))
         self.assertTrue(_g1_future_base("guh", "guha", "guh"))
         self.assertTrue(_g1_future_base("rinv", "rinv", "rinv").endswith("Rv"))
         self.assertTrue(future_stem("x", 5, None, "xo"))
@@ -364,7 +365,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(derive_stem("saYj", 1, "lrt", "shuddha")[0], "saNkzy")
         self.assertEqual(derive_stem("tras", 4, "lat", "shuddha")[0], "trasa")
         self.assertEqual(derive_stem("GuR", 6, "lrt", "shuddha")[0], "GoRizya")
-        self.assertEqual(derive_stem("vfh", 6, "lrt", "shuddha")[0], "varkzya")
+        self.assertEqual(derive_stem("vfh", 6, "lrt", "shuddha")[0], "varhizya")
         self.assertEqual(_join_g1_a_final("SrA", "va", "lang", 3), "aSrAva")
         self.assertEqual(_join_g1_a_final("SrA", "ma", "lang", 3), "aSrAma")
         self.assertEqual(join_form("jYA", "Ani", 1, "lot", 3, "P", None, "jYA", 1), "jYAni")
