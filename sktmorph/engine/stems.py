@@ -27,6 +27,7 @@ from .phonology import (
     yam_cc_present_stem,
     lang_geminate_stem,
     _causative_lang_base,
+    _CAUSATIVE_LANG_BASE,
     thematic_aya_present_stem,
     thematic_present_base,
     vowel_initial_lang_stem,
@@ -172,6 +173,8 @@ def _g1_future_base(dhatu: str, present_base: str, guna: str) -> str:
         return apply_guna_to_stem(dhatu)
     if dhatu == "guh":
         return "gUh"
+    if dhatu == "f":
+        return "ar"
     if dhatu in ("SrA", "jYA"):
         return dhatu[:-1] + "i"
     vrddhi = apply_vrddhi_to_stem(dhatu)
@@ -545,9 +548,12 @@ def derive_stem(
         if dhatu in _G1_A_FINAL and cgana == 1:
             _append_step(steps, dhatu, ["3.4.111"], "lang_stem")
             return dhatu, "a", steps
-        if gana in CAUSATIVE_GANAS and cgana == 10:
+        if dhatu == "f" and cgana == 1:
+            _append_step(steps, "Ar", ["3.4.111"], "lang_stem")
+            return "Ar", None, steps
+        if gana in CAUSATIVE_GANAS:
             init = vowel_initial_lang_stem(dhatu)
-            if init is not None:
+            if init is not None and dhatu not in _CAUSATIVE_LANG_BASE:
                 root = init + "ay"
                 _append_step(steps, root, ["3.4.111"], "lang_stem")
                 return root, None, steps
@@ -631,8 +637,8 @@ def derive_stem(
                 root = dhatu + "RI"
         elif gana == N_GANA and dhatu.endswith("D"):
             root = dhatu[:-1] + "nD"
-        elif gana in CAUSATIVE_GANAS and cgana == 10:
-            root = _causative_lang_base(dhatu)
+        elif gana in CAUSATIVE_GANAS:
+            root = causative_lang_stem(dhatu)
         else:
             root = guna if cgana not in THEMATIC_GANAS else thematic_present_base(dhatu, cgana, aupadeshik)
         _append_step(steps, root, ["3.4.104"], "vidhilin_stem")

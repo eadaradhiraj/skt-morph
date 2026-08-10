@@ -296,9 +296,20 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             g6_lang_base,
             g6_lang_stem,
             g9_r_lang_root,
+            lang_geminate_stem,
+            _causative_lang_base,
+            sad_present_base,
             thematic_aya_present_stem,
             thematic_present_base,
             vowel_initial_lang_stem,
+        )
+        from sktmorph.engine.join import (
+            _g1_f_lang_join,
+            _g2_a_lat_join,
+            _g2_a_lang_join,
+            _g2_ih_lang_join,
+            _g2_u_lat_join,
+            _g2_u_plot_join,
         )
         from sktmorph.engine.redup import _profile, gana3_perfect_stem
         from sktmorph.engine.stems import (
@@ -390,11 +401,29 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(causative_lang_stem("Camp"), "cCamp")
         self.assertEqual(causative_lang_stem("gup"), "gop")
         self.assertEqual(join_form("capay", "at", 10, "lang", 1, "P", "a", "ci", 1), "acapayat")
+        self.assertEqual(derive_stem("ci", 10, "lang", "shuddha")[0], "capay")
+        self.assertEqual(join_form("go", "at", 1, "lang", 1, "P", "a", "go", 1), "agot")
+        self.assertEqual(_g2_a_lang_join("yA", "tAm"), "yAtAm")
+        self.assertEqual(_g2_a_lang_join("yA", "uH"), "yyuH")
+        self.assertEqual(_g2_ih_lang_join("duh", "atAm", 1, 2), "adugDAm")
+        self.assertEqual(_g2_ih_lang_join("duh", "ma", 3, 3), "dohma")
+        self.assertIsNone(_g2_a_lang_join("yA", "ti"))
+        self.assertIsNone(_g2_ih_lang_join("duh", "ti", 1, 1))
+        self.assertEqual(_causative_lang_base("ci"), "capay")
+        self.assertEqual(_causative_lang_base("Camp"), "cCamp")
+        self.assertEqual(lang_geminate_stem("Card", "Carday"), "cCarday")
+        self.assertEqual(sad_present_base("gam"), "gacC")
+        self.assertEqual(sad_present_base("sTA"), "tizW")
+        self.assertEqual(sad_present_base("su"), "sav")
+        self.assertEqual(thematic_present_base("f", 1), "fcC")
+        self.assertEqual(_g1_future_base("f", "fcC", "f"), "ar")
+        self.assertEqual(derive_stem("f", 1, "lang", "shuddha")[0], "Ar")
+        self.assertEqual(join_form("Ar", "at", 1, "lang", 1, "P", None, "f", 1), "ArcCat")
+        self.assertIsNone(_g1_f_lang_join("go", "Ar", "at"))
+        self.assertEqual(join_form("srav", "Ani", 1, "plot", 3, "P", None, "sru", 1), "sravARi")
         self.assertEqual(_g6_future_suffix("abjj"), "abkzya")
         self.assertEqual(_g6_future_suffix("xxfh"), "xxfhizya")
         self.assertEqual(_g1_future_suffix("ekza", "ikz"), "ikzizya")
-        from sktmorph.engine.join import _g2_a_lat_join, _g2_a_lang_join, _g2_u_lat_join, _g2_u_plot_join
-
         self.assertEqual(_g2_a_lang_join("yA", "at"), "yAt")
         self.assertEqual(join_form("yA", "at", 2, "lang", 1, "P", "a", "yA", 1), "ayAt")
         self.assertEqual(join_form("SrA", "at", 2, "lang", 1, "P", "a", "SrA", 1), "aSrAt")

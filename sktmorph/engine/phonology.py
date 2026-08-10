@@ -267,6 +267,16 @@ def sad_present_base(dhatu: str) -> Optional[str]:
         return "jiGr"
     if dhatu == "saYj":
         return "saj"
+    if dhatu == "DmA":
+        return "Dam"
+    if dhatu == "mnA":
+        return "man"
+    if dhatu == "sTA":
+        return "tizW"
+    if dhatu == "gam":
+        return "gacC"
+    if dhatu.endswith("u") and len(dhatu) <= 4 and dhatu not in ("gu", "Sru"):
+        return dhatu[:-1] + "av"
     return None
 
 
@@ -418,6 +428,7 @@ _CAUSATIVE_LANG_BASE = {
     "gUd": "gUrday",
     "gup": "gop",
     "uDras": "ODrAsay",
+    "Card": "cCarday",
 }
 
 
@@ -513,6 +524,8 @@ def thematic_present_base(dhatu: str, gana: int, aupadeshik: str = "") -> str:
     if dhatu == "sUrkzy" and aupadeshik.startswith("z"):
         return "sUkzy"
     if gana == 1:
+        if dhatu == "f":
+            return "fcC"
         rv = g1_rv_nv_present_base(dhatu)
         if rv:
             return rv

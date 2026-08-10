@@ -14,6 +14,7 @@ _G2_U_LAT_O = frozenset({"yu", "nu", "ku", "su", "dyu", "kzu", "snu", "kzRu", "U
 _G2_A_LAT_ROOTS = frozenset(
     {"yA", "vA", "BA", "snA", "SrA", "drA", "psA", "pA", "rA", "lA", "dA", "KyA", "prA", "mA"}
 )
+_G1_PLOT_ARI = frozenset({"sru"})
 _G6_PLOT_ARI = frozenset(
     {
         "Cur",
@@ -200,11 +201,71 @@ def _g2_u_lat_join(
     return None
 
 
+def _g1_f_lang_join(dhatu: str, stem: str, ending: str) -> Optional[str]:
+    if dhatu == "f" and stem == "Ar":
+        return stem + "cC" + ending
+    return None
+
+
 def _g2_a_lang_join(dhatu: str, ending: str) -> Optional[str]:
     if dhatu not in _G2_A_LAT_ROOTS:
         return None
+    body = dhatu[:-1]
     if ending in ("at", "ad"):
-        return dhatu[:-1] + "A" + ending[1:]
+        return body + "A" + ending[1:]
+    if ending in ("tAm", "atAm"):
+        return body + "AtAm"
+    if ending == "an":
+        return body + "An"
+    if ending == "atam":
+        return body + "Atam"
+    if ending == "ata":
+        return body + "Ata"
+    if ending == "aH":
+        return body + "AH"
+    if ending == "am":
+        return body + "Am"
+    if ending == "va":
+        return body + "Ava"
+    if ending == "ma":
+        return body + "Ama"
+    if ending == "uH":
+        return body + "yuH"
+    return None
+
+
+def _g2_ih_lang_join(
+    dhatu: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    if dhatu not in _G2_IH_PLOT:
+        return None
+    stem, _, guna = _G2_IH_PLOT[dhatu]
+    if ending in ("at", "ad") and purusha == 1 and vacana == 1:
+        if dhatu == "duh":
+            return "Dok"
+        if dhatu == "dih":
+            return "Dek"
+        if dhatu == "lih":
+            return "lew"
+    if ending == "atAm":
+        return "a" + stem + "Am"
+    if ending == "an" and purusha == 1 and vacana == 3:
+        return dhatu + "an"
+    if ending == "aH" and purusha == 2 and vacana == 1:
+        return guna + "H"
+    if ending == "atam":
+        return "a" + stem + "am"
+    if ending == "ata":
+        return "a" + stem + "a"
+    if ending == "am" and purusha == 3 and vacana == 1:
+        return guna + "am"
+    if ending == "va" and purusha == 3 and vacana == 2:
+        return guna + "va"
+    if ending == "ma" and purusha == 3 and vacana == 3:
+        return guna + "ma"
     return None
 
 
@@ -486,6 +547,8 @@ def _thematic_lot_third(
         return base + "ARi"
     if gana == 6 and dhatu in _G6_PLOT_ARI:
         return base + "ARi"
+    if dhatu in _G1_PLOT_ARI:
+        return base + "ARi"
     if gana in THEMATIC_GANAS:
         if (
             base.endswith(("aya", "Aya"))
@@ -571,6 +634,10 @@ def _join_raw(
         if dhatu in _G1_A_FINAL and family in ("lat", "lot", "lang", "vidhilin"):
             return _join_g1_a_final(stem, ending, family, purusha, dhatu or "")
         if family in ("lang", "vidhilin", "lit"):
+            if family == "lang":
+                joined = _g1_f_lang_join(dhatu or "", stem, ending)
+                if joined is not None:
+                    return joined
             if family == "lang" and stem.endswith("o") and ending in ("at", "ad"):
                 return stem + ending[1:]
             return stem + ending
@@ -908,6 +975,9 @@ def _join_ad(
                 if ending == "ma":
                     return "Ema"
     if family == "lang" and dhatu:
+        joined = _g2_ih_lang_join(dhatu, ending, purusha, vacana)
+        if joined is not None:
+            return joined
         joined = _g2_a_lang_join(dhatu, ending)
         if joined is not None:
             return joined
