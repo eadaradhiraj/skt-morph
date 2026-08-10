@@ -11,6 +11,7 @@ from .phonology import (
     bidadi_present_stem,
     bidadi_vidhilin_stem,
     causative_lang_stem,
+    causative_vidhilin_stem,
     causative_present_stem,
     g6_plot_base,
     g6_present_base,
@@ -616,6 +617,10 @@ def derive_stem(
             root = dhatu[:-1]
             _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
             return root, None, steps
+        if gana in CAUSATIVE_GANAS:
+            root = causative_vidhilin_stem(dhatu, tags)
+            _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
+            return root, None, steps
         if gana == YA_GANA and present_stem:
             root = present_stem[:-1] if present_stem.endswith("a") else present_stem
         elif cgana in THEMATIC_GANAS:
@@ -639,8 +644,6 @@ def derive_stem(
                 root = dhatu + "RI"
         elif gana == N_GANA and dhatu.endswith("D"):
             root = dhatu[:-1] + "nD"
-        elif gana in CAUSATIVE_GANAS:
-            root = causative_lang_stem(dhatu)
         else:
             root = guna if cgana not in THEMATIC_GANAS else thematic_present_base(dhatu, cgana, aupadeshik)
         _append_step(steps, root, ["3.4.104"], "vidhilin_stem")

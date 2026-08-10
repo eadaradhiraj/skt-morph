@@ -293,6 +293,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         from sktmorph.engine.phonology import (
             apply_guna_to_stem,
             causative_lang_stem,
+            causative_vidhilin_stem,
             g6_plot_base,
             g6_present_base,
             g6_lang_base,
@@ -307,11 +308,13 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         )
         from sktmorph.engine.join import (
             _g10_lang_join,
+            _g10_vidhilin_join,
             _g10_uses_drop_ay,
             _g1_f_lang_join,
             _g2_a_lat_join,
             _g2_a_lang_join,
             _g2_ih_lang_join,
+            _g2_ih_lat_join,
             _g2_u_lat_join,
             _g2_u_plot_join,
         )
@@ -418,10 +421,30 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(_g10_lang_join("Una", "Onaay", "at"), "Onayat")
         self.assertEqual(_g10_lang_join("Cada", "cCad", "at"), "cCadayat")
         self.assertEqual(_g10_lang_join("Cad", "cCad", "at"), None)
-        self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", None, "uDras", 10), "ODrAsayat")
-        self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", "a", "uDras", 10), "ODrAsayat")
         from unittest.mock import patch
 
+        self.assertEqual(causative_vidhilin_stem("Cad"), "Cad")
+        self.assertEqual(causative_vidhilin_stem("Cfd"), "Carday")
+        self.assertEqual(causative_vidhilin_stem("olaRq"), "olaRqay")
+        self.assertEqual(causative_vidhilin_stem("mI"), "may")
+        self.assertEqual(causative_vidhilin_stem("Gf"), "GAray")
+        self.assertEqual(causative_vidhilin_stem("raMh", "nityaRic"), "raNg")
+        self.assertEqual(join_form("coray", "et", 10, "vidhilin", 1, "P", None, "cur", 10), "corayet")
+        self.assertEqual(join_form("paray", "et", 10, "vidhilin", 1, "P", None, "pF", 10), "paret")
+        self.assertEqual(join_form("capay", "et", 10, "vidhilin", 1, "P", None, "ci", 10), "cayet")
+        self.assertEqual(join_form("may", "et", 10, "vidhilin", 1, "P", None, "mI", 10), "mayet")
+        self.assertEqual(join_form("Unay", "et", 10, "vidhilin", 1, "P", None, "Una", 10), "Unayet")
+        self.assertEqual(join_form("raNg", "et", 10, "vidhilin", 1, "P", None, "raMh", 10), "raNgayet")
+        self.assertEqual(_g10_vidhilin_join("Cuw", "Coway", "et"), "Cowayet")
+        self.assertEqual(_g10_vidhilin_join("mfj", "mArj", "et"), "mArjayet")
+        with patch("sktmorph.engine.join._g10_lang_join", return_value="odd"):
+            self.assertEqual(_g10_vidhilin_join("cur", "coray", "et"), "odd")
+        with patch("sktmorph.engine.join._g10_lang_join", return_value=None):
+            self.assertEqual(_g10_vidhilin_join("Cand", "Canday", "et"), "Candayet")
+        with patch("sktmorph.engine.phonology._causative_aya_base", return_value="xy"):
+            self.assertEqual(causative_vidhilin_stem("zz"), "xy")
+        self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", None, "uDras", 10), "ODrAsayat")
+        self.assertEqual(join_form("ODrAsay", "at", 10, "lang", 1, "P", "a", "uDras", 10), "ODrAsayat")
         with patch("sktmorph.engine.join._G10_LANG_DROP_AY", frozenset({"mI"})):
             self.assertEqual(_g10_lang_join("mI", "mIay", "at"), "mIyat")
         self.assertEqual(derive_stem("ci", 10, "lang", "shuddha")[0], "capay")
@@ -455,6 +478,11 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertIsNone(_g2_u_lat_join("uru", "ti", 1, 1))
         self.assertEqual(_g2_u_lat_join("yu", "TaH", 2, 2), "yuTaH")
         self.assertEqual(_g2_u_lat_join("yu", "mi", 1, 1), "yOmi")
+        self.assertEqual(_g2_u_lat_join("ru", "vaH", 3, 2), "ruvaH")
+        self.assertIsNone(_g2_u_lat_join("ru", "xx", 1, 1))
+        self.assertEqual(_g2_ih_lat_join("duh", "maH", 3, 3), "dohmaH")
+        self.assertIsNone(_g2_ih_lat_join("duh", "xx", 1, 1))
+        self.assertEqual(_g2_ih_lat_join("duh", "ti", 1, 1), "dogDi")
         self.assertEqual(_g2_u_plot_join("yu", "tAt", 1, 1), "yutAt")
         self.assertEqual(_g2_u_plot_join("duh", "tAt", 1, 1), "dugDAt")
         self.assertEqual(_g2_u_plot_join("duh", "Ava", 3, 2), "dohAva")

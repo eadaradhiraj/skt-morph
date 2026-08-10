@@ -4,6 +4,7 @@ from typing import List, Optional
 
 from .phonology import (
     apply_guna_to_stem,
+    causative_vidhilin_stem,
     g9_r_lang_root,
     g9_uses_r_infix,
     thematic_join,
@@ -182,6 +183,10 @@ def _g2_u_lat_join(
             return body + "uvanti"
         if ending == "si":
             return body + "uze"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return body + "uTaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return body + "uTa"
         if ending in ("TaH", "Ta"):
             return body + "u" + ending
         if ending == "mi":
@@ -199,9 +204,13 @@ def _g2_u_lat_join(
     if ending == "anti" and purusha == 1 and vacana == 3:
         return body + "uvanti"
     if ending == "si" and purusha == 2 and vacana == 1:
-        return body + "uze"
+        return body + ("Ozi" if dhatu in _G2_U_LAT_O else "uze")
     if ending in ("TaH", "Ta") and purusha == 2:
         return body + "u" + ending
+    if ending == "thaH" and purusha == 2 and vacana == 2:
+        return body + "uTaH"
+    if ending == "tha" and purusha == 2 and vacana == 3:
+        return body + "uTa"
     if ending == "mi" and purusha == 1 and vacana == 1:
         return body + "Omi"
     if ending in ("vaH", "maH") and purusha == 3:
@@ -235,6 +244,36 @@ def _g10_lang_join(dhatu: str, stem: str, ending: str) -> Optional[str]:
     if stem.endswith("ay"):
         return stem + ending
     return None
+
+
+def _g10_vidhilin_applies(dhatu: str, stem: str) -> bool:
+    if not dhatu:
+        return False
+    if stem == causative_vidhilin_stem(dhatu):
+        return True
+    return stem == causative_vidhilin_stem(dhatu, "nityaRic")
+
+
+def _g10_vidhilin_join(dhatu: str, stem: str, ending: str) -> Optional[str]:
+    if not _g10_vidhilin_applies(dhatu, stem) or not ending.startswith("e"):
+        return None
+    if dhatu in _CAUSATIVE_LANG_NO_AUG and stem.endswith("ay"):
+        return stem + ending
+    if dhatu.endswith("I") or (
+        len(dhatu) == 3 and dhatu[0] == "C" and stem.lower() == dhatu.lower()
+    ):
+        return stem + ending
+    if dhatu in _G10_LANG_AYAT and stem.endswith("ay"):
+        return stem + ending
+    lang_end = "a" + ending[1:]
+    if stem.endswith("ay") or dhatu == "ci":
+        joined = _g10_lang_join(dhatu, stem, lang_end)
+        if joined is not None:
+            if joined.endswith(lang_end):
+                return joined[: -len(lang_end)] + ending
+            return joined
+        return stem + ending
+    return stem + "ay" + ending
 
 
 def _g1_f_lang_join(dhatu: str, stem: str, ending: str) -> Optional[str]:
@@ -305,14 +344,50 @@ def _g2_ih_lang_join(
     return None
 
 
+def _g2_ih_lat_join(
+    dhatu: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    if dhatu not in _G2_IH_PLOT:
+        return None
+    stem, tu_stem, guna = _G2_IH_PLOT[dhatu]
+    if ending == "ti" and purusha == 1 and vacana == 1:
+        return tu_stem + "i"
+    if ending == "taH" and purusha == 1 and vacana == 2:
+        return stem + "aH"
+    if ending == "anti" and purusha == 1 and vacana == 3:
+        return stem + "anti"
+    if ending == "si" and purusha == 2 and vacana == 1:
+        return guna + "Di"
+    if ending == "thaH" and purusha == 2 and vacana == 2:
+        return guna + "DaH"
+    if ending == "tha" and purusha == 2 and vacana == 3:
+        return guna + "Da"
+    if ending == "mi" and purusha == 3 and vacana == 1:
+        return guna + "mi"
+    if ending == "vaH" and purusha == 3 and vacana == 2:
+        return guna + "vaH"
+    if ending == "maH" and purusha == 3 and vacana == 3:
+        return guna + "maH"
+    return None
+
+
 def _g2_a_lat_join(dhatu: str, ending: str, purusha: int, vacana: int) -> Optional[str]:
     if dhatu not in _G2_A_LAT_ROOTS:
         return None
     body = dhatu[0]
     if ending == "anti" and purusha == 1 and vacana == 3:
+        if len(dhatu) == 3 and dhatu.endswith("A"):
+            return dhatu[:-1] + "Anti"
         return body + "Anti"
     if ending in ("TaH", "Ta") and purusha == 2 and vacana == 2:
         return body + "AT" + ending[1:]
+    if ending == "thaH" and purusha == 2 and vacana == 2:
+        return body + "ATaH"
+    if ending == "tha" and purusha == 2 and vacana == 3:
+        return body + "ATa"
     return None
 
 
@@ -677,6 +752,10 @@ def _join_raw(
                 joined = _g1_f_lang_join(dhatu or "", stem, ending)
                 if joined is not None:
                     return joined
+            if family == "vidhilin":
+                joined = _g10_vidhilin_join(dhatu or "", stem, ending)
+                if joined is not None:
+                    return joined
             if family == "lang" and stem.endswith("o") and ending in ("at", "ad"):
                 return stem + ending[1:]
             return stem + ending
@@ -1021,6 +1100,9 @@ def _join_ad(
         if joined is not None:
             return joined
     if family == "lat" and dhatu:
+        joined = _g2_ih_lat_join(dhatu, ending, purusha, vacana)
+        if joined is not None:
+            return joined
         joined = _g2_u_lat_join(dhatu, ending, purusha, vacana)
         if joined is not None:
             return joined

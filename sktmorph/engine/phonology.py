@@ -440,6 +440,19 @@ _CAUSATIVE_LANG_BASE = {
 _CAUSATIVE_LANG_NO_AUG = frozenset({"uDras", "Una", "anDa", "aMsa", "aNka", "aNga"})
 _G10_LANG_KEEP_AY = frozenset({"jYA", "Card", "uDras"})
 
+_CAUSATIVE_VIDHILIN_BASE = {
+    "ci": "capay",
+    "jYA": "jYApay",
+    "kfp": "kalpay",
+    "Gf": "GAray",
+    "kFt": "kIrtay",
+    "cyu": "cyAvay",
+    "BU": "BAvay",
+    "lI": "lay",
+    "gUd": "gUrday",
+    "mfj": "mArj",
+}
+
 
 def lang_geminate_stem(dhatu: str, stem: str) -> str:
     """Initial consonant gemination in laṅ (Card → cCarday, Cand → cCand)."""
@@ -518,6 +531,26 @@ def causative_lang_stem(dhatu: str) -> str:
         return dhatu[0].lower() + body
     stem = _causative_lang_base(dhatu)
     return lang_geminate_stem(dhatu, stem)
+
+
+def causative_vidhilin_stem(dhatu: str, tags: str = "") -> str:
+    """Vidhilin stem for gaṇa-10 causative (differs from laṅ for many roots)."""
+    if "nityaRic" in (tags or "") and dhatu == "raMh":
+        return "raNg"
+    if dhatu in _CAUSATIVE_VIDHILIN_BASE:
+        return _CAUSATIVE_VIDHILIN_BASE[dhatu]
+    if dhatu == "sad":
+        return "AsAday"
+    if dhatu.endswith("I"):
+        return dhatu[:-1] + "ay"
+    if len(dhatu) == 3 and dhatu[0] == "C":
+        aya = _causative_aya_base(dhatu)
+        if aya.endswith("aya") and aya[:-3].lower() == dhatu.lower():
+            return dhatu
+    aya = _causative_aya_base(dhatu)
+    if aya.endswith("aya"):
+        return aya[:-1]
+    return aya
 
 
 def thematic_aya_present_stem(dhatu: str) -> Optional[str]:
