@@ -221,6 +221,31 @@ _G1_LRT_STEMS = {
     "Sap": "Sapsya",
 }
 _G2_U_LRT_OZY = frozenset({"su", "tu", "dyu", "ku", "stu"})
+_G2_LRT_STEMS = {
+    "brU": "vakzya",
+    "vac": "vakzya",
+    "vid": "vedizya",
+    "as": "Bavizya",
+    "mfj": "mArkzya",
+    "rud": "rodizya",
+    "saMst": "saMstizya",
+    "svap": "svapsya",
+}
+
+
+def _g2_ad_lrt_stem(
+    dhatu: str,
+    present_stem: Optional[str],
+) -> Optional[str]:
+    if dhatu in _G2_LRT_STEMS:
+        return _G2_LRT_STEMS[dhatu]
+    if dhatu in ("i", "vI"):
+        return apply_guna_to_stem(dhatu) + "zy"
+    if dhatu == "daridrA":
+        return dhatu[:-1] + "izy"
+    if present_stem and present_stem[-1] == "A":
+        return present_stem + "sya"
+    return None
 
 
 def _g1_special_lrt_stem(dhatu: str) -> Optional[str]:
@@ -287,8 +312,6 @@ def future_stem(
         special = _g1_special_lrt_stem(dhatu)
         if special:
             return special
-    if gana == 2 and dhatu == "i":
-        return apply_guna_to_stem(dhatu) + "zy"
     if gana == 2 and dhatu.endswith("u"):
         if dhatu in _G2_U_LRT_OZY:
             return apply_guna_to_stem(dhatu) + "zy"
@@ -512,6 +535,12 @@ def derive_stem(
         fstem = g6_future_stem(dhatu)
         _append_step(steps, fstem, ["3.2.135"], "lrt")
         return fstem, None, steps
+
+    if family == "lrt" and gana in AD_GANAS:
+        g2_lrt = _g2_ad_lrt_stem(dhatu, present_stem)
+        if g2_lrt:
+            _append_step(steps, g2_lrt, ["3.2.135"], "lrt")
+            return g2_lrt, None, steps
 
     yam_fut = yam_cc_future_stem(dhatu, antarganas)
     if family == "lrt" and yam_fut:

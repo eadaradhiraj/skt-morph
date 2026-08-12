@@ -76,6 +76,228 @@ _G2_IH_LRT = {
     "dih": "Dek",
     "lih": "lek",
 }
+_G2_PLAT_ITI = frozenset({"rud", "svap", "jakz", "an", "Svas"})
+_G2_PLAT_ATI = frozenset({"cakAs", "SAs", "daridrA"})
+_G2_PLAT_P2_T = frozenset({"sas", "saMst", "cakAs", "daridrA"})
+
+
+def _g2_plat_iti_join(
+    dhatu: str,
+    guna: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    if ending == "ti" and purusha == 1 and vacana == 1:
+        return guna + "iti"
+    if ending == "taH" and purusha == 1 and vacana == 2:
+        return dhatu + "itaH"
+    if ending == "anti" and purusha == 1 and vacana == 3:
+        return dhatu + "anti"
+    if ending == "si" and purusha == 2 and vacana == 1:
+        return guna + "izi"
+    if ending == "thaH" and purusha == 2 and vacana == 2:
+        return dhatu + "iTaH"
+    if ending == "tha" and purusha == 2 and vacana == 3:
+        return dhatu + "iTa"
+    if ending == "mi" and purusha == 3 and vacana == 1:
+        return guna + "imi"
+    if ending == "vaH" and purusha == 3 and vacana == 2:
+        return dhatu + "ivaH"
+    if ending == "maH" and purusha == 3 and vacana == 3:
+        return dhatu + "imaH"
+    return None
+
+
+def _g2_irreg_lat_join(
+    dhatu: str,
+    stem: str,
+    ending: str,
+    purusha: int,
+    vacana: int,
+) -> Optional[str]:
+    guna = apply_guna_to_stem(dhatu)
+    if dhatu in _G2_PLAT_ITI:
+        if dhatu == "jakz" and ending == "anti" and purusha == 1 and vacana == 3:
+            return dhatu + "ati"
+        return _g2_plat_iti_join(dhatu, guna, ending, purusha, vacana)
+    if dhatu == "daridrA":
+        base = "daridr"
+        if ending == "ti" and purusha == 1 and vacana == 1:
+            return dhatu + "ti"
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return base + "itaH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return base + "ati"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return dhatu + "si"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return base + "iTaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return base + "iTa"
+        if ending == "mi" and purusha == 3 and vacana == 1:
+            return dhatu + "mi"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return base + "ivaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return base + "imaH"
+    if dhatu in _G2_PLAT_ATI and ending == "anti" and purusha == 1 and vacana == 3:
+        return dhatu + "ati"
+    if dhatu == "jAgf":
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return dhatu + "taH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "jAgrati"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return guna + "zi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return dhatu + "TaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return dhatu + "Ta"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return dhatu + "vaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return dhatu + "maH"
+    if dhatu in _G2_PLAT_P2_T and purusha == 2:
+        if ending == "thaH" and vacana == 2:
+            return dhatu + "TaH"
+        if ending == "tha" and vacana == 3:
+            return dhatu + "Ta"
+    if dhatu == "i":
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "itaH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "yanti"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "iTaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "iTa"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return "ivaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return "imaH"
+    if dhatu == "as":
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "staH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "santi"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return "asi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "sTaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "sTa"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return "svaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return "smaH"
+    if dhatu == "vI":
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "vItaH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "viyanti"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return "vezi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "vITaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "vITa"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return "vIvaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return "vImaH"
+    if dhatu == "vac":
+        base = "vak"
+        if ending == "ti" and purusha == 1 and vacana == 1:
+            return base + "ti"
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return base + "taH"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return base + "zi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return base + "TaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return base + "Ta"
+    if dhatu == "vid":
+        if ending == "ti" and purusha == 1 and vacana == 1:
+            return "vetti"
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "vittaH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "vidanti"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return "vetTa"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "vitTaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "vitTa"
+    if dhatu == "SAs":
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "SizwaH"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "SizWaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "SizWa"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return "SizvaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return "SizmaH"
+    if dhatu == "mfj":
+        if ending == "ti" and purusha == 1 and vacana == 1:
+            return "mArzwi"
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "mfzwaH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "mArjanti"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return "mArkzi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "mfzWaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "mfzWa"
+        if ending == "mi" and purusha == 3 and vacana == 1:
+            return "mArjmi"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return "mfjvaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return "mfjmaH"
+    if dhatu == "vaS":
+        if ending == "ti" and purusha == 1 and vacana == 1:
+            return "vazwi"
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return "uzwaH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return "uSanti"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return "vakzi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return "uzWaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return "uzWa"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return "uSvaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return "uSmaH"
+    if dhatu == "brU":
+        if ending == "ti" and purusha == 1 and vacana == 1:
+            return guna + "Iti"
+        if ending == "taH" and purusha == 1 and vacana == 2:
+            return dhatu + "taH"
+        if ending == "anti" and purusha == 1 and vacana == 3:
+            return dhatu[:-1] + "uvanti"
+        if ending == "si" and purusha == 2 and vacana == 1:
+            return guna + "Izi"
+        if ending == "thaH" and purusha == 2 and vacana == 2:
+            return dhatu + "TaH"
+        if ending == "tha" and purusha == 2 and vacana == 3:
+            return dhatu + "Ta"
+        if ending == "mi" and purusha == 3 and vacana == 1:
+            return guna + "Imi"
+        if ending == "vaH" and purusha == 3 and vacana == 2:
+            return dhatu + "vaH"
+        if ending == "maH" and purusha == 3 and vacana == 3:
+            return dhatu + "maH"
+    return None
 
 
 def _g2_u_plot_body(dhatu: str) -> str:
@@ -1125,6 +1347,9 @@ def _join_ad(
         joined = _g2_a_lat_join(dhatu, ending, purusha, vacana)
         if joined is not None:
             return joined
+        joined = _g2_irreg_lat_join(dhatu, stem, ending, purusha, vacana)
+        if joined is not None:
+            return joined
     if family in ("lot", "plot") and dhatu:
         joined = _g2_u_plot_join(dhatu, ending, purusha, vacana)
         if joined is not None:
@@ -1248,11 +1473,17 @@ def _join_ad(
         if family == "lrt" and stem.endswith("zy") and not stem.endswith(("zya", "izya", "tsya")):
             if ending == "ti":
                 return stem + "ati"
+            if ending == "taH":
+                return stem + "ataH"
+            if ending == "si":
+                return stem + "asi"
             if ending == "anti":
                 return stem + "anti"
+            if ending in ("TaH", "Ta"):
+                return stem + "a" + ending
             if ending and ending[0] in "aA":
                 return stem + ending
-        if family == "lrt" and stem.endswith(("zya", "tsya", "izya")):
+        if family == "lrt" and stem.endswith(("zya", "tsya", "izya", "sya")):
             if ending == "anti":
                 return stem[:-1] + "anti"
             if ending == "taH":

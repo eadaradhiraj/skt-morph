@@ -24,6 +24,7 @@ from sktmorph.engine.phonology import (
 from sktmorph.engine.stems import (
     _g1_future_from_present,
     _g1_future_suffix,
+    _g2_ad_lrt_stem,
     derive_stem,
     future_stem,
     g6_future_stem,
@@ -319,6 +320,8 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             _g2_a_lang_join,
             _g2_ih_lang_join,
             _g2_ih_lat_join,
+            _g2_irreg_lat_join,
+            _g2_plat_iti_join,
             _g2_u_lat_join,
             _g2_u_plot_join,
         )
@@ -400,7 +403,15 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(join_form("jYA", "Ani", 1, "lot", 3, "P", None, "jYA", 1), "jYAni")
         self.assertEqual(_join_ad("testzy", "anti", "lrt", "xx", 1, 3), "testzyanti")
         self.assertEqual(_join_ad("testzy", "ti", "lrt", "xx", 1, 1), "testzyati")
+        self.assertEqual(_join_ad("testzy", "taH", "lrt", "xx", 1, 2), "testzyataH")
+        self.assertEqual(_join_ad("testzy", "si", "lrt", "xx", 2, 1), "testzyasi")
         self.assertEqual(_join_ad("testzy", "Ami", "lrt", "xx", 3, 1), "testzyAmi")
+        self.assertEqual(_join_ad("snAsya", "ti", "lrt", "snA", 1, 1), "snAsyati")
+        self.assertEqual(_g2_ad_lrt_stem("snA", "snA"), "snAsya")
+        self.assertEqual(_g2_ad_lrt_stem("brU", "brav"), "vakzya")
+        self.assertEqual(_g2_ad_lrt_stem("daridrA", "daridrA"), "daridrizy")
+        self.assertEqual(derive_stem("dA", 2, "lrt", "shuddha")[0], "dAsya")
+        self.assertEqual(derive_stem("vid", 2, "lrt", "shuddha")[0], "vedizya")
         self.assertEqual(future_stem("x", 1, "xyAa", "xE"), "xyAsy")
         self.assertEqual(_join_ni_npattern("abnA", "foo", "lat", 1, "P"), "abnAfoo")
         self.assertEqual(g9_r_lang_root("SF"), "SIr")
@@ -519,6 +530,20 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(_g2_ih_lat_join("duh", "si", 2, 1), "Dokzi")
         self.assertIsNone(_g2_ih_lat_join("duh", "xx", 1, 1))
         self.assertEqual(_g2_ih_lat_join("duh", "ti", 1, 1), "dogDi")
+        self.assertEqual(_g2_irreg_lat_join("rud", "rod", "ti", 1, 1), "roditi")
+        self.assertEqual(_g2_irreg_lat_join("i", "e", "anti", 1, 3), "yanti")
+        self.assertEqual(_g2_irreg_lat_join("as", "as", "anti", 1, 3), "santi")
+        self.assertEqual(_g2_irreg_lat_join("vac", "vac", "ti", 1, 1), "vakti")
+        self.assertEqual(_g2_irreg_lat_join("vid", "ved", "ti", 1, 1), "vetti")
+        self.assertEqual(_g2_irreg_lat_join("brU", "brav", "ti", 1, 1), "bravIti")
+        self.assertEqual(_g2_irreg_lat_join("SAs", "SAs", "anti", 1, 3), "SAsati")
+        self.assertEqual(_g2_irreg_lat_join("cakAs", "cakAs", "anti", 1, 3), "cakAsati")
+        self.assertEqual(_g2_irreg_lat_join("SAs", "SAs", "taH", 1, 2), "SizwaH")
+        self.assertEqual(_g2_irreg_lat_join("SAs", "SAs", "thaH", 2, 2), "SizWaH")
+        self.assertEqual(_g2_irreg_lat_join("SAs", "SAs", "tha", 2, 3), "SizWa")
+        self.assertEqual(_g2_irreg_lat_join("SAs", "SAs", "vaH", 3, 2), "SizvaH")
+        self.assertEqual(_g2_irreg_lat_join("SAs", "SAs", "maH", 3, 3), "SizmaH")
+        self.assertIsNone(_g2_plat_iti_join("rud", "rod", "xx", 1, 1))
         self.assertEqual(_g2_u_plot_join("yu", "tAt", 1, 1), "yutAt")
         self.assertEqual(_g2_u_plot_join("duh", "tAt", 1, 1), "dugDAt")
         self.assertEqual(_g2_u_plot_join("duh", "Ava", 3, 2), "dohAva")

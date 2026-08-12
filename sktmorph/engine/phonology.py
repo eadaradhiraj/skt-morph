@@ -128,8 +128,6 @@ def yam_cc_lang_stem(dhatu: str, antarganas: str) -> Optional[str]:
 def yam_cc_future_stem(dhatu: str, antarganas: str) -> Optional[str]:
     if dhatu == "yam" and not is_gawadi(antarganas):
         return "yaMsy"
-    if dhatu == "dA":
-        return "dAsy"
     return None
 
 
