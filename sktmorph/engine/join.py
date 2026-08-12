@@ -182,7 +182,7 @@ def _g2_u_lat_join(
         if ending == "anti":
             return body + "uvanti"
         if ending == "si":
-            return body + "uze"
+            return body + "avIzi"
         if ending == "thaH" and purusha == 2 and vacana == 2:
             return body + "uTaH"
         if ending == "tha" and purusha == 2 and vacana == 3:
@@ -211,7 +211,7 @@ def _g2_u_lat_join(
         return body + "uTaH"
     if ending == "tha" and purusha == 2 and vacana == 3:
         return body + "uTa"
-    if ending == "mi" and purusha == 1 and vacana == 1:
+    if ending == "mi" and purusha == 3 and vacana == 1:
         return body + "Omi"
     if ending in ("vaH", "maH") and purusha == 3:
         return body + "u" + ending
@@ -358,32 +358,46 @@ def _g2_ih_lat_join(
     if ending == "taH" and purusha == 1 and vacana == 2:
         return stem + "aH"
     if ending == "anti" and purusha == 1 and vacana == 3:
-        return stem + "anti"
+        return dhatu + "anti"
     if ending == "si" and purusha == 2 and vacana == 1:
-        return guna + "Di"
+        if dhatu == "duh":
+            return "Dokzi"
+        if dhatu == "dih":
+            return "Dekzi"
+        if dhatu == "lih":
+            return "lekzi"
     if ending == "thaH" and purusha == 2 and vacana == 2:
-        return guna + "DaH"
+        return stem + "aH"
     if ending == "tha" and purusha == 2 and vacana == 3:
-        return guna + "Da"
+        return stem + "a"
     if ending == "mi" and purusha == 3 and vacana == 1:
         return guna + "mi"
     if ending == "vaH" and purusha == 3 and vacana == 2:
-        return guna + "vaH"
+        return dhatu + "vaH"
     if ending == "maH" and purusha == 3 and vacana == 3:
-        return guna + "maH"
+        return dhatu + "maH"
     return None
+
+
+def _g2_a_lat_body(dhatu: str) -> str:
+    if len(dhatu) == 3 and dhatu.endswith("A"):
+        return dhatu[:2]
+    return dhatu[0]
 
 
 def _g2_a_lat_join(dhatu: str, ending: str, purusha: int, vacana: int) -> Optional[str]:
     if dhatu not in _G2_A_LAT_ROOTS:
         return None
-    body = dhatu[0]
+    body = _g2_a_lat_body(dhatu)
     if ending == "anti" and purusha == 1 and vacana == 3:
         if len(dhatu) == 3 and dhatu.endswith("A"):
             return dhatu[:-1] + "Anti"
         return body + "Anti"
-    if ending in ("TaH", "Ta") and purusha == 2 and vacana == 2:
-        return body + "AT" + ending[1:]
+    if ending in ("TaH", "Ta") and purusha == 2:
+        if ending == "TaH" and vacana == 2:
+            return body + "ATaH"
+        if ending == "Ta" and vacana == 3:
+            return body + "ATa"
     if ending == "thaH" and purusha == 2 and vacana == 2:
         return body + "ATaH"
     if ending == "tha" and purusha == 2 and vacana == 3:
