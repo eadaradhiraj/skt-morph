@@ -18,6 +18,7 @@ from .phonology import (
     g6_vidhilin_stem,
     g6_lang_stem,
     g2_vidhilin_stem,
+    g7_vidhilin_stem,
     g9_vidhilin_stem,
     g9_n_lang_base,
     g9_uses_n_infix,
@@ -647,10 +648,11 @@ def derive_stem(
             root = base + "uy"
         elif gana == NI_GANA:
             root = g9_vidhilin_stem(dhatu, antarganas)
-        elif gana == N_GANA and dhatu.endswith("D"):
-            root = dhatu[:-1] + "nD"
-        else:
-            root = guna if cgana not in THEMATIC_GANAS else thematic_present_base(dhatu, cgana, aupadeshik)
+        elif gana == N_GANA:
+            if dhatu.endswith("D"):
+                root = dhatu[:-1] + "nD"
+            else:
+                root = g7_vidhilin_stem(dhatu)
         _append_step(steps, root, ["3.4.104"], "vidhilin_stem")
         return root, None, steps
 

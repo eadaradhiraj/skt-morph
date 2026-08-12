@@ -580,6 +580,31 @@ def g6_vidhilin_stem(dhatu: str) -> str:
     return g6_plot_base(dhatu)
 
 
+_G7_VIDHILIN_INFIX = (
+    ("id", "ind"),
+    ("ic", "iYc"),
+    ("ud", "und"),
+    ("uj", "uYj"),
+    ("fd", "fnd"),
+    ("ft", "fnt"),
+    ("iz", "iMz"),
+    ("fh", "fMh"),
+    ("ij", "iYj"),
+    ("fj", "fYj"),
+    ("fc", "fYc"),
+)
+
+
+def g7_vidhilin_stem(dhatu: str) -> str:
+    """Gaṇa-7 vidhilin stem (n/Y/M infix; often without guṇa)."""
+    if dhatu.endswith(("Ms", "nd")):
+        return dhatu
+    for suffix, repl in _G7_VIDHILIN_INFIX:
+        if dhatu.endswith(suffix):
+            return dhatu[: -len(suffix)] + repl
+    return apply_guna_to_stem(dhatu)
+
+
 def g9_vidhilin_stem(dhatu: str, antarganas: str = "") -> str:
     """Gaṇa-9 vidhilin stem before -yAt- etc."""
     if dhatu in _G9_VIDHILIN_BASE:

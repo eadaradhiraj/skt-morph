@@ -297,6 +297,7 @@ class TestEngineCorpusCoverage(unittest.TestCase):
             g2_vidhilin_stem,
             g6_present_base,
             g6_vidhilin_stem,
+            g7_vidhilin_stem,
             g9_vidhilin_stem,
             g6_plot_base,
             g6_lang_base,
@@ -451,6 +452,10 @@ class TestEngineCorpusCoverage(unittest.TestCase):
         self.assertEqual(g2_vidhilin_stem("han"), "han")
         self.assertEqual(g6_vidhilin_stem("fz"), "fz")
         self.assertEqual(g6_vidhilin_stem("Dru"), "Dru")
+        self.assertEqual(g7_vidhilin_stem("Bid"), "Bind")
+        self.assertEqual(g7_vidhilin_stem("ric"), "riYc")
+        self.assertEqual(g7_vidhilin_stem("und"), "und")
+        self.assertEqual(g7_vidhilin_stem("ruD"), "roD")
         self.assertEqual(g9_vidhilin_stem("kF"), "kfRI")
         self.assertEqual(g9_vidhilin_stem("mI"), "mInI")
         self.assertEqual(g9_vidhilin_stem("banD"), "baDnI")
