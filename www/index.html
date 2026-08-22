@@ -74,33 +74,37 @@ tabs.forEach(t=>{
   };
 });
 
+function asObj(m){ if(!m) return {}; if(m instanceof Map) return Object.fromEntries(m); return m; }
+function strfy(v){ return JSON.stringify(v, (k,x)=> x instanceof Map ? Object.fromEntries(x) : x, 2); }
+
 document.getElementById('btn-analyze').onclick=()=>{
   const w=document.getElementById('q').value.trim();
   if(!w) return;
   const res=analyze(w);
-  document.getElementById('out-analyze').textContent=JSON.stringify(res,null,2);
+  document.getElementById('out-analyze').textContent=strfy(res);
 };
 document.getElementById('btn-search').onclick=()=>{
   const w=document.getElementById('q').value.trim();
   const res=search(w,10);
-  document.getElementById('out-analyze').textContent=JSON.stringify(res,null,2);
+  document.getElementById('out-analyze').textContent=strfy(res);
 };
 document.getElementById('btn-verb').onclick=()=>{
   const d=document.getElementById('dhatu').value.trim()||'BU';
   const l=document.getElementById('lakara').value;
   const res=generate_verb_paradigm(d,l);
-  document.getElementById('out-verb').textContent=JSON.stringify(res,null,2);
+  document.getElementById('out-verb').textContent=strfy(res);
 };
 document.getElementById('btn-verb1').onclick=()=>{
   const d=document.getElementById('dhatu').value.trim()||'BU';
   const l=document.getElementById('lakara').value;
   const res=generate_verb(d,l,1,1);
-  document.getElementById('out-verb').textContent=JSON.stringify(res,null,2);
+  document.getElementById('out-verb').textContent=strfy(res);
 };
 function renderDeclension(res){
   const el=document.getElementById('out-noun');
-  if(!res || !res.declension){
-    const raw = res ? JSON.stringify(res,null,2) : 'null';
+  const decl=asObj(res?.declension);
+  if(!res || !decl || Object.keys(decl).length===0){
+    const raw = res ? strfy(res) : 'null';
     el.innerHTML = '<div style="color:#900">No declension for <b>'+document.getElementById('nbase').value+'</b> ('+document.getElementById('linga').value+')</div>'+
       '<div style="font-size:.85em;color:#666">Try: rAma (a-pum), sItA (A-stri), hari (i-pum), nadi (I-stri), guru (u-pum), phala (a-nap), rAjan (an-pum), manas (as-nap), bhavat (at-pum)</div>'+
       '<pre>'+raw+'</pre>';
@@ -110,27 +114,28 @@ function renderDeclension(res){
   let html='<div style="margin:.5rem 0">Stem: <b>'+res.stem+'</b> ('+res.linga+')</div>';
   html+='<table border=1 cellpadding=6 style="border-collapse:collapse;width:100%"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
   for(const v of order){
-    const row=res.declension[v]||[];
+    const row=decl[v]||[];
     html+='<tr><td>'+v+'</td>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
   }
-  html+='</table><details style="margin-top:.5rem"><summary>JSON</summary><pre>'+JSON.stringify(res,null,2)+'</pre></details>';
+  html+='</table><details style="margin-top:.5rem"><summary>JSON</summary><pre>'+strfy(res)+'</pre></details>';
   el.innerHTML=html;
 }
 document.getElementById('btn-noun').onclick=()=>{
   const b=document.getElementById('nbase').value.trim()||'rAma';
   const l=document.getElementById('linga').value;
   let res=generate_noun(b,l);
-  if(!res || !res.declension) res=generate_pronoun(b,l);
-  if(res && res.table && !res.declension){ // pronoun shape
+  if(!res || !asObj(res.declension) || Object.keys(asObj(res.declension)).length===0) res=generate_pronoun(b,l);
+  if(res && res.table && !res.declension){
+    const tbl=asObj(res.table);
     const el=document.getElementById('out-noun');
     let html='<div>Pratipadika: <b>'+res.base+'</b> ('+res.linga+')</div>';
     html+='<table border=1 cellpadding=6 style="border-collapse:collapse"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
     const order=["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI"];
     for(const v of order){
-      const row=res.table[v]||[];
+      const row=tbl[v]||[];
       html+='<tr><td>'+v+'</td>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
     }
-    html+='</table><pre>'+JSON.stringify(res,null,2)+'</pre>';
+    html+='</table><pre>'+strfy(res)+'</pre>';
     el.innerHTML=html;
     return;
   }
@@ -143,26 +148,24 @@ document.getElementById('btn-krdanta').onclick=()=>{
     const res=generate_krdanta(d,p);
     const el=document.getElementById('out-krdanta');
     if(!res || !res.forms || res.forms.length===0 || (res.forms[0]==="")){
-      el.innerHTML='<div style="color:#900">No participle for <b>'+d+'</b> + '+p+'</div><div style="font-size:.85em;color:#666">Try: BU,gam,pac with kta/ktavatu/tumun/ktvA/Satf/SAnac (SLP1). Use dhatu form without prefix, e.g. BU not bhavati.</div><pre>'+JSON.stringify(res,null,2)+'</pre>';
+      el.innerHTML='<div style="color:#900">No participle for <b>'+d+'</b> + '+p+'</div><div style="font-size:.85em;color:#666">Try: BU,gam,pac with kta/ktavatu/tumun/ktvA/Satf/SAnac (SLP1). Use dhatu form without prefix, e.g. BU not bhavati.</div><pre>'+strfy(res)+'</pre>';
       return;
     }
-    // show base + declined via subanta if available
     let html='<div>Base: <b>'+res.forms[0]+'</b> ('+d+' + '+p+')</div>';
-    // try to decline the participle as a-stem for demo
     try{
       const base=res.forms[0].replace(/H$/,'').replace(/M$/,'');
       const decl=generate_noun(base, 'pum');
-      if(decl && decl.declension){
-        html+='<div style="margin:.5rem 0">Declined (pum, a-stem): '+decl.declension['prathamA'].join(' / ')+'</div>';
+      const d2=asObj(decl?.declension);
+      if(d2 && d2['prathamA']){
+        html+='<div style="margin:.5rem 0">Declined (pum, a-stem): '+d2['prathamA'].join(' / ')+'</div>';
       }
     }catch(e){}
-    html+='<pre>'+JSON.stringify(res,null,2)+'</pre>';
+    html+='<pre>'+strfy(res)+'</pre>';
     el.innerHTML=html;
   }catch(e){
     document.getElementById('out-krdanta').textContent='Error: '+e + ' — try BU + kta';
   }
 };
-// demo defaults
 document.getElementById('out-analyze').textContent='Try: rAmaH → Analyze,  BU → Search,  dhatu BU plat → Conjugations';
 </script>
 </body>
