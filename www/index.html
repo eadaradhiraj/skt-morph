@@ -151,8 +151,10 @@ document.getElementById('btn-krdanta').onclick=()=>{
       el.innerHTML='<div style="color:#900">No participle for <b>'+d+'</b> + '+p+'</div><div style="font-size:.85em;color:#666">Try: BU,gam,pac with kta/ktavatu/tumun/ktvA/Satf/SAnac (SLP1). Use dhatu form without prefix, e.g. BU not bhavati.</div><pre>'+strfy(res)+'</pre>';
       return;
     }
+    const indecl=["ktvA","lyap","tumun","RamuL","am"];
     let html='<div>Base: <b>'+res.forms[0]+'</b> ('+d+' + '+p+')</div>';
-    try{
+    if(indecl.includes(p)) html+='<div style="font-size:.85em;color:#666">Indeclinable (avyaya) — not declined</div>';
+    else try{
       const base=res.forms[0].replace(/H$/,'').replace(/M$/,'');
       const decl=generate_noun(base, 'pum');
       const d2=asObj(decl?.declension);
