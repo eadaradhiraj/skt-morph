@@ -1,19 +1,117 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><title>skt-morph WASM demo</title></head>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>skt-morph WASM</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}
+nav button{margin-right:.5rem;padding:.4rem .8rem;border:1px solid #ccc;background:#f5f5f5;cursor:pointer}
+nav button.active{background:#222;color:#fff}
+section{margin-top:1rem;border:1px solid #ddd;padding:1rem}
+pre{background:#f7f7f7;padding:.8rem;overflow:auto;white-space:pre-wrap}
+input,select{padding:.4rem;margin:.2rem}
+</style>
+</head>
 <body>
-<h1>skt-morph WASM</h1>
-<input id="q" placeholder="rAmaH / gacCati (SLP1)" style="width:300px">
-<button id="btn">Analyze</button>
-<pre id="out"></pre>
+<h1>skt-morph <small>WASM — conjugations · participles · declensions</small></h1>
+<nav>
+<button id="tab-analyze" class="active">Analyze / Search</button>
+<button id="tab-verb">Conjugations</button>
+<button id="tab-noun">Declensions</button>
+<button id="tab-krdanta">Participles</button>
+</nav>
+
+<section id="sec-analyze">
+  <input id="q" placeholder="rAmaH / gacCati / Bavati (SLP1)" style="width:360px">
+  <button id="btn-analyze">Analyze</button>
+  <button id="btn-search">Search prefix</button>
+  <pre id="out-analyze"></pre>
+</section>
+
+<section id="sec-verb" hidden>
+  <input id="dhatu" placeholder="dhatu e.g. BU or 01.0001" value="BU">
+  <select id="lakara">
+    <option value="plat">plat (lat)</option>
+    <option value="plan">plan (laṅ)</option>
+    <option value="plot">plot (loṭ)</option>
+    <option value="plrt">plrt (lṛṭ)</option>
+    <option value="pvidhilin">pvidhilin</option>
+    <option value="plit">plit (liṭ)</option>
+  </select>
+  <button id="btn-verb">Paradigm (9)</button>
+  <button id="btn-verb1">Single (1sg)</button>
+  <pre id="out-verb"></pre>
+</section>
+
+<section id="sec-noun" hidden>
+  <input id="nbase" placeholder="prātipadika e.g. rAma" value="rAma">
+  <select id="linga"><option>pum</option><option>stri</option><option>nap</option></select>
+  <button id="btn-noun">Decline</button>
+  <pre id="out-noun"></pre>
+</section>
+
+<section id="sec-krdanta" hidden>
+  <input id="kdhatu" placeholder="dhatu e.g. BU" value="BU">
+  <select id="pratyaya">
+    <option>kta</option><option>ktavatu</option><option>tumun</option><option>ktvA</option><option>lyap</option><option>Satf</option><option>SAnac</option><option>lyuw</option><option>tavya</option><option>anIyar</option>
+  </select>
+  <button id="btn-krdanta">Generate</button>
+  <pre id="out-krdanta"></pre>
+</section>
+
 <script type="module">
-import init, { analyze, generate_verb, generate_noun } from '../pkg/skt_morph.js';
+import init, { analyze, search, generate_verb, generate_verb_paradigm, generate_noun, generate_pronoun, generate_krdanta } from '../pkg/skt_morph.js';
 await init();
-document.getElementById('btn').onclick = () => {
-  const w = document.getElementById('q').value;
-  const res = analyze(w);
-  document.getElementById('out').textContent = JSON.stringify(res, null, 2);
+
+const tabs = ['analyze','verb','noun','krdanta'];
+tabs.forEach(t=>{
+  document.getElementById('tab-'+t).onclick=()=>{
+    tabs.forEach(x=>{
+      document.getElementById('sec-'+x).hidden = x!==t;
+      document.getElementById('tab-'+x).classList.toggle('active', x===t);
+    });
+  };
+});
+
+document.getElementById('btn-analyze').onclick=()=>{
+  const w=document.getElementById('q').value.trim();
+  if(!w) return;
+  const res=analyze(w);
+  document.getElementById('out-analyze').textContent=JSON.stringify(res,null,2);
 };
+document.getElementById('btn-search').onclick=()=>{
+  const w=document.getElementById('q').value.trim();
+  const res=search(w,10);
+  document.getElementById('out-analyze').textContent=JSON.stringify(res,null,2);
+};
+document.getElementById('btn-verb').onclick=()=>{
+  const d=document.getElementById('dhatu').value.trim()||'BU';
+  const l=document.getElementById('lakara').value;
+  const res=generate_verb_paradigm(d,l);
+  document.getElementById('out-verb').textContent=JSON.stringify(res,null,2);
+};
+document.getElementById('btn-verb1').onclick=()=>{
+  const d=document.getElementById('dhatu').value.trim()||'BU';
+  const l=document.getElementById('lakara').value;
+  const res=generate_verb(d,l,1,1);
+  document.getElementById('out-verb').textContent=JSON.stringify(res,null,2);
+};
+document.getElementById('btn-noun').onclick=()=>{
+  const b=document.getElementById('nbase').value.trim()||'rAma';
+  const l=document.getElementById('linga').value;
+  let res=generate_noun(b,l);
+  if(!res || res.declension===undefined) res=generate_pronoun(b,l);
+  document.getElementById('out-noun').textContent=JSON.stringify(res,null,2);
+};
+document.getElementById('btn-krdanta').onclick=()=>{
+  const d=document.getElementById('kdhatu').value.trim()||'BU';
+  const p=document.getElementById('pratyaya').value;
+  const res=generate_krdanta(d,p);
+  document.getElementById('out-krdanta').textContent=JSON.stringify(res,null,2);
+};
+// demo defaults
+document.getElementById('out-analyze').textContent='Try: rAmaH → Analyze,  BU → Search,  dhatu BU plat → Conjugations';
 </script>
 </body>
 </html>
