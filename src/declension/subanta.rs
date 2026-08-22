@@ -23,7 +23,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("U".to_string(),"pum".to_string()), vec![vec!["UH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["Um".to_string(),"U".to_string(),"Un".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["O".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("U".to_string(),"stri".to_string()), vec![vec!["UH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["Um".to_string(),"U".to_string(),"UH".to_string(),],vec!["vA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["vE,ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm,O".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("U".to_string(),"nap".to_string()), vec![vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"UnoH".to_string(),"UnAm".to_string(),],vec!["Uni".to_string(),"UnoH".to_string(),"Uzu".to_string(),],vec!["U,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
-  m.insert(("f".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["aram".to_string(),"arO".to_string(),"Fn".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
+  // f-stem: agent (kartf-type, Pāṇini 7.1.9) -> Aram; kinship (pitf) is handled as exception in generate()
+  m.insert(("f".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["Aram".to_string(),"arO".to_string(),"Fn".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
   m.insert(("f".to_string(),"stri".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["aram".to_string(),"arO".to_string(),"FH".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
   m.insert(("f".to_string(),"nap".to_string()), vec![vec!["f".to_string(),"fnI".to_string(),"Fni".to_string(),],vec!["f".to_string(),"fnI".to_string(),"Fni".to_string(),],vec!["fnA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["fne".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["fnaH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["fnaH".to_string(),"fnoH".to_string(),"FnAm".to_string(),],vec!["fni".to_string(),"fnoH".to_string(),"fzu".to_string(),],vec!["f,ar".to_string(),"fnI".to_string(),"Fni".to_string(),],]);
   m.insert(("in".to_string(),"pum".to_string()), vec![vec!["I".to_string(),"inO".to_string(),"inaH".to_string(),],vec!["inam".to_string(),"inO".to_string(),"inaH".to_string(),],vec!["inA".to_string(),"iByAm".to_string(),"iBiH".to_string(),],vec!["ine".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"inoH".to_string(),"inAm".to_string(),],vec!["ini".to_string(),"inoH".to_string(),"izu".to_string(),],vec!["in".to_string(),"inO".to_string(),"inaH".to_string(),],]);
@@ -60,8 +61,13 @@ fn apply_natva(word_stem: &str, suffix: &str) -> String {
     if trigger { suffix.replacen('n', "R", 1) } else { suffix.to_string() }
 }
 
+const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf","svasf","naptf"];
+
 pub fn generate(base: &str, linga: &str) -> Option<Declension> {
-    let paradigms = paradigms();
+    let mut paradigms = paradigms();
+    // Pāṇini 7.1.9 exception: kinship f-stems keep short a in acc.sg (pitaram), agents take vṛddhi (kartAram <- netAram)
+    // We store agent as default (Aram); if kinship, patch dvitīyā eka to aram
+    let is_kinship = F_KINSHIP.contains(&base);
     // try candidates to handle bases passed as declined forms (e.g. rAmaH)
     let cands = [
         base.to_string(),
@@ -83,7 +89,13 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
                 best_ending = ending.clone();
             }
         }
-        if let Some((_, table)) = best {
+        if let Some((_, mut table)) = best {
+            // Pāṇini exception: kinship keeps short a
+            if is_kinship && best_ending == "f" && linga == "pum" {
+                if table.len() > 1 && !table[1].is_empty() {
+                    table[1][0] = "aram".to_string();
+                }
+            }
             let base_no_end = &cand[..cand.len()-best_ending.len()];
             let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
             let mut decl = std::collections::HashMap::new();
