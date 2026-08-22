@@ -99,7 +99,13 @@ document.getElementById('btn-verb1').onclick=()=>{
 };
 function renderDeclension(res){
   const el=document.getElementById('out-noun');
-  if(!res || !res.declension){ el.textContent=JSON.stringify(res,null,2); return; }
+  if(!res || !res.declension){
+    const raw = res ? JSON.stringify(res,null,2) : 'null';
+    el.innerHTML = '<div style="color:#900">No declension for <b>'+document.getElementById('nbase').value+'</b> ('+document.getElementById('linga').value+')</div>'+
+      '<div style="font-size:.85em;color:#666">Try: rAma (a-pum), sItA (A-stri), hari (i-pum), nadi (I-stri), guru (u-pum), phala (a-nap), rAjan (an-pum), manas (as-nap), bhavat (at-pum)</div>'+
+      '<pre>'+raw+'</pre>';
+    return;
+  }
   const order=["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
   let html='<div style="margin:.5rem 0">Stem: <b>'+res.stem+'</b> ('+res.linga+')</div>';
   html+='<table border=1 cellpadding=6 style="border-collapse:collapse;width:100%"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
@@ -133,8 +139,28 @@ document.getElementById('btn-noun').onclick=()=>{
 document.getElementById('btn-krdanta').onclick=()=>{
   const d=document.getElementById('kdhatu').value.trim()||'BU';
   const p=document.getElementById('pratyaya').value;
-  const res=generate_krdanta(d,p);
-  document.getElementById('out-krdanta').textContent=JSON.stringify(res,null,2);
+  try{
+    const res=generate_krdanta(d,p);
+    const el=document.getElementById('out-krdanta');
+    if(!res || !res.forms || res.forms.length===0 || (res.forms[0]==="")){
+      el.innerHTML='<div style="color:#900">No participle for <b>'+d+'</b> + '+p+'</div><div style="font-size:.85em;color:#666">Try: BU,gam,pac with kta/ktavatu/tumun/ktvA/Satf/SAnac (SLP1). Use dhatu form without prefix, e.g. BU not bhavati.</div><pre>'+JSON.stringify(res,null,2)+'</pre>';
+      return;
+    }
+    // show base + declined via subanta if available
+    let html='<div>Base: <b>'+res.forms[0]+'</b> ('+d+' + '+p+')</div>';
+    // try to decline the participle as a-stem for demo
+    try{
+      const base=res.forms[0].replace(/H$/,'').replace(/M$/,'');
+      const decl=generate_noun(base, 'pum');
+      if(decl && decl.declension){
+        html+='<div style="margin:.5rem 0">Declined (pum, a-stem): '+decl.declension['prathamA'].join(' / ')+'</div>';
+      }
+    }catch(e){}
+    html+='<pre>'+JSON.stringify(res,null,2)+'</pre>';
+    el.innerHTML=html;
+  }catch(e){
+    document.getElementById('out-krdanta').textContent='Error: '+e + ' — try BU + kta';
+  }
 };
 // demo defaults
 document.getElementById('out-analyze').textContent='Try: rAmaH → Analyze,  BU → Search,  dhatu BU plat → Conjugations';
