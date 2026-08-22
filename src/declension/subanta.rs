@@ -97,6 +97,31 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(Declension { stem: cand.clone(), linga: linga.to_string(), declension: decl });
         }
     }
+    // Fallback: foreign/unknown ending — match ending sound by last char, otherwise use a-stem
+    // e.g. apolo (o) -> treat as a-stem with base "apol" + a-suffixes => apolaH
+    let fallback_key = if linga == "stri" { ("A","stri") } else { ("a","pum") };
+    if let Some(table) = paradigms.get(&(fallback_key.0.to_string(), fallback_key.1.to_string())) {
+        let base_no_end = if base.chars().last().map_or(false, |c| "aAiIuUeEoO".contains(c)) {
+            &base[..base.len()-1]
+        } else {
+            base
+        };
+        if !base_no_end.is_empty() {
+            let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
+            let mut decl = std::collections::HashMap::new();
+            for (i, vib) in vibhaktis.iter().enumerate() {
+                let mut row: Vec<String> = Vec::new();
+                for suffix_group in &table[i] {
+                    for s in suffix_group.split(',') {
+                        let nat = apply_natva(base_no_end, s);
+                        row.push(format!("{}{}", base_no_end, nat));
+                    }
+                }
+                decl.insert(vib.to_string(), row);
+            }
+            return Some(Declension { stem: base.to_string(), linga: linga.to_string(), declension: decl });
+        }
+    }
     None
 }
 
