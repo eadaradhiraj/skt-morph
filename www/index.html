@@ -97,12 +97,38 @@ document.getElementById('btn-verb1').onclick=()=>{
   const res=generate_verb(d,l,1,1);
   document.getElementById('out-verb').textContent=JSON.stringify(res,null,2);
 };
+function renderDeclension(res){
+  const el=document.getElementById('out-noun');
+  if(!res || !res.declension){ el.textContent=JSON.stringify(res,null,2); return; }
+  const order=["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
+  let html='<div style="margin:.5rem 0">Stem: <b>'+res.stem+'</b> ('+res.linga+')</div>';
+  html+='<table border=1 cellpadding=6 style="border-collapse:collapse;width:100%"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
+  for(const v of order){
+    const row=res.declension[v]||[];
+    html+='<tr><td>'+v+'</td>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
+  }
+  html+='</table><details style="margin-top:.5rem"><summary>JSON</summary><pre>'+JSON.stringify(res,null,2)+'</pre></details>';
+  el.innerHTML=html;
+}
 document.getElementById('btn-noun').onclick=()=>{
   const b=document.getElementById('nbase').value.trim()||'rAma';
   const l=document.getElementById('linga').value;
   let res=generate_noun(b,l);
-  if(!res || res.declension===undefined) res=generate_pronoun(b,l);
-  document.getElementById('out-noun').textContent=JSON.stringify(res,null,2);
+  if(!res || !res.declension) res=generate_pronoun(b,l);
+  if(res && res.table && !res.declension){ // pronoun shape
+    const el=document.getElementById('out-noun');
+    let html='<div>Pratipadika: <b>'+res.base+'</b> ('+res.linga+')</div>';
+    html+='<table border=1 cellpadding=6 style="border-collapse:collapse"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
+    const order=["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI"];
+    for(const v of order){
+      const row=res.table[v]||[];
+      html+='<tr><td>'+v+'</td>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
+    }
+    html+='</table><pre>'+JSON.stringify(res,null,2)+'</pre>';
+    el.innerHTML=html;
+    return;
+  }
+  renderDeclension(res);
 };
 document.getElementById('btn-krdanta').onclick=()=>{
   const d=document.getElementById('kdhatu').value.trim()||'BU';

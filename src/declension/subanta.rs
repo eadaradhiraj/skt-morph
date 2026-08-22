@@ -40,34 +40,64 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
 }
 
 
-pub fn generate(base: &str, linga: &str) -> Option<Declension> {
-    // find longest matching ending
-    let paradigms = paradigms();
-    let mut best: Option<(String, Vec<Vec<String>>)> = None;
-    let mut best_len = 0;
-    let mut best_ending = String::new();
-    for ((ending, l), table) in &paradigms {
-        if l != linga { continue; }
-        if base.ends_with(ending) && ending.len() > best_len {
-            best = Some((ending.clone(), table.clone()));
-            best_len = ending.len();
-            best_ending = ending.clone();
-        }
+
+fn apply_natva(word_stem: &str, suffix: &str) -> String {
+    if !suffix.contains('n') { return suffix.to_string(); }
+    let word = format!("{}{}", word_stem, suffix);
+    let n_pos = suffix.find('n').unwrap();
+    let full_n_pos = word_stem.len() + n_pos;
+    if full_n_pos == word.len() - 1 { return suffix.to_string(); }
+    let blockers: std::collections::HashSet<char> = ['c','C','j','J','Y','S','w','W','q','Q','R','t','T','d','D','l','s','S'].iter().cloned().collect();
+    let mut trigger = false;
+    for (i,ch) in word.chars().enumerate() {
+        if i >= full_n_pos { break; }
+        if matches!(ch, 'r'|'f'|'F'|'z') { trigger = true; }
+        else if trigger && blockers.contains(&ch) { trigger = false; }
     }
-    let (ending, table) = best?;
-    let base_no_end = &base[..base.len()-best_ending.len()];
-    let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
-    let mut decl = HashMap::new();
-    for (i, vib) in vibhaktis.iter().enumerate() {
-        let mut row: Vec<String> = Vec::new();
-        for suffix_group in &table[i] {
-            for s in suffix_group.split(',') {
-                row.push(format!("{}{}", base_no_end, s));
+    if trigger { suffix.replacen('n', "R", 1) } else { suffix.to_string() }
+}
+
+pub fn generate(base: &str, linga: &str) -> Option<Declension> {
+    let paradigms = paradigms();
+    // try candidates to handle bases passed as declined forms (e.g. rAmaH)
+    let cands = [
+        base.to_string(),
+        base.trim_end_matches('H').to_string(),
+        base.trim_end_matches('M').to_string(),
+        base.trim_end_matches("AH").to_string(),
+        base.trim_end_matches("AM").to_string(),
+    ];
+    for cand in cands {
+        if cand.is_empty() { continue; }
+        let mut best: Option<(String, Vec<Vec<String>>)> = None;
+        let mut best_len = 0;
+        let mut best_ending = String::new();
+        for ((ending, l), table) in &paradigms {
+            if l != linga { continue; }
+            if cand.ends_with(ending) && ending.len() > best_len {
+                best = Some((ending.clone(), table.clone()));
+                best_len = ending.len();
+                best_ending = ending.clone();
             }
         }
-        decl.insert(vib.to_string(), row);
+        if let Some((_, table)) = best {
+            let base_no_end = &cand[..cand.len()-best_ending.len()];
+            let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
+            let mut decl = std::collections::HashMap::new();
+            for (i, vib) in vibhaktis.iter().enumerate() {
+                let mut row: Vec<String> = Vec::new();
+                for suffix_group in &table[i] {
+                    for s in suffix_group.split(',') {
+                        let nat = apply_natva(base_no_end, s);
+                        row.push(format!("{}{}", base_no_end, nat));
+                    }
+                }
+                decl.insert(vib.to_string(), row);
+            }
+            return Some(Declension { stem: cand.clone(), linga: linga.to_string(), declension: decl });
+        }
     }
-    Some(Declension { stem: base.to_string(), linga: linga.to_string(), declension: decl })
+    None
 }
 
 pub fn analyze(word: &str) -> Vec<HashMap<String, String>> {
@@ -77,9 +107,11 @@ pub fn analyze(word: &str) -> Vec<HashMap<String, String>> {
     for ((ending, linga), table) in &paradigms {
         for (vi, vib) in vibhaktis.iter().enumerate() {
             for (vac_idx, suffix_group) in table[vi].iter().enumerate() {
-                for suffix in suffix_group.split(',') {
-                    if word.len() > suffix.len() && word.ends_with(suffix) {
-                        let base_stripped = &word[..word.len()-suffix.len()];
+                for orig_suffix in suffix_group.split(',') {
+                    if word.len() <= orig_suffix.len() { continue; }
+                    let base_stripped = &word[..word.len()-orig_suffix.len()];
+                    let surface = apply_natva(base_stripped, orig_suffix);
+                    if word == format!("{}{}", base_stripped, surface) {
                         let pratipadika = format!("{}{}", base_stripped, ending);
                         let mut m = HashMap::new();
                         m.insert("pratipadika".to_string(), pratipadika);
