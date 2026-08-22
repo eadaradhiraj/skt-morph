@@ -1,4 +1,0 @@
-# MANIFEST.in
-include README.MD
-include LICENSE
-include sktmorph/data/*.sqlite

@@ -1,4 +1,12 @@
-# --- Python ---
+# --- Rust / WASM ---
+/target/
+/pkg/
+/wasm-pack.log
+/src/data/dhatus.json
+www/dist/
+www/node_modules/
+
+# --- Python (to be deleted after port) ---
 __pycache__/
 *.py[cod]
 *$py.class
@@ -30,25 +38,19 @@ ENV/
 bin/
 
 # --- SQLite Temporary Files ---
-# We WANT to track .sqlite, but NOT the temporary journal files
 *.sqlite-journal
 *.sqlite-shm
 *.sqlite-wal
 
-# --- Operating System ---
+# --- OS / IDE ---
 .DS_Store
 Thumbs.db
 .directory
-
-# --- IDEs ---
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Exclude raw data
 data_raw
-# Coverage
 .coverage
 htmlcov/
 *,cover

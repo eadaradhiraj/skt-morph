@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>skt-morph WASM demo</title></head>
+<body>
+<h1>skt-morph WASM</h1>
+<input id="q" placeholder="rAmaH / gacCati (SLP1)" style="width:300px">
+<button id="btn">Analyze</button>
+<pre id="out"></pre>
+<script type="module">
+import init, { analyze, generate_verb, generate_noun } from '../pkg/skt_morph.js';
+await init();
+document.getElementById('btn').onclick = () => {
+  const w = document.getElementById('q').value;
+  const res = analyze(w);
+  document.getElementById('out').textContent = JSON.stringify(res, null, 2);
+};
+</script>
+</body>
+</html>

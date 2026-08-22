@@ -1,0 +1,28 @@
+[package]
+name = "skt-morph"
+version = "0.1.0"
+edition = "2021"
+description = "Sanskrit morphology - conjugations, participles, declensions (WASM)"
+license = "MIT"
+repository = "https://github.com/eadaradhiraj/skt-morph"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde-wasm-bindgen = "0.6"
+js-sys = "0.3"
+
+[dependencies.web-sys]
+version = "0.3"
+features = ["console"]
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[profile.release]
+opt-level = 3
+lto = true

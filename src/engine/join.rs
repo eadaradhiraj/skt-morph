@@ -1,0 +1,62 @@
+//! Simplified port of engine/join.py
+//! Handles thematic join + augment + gana-specific overrides via stubs.
+//! Full 1874 LOC will be expanded, but this covers lat/lot/lrt/lang/vidhilin for gana 1,4,6 shuddha.
+
+use crate::engine::phonology::thematic_join;
+
+pub fn join_form(
+    stem: &str,
+    ending: &str,
+    gana: u8,
+    family: &str,
+    _purusha: u8,
+    _pada: &str,
+    augment: Option<&str>,
+    _dhatu: Option<&str>,
+    _vacana: u8,
+    _antarganas: Option<&str>,
+) -> String {
+    // Core join - simplified
+    let mut form = if stem.ends_with('a') && !ending.is_empty() {
+        // thematic
+        thematic_join(stem, ending)
+    } else {
+        format!("{}{}", stem, ending)
+    };
+
+    // augment handling (a- for lang)
+    if let Some(aug) = augment {
+        // Don't double-augment if stem already starts with vowel augment
+        if !form.starts_with('A') && !form.starts_with('E') && !form.starts_with('O') {
+            // gana 1 thematic: a + Bavati -> aBavat etc ; but for demo we prefix
+            // Real logic checks vowel_initial etc - simplified to prefix
+            if gana == 1 || gana == 6 || gana == 4 {
+                // If stem was vowel-initial, augment already merged
+                if !["a","A","i","I","u","U","e","E","o","O"].contains(&&stem[..1]) {
+                    form = format!("{}{}", aug, form);
+                }
+            } else {
+                form = format!("{}{}", aug, form);
+            }
+        }
+        // lang gemination etc omitted for now
+    }
+
+    // Special case: avoid double a (Bava + anti -> Bavanti not Bavaanti) already handled by thematic_join
+    form
+}
+
+pub fn join_variants(
+    stem: &str,
+    variants: &[String],
+    gana: u8,
+    family: &str,
+    purusha: u8,
+    pada: &str,
+    augment: Option<&str>,
+    dhatu: &str,
+    vacana: u8,
+    antarganas: &str,
+) -> Vec<String> {
+    variants.iter().map(|v| join_form(stem, v, gana, family, purusha, pada, augment, Some(dhatu), vacana, Some(antarganas))).collect()
+}
