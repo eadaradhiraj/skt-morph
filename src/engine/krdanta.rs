@@ -97,6 +97,12 @@ pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
     KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
 }
 
+pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
+    let (forms, _) = derive(dhatu_query, pratyaya);
+    let forms = if prefixes.is_empty() { forms } else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() };
+    KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
+}
+
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> (Vec<String>, Vec<EngineStep>) {
     let Some((dhatu, gana)) = load_dhatu(dhatu_query) else { return (vec![], vec![]); };
     let rule = pratyaya_rule(pratyaya);

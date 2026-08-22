@@ -39,8 +39,10 @@ input,select{padding:.4rem;margin:.2rem}
     <option value="pvidhilin">pvidhilin</option>
     <option value="plit">plit (liṭ)</option>
   </select>
+  <input id="verb-prefix" placeholder="prefixes e.g. pra,sam (optional)" style="width:180px">
   <button id="btn-verb">Paradigm (9)</button>
   <button id="btn-verb1">Single (1sg)</button>
+  <div style="font-size:.8em;color:#666">Upasarga sandhi: sam+BU→saMBU, pra+i→pre, pari+hf→parihar, etc. (Pāṇini)</div>
   <pre id="out-verb"></pre>
 </section>
 
@@ -56,12 +58,14 @@ input,select{padding:.4rem;margin:.2rem}
   <select id="pratyaya">
     <option>kta</option><option>ktavatu</option><option>tumun</option><option>ktvA</option><option>lyap</option><option>Satf</option><option>SAnac</option><option>lyuw</option><option>tavya</option><option>anIyar</option>
   </select>
+  <input id="krd-prefix" placeholder="prefixes e.g. sam, pra" style="width:160px">
   <button id="btn-krdanta">Generate</button>
+  <div style="font-size:.8em;color:#666">With prefix: sam+BU+ktvA → saMBUtvA (m→M), pra+i → pre</div>
   <pre id="out-krdanta"></pre>
 </section>
 
 <script type="module">
-import init, { analyze, search, generate_verb, generate_verb_paradigm, generate_noun, generate_pronoun, generate_krdanta } from '../pkg/skt_morph.js';
+import init, { analyze, search, generate_verb, generate_verb_with_prefix, generate_verb_paradigm, generate_verb_paradigm_with_prefix, generate_noun, generate_pronoun, generate_krdanta, generate_krdanta_with_prefix } from '../pkg/skt_morph.js';
 await init();
 
 const tabs = ['analyze','verb','noun','krdanta'];
@@ -91,13 +95,15 @@ document.getElementById('btn-search').onclick=()=>{
 document.getElementById('btn-verb').onclick=()=>{
   const d=document.getElementById('dhatu').value.trim()||'BU';
   const l=document.getElementById('lakara').value;
-  const res=generate_verb_paradigm(d,l);
+  const pref=document.getElementById('verb-prefix').value.trim();
+  const res=pref ? generate_verb_paradigm_with_prefix(d,l,pref) : generate_verb_paradigm(d,l);
   document.getElementById('out-verb').textContent=strfy(res);
 };
 document.getElementById('btn-verb1').onclick=()=>{
   const d=document.getElementById('dhatu').value.trim()||'BU';
   const l=document.getElementById('lakara').value;
-  const res=generate_verb(d,l,1,1);
+  const pref=document.getElementById('verb-prefix').value.trim();
+  const res=pref ? generate_verb_with_prefix(d,l,1,1,pref) : generate_verb(d,l,1,1);
   document.getElementById('out-verb').textContent=strfy(res);
 };
 function renderDeclension(res){
@@ -144,8 +150,9 @@ document.getElementById('btn-noun').onclick=()=>{
 document.getElementById('btn-krdanta').onclick=()=>{
   const d=document.getElementById('kdhatu').value.trim()||'BU';
   const p=document.getElementById('pratyaya').value;
+  const pref=document.getElementById('krd-prefix').value.trim();
   try{
-    const res=generate_krdanta(d,p);
+    const res=pref ? generate_krdanta_with_prefix(d,p,pref) : generate_krdanta(d,p);
     const el=document.getElementById('out-krdanta');
     if(!res || !res.forms || res.forms.length===0 || (res.forms[0]==="")){
       el.innerHTML='<div style="color:#900">No participle for <b>'+d+'</b> + '+p+'</div><div style="font-size:.85em;color:#666">Try: BU,gam,pac with kta/ktavatu/tumun/ktvA/Satf/SAnac (SLP1). Use dhatu form without prefix, e.g. BU not bhavati.</div><pre>'+strfy(res)+'</pre>';

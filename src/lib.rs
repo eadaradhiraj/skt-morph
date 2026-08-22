@@ -28,8 +28,22 @@ pub fn generate_verb(dhatu: &str, lakara: &str, purusha: u8, vacana: u8) -> JsVa
 }
 
 #[wasm_bindgen]
+pub fn generate_verb_with_prefix(dhatu: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str) -> JsValue {
+    let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    let result = engine::tinanta::generate_with_prefixes(dhatu, lakara, purusha, vacana, &prefs);
+    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
 pub fn generate_verb_paradigm(dhatu: &str, lakara: &str) -> JsValue {
     let result = engine::tinanta::generate_paradigm(dhatu, lakara);
+    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
+pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &str) -> JsValue {
+    let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    let result = engine::tinanta::generate_paradigm_with_prefixes(dhatu, lakara, &prefs);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
@@ -37,6 +51,13 @@ pub fn generate_verb_paradigm(dhatu: &str, lakara: &str) -> JsValue {
 #[wasm_bindgen]
 pub fn generate_krdanta(dhatu: &str, pratyaya: &str) -> JsValue {
     let result = engine::krdanta::generate(dhatu, pratyaya);
+    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
+pub fn generate_krdanta_with_prefix(dhatu: &str, pratyaya: &str, prefixes: &str) -> JsValue {
+    let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    let result = engine::krdanta::generate_with_prefixes(dhatu, pratyaya, &prefs);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 

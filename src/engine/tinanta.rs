@@ -36,6 +36,15 @@ pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> Tin
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
+pub fn generate_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> TinantaResult {
+    let (mut forms, _) = generate_all(dhatu_query, lakara, purusha, vacana);
+    if !prefixes.is_empty() {
+        forms = forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+    }
+    let (canon, _) = normalize_lakara(lakara);
+    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
+}
+
 pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> (Vec<String>, Vec<EngineStep>) {
     let Some((dhatu, gana, root_pada, tags, antarganas, aupadeshik)) = load_dhatu_info(dhatu_query) else {
         return (vec![], vec![]);
@@ -76,6 +85,18 @@ pub fn generate_paradigm(dhatu: &str, lakara: &str) -> Vec<ParadigmEntry> {
     for p in 1..=3 {
         for v in 1..=3 {
             let (forms, _) = generate_all(dhatu, lakara, p, v);
+            out.push(ParadigmEntry { purusha: p, vacana: v, forms });
+        }
+    }
+    out
+}
+
+pub fn generate_paradigm_with_prefixes(dhatu: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
+    let mut out = Vec::new();
+    for p in 1..=3 {
+        for v in 1..=3 {
+            let (forms, _) = generate_all(dhatu, lakara, p, v);
+            let forms = if prefixes.is_empty() { forms } else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() };
             out.push(ParadigmEntry { purusha: p, vacana: v, forms });
         }
     }

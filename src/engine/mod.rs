@@ -5,6 +5,7 @@ pub mod krdanta;
 pub mod lakara;
 pub mod lang_ya;
 pub mod phonology;
+pub mod prefix;
 pub mod redup;
 pub mod steps;
 pub mod stems;
