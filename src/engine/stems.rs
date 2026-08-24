@@ -225,7 +225,7 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
-    // Strip anubandha: N 7 ir (ruDir->ruD), YA divu->div / asu->as, AD hana->han etc.
+    // Strip anubandha: N 7 ir (ruDir->ruD), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
     let dhatu_clean: String = if dhatu == "divu" {
         "div".to_string()
     } else if gana == YA_GANA && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
@@ -234,6 +234,9 @@ pub fn derive_stem(
         dhatu[..dhatu.len()-2].to_string()
     } else if (gana == 2 || gana == 3) && dhatu.ends_with('a') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // hana~ -> han, vida~ -> vid (AD adds final a)
+        dhatu[..dhatu.len()-1].to_string()
+    } else if gana == 10 && dhatu.ends_with('a') && dhatu.len() > 3 && aupadeshik.contains('~') {
+        // 10th cura~ -> cur (strip final a)
         dhatu[..dhatu.len()-1].to_string()
     } else {
         dhatu.to_string()
@@ -257,6 +260,10 @@ pub fn derive_stem(
     if aya_present {
         let ps = bidadi_present_stem(dhatu);
         append_step(&mut steps, &ps, &["3.1.33"], "yap");
+        present_stem = Some(ps);
+    } else if is_causative(gana) {
+        let ps = causative_present_stem(dhatu);
+        append_step(&mut steps, &ps, &["3.1.25"], "causal");
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
         if let Some(yam) = yam_cc_present_stem(dhatu, antarganas) {
@@ -317,10 +324,6 @@ pub fn derive_stem(
     } else if gana == NI_GANA {
         let ps = format!("{}nA", dhatu);
         append_step(&mut steps, &ps, &["3.1.81"], "nI");
-        present_stem = Some(ps);
-    } else if is_causative(gana) {
-        let ps = causative_present_stem(dhatu);
-        append_step(&mut steps, &ps, &["3.1.25"], "causal");
         present_stem = Some(ps);
     } else {
         return (None, None, steps);
