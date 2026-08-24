@@ -323,6 +323,9 @@ pub fn g6_lang_stem(dhatu: &str) -> (String, Option<String>) {
 
 const CAUSATIVE_GUNA_AY: &[&str] = &["yam","cap","cah","rah","bal","jYap"];
 
+pub const _CAUSATIVE_LANG_BASE: &[&str] = &["ci","jYA","kfp","Gf","kFt","cyu","BU","lI","gUd","gup","uDras","Card","raMh","mfj"];
+pub const _CAUSATIVE_LANG_NO_AUG: &[&str] = &["uDras","Una","anDa","aMsa","aNka","aNga"];
+
 fn causative_aya_base(dhatu: &str) -> String {
     if CAUSATIVE_GUNA_AY.contains(&dhatu) { return format!("{}aya", apply_guna_to_stem(dhatu)); }
     if matches!(dhatu.chars().last(), Some('U'|'u'|'f'|'F')) { return format!("{}aya", apply_guna_to_stem(dhatu)); }
