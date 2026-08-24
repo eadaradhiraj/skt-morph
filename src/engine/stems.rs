@@ -226,7 +226,10 @@ pub fn derive_stem(
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
     // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
-    let dhatu_clean: String = if dhatu == "divu" {
+    let dhatu_clean: String = if dhatu.starts_with("qu") && dhatu.len() > 3 {
+        let rest = &dhatu[2..];
+        if rest.ends_with('Y') { rest[..rest.len()-1].to_string() } else { rest.to_string() }
+    } else if dhatu == "divu" {
         "div".to_string()
     } else if dhatu.ends_with("ir") && aupadeshik.contains('~') && dhatu.len() > 3 {
         // general ir anubandha: cyutir (01.0040 cyuti~r) -> cyut, ruDir (07) -> ruD etc.
