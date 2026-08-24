@@ -118,8 +118,11 @@ pub fn join_form(
             }
         }
     }
-    // G3 (3) reduplicated – juhu→juhoti, bibhI→bibheti
+    // G3 (3) reduplicated – juhu→juhoti, bibhI→bibheti, pF→piparti
     if gana == 3 {
+        if stem.ends_with("Ur") && ending == "ti" {
+            return format!("{}arti", &stem[..stem.len()-2]); // pipUr+ti→piparti
+        }
         if stem.ends_with('u') {
             let base = &stem[..stem.len()-1];
             match ending {
