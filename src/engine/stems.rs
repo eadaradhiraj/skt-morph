@@ -234,6 +234,9 @@ pub fn derive_stem(
     } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
         // kftI~ -> kft, etc. (strip final I/U/F anubandha)
         dhatu[..dhatu.len()-1].to_string()
+    } else if dhatu == "zaRu" {
+        // 08.0002 zaRu~ -> san (z->s, R->n) for sunoti gold
+        "san".to_string()
     } else if (gana == 5 || gana == 8) && dhatu.ends_with('Y') && dhatu.len() > 2 {
         // NU Y: zuY -> su (strip Y, z->s), ziY->si, SiY stays Si etc.
         let base = &dhatu[..dhatu.len()-1];
@@ -328,7 +331,13 @@ pub fn derive_stem(
         append_step(&mut steps, &guna, &["3.1.3"], "ad");
         present_stem = Some(guna.clone());
     } else if is_nu(gana) {
-        let ps = format!("{}{}", dhatu, if dhatu.ends_with('n') { "u" } else { "nu" });
+        let ps = if dhatu.ends_with('R') {
+            dhatu.to_string()
+        } else if dhatu.ends_with('n') {
+            format!("{}u", dhatu)
+        } else {
+            format!("{}nu", dhatu)
+        };
         append_step(&mut steps, &ps, &["3.1.75"], "nu");
         present_stem = Some(ps);
     } else if gana == N_GANA {

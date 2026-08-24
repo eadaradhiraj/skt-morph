@@ -170,6 +170,16 @@ pub fn join_form(
                 _ => {}
             }
         }
+        if stem.ends_with('R') {
+            match ending {
+                "ti" => return format!("{}oti", stem),
+                "taH" => return format!("{}taH", stem),
+                "nti" | "anti" => return format!("{}anti", stem),
+                "si" => return format!("{}oSi", stem),
+                "mi" => return format!("{}omi", stem),
+                _ => {}
+            }
+        }
     }
     // N (7) rudh → yunakti : handle Ru/Ra stems
     if gana == 7 {
