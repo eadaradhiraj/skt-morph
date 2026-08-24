@@ -239,6 +239,9 @@ pub fn derive_stem(
     } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
         // kftI~ -> kft, etc. (strip final I/U/F anubandha)
         dhatu[..dhatu.len()-1].to_string()
+    } else if dhatu.ends_with('f') && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
+        // jyutf~ -> jyut (strip final f anubandha)
+        dhatu[..dhatu.len()-1].to_string()
     } else if dhatu == "zaRu" {
         // 08.0002 zaRu~ -> san (z->s, R->n) for sunoti gold
         "san".to_string()
