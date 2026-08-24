@@ -57,6 +57,67 @@ pub fn join_form(
         // div (04.0001) lang double-y fix is handled via stems, but join also needs to avoid double y
         // Fall through to normal
     }
+    // AD (2,3) irregulars: vid/as/han/vac etc. (high-impact for gana02)
+    if gana == 2 || gana == 3 {
+        if let Some(d) = dhatu {
+            // han (02.??) – _join_han lat/lot/lang
+            if d == "han" {
+                if family == "lat" {
+                    match ending {
+                        "taH" => return "hataH".to_string(),
+                        "nti" | "anti" => return "Gnanti".to_string(),
+                        "si" => return "haMsi".to_string(),
+                        "thaH" | "TaH" => return "haTaH".to_string(),
+                        "tha" | "Ta" => return "haTa".to_string(),
+                        _ => {}
+                    }
+                }
+                if family == "lot" {
+                    match ending {
+                        "tu" => return "hantu".to_string(),
+                        "tAm" => return "hatAm".to_string(),
+                        "antu" => return "Gnantu".to_string(),
+                        _ => {}
+                    }
+                }
+                if family == "lang" {
+                    match ending {
+                        "an" => return "Gnan".to_string(),
+                        "atAm" => return "hatAm".to_string(),
+                        _ => {}
+                    }
+                }
+            }
+            if d == "vid" {
+                if family == "lat" {
+                    match (ending, purusha) {
+                        ("ti", 1) => return "vetti".to_string(),
+                        ("taH", 1) => return "vittaH".to_string(),
+                        ("si", 2) => return "vetTa".to_string(),
+                        _ => {}
+                    }
+                }
+            }
+            if d == "as" {
+                if family == "lat" {
+                    match ending {
+                        "taH" => return "staH".to_string(),
+                        "anti" | "nti" => return "santi".to_string(),
+                        "si" => return "asi".to_string(),
+                        _ => {}
+                    }
+                }
+            }
+            if d == "vac" {
+                match ending {
+                    "ti" => return "vakti".to_string(),
+                    "taH" => return "vaktaH".to_string(),
+                    "si" => return "vakzi".to_string(),
+                    _ => {}
+                }
+            }
+        }
+    }
     // NU gaṇa (5,8) – port of _join_nu (lat/lot/lrt core)
     if gana == 5 || gana == 8 {
         if family == "lrt" {
