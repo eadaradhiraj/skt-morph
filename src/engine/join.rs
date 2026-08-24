@@ -105,6 +105,25 @@ pub fn join_form(
             }
         }
     }
+    // NI (9) punāti / krIRAti – handle nA → RA / nA
+    if gana == 9 && stem.ends_with("nA") {
+        if family == "lrt" {
+            return format!("{}{}", stem, ending);
+        }
+        let base = &stem[..stem.len()-2];
+        let use_n = crate::engine::phonology::g9_uses_n_infix(dhatu.unwrap_or(""), _antarganas.unwrap_or(""));
+        let nasal = if use_n { "n" } else { "R" };
+        match ending {
+            "ti" => return format!("{}{}Ati", base, nasal),
+            "taH" => return format!("{}{}ItaH", base, nasal),
+            "anti" | "nti" => return format!("{}{}anti", base, nasal),
+            "si" => return format!("{}{}Asi", base, nasal),
+            "mi" => return format!("{}{}Ami", base, nasal),
+            "vaH" => return format!("{}{}IvaH", base, nasal),
+            "maH" => return format!("{}{}ImaH", base, nasal),
+            _ => {}
+        }
+    }
     // Core join - simplified
     let mut form = if stem.ends_with('a') && !ending.is_empty() {
         // thematic
