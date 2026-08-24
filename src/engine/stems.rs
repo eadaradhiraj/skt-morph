@@ -231,6 +231,8 @@ pub fn derive_stem(
         if rest.ends_with('Y') { rest[..rest.len()-1].to_string() } else { rest.to_string() }
     } else if dhatu == "divu" {
         "div".to_string()
+    } else if dhatu.starts_with('z') && dhatu.len() > 2 && (gana == 1 || gana == 6) {
+        format!("s{}", &dhatu[1..])
     } else if dhatu.ends_with("ir") && aupadeshik.contains('~') && dhatu.len() > 3 {
         // general ir anubandha: cyutir (01.0040 cyuti~r) -> cyut, ruDir (07) -> ruD etc.
         dhatu[..dhatu.len()-2].to_string()
