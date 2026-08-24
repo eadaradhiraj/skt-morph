@@ -57,6 +57,33 @@ pub fn join_form(
         // div (04.0001) lang double-y fix is handled via stems, but join also needs to avoid double y
         // Fall through to normal
     }
+    // NU gaṇa (5,8) – port of _join_nu (lat/lot/lrt core)
+    if gana == 5 || gana == 8 {
+        if family == "lrt" {
+            // future stems already like "to" etc, simple concat
+            if ending.is_empty() { return stem.to_string(); }
+            return format!("{}{}", stem, ending);
+        }
+        if stem.ends_with('u') {
+            let base = &stem[..stem.len()-1];
+            match ending {
+                "ti" => return format!("{}oti", base),
+                "taH" => return format!("{}taH", stem),
+                "nti" | "anti" => return format!("{}vanti", base),
+                "si" => return format!("{}oSi", base), // slp1 S for z
+                "thaH" | "TaH" => return format!("{}{}", stem, ending),
+                "tha" | "Ta" => return format!("{}{}", stem, ending),
+                "mi" => return format!("{}omi", base),
+                "vaH" => return format!("{}vaH", stem),
+                "maH" => return format!("{}maH", stem),
+                "tu" => return format!("{}otu", base),
+                "tAm" => return format!("{}tAm", stem),
+                "antu" | "vantu" => return format!("{}vantu", base),
+                "Ani" => return format!("{}avAni", base),
+                _ => {}
+            }
+        }
+    }
     // Core join - simplified
     let mut form = if stem.ends_with('a') && !ending.is_empty() {
         // thematic
