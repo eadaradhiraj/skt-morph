@@ -238,6 +238,9 @@ pub fn derive_stem(
         // NU Y: zuY -> su (strip Y, z->s), ziY->si, SiY stays Si etc.
         let base = &dhatu[..dhatu.len()-1];
         if base.starts_with('z') { format!("s{}", &base[1..]) } else { base.to_string() }
+    } else if (gana == 5 || gana == 8) && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
+        // NU u: tanu~ -> tan, vanu~ -> van etc.
+        dhatu[..dhatu.len()-1].to_string()
     } else if dhatu.len() > 3 && dhatu.chars().last().map_or(false, |c| c.is_ascii_uppercase()) && aupadeshik == format!("{}~", dhatu) {
         // general uppercase anubandha: qukrIY~? -> qukrI, etc. (strip last uppercase)
         dhatu[..dhatu.len()-1].to_string()
