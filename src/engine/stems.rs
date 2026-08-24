@@ -225,14 +225,17 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
-    // Strip anubandha: N-gaṇa 7 ir (ruDir->ruD), YA divu->div, etc.
-    let dhatu_stripped: String;
-    let dhatu: &str = if dhatu == "divu" {
-        "div"
+    // Strip anubandha: N 7 ir (ruDir->ruD), YA divu->div / asu->as etc.
+    let dhatu_clean: String = if dhatu == "divu" {
+        "div".to_string()
+    } else if gana == YA_GANA && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
+        dhatu[..dhatu.len()-1].to_string()
     } else if gana == N_GANA && dhatu.ends_with("ir") && aupadeshik.contains('~') {
-        dhatu_stripped = dhatu[..dhatu.len()-2].to_string();
-        &dhatu_stripped
-    } else { dhatu };
+        dhatu[..dhatu.len()-2].to_string()
+    } else {
+        dhatu.to_string()
+    };
+    let dhatu = dhatu_clean.as_str();
     let mut steps: Vec<EngineStep> = Vec::new();
     if derivation != "shuddha" {
         steps.push(EngineStep::new(dhatu, vec!["1.3.1"], "dhatu"));
