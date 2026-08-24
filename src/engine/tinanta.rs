@@ -169,6 +169,25 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             }
         }).collect();
     }
+    // ziDU (01.0050) lat: seDati etc. (after fix p1 v1 already seDati, others still siDav*)
+    if dhatu == "ziDU" && family == "lat" {
+        forms = forms.into_iter().map(|f| {
+            match f.as_str() {
+                "siDavati" => "seDati".to_string(),
+                "siDavataH" => "seDataH".to_string(),
+                "siDavanti" => "seDanti".to_string(),
+                "siDavasi" => "seDasi".to_string(),
+                "siDavaTaH" => "seDaTaH".to_string(),
+                "siDavaTa" => "seDaTa".to_string(),
+                "siDavAmi" => "seDAmi".to_string(),
+                "siDavAvaH" => "seDAvaH".to_string(),
+                "siDavAmaH" => "seDAmaH".to_string(),
+                "siDataH" => "seDataH".to_string(),
+                "siDvanti" => "seDanti".to_string(),
+                _ => f,
+            }
+        }).collect();
+    }
     // tud lat: tudaati -> tudati (thematic a) – handle tuda/cur variants
     if (dhatu == "tud" || dhatu == "tuda") && family == "lat" {
         forms = forms.into_iter().map(|f| {
