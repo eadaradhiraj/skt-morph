@@ -234,6 +234,10 @@ pub fn derive_stem(
     } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
         // kftI~ -> kft, etc. (strip final I/U/F anubandha)
         dhatu[..dhatu.len()-1].to_string()
+    } else if (gana == 5 || gana == 8) && dhatu.ends_with('Y') && dhatu.len() > 2 {
+        // NU Y: zuY -> su (strip Y, z->s), ziY->si, SiY stays Si etc.
+        let base = &dhatu[..dhatu.len()-1];
+        if base.starts_with('z') { format!("s{}", &base[1..]) } else { base.to_string() }
     } else if dhatu.len() > 3 && dhatu.chars().last().map_or(false, |c| c.is_ascii_uppercase()) && aupadeshik == format!("{}~", dhatu) {
         // general uppercase anubandha: qukrIY~? -> qukrI, etc. (strip last uppercase)
         dhatu[..dhatu.len()-1].to_string()
