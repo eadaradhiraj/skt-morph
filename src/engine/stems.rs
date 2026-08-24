@@ -251,7 +251,8 @@ pub fn derive_stem(
         // general uppercase anubandha: qukrIY~? -> qukrI, etc. (strip last uppercase)
         dhatu[..dhatu.len()-1].to_string()
     } else if gana == YA_GANA && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
-        dhatu[..dhatu.len()-1].to_string()
+        let base = &dhatu[..dhatu.len()-1];
+        if base.starts_with('z') { format!("s{}", &base[1..]) } else { base.to_string() }
     } else if (gana == 2 || gana == 3) && dhatu.ends_with('a') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // hana~ -> han, vida~ -> vid (AD adds final a)
         dhatu[..dhatu.len()-1].to_string()
