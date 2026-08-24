@@ -181,10 +181,14 @@ pub fn join_form(
             let base_rur = &stem[..stem.len()-1];
             match ending {
                 "ti" => return format!("{}adDi", base_rur),
-                "taH" => return format!("{}dDaH", base_run),
+                "taH" | "TaH" => return format!("{}dDaH", base_run),
                 "nti" => return format!("{}Danti", base_run),
                 "si" => return format!("{}atsi", base_rur),
+                "thaH" | "TaH" => return format!("{}dDaH", base_run),
+                "tha" | "Ta" => return format!("{}dDa", base_run),
                 "mi" => return format!("{}Dmi", stem),
+                "vaH" => return format!("{}dDvaH", base_run),
+                "maH" => return format!("{}dDmaH", base_run),
                 "tAm" => return format!("{}dDAm", base_run),
                 "tu" => return format!("{}adDu", base_rur),
                 "antu" => return format!("{}Dantu", base_run),
