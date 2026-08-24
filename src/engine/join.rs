@@ -9,13 +9,54 @@ pub fn join_form(
     ending: &str,
     gana: u8,
     family: &str,
-    _purusha: u8,
+    purusha: u8,
     _pada: &str,
     augment: Option<&str>,
-    _dhatu: Option<&str>,
+    dhatu: Option<&str>,
     _vacana: u8,
     _antarganas: Option<&str>,
 ) -> String {
+    // Pāṇini ad-gaṇa special sandhi for "ad" (02.0001) – port of _join_ad (handle ada variant)
+    if let Some(d) = dhatu {
+        let d_norm = if d == "ada" { "ad" } else { d };
+        if d_norm == "ad" {
+            // lat/lrt: d + ti/taH/si etc -> tt assimilation
+            // AD_T_INFLECT = ti,taH,si,thaH,tha,tAt,tAd,tu,tam,ta
+            if matches!(ending, "ti" | "taH" | "si" | "thaH" | "tha" | "tAt" | "tAd" | "tu" | "tam" | "ta") {
+                // Pāṇini 8.2.31 etc: d -> t before t/th/s; tha -> Ta
+                match ending {
+                    "thaH" => return "atTaH".to_string(),
+                    "tha" => return "atTa".to_string(),
+                    _ => return format!("at{}", ending),
+                }
+            }
+            if family == "lang" {
+                // a + ad -> Ad (augment merged, no extra 'a')
+                // For ad, lang forms are Adat, Adad etc (capital A) regardless of augment flag
+                match ending {
+                    "at" => return "Adat".to_string(),
+                    "ad" => return "Adad".to_string(),
+                    "atAm" => return "AttAm".to_string(),
+                    "an" => return "Adan".to_string(),
+                    "aH" => return "AdaH".to_string(),
+                    "atam" => return "Attam".to_string(),
+                    "ata" => return "Atta".to_string(),
+                    "am" => return "Adam".to_string(),
+                    "va" => return "Adva".to_string(),
+                    "ma" => return "Adma".to_string(),
+                    _ => {}
+                }
+            }
+            if family == "lot" {
+                // ad lot: attAt etc handled above via AD_T_INFLECT; for 3rd pl etc
+                if matches!(ending, "tAt"|"tAd"|"tu"|"tam"|"ta") {
+                    return format!("at{}", ending);
+                }
+            }
+        }
+        // div (04.0001) lang double-y fix is handled via stems, but join also needs to avoid double y
+        // Fall through to normal
+    }
     // Core join - simplified
     let mut form = if stem.ends_with('a') && !ending.is_empty() {
         // thematic

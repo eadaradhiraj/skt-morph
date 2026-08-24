@@ -30,10 +30,24 @@ if str(db).endswith(".db"):
     rows = []
     for did, gana in cur.fetchall():
         det = info.get(did, {})
+        # gana in DB is TEXT like "01","10" – use int() directly, not strip("0") which mangles "10"→"1"
+        try:
+            g = int(str(gana).strip())
+        except:
+            g = 1
+        padam = det.get("padam","") or ""
+        if padam.startswith("uBaya"):
+            pada = "U"
+        elif padam.startswith("parasm"):
+            pada = "P"
+        elif padam.startswith("Atman"):
+            pada = "A"
+        else:
+            pada = "P"
         details = {
             "dhatu": det.get("OpadeSikasvarUpam","").replace("~",""),
-            "gana": int(str(gana).strip("0") or 1),
-            "pada": "P" if det.get("padam","").startswith("parasm") else ("A" if det.get("padam","").startswith("Atman") else "P"),
+            "gana": g,
+            "pada": pada,
             "tags": det.get("anubanDaviSezaH",""),
             "antarganas": det.get("antargaRaH",""),
             "aupadeshik": det.get("OpadeSikasvarUpam",""),

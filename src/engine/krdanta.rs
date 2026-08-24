@@ -140,10 +140,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> (Vec<String>, Vec<EngineStep
         "guna_tavya" => if guna.ends_with('a') { format!("{}itavya", &guna[..guna.len()-1]) } else { format!("{}itavya", guna) },
         "root" => format!("{}{}", dhatu, suffix),
         "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap(), dhatu, suffix),
-        "lyap" => {
-            let f = format!("{}{}", dhatu, suffix);
-            if dhatu == "BU" { format!("pra{}{}", dhatu, suffix) } else { f }
-        }
+        "lyap" => format!("{}{}", dhatu, suffix),
         _ => format!("{}{}", guna, suffix),
     };
     let mut meta = HashMap::new(); meta.insert("pratyaya".to_string(), pratyaya.to_string());

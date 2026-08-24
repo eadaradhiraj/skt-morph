@@ -480,7 +480,14 @@ pub fn thematic_present_base(dhatu: &str, gana: u8, aupadeshik: &str) -> String 
 
 pub fn thematic_join(stem_a: &str, ending: &str) -> String {
     if !stem_a.ends_with('a') { return format!("{}{}", stem_a, ending); }
-    if ending.starts_with('a') { return format!("{}{}", stem_a, &ending[1..]); }
-    if ending.starts_with('A') { return format!("{}{}", &stem_a[..stem_a.len()-1], ending); }
+    if ending.is_empty() { return stem_a.to_string(); }
+    let first = ending.chars().next().unwrap();
+    // a + a -> a (elide one a)  e.g. gacCa + ante -> gacCante
+    if first == 'a' { return format!("{}{}", stem_a, &ending[1..]); }
+    // a + A/e/E/o/O/i/I/u/U/f/F -> drop stem a and keep vowel (sandhi: pra+eti->preti)
+    // covers Atmanepada ete, etc.: gacCa + ete -> gacCete (not gacCaete)
+    if "AEIOUaeioufF".contains(first) { // vowel-initial ending
+        return format!("{}{}", &stem_a[..stem_a.len()-1], ending);
+    }
     format!("{}{}", stem_a, ending)
 }

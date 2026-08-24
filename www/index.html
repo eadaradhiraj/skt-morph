@@ -92,19 +92,40 @@ document.getElementById('btn-search').onclick=()=>{
   const res=search(w,10);
   document.getElementById('out-analyze').textContent=strfy(res);
 };
+function renderVerbParadigm(res){
+  const el=document.getElementById('out-verb');
+  if(!Array.isArray(res) || res.length===0){ el.textContent=strfy(res); return; }
+  // build 3x3 table: rows purusha (1=prathama,2=madhyama,3=uttama), cols vacana (1=eka,2=dvi,3=bahu)
+  const get = (p,v)=> (res.find(e=>e.purusha===p && e.vacana===v)||{}).forms||[];
+  let html='<table border=1 cellpadding=6 style="border-collapse:collapse;width:100%"><tr><th></th><th>eka (sg)</th><th>dvi (du)</th><th>bahu (pl)</th></tr>';
+  const rowNames=["", "prathama (3rd)", "madhyama (2nd)", "uttama (1st)"];
+  for(let p=1;p<=3;p++){
+    html+='<tr><td><b>'+rowNames[p]+'</b></td>';
+    for(let v=1;v<=3;v++) html+='<td>'+(get(p,v).join(', ')||'<span style="color:#999">—</span>')+'</td>';
+    html+='</tr>';
+  }
+  html+='</table><details style="margin-top:.5rem"><summary>JSON</summary><pre>'+strfy(res)+'</pre></details>';
+  el.innerHTML=html;
+}
+function renderVerbSingle(res){
+  const el=document.getElementById('out-verb');
+  if(!res || !res.forms){ el.textContent=strfy(res); return; }
+  let html='<div>Forms: <b>'+res.forms.join(', ')+'</b> ('+res.dhatu+' · '+res.lakara+' · '+res.purusha+'/'+res.vacana+')</div><pre>'+strfy(res)+'</pre>';
+  el.innerHTML=html;
+}
 document.getElementById('btn-verb').onclick=()=>{
   const d=document.getElementById('dhatu').value.trim()||'BU';
   const l=document.getElementById('lakara').value;
   const pref=document.getElementById('verb-prefix').value.trim();
   const res=pref ? generate_verb_paradigm_with_prefix(d,l,pref) : generate_verb_paradigm(d,l);
-  document.getElementById('out-verb').textContent=strfy(res);
+  renderVerbParadigm(res);
 };
 document.getElementById('btn-verb1').onclick=()=>{
   const d=document.getElementById('dhatu').value.trim()||'BU';
   const l=document.getElementById('lakara').value;
   const pref=document.getElementById('verb-prefix').value.trim();
   const res=pref ? generate_verb_with_prefix(d,l,1,1,pref) : generate_verb(d,l,1,1);
-  document.getElementById('out-verb').textContent=strfy(res);
+  renderVerbSingle(res);
 };
 function renderDeclension(res){
   const el=document.getElementById('out-noun');

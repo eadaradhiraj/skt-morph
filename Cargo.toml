@@ -20,8 +20,26 @@ js-sys = "0.3"
 version = "0.3"
 features = ["console"]
 
+[dependencies.rusqlite]
+version = "0.31"
+features = ["bundled"]
+optional = true
+
+[features]
+default = []
+native-db = ["rusqlite"]
+
 [dev-dependencies]
 wasm-bindgen-test = "0.3"
+
+[[bin]]
+name = "validate"
+path = "src/bin/validate.rs"
+required-features = ["native-db"]
+
+[[bin]]
+name = "time_analyze"
+path = "src/bin/time_analyze.rs"
 
 [profile.release]
 opt-level = 3
