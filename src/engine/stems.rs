@@ -258,8 +258,11 @@ pub fn derive_stem(
     } else if (gana == 2 || gana == 3) && dhatu.ends_with('a') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // hana~ -> han, vida~ -> vid (AD adds final a)
         dhatu[..dhatu.len()-1].to_string()
+    } else if dhatu.ends_with('a') && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
+        // general a stripping: tuda~ -> tud, cura~ -> cur etc. (for any gana with final a anubandha)
+        dhatu[..dhatu.len()-1].to_string()
     } else if gana == 10 && dhatu.ends_with('a') && dhatu.len() > 3 && aupadeshik.contains('~') {
-        // 10th cura~ -> cur (strip final a)
+        // 10th cura~ -> cur (strip final a) – fallback
         dhatu[..dhatu.len()-1].to_string()
     } else {
         dhatu.to_string()
