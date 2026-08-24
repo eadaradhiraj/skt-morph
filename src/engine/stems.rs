@@ -307,6 +307,16 @@ pub fn derive_stem(
             let ps = "anta".to_string();
             append_step(&mut steps, &ps, &["3.1.68"], "sap");
             present_stem = Some(ps);
+        } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 {
+            // general i anubandha with nasal: adi->anda, bidi->binda, ati->anta etc. (also len 3)
+            let base = &dhatu[..dhatu.len()-1]; // without i
+            if let Some(last) = base.chars().last() {
+                let ps = format!("{}n{}a", &base[..base.len()-last.len_utf8()], last);
+                append_step(&mut steps, &ps, &["3.1.68"], "sap");
+                present_stem = Some(ps);
+            } else {
+                present_stem = None;
+            }
         } else if let Some(yam) = yam_cc_present_stem(dhatu, antarganas) {
             append_step(&mut steps, &yam, &["7.2.9"], "samprasaran");
             present_stem = Some(yam);
