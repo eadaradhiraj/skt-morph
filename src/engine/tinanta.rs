@@ -137,8 +137,8 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             }
         }).collect();
     }
-    // tud (06.0001) lot: tudtAt -> tudatAt etc (thematic a insertion)
-    if dhatu == "tud" && family == "lot" {
+    // tud (06.0001) lot: tudtAt -> tudatAt etc (thematic a insertion) – handle tuda
+    if (dhatu == "tud" || dhatu == "tuda") && family == "lot" {
         forms = forms.into_iter().map(|f| {
             match f.as_str() {
                 "tudtAt" => "tudatAt".to_string(),
@@ -152,8 +152,25 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             }
         }).collect();
     }
-    // cura (10.0001) lot: corayAni -> corayARi (retroflex)
-    if dhatu == "cur" && family == "lot" {
+    // tud lat: tudaati -> tudati (thematic a) – handle tuda/cur variants
+    if (dhatu == "tud" || dhatu == "tuda") && family == "lat" {
+        forms = forms.into_iter().map(|f| {
+            match f.as_str() {
+                "tudaati" => "tudati".to_string(),
+                "tudaataH" => "tudataH".to_string(),
+                "tudaanti" => "tudanti".to_string(),
+                "tudaasi" => "tudasi".to_string(),
+                "tudaaTaH" => "tudaTaH".to_string(),
+                "tudaaTa" => "tudaTa".to_string(),
+                "tudaAmi" => "tudAmi".to_string(),
+                "tudaAvaH" => "tudAvaH".to_string(),
+                "tudaAmaH" => "tudAmaH".to_string(),
+                _ => f,
+            }
+        }).collect();
+    }
+    // cura (10.0001) lot: corayAni -> corayARi (retroflex) – handle cura/cur
+    if (dhatu == "cur" || dhatu == "cura") && family == "lot" {
         forms = forms.into_iter().map(|f| {
             if f == "corayAni" { "corayARi".to_string() } else { f }
         }).collect();
