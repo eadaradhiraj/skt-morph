@@ -297,10 +297,14 @@ pub fn derive_stem(
         append_step(&mut steps, &ps, &["3.1.25"], "causal");
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
-        if cgana == 1 && dhatu.ends_with("Ti") && dhatu.len() > 3 {
-            // kuTi->kunTa, maTi->manTa etc. (Ti anubandha with nasal)
+        if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
+            // kuTi->kunTa, ati->anta etc. (Ti/ti anubandha with nasal)
             let base = &dhatu[..dhatu.len()-2];
-            let ps = format!("{}nTa", base);
+            let ps = if dhatu.ends_with("Ti") { format!("{}nTa", base) } else { format!("{}nta", base) };
+            append_step(&mut steps, &ps, &["3.1.68"], "sap");
+            present_stem = Some(ps);
+        } else if cgana == 1 && dhatu == "ati" {
+            let ps = "anta".to_string();
             append_step(&mut steps, &ps, &["3.1.68"], "sap");
             present_stem = Some(ps);
         } else if let Some(yam) = yam_cc_present_stem(dhatu, antarganas) {
