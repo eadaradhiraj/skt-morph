@@ -225,12 +225,15 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
-    // Strip anubandha: N 7 ir (ruDir->ruD), YA divu->div / asu->as, AD hana->han, CAUS cura->cur, general ir (cyutir->cyut) etc.
+    // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
     let dhatu_clean: String = if dhatu == "divu" {
         "div".to_string()
     } else if dhatu.ends_with("ir") && aupadeshik.contains('~') && dhatu.len() > 3 {
         // general ir anubandha: cyutir (01.0040 cyuti~r) -> cyut, ruDir (07) -> ruD etc.
         dhatu[..dhatu.len()-2].to_string()
+    } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
+        // kftI~ -> kft, etc. (strip final I/U/F anubandha)
+        dhatu[..dhatu.len()-1].to_string()
     } else if gana == YA_GANA && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
         dhatu[..dhatu.len()-1].to_string()
     } else if (gana == 2 || gana == 3) && dhatu.ends_with('a') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
