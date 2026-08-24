@@ -84,6 +84,27 @@ pub fn join_form(
             }
         }
     }
+    // N (7) rudh → yunakti : handle Ru/Ra stems
+    if gana == 7 {
+        if family == "lrt" {
+            return format!("{}{}", stem, ending);
+        }
+        if stem.ends_with("Ra") {
+            let base_run = format!("{}n", &stem[..stem.len()-2]);
+            let base_rur = &stem[..stem.len()-1];
+            match ending {
+                "ti" => return format!("{}adDi", base_rur),
+                "taH" => return format!("{}dDaH", base_run),
+                "nti" => return format!("{}Danti", base_run),
+                "si" => return format!("{}atsi", base_rur),
+                "mi" => return format!("{}Dmi", stem),
+                "tAm" => return format!("{}dDAm", base_run),
+                "tu" => return format!("{}adDu", base_rur),
+                "antu" => return format!("{}Dantu", base_run),
+                _ => {}
+            }
+        }
+    }
     // Core join - simplified
     let mut form = if stem.ends_with('a') && !ending.is_empty() {
         // thematic

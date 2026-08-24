@@ -225,6 +225,12 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
+    // Strip anubandha "ir" for N-gaṇa 7 where JSON keeps e.g. ruDir -> ruD (aupadeshik ruDi~r)
+    let dhatu_stripped: String;
+    let dhatu: &str = if gana == N_GANA && dhatu.ends_with("ir") && aupadeshik.contains('~') {
+        dhatu_stripped = dhatu[..dhatu.len()-2].to_string();
+        &dhatu_stripped
+    } else { dhatu };
     let mut steps: Vec<EngineStep> = Vec::new();
     if derivation != "shuddha" {
         steps.push(EngineStep::new(dhatu, vec!["1.3.1"], "dhatu"));
