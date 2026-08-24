@@ -225,9 +225,11 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
-    // Strip anubandha "ir" for N-gaṇa 7 where JSON keeps e.g. ruDir -> ruD (aupadeshik ruDi~r)
+    // Strip anubandha: N-gaṇa 7 ir (ruDir->ruD), YA divu->div, etc.
     let dhatu_stripped: String;
-    let dhatu: &str = if gana == N_GANA && dhatu.ends_with("ir") && aupadeshik.contains('~') {
+    let dhatu: &str = if dhatu == "divu" {
+        "div"
+    } else if gana == N_GANA && dhatu.ends_with("ir") && aupadeshik.contains('~') {
         dhatu_stripped = dhatu[..dhatu.len()-2].to_string();
         &dhatu_stripped
     } else { dhatu };
