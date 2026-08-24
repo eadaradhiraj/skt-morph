@@ -411,11 +411,6 @@ pub fn derive_stem(
     match family {
         "lat" => return (present_stem, None, steps),
         "lot" => {
-            if cgana == 6 {
-                let root = g6_plot_base(dhatu);
-                append_step(&mut steps, &root, &["3.2.69"], "plot_stem");
-                return (Some(root), None, steps);
-            }
             return (present_stem, None, steps);
         }
         "lrt" => {

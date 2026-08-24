@@ -77,13 +77,16 @@ pub fn apply_causative_grade(stem: &str) -> String {
 }
 
 pub fn vowel_initial_lang_stem(dhatu: &str) -> Option<String> {
-    let first = dhatu.chars().next()?;
-    if !is_vowel_final(first) { return None; }
-    let rest: String = dhatu.chars().skip(1).collect();
+    let mut chars = dhatu.chars();
+    let first = chars.next()?;
+    let rest: String = chars.collect();
     match first {
         'a' | 'A' => Some(format!("A{}", rest)),
-        'i' | 'I' | 'e' | 'E' => Some(format!("E{}", rest)),
-        'u' | 'U' | 'o' | 'O' => Some(format!("O{}", rest)),
+        'i' | 'I' => Some(format!("E{}", rest)),
+        'u' | 'U' => Some(format!("O{}", rest)),
+        'f' | 'F' => Some(format!("Ar{}", rest)),
+        'e' | 'E' => Some(format!("E{}", rest)),
+        'o' | 'O' => Some(format!("O{}", rest)),
         _ => None,
     }
 }
@@ -493,4 +496,28 @@ pub fn thematic_join(stem_a: &str, ending: &str) -> String {
         return format!("{}{}", &stem_a[..stem_a.len()-1], ending);
     }
     format!("{}{}", stem_a, ending)
+}
+
+pub fn apply_natva_to_word(word: &str) -> String {
+    if !word.contains('n') { return word.to_string(); }
+    let mut chars: Vec<char> = word.chars().collect();
+    let blockers: std::collections::HashSet<char> = ['c','C','j','J','Y','S','w','W','q','Q','R','t','T','d','D','l','s','S'].iter().cloned().collect();
+    let mut trigger = false;
+    for i in 0..chars.len() {
+        let ch = chars[i];
+        if matches!(ch, 'r'|'f'|'F'|'z') {
+            trigger = true;
+        } else if trigger && ch == 'n' {
+            if i != chars.len() - 1 {
+                let next_ch = chars[i+1];
+                // Pāṇini 8.4.2: vowel, y, v, m allow natva.
+                if "aAiIuUfFeEoOyvm".contains(next_ch) {
+                    chars[i] = 'R';
+                }
+            }
+        } else if trigger && blockers.contains(&ch) {
+            trigger = false;
+        }
+    }
+    chars.into_iter().collect()
 }

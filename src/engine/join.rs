@@ -4,6 +4,28 @@
 
 use crate::engine::phonology::thematic_join;
 
+
+pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
+    if stem.is_empty() || suffix.is_empty() { return format!("{}{}", stem, suffix); }
+    let suff_first = suffix.chars().next().unwrap();
+    if "aAiIuUfFeEoO".contains(suff_first) { return format!("{}{}", stem, suffix); }
+    let stem_chars: Vec<char> = stem.chars().collect();
+    let s_last = *stem_chars.last().unwrap();
+    let stem_body: String = stem_chars[..stem_chars.len()-1].iter().collect();
+    match (s_last, suff_first) {
+        ('d', 't') => format!("{}t{}", stem_body, suffix),
+        ('d', 'T') => format!("{}tT{}", stem_body, &suffix[1..]),
+        ('d', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
+        ('c', 't') | ('j', 't') => format!("{}kt{}", stem_body, &suffix[1..]),
+        ('z', 't') => format!("{}zw{}", stem_body, &suffix[1..]),
+        ('z', 'T') => format!("{}zW{}", stem_body, &suffix[1..]),
+        ('h', 't') => format!("{}gD{}", stem_body, &suffix[1..]),
+        ('h', 'T') => format!("{}gD{}", stem_body, &suffix[1..]),
+        ('h', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
+        _ => format!("{}{}", stem, suffix),
+    }
+}
+
 pub fn join_form(
     stem: &str,
     ending: &str,
@@ -16,47 +38,6 @@ pub fn join_form(
     _vacana: u8,
     _antarganas: Option<&str>,
 ) -> String {
-    // Pāṇini ad-gaṇa special sandhi for "ad" (02.0001) – port of _join_ad (handle ada variant)
-    if let Some(d) = dhatu {
-        let d_norm = if d == "ada" { "ad" } else { d };
-        if d_norm == "ad" {
-            // lat/lrt: d + ti/taH/si etc -> tt assimilation
-            // AD_T_INFLECT = ti,taH,si,thaH,tha,tAt,tAd,tu,tam,ta
-            if matches!(ending, "ti" | "taH" | "si" | "thaH" | "tha" | "tAt" | "tAd" | "tu" | "tam" | "ta") {
-                // Pāṇini 8.2.31 etc: d -> t before t/th/s; tha -> Ta
-                match ending {
-                    "thaH" => return "atTaH".to_string(),
-                    "tha" => return "atTa".to_string(),
-                    _ => return format!("at{}", ending),
-                }
-            }
-            if family == "lang" {
-                // a + ad -> Ad (augment merged, no extra 'a')
-                // For ad, lang forms are Adat, Adad etc (capital A) regardless of augment flag
-                match ending {
-                    "at" => return "Adat".to_string(),
-                    "ad" => return "Adad".to_string(),
-                    "atAm" => return "AttAm".to_string(),
-                    "an" => return "Adan".to_string(),
-                    "aH" => return "AdaH".to_string(),
-                    "atam" => return "Attam".to_string(),
-                    "ata" => return "Atta".to_string(),
-                    "am" => return "Adam".to_string(),
-                    "va" => return "Adva".to_string(),
-                    "ma" => return "Adma".to_string(),
-                    _ => {}
-                }
-            }
-            if family == "lot" {
-                // ad lot: attAt etc handled above via AD_T_INFLECT; for 3rd pl etc
-                if matches!(ending, "tAt"|"tAd"|"tu"|"tam"|"ta") {
-                    return format!("at{}", ending);
-                }
-            }
-        }
-        // div (04.0001) lang double-y fix is handled via stems, but join also needs to avoid double y
-        // Fall through to normal
-    }
     // AD (2,3) irregulars: vid/as/han/vac etc. (high-impact for gana02)
     if gana == 2 || gana == 3 {
         if let Some(d) = dhatu {
@@ -225,34 +206,29 @@ pub fn join_form(
             _ => {}
         }
     }
-    // Core join - simplified
+    // Core join - upgraded
     let mut form = if stem.ends_with('a') && !ending.is_empty() {
-        // thematic
         thematic_join(stem, ending)
     } else {
-        format!("{}{}", stem, ending)
+        internal_sandhi(stem, ending)
     };
 
-    // augment handling (a- for lang)
+    // augment handling (a- for lang) with proper Pāṇini vowel sandhi
     if let Some(aug) = augment {
-        // Don't double-augment if stem already starts with vowel augment
-        if !form.starts_with('A') && !form.starts_with('E') && !form.starts_with('O') {
-            // gana 1 thematic: a + Bavati -> aBavat etc ; but for demo we prefix
-            // Real logic checks vowel_initial etc - simplified to prefix
-            if gana == 1 || gana == 6 || gana == 4 {
-                // If stem was vowel-initial, augment already merged
-                if !["a","A","i","I","u","U","e","E","o","O"].contains(&&stem[..1]) {
-                    form = format!("{}{}", aug, form);
-                }
-            } else {
-                form = format!("{}{}", aug, form);
-            }
+        if aug == "a" && (form.starts_with('a') || form.starts_with('A')) {
+            form = format!("A{}", &form[1..]);
+        } else if aug == "a" && (form.starts_with('i') || form.starts_with('I') || form.starts_with('e') || form.starts_with('E')) {
+            form = format!("E{}", &form[1..]);
+        } else if aug == "a" && (form.starts_with('u') || form.starts_with('U') || form.starts_with('o') || form.starts_with('O')) {
+            form = format!("O{}", &form[1..]);
+        } else if aug == "a" && (form.starts_with('f') || form.starts_with('F')) {
+            form = format!("Ar{}", &form[1..]);
+        } else if !form.starts_with('A') && !form.starts_with('E') && !form.starts_with('O') {
+            form = format!("{}{}", aug, form);
         }
-        // lang gemination etc omitted for now
     }
 
-    // Special case: avoid double a (Bava + anti -> Bavanti not Bavaanti) already handled by thematic_join
-    form
+    crate::engine::phonology::apply_natva_to_word(&form)
 }
 
 pub fn join_variants(

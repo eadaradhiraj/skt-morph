@@ -3,6 +3,7 @@ use crate::engine::phonology::apply_guna_to_stem;
 use crate::engine::steps::EngineStep;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use crate::engine::join::internal_sandhi;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct KrdantaResult {
@@ -130,13 +131,25 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> (Vec<String>, Vec<EngineStep
             }
         }
         "kta" => {
-            let base = kta_stem(&dhatu);
+            let base = if dhatu.len() >= 2 && "iIuUfF".contains(dhatu.chars().last().unwrap()) {
+                format!("{}ta", dhatu)
+            } else {
+                internal_sandhi(&dhatu, "ta")
+            };
             steps.push(EngineStep::new(&base, vec!["3.2.102"], "kta"));
             if pratyaya.starts_with("ktavatu") { format!("{}vat", base) } else { base }
         }
         "guna" => format!("{}{}", guna, suffix),
         "guna_a" => format!("{}a", guna),
-        "guna_tum" => if guna.ends_with('a') { format!("{}itum", &guna[..guna.len()-1]) } else { format!("{}itum", guna) },
+        "guna_tum" => {
+            let last_c = guna.chars().last().unwrap();
+            if guna.ends_with('a') || "iIuUfFeEoO".contains(last_c) {
+                let base = if guna.ends_with('a') { &guna[..guna.len()-1] } else { &guna };
+                format!("{}itum", base)
+            } else {
+                internal_sandhi(&guna, "tum")
+            }
+        },
         "guna_tavya" => if guna.ends_with('a') { format!("{}itavya", &guna[..guna.len()-1]) } else { format!("{}itavya", guna) },
         "root" => format!("{}{}", dhatu, suffix),
         "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap(), dhatu, suffix),

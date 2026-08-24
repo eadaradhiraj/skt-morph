@@ -122,8 +122,8 @@ pub fn lot_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
         (vec!["tam".into()], vec!["3.1.3".into(), "3.4.78".into()]),
         (vec!["ta".into()], vec!["3.1.3".into(), "3.4.78".into()]),
         (vec!["Ani".into()], vec!["3.1.3".into(), "3.4.78".into()]),
-        (vec!["va".into()], vec!["3.1.3".into(), "3.4.78".into()]),
-        (vec!["ma".into()], vec!["3.1.3".into(), "3.4.78".into()]),
+        (vec!["Ava".into()], vec!["3.1.3".into(), "3.4.78".into()]),
+        (vec!["Ama".into()], vec!["3.1.3".into(), "3.4.78".into()]),
     ]
 }
 
