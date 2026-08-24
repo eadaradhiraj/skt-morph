@@ -118,6 +118,29 @@ pub fn join_form(
             }
         }
     }
+    // G3 (3) reduplicated – juhu→juhoti, bibhI→bibheti
+    if gana == 3 {
+        if stem.ends_with('u') {
+            let base = &stem[..stem.len()-1];
+            match ending {
+                "ti" => return format!("{}oti", base),
+                "taH" => return format!("{}utaH", base),
+                "nti" | "anti" => return format!("{}vati", base),
+                "si" => return format!("{}oSi", base),
+                "mi" => return format!("{}omi", base),
+                "tu" => return format!("{}otu", base),
+                _ => {}
+            }
+        }
+        if stem.ends_with('I') {
+            let base = &stem[..stem.len()-1];
+            match ending {
+                "ti" => return format!("{}eti", base), // bibhI→bibheti
+                "taH" => return format!("{}ItaH", base),
+                _ => {}
+            }
+        }
+    }
     // NU gaṇa (5,8) – port of _join_nu (lat/lot/lrt core)
     if gana == 5 || gana == 8 {
         if family == "lrt" {
