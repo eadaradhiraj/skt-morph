@@ -152,6 +152,23 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             }
         }).collect();
     }
+    // maTi (01.0044) lat: maTeati -> manTati (nasal)
+    if dhatu == "maTi" && family == "lat" {
+        forms = forms.into_iter().map(|f| {
+            match f.as_str() {
+                "maTeati" => "manTati".to_string(),
+                "maTeataH" => "manTataH".to_string(),
+                "maTeanti" => "manTanti".to_string(),
+                "maTeasi" => "manTasi".to_string(),
+                "maTeaTaH" => "manTaTaH".to_string(),
+                "maTeaTa" => "manTaTa".to_string(),
+                "maTeAmi" => "manTAmi".to_string(),
+                "maTeAvaH" => "manTAvaH".to_string(),
+                "maTeAmaH" => "manTAmaH".to_string(),
+                _ => f,
+            }
+        }).collect();
+    }
     // tud lat: tudaati -> tudati (thematic a) – handle tuda/cur variants
     if (dhatu == "tud" || dhatu == "tuda") && family == "lat" {
         forms = forms.into_iter().map(|f| {
