@@ -4,8 +4,12 @@ use std::path::Path;
 fn main() {
     let out = Path::new("src/data");
     fs::create_dir_all(out).unwrap();
+    fs::create_dir_all(Path::new("www")).unwrap();
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/data/dhatus_compact.rs");
+    println!("cargo:rerun-if-changed=src/engine/hardcode_all.rs");
+    println!("cargo:rerun-if-changed=src/engine/hardcode_g01.rs");
+    println!("cargo:rerun-if-changed=www/hardcode.json");
     for p in ["sktmorph/data/dhatus.sqlite", "../skt-morph-data/data/skt_morph.db", "/home/edhiraj/Documents/projs/skt-morph-data/data/skt_morph.db"] {
         println!("cargo:rerun-if-changed={}", p);
     }
@@ -75,6 +79,51 @@ print(f"Generated compact: {len(rows)} from {db}")
 "#])
         .output();
     if let Ok(o) = py {
+        println!("{}", String::from_utf8_lossy(&o.stdout));
+        eprintln!("{}", String::from_utf8_lossy(&o.stderr));
+    }
+
+    // --- hardcode.json for 100% no-bloat (lite 970K + 207K gz) ---
+    // Regenerate www/hardcode.json from embedded hardcode_*.rs so lite+fetch stays 100% in sync.
+    // If hardcode_*.rs are present, derive JSON; else keep existing www/hardcode.json.
+    let py2 = std::process::Command::new("python3")
+        .args(["-c", r#"
+import pathlib, re, json, gzip, sys
+import pathlib as P
+srcs = [P.Path("src/engine/hardcode_all.rs"), P.Path("src/engine/hardcode_g01.rs")]
+if not all(p.exists() for p in srcs):
+    print("hardcode rs missing, keep www/hardcode.json", file=sys.stderr)
+    sys.exit(0)
+pat = re.compile(r'\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*"([^"]+)"\s*\)')
+entries=[]
+for src in srcs:
+    txt=src.read_text(encoding="utf-8")
+    for m in pat.findall(txt):
+        entries.append({"id":m[0],"lak":m[1],"p":int(m[2]),"v":int(m[3]),"forms":m[4].split("|")})
+# dedup
+seen=set()
+uniq=[]
+for e in entries:
+    k=(e["id"],e["lak"],e["p"],e["v"])
+    if k not in seen:
+        seen.add(k)
+        uniq.append(e)
+uniq.sort(key=lambda x:(x["id"],x["lak"],x["p"],x["v"]))
+import json as J
+out=P.Path("www/hardcode.json")
+existing=None
+if out.exists():
+    try: existing=J.loads(out.read_text(encoding="utf-8"))
+    except: existing=None
+if existing!=uniq:
+    out.write_text(J.dumps(uniq, ensure_ascii=False, separators=(',',':')), encoding="utf-8")
+    P.Path("www/hardcode.json.gz").write_bytes(gzip.compress(out.read_bytes(), compresslevel=9))
+    print(f"Generated hardcode.json: {len(uniq)} entries, {out.stat().st_size} bytes, gz {P.Path('www/hardcode.json.gz').stat().st_size}")
+else:
+    print(f"hardcode.json up to date: {len(uniq)} entries")
+"#])
+        .output();
+    if let Ok(o) = py2 {
         println!("{}", String::from_utf8_lossy(&o.stdout));
         eprintln!("{}", String::from_utf8_lossy(&o.stderr));
     }
