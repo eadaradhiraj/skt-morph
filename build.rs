@@ -83,48 +83,8 @@ print(f"Generated compact: {len(rows)} from {db}")
         eprintln!("{}", String::from_utf8_lossy(&o.stderr));
     }
 
-    // --- hardcode.json for 100% no-bloat (lite 970K + 207K gz) ---
-    // Regenerate www/hardcode.json from embedded hardcode_*.rs so lite+fetch stays 100% in sync.
-    // If hardcode_*.rs are present, derive JSON; else keep existing www/hardcode.json.
-    let py2 = std::process::Command::new("python3")
-        .args(["-c", r#"
-import pathlib, re, json, gzip, sys
-import pathlib as P
-srcs = [P.Path("src/engine/hardcode_all.rs"), P.Path("src/engine/hardcode_g01.rs")]
-if not all(p.exists() for p in srcs):
-    print("hardcode rs missing, keep www/hardcode.json", file=sys.stderr)
-    sys.exit(0)
-pat = re.compile(r'\(\s*"([^"]+)"\s*,\s*"([^"]+)"\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*"([^"]+)"\s*\)')
-entries=[]
-for src in srcs:
-    txt=src.read_text(encoding="utf-8")
-    for m in pat.findall(txt):
-        entries.append({"id":m[0],"lak":m[1],"p":int(m[2]),"v":int(m[3]),"forms":m[4].split("|")})
-# dedup
-seen=set()
-uniq=[]
-for e in entries:
-    k=(e["id"],e["lak"],e["p"],e["v"])
-    if k not in seen:
-        seen.add(k)
-        uniq.append(e)
-uniq.sort(key=lambda x:(x["id"],x["lak"],x["p"],x["v"]))
-import json as J
-out=P.Path("www/hardcode.json")
-existing=None
-if out.exists():
-    try: existing=J.loads(out.read_text(encoding="utf-8"))
-    except: existing=None
-if existing!=uniq:
-    out.write_text(J.dumps(uniq, ensure_ascii=False, separators=(',',':')), encoding="utf-8")
-    P.Path("www/hardcode.json.gz").write_bytes(gzip.compress(out.read_bytes(), compresslevel=9))
-    print(f"Generated hardcode.json: {len(uniq)} entries, {out.stat().st_size} bytes, gz {P.Path('www/hardcode.json.gz').stat().st_size}")
-else:
-    print(f"hardcode.json up to date: {len(uniq)} entries")
-"#])
-        .output();
-    if let Ok(o) = py2 {
-        println!("{}", String::from_utf8_lossy(&o.stdout));
-        eprintln!("{}", String::from_utf8_lossy(&o.stderr));
-    }
+    // hardcode.json is now minimal (lite+external = 100%) - generated via gen_hardcode_min.rs (26423 entries, 1.8M)
+    // Keep it as committed artifact; do not auto-regen from embedded hardcode_*.rs (which is 30641 full) to preserve no-bloat.
+    // To regenerate minimal after engine improvements: cargo run --bin gen_hardcode_min --features native-db --no-default-features
+    println!("hardcode.json kept as is (minimal 26423, use gen_hardcode_min to refresh after engine gains)");
 }
