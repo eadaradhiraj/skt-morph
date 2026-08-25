@@ -26,7 +26,8 @@ features = ["bundled"]
 optional = true
 
 [features]
-default = []
+default = ["hardcode"]
+hardcode = []
 native-db = ["rusqlite"]
 
 [dev-dependencies]

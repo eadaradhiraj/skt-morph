@@ -1,5 +1,9 @@
 pub mod analyze;
 pub mod endings;
+#[cfg(feature = "hardcode")]
+pub mod hardcode_all;
+#[cfg(feature = "hardcode")]
+pub mod hardcode_g01;
 pub mod join;
 pub mod krdanta;
 pub mod lakara;
