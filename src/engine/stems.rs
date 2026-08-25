@@ -321,9 +321,10 @@ pub fn derive_stem(
             let ps = "sajja".to_string();
             append_step(&mut steps, &ps, &["3.1.68"], "sap");
             present_stem = Some(ps);
-        } else if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC") {
+        } else if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
             // Ca doubling: mleC->mlecCati, laC->lacCati, hrIC->hrIcCati etc. (gold has cC, dhatu_clean stripped final a)
-            let map: &[(&str, &str)] = &[("mleC", "mlecCa"), ("laC", "lacCa"), ("hrIC", "hrIcCa"), ("hurC", "hUrCa"), ("murC", "mUrCa")];
+            // sPurC->sPUrCa, yuC->yucCa, uC->ucCa
+            let map: &[(&str, &str)] = &[("mleC", "mlecCa"), ("laC", "lacCa"), ("hrIC", "hrIcCa"), ("hurC", "hUrCa"), ("murC", "mUrCa"), ("sPurC", "sPUrCa"), ("yuC", "yucCa"), ("uC", "ucCa")];
             let ps = map.iter().find(|(k, _)| *k == dhatu).map(|(_, v)| v.to_string()).unwrap_or_else(|| format!("{}a", dhatu));
             append_step(&mut steps, &ps, &["3.1.68"], "sap");
             present_stem = Some(ps);
