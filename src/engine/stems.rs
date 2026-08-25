@@ -257,6 +257,9 @@ pub fn derive_stem(
     } else if gana == 1 && dhatu.ends_with("ncu") && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
         // ancu~ -> anc, vancu~ -> vanc etc. (u is anubandha, then nc->Yc via nasal palatal -> aYca)
         dhatu[..dhatu.len()-1].to_string()
+    } else if gana == 1 && (dhatu.ends_with("ucu") || dhatu.ends_with("uju")) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
+        // mrucu~ -> mruc, kuju~ -> kuj etc. (final u is anubandha, then u->o guNa -> mroc, koj)
+        dhatu[..dhatu.len()-1].to_string()
     } else if (gana == 5 || gana == 8) && dhatu.ends_with('Y') && dhatu.len() > 2 {
         // NU Y: zuY -> su (strip Y, z->s), ziY->si, SiY stays Si etc.
         let base = &dhatu[..dhatu.len()-1];
