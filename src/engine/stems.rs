@@ -226,7 +226,9 @@ pub fn derive_stem(
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
     // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
-    let dhatu_clean: String = if matches!(dhatu, "ziDu" | "zfBu" | "zfnBu" | "ziBu" | "zinBu") {
+    let dhatu_clean: String = if dhatu == "zwana" {
+        "stana".to_string() // zwana~ -> stana (zw->st, gold stanati not swanati)
+    } else if matches!(dhatu, "ziDu" | "zfBu" | "zfnBu" | "ziBu" | "zinBu") {
         // ziDu~ -> ziD -> siD etc., zfBu~ -> zfB -> sfB -> sarB
         let mut s = format!("s{}", &dhatu[1..]);
         s = s[..s.len()-1].to_string(); // strip final u
@@ -514,32 +516,37 @@ pub fn derive_stem(
             return (Some(f), None, steps);
         }
         "lang" => {
+            // fix nasals for lang too (zfnBu asfnBat->asfmBat etc.)
+            let fix_lang = |s: String| apply_nasal_palatal(&s);
             // bidadi / aya early as in Python
             if bidadi {
-                let root = bidadi_lang_stem(dhatu);
+                let root = fix_lang(bidadi_lang_stem(dhatu));
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
             if aya_present && !bidadi {
-                let root = bidadi_lang_stem(dhatu);
+                let root = fix_lang(bidadi_lang_stem(dhatu));
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
             if let Some(yam) = yam_cc_lang_stem(dhatu, antarganas) {
                 if cgana == 1 {
+                    let yam = fix_lang(yam);
                     append_step(&mut steps, &yam, &["7.2.9"], "lang_stem");
                     return (Some(yam), Some("a".to_string()), steps);
                 }
             }
             if let Some(nv) = g1_nv_present_stem(dhatu) {
                 if cgana == 1 {
+                    let nv = fix_lang(nv);
                     append_step(&mut steps, &nv, &["7.3.84"], "lang_stem");
                     return (Some(nv), Some("a".to_string()), steps);
                 }
             }
             if is_g1_a_final(dhatu) && cgana==1 {
-                append_step(&mut steps, dhatu, &["3.4.111"], "lang_stem");
-                return (Some(dhatu.to_string()), Some("a".to_string()), steps);
+                let d = fix_lang(dhatu.to_string());
+                append_step(&mut steps, &d, &["3.4.111"], "lang_stem");
+                return (Some(d), Some("a".to_string()), steps);
             }
             if dhatu=="f" && cgana==1 {
                 append_step(&mut steps, "Ar", &["3.4.111"], "lang_stem");
@@ -580,17 +587,19 @@ pub fn derive_stem(
             if is_thematic(cgana) {
                 if let Some(aya)=thematic_aya_present_stem(dhatu) {
                     if cgana==1 {
-                        let root = &aya[..aya.len()-1];
-                        append_step(&mut steps, root, &["3.4.111"], "lang_stem");
-                        return (Some(root.to_string()), Some("a".to_string()), steps);
+                        let root = fix_lang(aya[..aya.len()-1].to_string());
+                        append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                        return (Some(root), Some("a".to_string()), steps);
                     }
                 }
                 if let Some(init)=vowel_initial_lang_stem(dhatu) {
+                    let init = fix_lang(init);
                     append_step(&mut steps, &init, &["7.2.115"], "lang_stem");
                     return (Some(init), None, steps);
                 }
                 let root = thematic_present_base(dhatu, cgana, aupadeshik);
                 let root = lang_geminate_stem(dhatu, &root);
+                let root = fix_lang(root);
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
@@ -671,6 +680,7 @@ pub fn derive_stem(
             }
             if is_thematic(cgana) {
                 let root = if cgana==6 { g6_vidhilin_stem(dhatu) } else if let Some(aya)=thematic_aya_present_stem(dhatu) { aya[..aya.len()-1].to_string() } else { thematic_present_base(dhatu, cgana, aupadeshik) };
+                let root = apply_nasal_palatal(&root);
                 append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
                 return (Some(root), None, steps);
             }
