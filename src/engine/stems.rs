@@ -432,15 +432,23 @@ pub fn derive_stem(
         append_step(&mut steps, &ps, &["6.1.1","3.1.3"], "redup");
         present_stem = Some(ps);
     } else if is_ad(gana) {
-        // ad (02) special: Ru->nO, zRu->snO, wukzu->kzO (wu stripped above, then kzu->kzO)
+        // ad (02) special: Ru->nO, zRu->snO, wukzu->kzO, zu->sO, iR->e, brUY->bravI etc.
         let ad_ps = if dhatu == "Ru" {
             "nO".to_string()
         } else if dhatu == "zRu" {
             "snO".to_string()
+        } else if dhatu == "zu" {
+            "sO".to_string() // z->s, u->O long
+        } else if dhatu == "iR" {
+            "e".to_string() // iR -> e (gold eti)
         } else if dhatu == "wukzu" || dhatu == "kzu" {
             "kzO".to_string()
         } else if dhatu == "UrRuY" {
-            "UrRo".to_string() // guess, check gold
+            "UrRo".to_string()
+        } else if dhatu == "zwuY" {
+            "stavI".to_string() // gold stavIti/stOti - take stavI
+        } else if dhatu == "brUY" {
+            "bravI".to_string()
         } else {
             guna.clone()
         };
