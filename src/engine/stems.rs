@@ -316,6 +316,17 @@ pub fn derive_stem(
             let ps = if dhatu.ends_with("Ti") { format!("{}nTa", base) } else { format!("{}nta", base) };
             append_step(&mut steps, &ps, &["3.1.68"], "sap");
             present_stem = Some(ps);
+        } else if dhatu == "zasja" || dhatu == "sasja" {
+            // zasja~ (z->s) -> sajja (gold sajjati, not sasjati)
+            let ps = "sajja".to_string();
+            append_step(&mut steps, &ps, &["3.1.68"], "sap");
+            present_stem = Some(ps);
+        } else if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC") {
+            // Ca doubling: mleC->mlecCati, laC->lacCati, hrIC->hrIcCati etc. (gold has cC, dhatu_clean stripped final a)
+            let map: &[(&str, &str)] = &[("mleC", "mlecCa"), ("laC", "lacCa"), ("hrIC", "hrIcCa"), ("hurC", "hUrCa"), ("murC", "mUrCa")];
+            let ps = map.iter().find(|(k, _)| *k == dhatu).map(|(_, v)| v.to_string()).unwrap_or_else(|| format!("{}a", dhatu));
+            append_step(&mut steps, &ps, &["3.1.68"], "sap");
+            present_stem = Some(ps);
         } else if cgana == 1 && dhatu == "ati" {
             let ps = "anta".to_string();
             append_step(&mut steps, &ps, &["3.1.68"], "sap");
@@ -325,7 +336,7 @@ pub fn derive_stem(
             // Ki/Gi etc. need retroflex N: taki->taNka, uKi->uNKa (cf. asa~ gold taNkati, uNKati)
             let base = &dhatu[..dhatu.len()-1]; // without i
             if let Some(last) = base.chars().last() {
-                let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'N' | 'C' | 'J') { 'N' } else { 'n' };
+                let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
                 let ps = format!("{}{}{}a", &base[..base.len()-last.len_utf8()], nasal, last);
                 append_step(&mut steps, &ps, &["3.1.68"], "sap");
                 present_stem = Some(ps);
