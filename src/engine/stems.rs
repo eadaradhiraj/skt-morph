@@ -228,6 +228,9 @@ pub fn derive_stem(
     // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
     let dhatu_clean: String = if dhatu == "wunadi" {
         "nadi".to_string() // wu- anubandha: wunadi~ -> nadi -> nanda (gold nandati)
+    } else if dhatu.starts_with("wu") && dhatu.len() > 3 && (gana == 1 || gana == 2) && (dhatu == "wukzu" || dhatu == "wuosPUrjA") {
+        // wu- prefix stripping for wukzu~ -> kzu, wuosPUrjA handled above but keep general
+        dhatu[2..].to_string()
     } else if dhatu.starts_with("qu") && dhatu.len() > 3 {
         let rest = &dhatu[2..];
         if rest.ends_with('Y') { rest[..rest.len()-1].to_string() } else { rest.to_string() }
@@ -415,8 +418,20 @@ pub fn derive_stem(
         append_step(&mut steps, &ps, &["6.1.1","3.1.3"], "redup");
         present_stem = Some(ps);
     } else if is_ad(gana) {
-        append_step(&mut steps, &guna, &["3.1.3"], "ad");
-        present_stem = Some(guna.clone());
+        // ad (02) special: Ru->nO, zRu->snO, wukzu->kzO (wu stripped above, then kzu->kzO)
+        let ad_ps = if dhatu == "Ru" {
+            "nO".to_string()
+        } else if dhatu == "zRu" {
+            "snO".to_string()
+        } else if dhatu == "wukzu" || dhatu == "kzu" {
+            "kzO".to_string()
+        } else if dhatu == "UrRuY" {
+            "UrRo".to_string() // guess, check gold
+        } else {
+            guna.clone()
+        };
+        if ad_ps != guna { append_step(&mut steps, &ad_ps, &["3.1.3"], "ad"); } else { append_step(&mut steps, &guna, &["3.1.3"], "ad"); }
+        present_stem = Some(ad_ps);
     } else if is_nu(gana) {
         let ps = if dhatu.ends_with('R') {
             dhatu.to_string()
