@@ -349,8 +349,20 @@ pub fn derive_stem(
             let base = g6_plot_base(dhatu);
             if base != dhatu { append_step(&mut steps, &base, &["7.2.115"], "guNa"); }
             let ps = format!("{}a", base);
+            let ps = apply_nasal_palatal(&ps);
             append_step(&mut steps, &ps, &["3.1.68","3.1.69"], "sap");
             present_stem = Some(ps);
+        }
+        // nasal palatal for gana1 a-final already handled via base, but also fix general i-anubandha cases (adi etc already ok)
+        // apply for any gana1 present_stem that may have nc->Yc
+        if cgana == 1 {
+            if let Some(ps) = present_stem.clone() {
+                let fixed = apply_nasal_palatal(&ps);
+                if fixed != ps {
+                    append_step(&mut steps, &fixed, &["8.4.58"], "anunAsika");
+                    present_stem = Some(fixed);
+                }
+            }
         }
     } else if cgana == YA_GANA {
         if ["tras","Bram","yas"].contains(&dhatu) {

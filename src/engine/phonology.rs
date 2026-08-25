@@ -498,6 +498,17 @@ pub fn thematic_join(stem_a: &str, ending: &str) -> String {
     format!("{}{}", stem_a, ending)
 }
 
+pub fn apply_nasal_palatal(word: &str) -> String {
+    // n before palatal c/C/j/J/Y/S -> Y (e.g., kunca->kuYca, kuncati->kuYcati)
+    if !word.contains('n') { return word.to_string(); }
+    let mut s = word.to_string();
+    for (a, b) in [("nc", "Yc"), ("nC", "YC"), ("nj", "Yj"), ("nJ", "YJ")] {
+        s = s.replace(a, b);
+    }
+    // also handle n before S? keep as is for now (nS -> YS not needed)
+    s
+}
+
 pub fn apply_natva_to_word(word: &str) -> String {
     if !word.contains('n') { return word.to_string(); }
     let mut chars: Vec<char> = word.chars().collect();
