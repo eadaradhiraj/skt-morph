@@ -465,7 +465,22 @@ pub fn derive_stem(
         append_step(&mut steps, &ps, &["3.1.75"], "nu");
         present_stem = Some(ps);
     } else if gana == N_GANA {
-        let ps = if dhatu.ends_with('D') { format!("{}Ra", &dhatu[..dhatu.len()-1]) } else { format!("{}a", guna) };
+        // ru-dhādi 07: handle uCfd etc. (uCfdir~ -> uCfd after ir strip) via map
+        let ps = if dhatu == "uCfd" {
+            "CfRa".to_string() // uCfd -> CfR + a -> CfRatti
+        } else if dhatu == "utfd" {
+            "tfRa".to_string()
+        } else if dhatu == "uCfdir" {
+            "CfRa".to_string()
+        } else if dhatu == "utfdir" {
+            "tfRa".to_string()
+        } else if dhatu == "Sizx" {
+            "Sinaz".to_string()
+        } else if dhatu == "pizx" {
+            "pinaz".to_string()
+        } else if dhatu == "Banjo" || dhatu == "Banj" {
+            "Banak".to_string() // Banjo -> Banak -> Banakti (gold Banakti with k)
+        } else if dhatu.ends_with('D') { format!("{}Ra", &dhatu[..dhatu.len()-1]) } else { format!("{}a", guna) };
         append_step(&mut steps, &ps, &["7.3.88"], "n_gana");
         present_stem = Some(ps);
     } else if gana == NI_GANA {

@@ -171,7 +171,7 @@ pub fn join_form(
             let base_run = format!("{}n", &stem[..stem.len()-2]);
             let base_rur = &stem[..stem.len()-1];
             match ending {
-                "ti" => return format!("{}adDi", base_rur),
+                "ti" => return format!("{}atti", base_rur),
                 "taH" | "TaH" => return format!("{}dDaH", base_run),
                 "nti" => return format!("{}Danti", base_run),
                 "si" => return format!("{}atsi", base_rur),
