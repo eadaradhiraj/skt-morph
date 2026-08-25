@@ -226,27 +226,37 @@ pub fn derive_stem(
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>, Vec<EngineStep>) {
     // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
-    let dhatu_clean: String = if dhatu.starts_with("qu") && dhatu.len() > 3 {
+    let dhatu_clean: String = if dhatu == "wunadi" {
+        "nadi".to_string() // wu- anubandha: wunadi~ -> nadi -> nanda (gold nandati)
+    } else if dhatu.starts_with("qu") && dhatu.len() > 3 {
         let rest = &dhatu[2..];
         if rest.ends_with('Y') { rest[..rest.len()-1].to_string() } else { rest.to_string() }
     } else if dhatu == "divu" {
         "div".to_string()
     } else if dhatu.starts_with('z') && dhatu.len() > 2 && (gana == 1 || gana == 6) {
-        format!("s{}", &dhatu[1..])
+        let mut s = format!("s{}", &dhatu[1..]);
+        // also strip final I/U/F anubandha if present (ziDU~ -> siD, not siDU)
+        if (s.ends_with('I') || s.ends_with('U') || s.ends_with('F')) && s.len() > 2 && aupadeshik == format!("{}~", dhatu) {
+            s = s[..s.len()-1].to_string();
+        }
+        s
     } else if dhatu.starts_with('R') && dhatu.len() > 2 && gana == 1 {
         format!("n{}", &dhatu[1..])
     } else if dhatu.ends_with("ir") && aupadeshik.contains('~') && dhatu.len() > 3 {
         // general ir anubandha: cyutir (01.0040 cyuti~r) -> cyut, ruDir (07) -> ruD etc.
         dhatu[..dhatu.len()-2].to_string()
-    } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
-        // kftI~ -> kft, etc. (strip final I/U/F anubandha)
+    } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
+        // kftI~ -> kft, ziDU~ -> ziD etc. (strip final I/U/F anubandha) - len>2 for short like oKf? actually f below
         dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.ends_with('f') && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
-        // jyutf~ -> jyut (strip final f anubandha)
+    } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
+        // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
         dhatu[..dhatu.len()-1].to_string()
     } else if dhatu == "zaRu" {
         // 08.0002 zaRu~ -> san (z->s, R->n) for sunoti gold
         "san".to_string()
+    } else if gana == 1 && dhatu.ends_with("ncu") && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
+        // ancu~ -> anc, vancu~ -> vanc etc. (u is anubandha, then nc->Yc via nasal palatal -> aYca)
+        dhatu[..dhatu.len()-1].to_string()
     } else if (gana == 5 || gana == 8) && dhatu.ends_with('Y') && dhatu.len() > 2 {
         // NU Y: zuY -> su (strip Y, z->s), ziY->si, SiY stays Si etc.
         let base = &dhatu[..dhatu.len()-1];
@@ -312,7 +322,7 @@ pub fn derive_stem(
             // Ki/Gi etc. need retroflex N: taki->taNka, uKi->uNKa (cf. asa~ gold taNkati, uNKati)
             let base = &dhatu[..dhatu.len()-1]; // without i
             if let Some(last) = base.chars().last() {
-                let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g' | 'N' | 'C' | 'J') { 'N' } else { 'n' };
+                let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'N' | 'C' | 'J') { 'N' } else { 'n' };
                 let ps = format!("{}{}{}a", &base[..base.len()-last.len_utf8()], nasal, last);
                 append_step(&mut steps, &ps, &["3.1.68"], "sap");
                 present_stem = Some(ps);
