@@ -330,9 +330,13 @@ pub fn derive_stem(
                 append_step(&mut steps, &aya, &["3.1.33"], "yap");
                 present_stem = Some(aya);
             } else if is_g1_a_final(dhatu) || dhatu.ends_with('a') || dhatu.ends_with('A') {
-                // a-final roots (eDa, sparDa etc.) already end in a — don't duplicate shap 'a' (cf. ashtadhyayi.com gold: eDate not eDaate)
-                append_step(&mut steps, dhatu, &["3.1.68"], "sap");
-                present_stem = Some(dhatu.to_string());
+                // a-final roots (eDa, sparDa, siDa) already end in a — don't duplicate shap 'a', but apply guNa to stem without final a (siDa->seDa)
+                let stem = &dhatu[..dhatu.len()-1];
+                let graded = apply_guna_to_stem(stem);
+                let ps = format!("{}a", graded);
+                if graded != stem { append_step(&mut steps, &graded, &["7.2.115"], "guNa"); }
+                append_step(&mut steps, &ps, &["3.1.68"], "sap");
+                present_stem = Some(ps);
             } else {
                 let base = if cgana == 6 { g6_plot_base(dhatu) } else { thematic_present_base(dhatu, cgana, aupadeshik) };
                 if base != dhatu { append_step(&mut steps, &base, &["7.2.115"], "guNa"); }
