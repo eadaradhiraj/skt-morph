@@ -505,7 +505,10 @@ pub fn apply_nasal_palatal(word: &str) -> String {
     for (a, b) in [("nc", "Yc"), ("nC", "YC"), ("nj", "Yj"), ("nJ", "YJ")] {
         s = s.replace(a, b);
     }
-    // also handle n before S? keep as is for now (nS -> YS not needed)
+    // n before labial p/P/b/B/m -> m (tunpa->tumpa, tunPa->tumPa)
+    for (a, b) in [("np", "mp"), ("nP", "mP"), ("nb", "mb"), ("nB", "mB")] {
+        s = s.replace(a, b);
+    }
     s
 }
 

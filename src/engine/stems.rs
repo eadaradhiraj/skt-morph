@@ -235,9 +235,12 @@ pub fn derive_stem(
         "div".to_string()
     } else if dhatu.starts_with('z') && dhatu.len() > 2 && (gana == 1 || gana == 6) {
         let mut s = format!("s{}", &dhatu[1..]);
-        // also strip final I/U/F anubandha if present (ziDU~ -> siD, not siDU)
-        if (s.ends_with('I') || s.ends_with('U') || s.ends_with('F')) && s.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-            s = s[..s.len()-1].to_string();
+        // also strip final I/U/F/f/e anubandha if present (ziDU~ -> siD, zalf~ -> sal, cawe~ -> caw etc.)
+        if s.len() > 2 && aupadeshik == format!("{}~", dhatu) {
+            let last = s.chars().last().unwrap();
+            if matches!(last, 'I' | 'U' | 'F' | 'f' | 'e' | 'E') {
+                s = s[..s.len()-1].to_string();
+            }
         }
         s
     } else if dhatu.starts_with('R') && dhatu.len() > 2 && gana == 1 {
@@ -251,9 +254,16 @@ pub fn derive_stem(
     } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
         dhatu[..dhatu.len()-1].to_string()
+    } else if dhatu == "Bfzu" {
+        "Bfz".to_string() // Bfzu~ -> Bfz (strip u, then f->ar -> Barz)
+    } else if dhatu == "wuosPUrjA" {
+        "sPUrj".to_string() // wuosPUrjA~ -> sPUrj (wu+o anubandha, gold sPUrjati)
     } else if dhatu == "zaRu" {
         // 08.0002 zaRu~ -> san (z->s, R->n) for sunoti gold
         "san".to_string()
+    } else if (dhatu.ends_with('e') || dhatu.ends_with('E')) && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
+        // cawe~ -> caw, kawe~ -> kaw etc. (e is anubandha)
+        dhatu[..dhatu.len()-1].to_string()
     } else if gana == 1 && dhatu.ends_with("ncu") && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
         // ancu~ -> anc, vancu~ -> vanc etc. (u is anubandha, then nc->Yc via nasal palatal -> aYca)
         dhatu[..dhatu.len()-1].to_string()
