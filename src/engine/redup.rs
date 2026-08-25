@@ -14,6 +14,11 @@ pub struct Gana3Profile {
 
 fn profile(dhatu: &str, guna: &str) -> Gana3Profile {
     match dhatu {
+        "YiBI" => return Gana3Profile { present:"biBe".into(), join:"ad".into(), lang:"biBe".into(), vidhilin:"biBe".into(), future: format!("{}zya", guna) },
+        "ohAk" => return Gana3Profile { present:"jahA".into(), join:"ad".into(), lang:"jah".into(), vidhilin:"jah".into(), future: format!("{}sya", guna) },
+        "Rijir" | "Rij" => return Gana3Profile { present:"nenek".into(), join:"ad".into(), lang:"nenek".into(), vidhilin:"nenek".into(), future:"nekzya".into() },
+        "vizx" => return Gana3Profile { present:"vevez".into(), join:"ad".into(), lang:"vevez".into(), vidhilin:"vevez".into(), future:"vejizya".into() },
+        "Gf" => return Gana3Profile { present:"jaGar".into(), join:"ad".into(), lang:"jaGar".into(), vidhilin:"jaGar".into(), future:"Garizya".into() },
         "hu" => return Gana3Profile { present:"juhu".into(), join:"nu".into(), lang:"juh".into(), vidhilin:"juhuy".into(), future: format!("{}zya", guna) },
         "BI" => return Gana3Profile { present:"biBi".into(), join:"ad".into(), lang:"biBi".into(), vidhilin:"biBi".into(), future: format!("{}zya", guna) },
         "hrI" => return Gana3Profile { present:"jihrI".into(), join:"ad".into(), lang:"jihrI".into(), vidhilin:"jihrI".into(), future: format!("{}zya", guna) },
@@ -68,6 +73,11 @@ pub fn gana3_weak_stem(dhatu: &str, guna: &str, ending: &str, purusha: u8) -> St
     if ending=="ti" && purusha==1 {
         match dhatu {
             "BI" => return format!("bi{}", guna),
+            "YiBI" => return "biBe".to_string(),
+            "ohAk" => return "jahA".to_string(),
+            "Rijir" => return "nenek".to_string(),
+            "vizx" => return "vevez".to_string(),
+            "Gf" => return "jaGar".to_string(),
             "hrI" => return "jihre".to_string(),
             "pF"|"pf" => return "pipa".to_string(),
             "Bf" => return "biBa".to_string(),
