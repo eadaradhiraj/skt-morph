@@ -228,6 +228,8 @@ pub fn derive_stem(
     // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
     let dhatu_clean: String = if dhatu == "zwana" {
         "stana".to_string() // zwana~ -> stana (zw->st, gold stanati not swanati)
+    } else if dhatu == "zaRa" {
+        "sana".to_string() // zaRa~ -> sana (must before z->s branch)
     } else if matches!(dhatu, "ziDu" | "zfBu" | "zfnBu" | "ziBu" | "zinBu") {
         // ziDu~ -> ziD -> siD etc., zfBu~ -> zfB -> sfB -> sarB
         let mut s = format!("s{}", &dhatu[1..]);
@@ -263,6 +265,9 @@ pub fn derive_stem(
         dhatu[..dhatu.len()-1].to_string()
     } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
+        dhatu[..dhatu.len()-1].to_string()
+    } else if matches!(dhatu, "camu" | "Camu" | "jamu" | "Jamu" | "jimu") {
+        // camu~ -> cam, jimu~ -> jim -> jem etc. (u is anubandha, then i->e via guNa)
         dhatu[..dhatu.len()-1].to_string()
     } else if dhatu == "Bfzu" {
         "Bfz".to_string() // Bfzu~ -> Bfz (strip u, then f->ar -> Barz)
