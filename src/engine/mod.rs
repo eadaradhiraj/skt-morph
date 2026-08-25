@@ -4,6 +4,7 @@ pub mod endings;
 pub mod hardcode_all;
 #[cfg(feature = "hardcode")]
 pub mod hardcode_g01;
+pub mod hardcode_external;
 pub mod join;
 pub mod krdanta;
 pub mod lakara;

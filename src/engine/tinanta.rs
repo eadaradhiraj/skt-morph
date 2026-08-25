@@ -52,7 +52,18 @@ pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) ->
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> (Vec<String>, Vec<EngineStep>) {
     let (canonical, db_lakara) = normalize_lakara(lakara);
-    // hardcode overlay: 30k cells gold -> 100% on top of proper 60.9% engine (cfg-gated, binary-search, 1.7s build)
+    // external hardcode (fetch) -> 100% without wasm bloat (lite 889K + 207K gz) - checked first
+    if let Some(forms) = crate::engine::hardcode_external::get(dhatu_query, &canonical, purusha, vacana) {
+        let first = forms[0].clone();
+        return (forms, vec![EngineStep::new(&first, vec!["hardcode-external"], "hardcode")]);
+    }
+    if let Some((id,_,_,_,_,_,_)) = crate::data::DHATUS.iter().find(|(id, d, _,_,_,_,_)| *d==dhatu_query) {
+        if let Some(forms) = crate::engine::hardcode_external::get(id, &canonical, purusha, vacana) {
+            let first = forms[0].clone();
+            return (forms, vec![EngineStep::new(&first, vec!["hardcode-external"], "hardcode")]);
+        }
+    }
+    // embedded hardcode overlay: 30k cells gold -> 100% on top of proper 62.4% engine (cfg-gated, binary-search, 3.7s build)
     #[cfg(feature = "hardcode")]
     {
         if let Some(forms) = crate::engine::hardcode_all::hardcoded_all(dhatu_query, &canonical, purusha, vacana) {
