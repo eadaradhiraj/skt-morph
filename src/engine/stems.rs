@@ -309,9 +309,11 @@ pub fn derive_stem(
             present_stem = Some(ps);
         } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 {
             // general i anubandha with nasal: adi->anda, bidi->binda, ati->anta etc. (also len 3)
+            // Ki/Gi etc. need retroflex N: taki->taNka, uKi->uNKa (cf. asa~ gold taNkati, uNKati)
             let base = &dhatu[..dhatu.len()-1]; // without i
             if let Some(last) = base.chars().last() {
-                let ps = format!("{}n{}a", &base[..base.len()-last.len_utf8()], last);
+                let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g' | 'N' | 'C' | 'J') { 'N' } else { 'n' };
+                let ps = format!("{}{}{}a", &base[..base.len()-last.len_utf8()], nasal, last);
                 append_step(&mut steps, &ps, &["3.1.68"], "sap");
                 present_stem = Some(ps);
             } else {
