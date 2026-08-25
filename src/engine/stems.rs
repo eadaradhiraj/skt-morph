@@ -261,13 +261,6 @@ pub fn derive_stem(
     } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // kftI~ -> kft, ziDU~ -> ziD etc. (strip final I/U/F anubandha) - len>2 for short like oKf? actually f below
         dhatu[..dhatu.len()-1].to_string()
-    } else if gana == 1 && (dhatu.ends_with('u') || dhatu.ends_with('i')) && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-        // ziDu~ -> ziD, zfBu~ -> zfB etc. (also handle z->s together: zfBu~ -> sfB -> sarB after guna)
-        let mut s = dhatu[..dhatu.len()-1].to_string();
-        if s.starts_with('z') && (gana == 1 || gana == 6) {
-            s = format!("s{}", &s[1..]);
-        }
-        s
     } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
         dhatu[..dhatu.len()-1].to_string()
