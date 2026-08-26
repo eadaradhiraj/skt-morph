@@ -330,6 +330,16 @@ pub const _CAUSATIVE_LANG_BASE: &[&str] = &["ci","jYA","kfp","Gf","kFt","cyu","B
 pub const _CAUSATIVE_LANG_NO_AUG: &[&str] = &["uDras","Una","anDa","aMsa","aNka","aNga"];
 
 fn causative_aya_base(dhatu: &str) -> String {
+    // 10th gaṇa nasal infix: citi→cintaya, yatri→yantraya, jri→jaraya? etc.
+    if matches!(dhatu, "citi" | "yatri" | "kudri" | "tatri" | "matri") {
+        let base = &dhatu[..dhatu.len()-1]; // strip i
+        if let Some(pos) = base.rfind('t') {
+            let mut s = base.to_string();
+            s.insert(pos, 'n');
+            return format!("{}aya", s);
+        }
+    }
+    if dhatu == "jri" { return "jAraya".to_string(); }
     if CAUSATIVE_GUNA_AY.contains(&dhatu) { return format!("{}aya", apply_guna_to_stem(dhatu)); }
     if matches!(dhatu.chars().last(), Some('U'|'u'|'f'|'F')) { return format!("{}aya", apply_guna_to_stem(dhatu)); }
     let graded=apply_causative_grade(dhatu);
