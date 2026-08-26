@@ -280,8 +280,11 @@ pub fn derive_stem(
     } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
         dhatu[..dhatu.len()-1].to_string()
-    } else if matches!(dhatu, "camu" | "Camu" | "jamu" | "Jamu" | "jimu") {
-        // camu~ -> cam, jimu~ -> jim -> jem etc. (u is anubandha, then i->e via guNa)
+    } else if dhatu == "YiPalA" {
+        "Pal".to_string()
+    } else if dhatu.ends_with("mu") && gana == 1 && aupadeshik.contains('~') && dhatu.len() > 2 {
+        // general mu anubandha for BvAdi: camu~->cam, kramu~->kram, Bramu~->Bram, ramu~->ram, syamu~->syam etc.
+        // keep m, strip u (then guNa/vrddhi: kram->krAm)
         dhatu[..dhatu.len()-1].to_string()
     } else if dhatu == "Bfzu" {
         "Bfz".to_string() // Bfzu~ -> Bfz (strip u, then f->ar -> Barz)
@@ -393,6 +396,15 @@ pub fn derive_stem(
             if let Some(aya) = thematic_aya_present_stem(dhatu) {
                 append_step(&mut steps, &aya, &["3.1.33"], "yap");
                 present_stem = Some(aya);
+            } else if dhatu == "UWa" {
+                let ps = "UWa".to_string();
+                append_step(&mut steps, &ps, &["3.1.68"], "sap");
+                present_stem = Some(ps);
+            } else if dhatu == "nIla" {
+                // RIla -> nIla keep long I (not nel)
+                let ps = "nIla".to_string();
+                append_step(&mut steps, &ps, &["3.1.68"], "sap");
+                present_stem = Some(ps);
             } else if is_g1_a_final(dhatu) || dhatu.ends_with('a') || dhatu.ends_with('A') {
                 // a-final roots (eDa, sparDa, siDa) already end in a — don't duplicate shap 'a', but apply guNa to stem without final a (siDa->seDa)
                 let stem = &dhatu[..dhatu.len()-1];
@@ -615,6 +627,16 @@ pub fn derive_stem(
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
+            if dhatu == "UWa" {
+                let root = "UW".to_string();
+                append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                return (Some(root), Some("a".to_string()), steps);
+            }
+            if dhatu == "nIla" {
+                let root = "nIl".to_string();
+                append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                return (Some(root), Some("a".to_string()), steps);
+            }
             // a-final (siDa->seD) for lang: apply guNa to stem without final a (non-causative, non-YA)
             if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA {
                 let stem = &dhatu[..dhatu.len()-1];
@@ -774,6 +796,16 @@ pub fn derive_stem(
             }
             if dhatu == "zasja" || dhatu == "sasja" {
                 let root = apply_nasal_palatal(&"sajj".to_string());
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
+            }
+            if dhatu == "UWa" {
+                let root = "UW".to_string();
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
+            }
+            if dhatu == "nIla" {
+                let root = "nIl".to_string();
                 append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
                 return (Some(root), None, steps);
             }
