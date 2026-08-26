@@ -135,9 +135,9 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 }
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
-    // Ca doubling future: hurC->hUrCizya etc.
-    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
-        let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya")];
+    // Ca doubling future: hurC->hUrCizya etc. + zWiv
+    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv") {
+        let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya"), ("zWiv", "zWIvizya")];
         if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) { return v.to_string(); }
     }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
@@ -251,7 +251,9 @@ pub fn derive_stem(
         if rest.ends_with('Y') { rest[..rest.len()-1].to_string() } else { rest.to_string() }
     } else if dhatu == "divu" {
         "div".to_string()
-    } else if dhatu.starts_with('z') && dhatu.len() > 2 && (gana == 1 || gana == 6) {
+    } else if dhatu == "zWivu" {
+        "zWiv".to_string()
+    } else if dhatu.starts_with('z') && !dhatu.starts_with("zW") && !dhatu.starts_with("zw") && dhatu.len() > 2 && (gana == 1 || gana == 6) {
         let mut s = format!("s{}", &dhatu[1..]);
         // also strip final I/U/F/f/e anubandha if present (ziDU~ -> siD, zalf~ -> sal etc.) - keep lowercase u/i for specific ziDu/zfBu handled below
         if s.len() > 2 && aupadeshik == format!("{}~", dhatu) {
@@ -347,6 +349,9 @@ pub fn derive_stem(
             // zasja~ (z->s) -> sajja (gold sajjati, not sasjati)
             let ps = "sajja".to_string();
                 present_stem = Some(ps);
+        } else if dhatu == "zWiv" {
+            let ps = "zWIva".to_string();
+            present_stem = Some(ps);
         } else if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
             // Ca doubling: mleC->mlecCati, laC->lacCati, hrIC->hrIcCati etc. (gold has cC, dhatu_clean stripped final a)
             // sPurC->sPUrCa, yuC->yucCa, uC->ucCa
@@ -602,6 +607,10 @@ pub fn derive_stem(
                                 return (Some(root), Some("a".to_string()));
                 }
             }
+            if dhatu == "zWiv" {
+                let root = fix_lang("zWIv".to_string());
+                return (Some(root), Some("a".to_string()));
+            }
             // Ca doubling: mleC->mlecC for lang (present mlecCa -> lang mlecC)
             if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
                 let map: &[(&str, &str)] = &[("mleC", "mlecC"), ("laC", "lacC"), ("hrIC", "hrIcC"), ("hurC", "hUrC"), ("murC", "mUrC"), ("sPurC", "sPUrC"), ("yuC", "yucC"), ("uC", "ucC")];
@@ -747,6 +756,10 @@ pub fn derive_stem(
                     let root = apply_nasal_palatal(&root);
                                 return (Some(root), None);
                 }
+            }
+            if dhatu == "zWiv" {
+                let root = apply_nasal_palatal("zWIv");
+                return (Some(root), None);
             }
             // Ca doubling for vidhilin: mleC->mlecC
             if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
