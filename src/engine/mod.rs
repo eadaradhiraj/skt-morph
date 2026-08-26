@@ -1,10 +1,5 @@
 pub mod analyze;
 pub mod endings;
-#[cfg(feature = "hardcode")]
-pub mod hardcode_all;
-#[cfg(feature = "hardcode")]
-pub mod hardcode_g01;
-pub mod hardcode_external;
 pub mod join;
 pub mod krdanta;
 pub mod lakara;
@@ -13,6 +8,5 @@ pub mod phonology;
 pub mod prefix;
 pub mod upa_pada;
 pub mod redup;
-pub mod steps;
 pub mod stems;
 pub mod tinanta;

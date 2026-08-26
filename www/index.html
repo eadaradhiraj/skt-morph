@@ -64,29 +64,9 @@ input,select{padding:.4rem;margin:.2rem}
   <pre id="out-krdanta"></pre>
 </section>
 
-<div id="hardcode-status" style="font-size:.85em;color:#666;margin:.5rem 0">Loading hardcode…</div>
 <script type="module">
-import init, { analyze, search, generate_verb, generate_verb_with_prefix, generate_verb_paradigm, generate_verb_paradigm_with_prefix, generate_noun, generate_pronoun, generate_krdanta, generate_krdanta_with_prefix, init_hardcode, hardcode_loaded, hardcode_size } from '../pkg/skt_morph.js';
+import init, { analyze, search, generate_verb, generate_verb_with_prefix, generate_verb_paradigm, generate_verb_paradigm_with_prefix, generate_noun, generate_pronoun, generate_krdanta, generate_krdanta_with_prefix } from '../pkg/skt_morph.js';
 await init();
-// 100% no-bloat: lite wasm 970K + fetch hardcode.json (207K gz) → full accuracy
-// embedded hardcode (2.1M wasm) still works offline; external fetch upgrades lite to 100%
-try{
-  const st=document.getElementById('hardcode-status');
-  if(hardcode_loaded()){ st.textContent=`Hardcode: embedded ${hardcode_size()} cells (full 2.1M wasm, 100% offline)`; st.style.color='#2a7'; }
-  else {
-    // try fetch external hardcode.json (vite serves www/)
-    const r=await fetch('./hardcode.json');
-    if(r.ok){
-      const txt=await r.text();
-      const n=init_hardcode(txt);
-      st.textContent=`Hardcode: external ${n} cells loaded (lite 970K + 207K gz → 100%)`;
-      st.style.color='#2a7';
-    } else {
-      st.textContent=`Hardcode: not loaded (lite ${hardcode_size()} cells, 62.4% engine only) — run wasm-pack build (full) for 100% offline`;
-      st.style.color='#a60';
-    }
-  }
-} catch(e){ document.getElementById('hardcode-status').textContent='Hardcode load failed: '+e; }
 
 const tabs = ['analyze','verb','noun','krdanta'];
 tabs.forEach(t=>{

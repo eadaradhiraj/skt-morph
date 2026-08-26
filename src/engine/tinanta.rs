@@ -3,7 +3,6 @@ use crate::engine::lakara::{lakara_family, normalize_lakara};
 use crate::engine::stems::{derive_stem, conjugation_gana};
 use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
-use crate::engine::steps::EngineStep;
 use crate::engine::upa_pada::pada_allowed;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -31,122 +30,61 @@ fn load_dhatu_info(dhatu_query: &str) -> Option<(String, u8, String, String, Str
     Some((dhatu_query.to_string(), 1, "P".to_string(), "".to_string(), "".to_string(), "".to_string()))
 }
 
-// pada logic moved to upa_pada.rs (1.3.19, 1.3.29 etc.) – keeps is_sam/ji etc declarative
-
 pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> TinantaResult {
-    let (forms, _) = generate_all(dhatu_query, lakara, purusha, vacana);
+    let forms = generate_all(dhatu_query, lakara, purusha, vacana);
     let (canon, _) = normalize_lakara(lakara);
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> TinantaResult {
-    // generate_all_with_prefixes already applies prefix sandhi; no double-apply
-    let (forms, _) = generate_all_with_prefixes(dhatu_query, lakara, purusha, vacana, prefixes);
+    let forms = generate_all_with_prefixes(dhatu_query, lakara, purusha, vacana, prefixes);
     let (canon, _) = normalize_lakara(lakara);
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
-pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> (Vec<String>, Vec<EngineStep>) {
+pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> Vec<String> {
     generate_all_with_prefixes(dhatu_query, lakara, purusha, vacana, &[])
 }
 
-pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> (Vec<String>, Vec<EngineStep>) {
+pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
-    // external hardcode (fetch) -> 100% without wasm bloat (lite 889K + 207K gz) - checked first
-    if let Some(forms) = crate::engine::hardcode_external::get(dhatu_query, &canonical, purusha, vacana) {
-        let first = forms[0].clone();
-        return (forms, vec![EngineStep::new(&first, vec!["hardcode-external"], "hardcode")]);
-    }
-    if let Some((id,_,_,_,_,_,_)) = crate::data::DHATUS.iter().find(|(id, d, _,_,_,_,_)| *d==dhatu_query) {
-        if let Some(forms) = crate::engine::hardcode_external::get(id, &canonical, purusha, vacana) {
-            let first = forms[0].clone();
-            return (forms, vec![EngineStep::new(&first, vec!["hardcode-external"], "hardcode")]);
-        }
-    }
-    // embedded hardcode overlay: 30k cells gold -> 100% on top of proper 62.4% engine (cfg-gated, binary-search, 3.7s build)
-    #[cfg(feature = "hardcode")]
-    {
-        if let Some(forms) = crate::engine::hardcode_all::hardcoded_all(dhatu_query, &canonical, purusha, vacana) {
-            let first = forms[0].clone();
-            return (forms, vec![EngineStep::new(&first, vec!["hardcode"], "hardcode")]);
-        }
-        if let Some((id,_,_,_,_,_,_)) = crate::data::DHATUS.iter().find(|(id, d, _,_,_,_,_)| *d==dhatu_query) {
-            if let Some(forms) = crate::engine::hardcode_all::hardcoded_all(id, &canonical, purusha, vacana) {
-                let first = forms[0].clone();
-                return (forms, vec![EngineStep::new(&first, vec!["hardcode"], "hardcode")]);
-            }
-        }
-        if let Some(forms) = crate::engine::hardcode_g01::hardcoded_g01(dhatu_query, &canonical, purusha, vacana) {
-            let first = forms[0].clone();
-            return (forms, vec![EngineStep::new(&first, vec!["hardcode"], "hardcode")]);
-        }
-        if let Some((id,_,_,_,_,_,_)) = crate::data::DHATUS.iter().find(|(id, d, _,_,_,_,_)| *d==dhatu_query) {
-            if let Some(forms) = crate::engine::hardcode_g01::hardcoded_g01(id, &canonical, purusha, vacana) {
-                let first = forms[0].clone();
-                return (forms, vec![EngineStep::new(&first, vec!["hardcode"], "hardcode")]);
-            }
-        }
-    }
     let Some((dhatu, gana, root_pada, tags, antarganas, aupadeshik)) = load_dhatu_info(dhatu_query) else {
-        return (vec![], vec![]);
+        return vec![];
     };
-    let Some(family) = lakara_family(&db_lakara) else { return (vec![], vec![]); };
-
-    // pada check — prefix-sensitive (sam+gam allows Atmanepada, cf. ashtadhyayi.com / 1.3.29)
+    let Some(family) = lakara_family(&db_lakara) else { return vec![]; };
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
-    if db_lakara == "plit" { /* pada = P */ }
     if !pada_allowed(&root_pada, &pada, &dhatu, prefixes) {
-        return (vec![], vec![]);
+        return vec![];
     }
-
     let cgana = conjugation_gana(gana, &tags);
-    let (stem_opt, augment, mut steps) = derive_stem(&dhatu, gana, &family, "shuddha", &tags, &antarganas, &aupadeshik);
-    let Some(stem) = stem_opt else {
-        return (vec![], steps);
-    };
-
+    let (stem_opt, augment) = derive_stem(&dhatu, gana, &family, "shuddha", &tags, &antarganas, &aupadeshik);
+    let Some(stem) = stem_opt else { return vec![]; };
     let table = family_endings(&family, "kartari", pada, cgana, Some(&dhatu));
-    let Some(table) = table else {
-        return (vec![], steps);
-    };
+    let Some(table) = table else { return vec![]; };
     let idx = ((purusha - 1) * 3 + (vacana - 1)) as usize;
-    if idx >= table.len() { return (vec![], steps); }
-    let (variants, sutras) = &table[idx];
+    if idx >= table.len() { return vec![]; }
+    let (variants, _) = &table[idx];
     let mut forms = join_variants(&stem, variants, cgana, &family, purusha, pada, augment.as_deref(), &dhatu, vacana, &antarganas);
-    // Apply upasarga sandhi (Pāṇini) if prefixes present
     if !prefixes.is_empty() {
         forms = forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
     }
-    for form in &forms {
-        steps.push(EngineStep { form: form.clone(), sutras: sutras.clone(), kind: "tinanta".to_string(), meta: {
-            let mut m = std::collections::HashMap::new();
-            m.insert("lakara".to_string(), canonical.clone());
-            m.insert("purusha".to_string(), purusha.to_string());
-            m.insert("vacana".to_string(), vacana.to_string());
-            m
-        }});
-    }
-    (forms, steps)
+    forms
 }
 
 pub fn generate_paradigm(dhatu: &str, lakara: &str) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
-    for p in 1..=3 {
-        for v in 1..=3 {
-            let (forms, _) = generate_all(dhatu, lakara, p, v);
-            out.push(ParadigmEntry { purusha: p, vacana: v, forms });
-        }
-    }
+    for p in 1..=3 { for v in 1..=3 {
+        let forms = generate_all(dhatu, lakara, p, v);
+        out.push(ParadigmEntry { purusha: p, vacana: v, forms });
+    }}
     out
 }
 
 pub fn generate_paradigm_with_prefixes(dhatu: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
-    for p in 1..=3 {
-        for v in 1..=3 {
-            let (forms, _) = generate_all_with_prefixes(dhatu, lakara, p, v, prefixes);
-            out.push(ParadigmEntry { purusha: p, vacana: v, forms });
-        }
-    }
+    for p in 1..=3 { for v in 1..=3 {
+        let forms = generate_all_with_prefixes(dhatu, lakara, p, v, prefixes);
+        out.push(ParadigmEntry { purusha: p, vacana: v, forms });
+    }}
     out
 }

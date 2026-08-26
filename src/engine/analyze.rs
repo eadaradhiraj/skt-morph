@@ -48,7 +48,7 @@ fn build_tinanta_map() -> HashMap<String, Vec<Analysis>> {
     for (dhatu_id, dhatu, _, _, _, _, _) in crate::data::DHATUS {
         for lak in lakaras {
             for p in 1..=3u8 { for v in 1..=3u8 {
-                let (bases, _) = crate::engine::tinanta::generate_all(dhatu_id, lak, p, v);
+                let bases = crate::engine::tinanta::generate_all(dhatu_id, lak, p, v);
                 for base in bases {
                     for pref in &combos {
                         let form = if pref.is_empty() { base.clone() } else { crate::engine::prefix::apply_prefixes(pref, &base) };
@@ -82,7 +82,7 @@ fn build_krdanta_map() -> HashMap<String, Vec<Analysis>> {
     let pratyayas = ["kta","ktavatu","Satf","SAnac","tumun","ktvA","lyap","lyuw","tavya","anIyar","Rvul"];
     for (dhatu_id, dhatu, _, _, _, _, _) in crate::data::DHATUS {
         for pr in pratyayas {
-            let (bases, _) = crate::engine::krdanta::derive(dhatu_id, pr);
+            let bases = crate::engine::krdanta::derive(dhatu_id, pr);
             for base in bases {
                 for pref in &combos {
                     let form = if pref.is_empty() { base.clone() } else { crate::engine::prefix::apply_prefixes(pref, &base) };

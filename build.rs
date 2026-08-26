@@ -7,9 +7,6 @@ fn main() {
     fs::create_dir_all(Path::new("www")).unwrap();
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=src/data/dhatus_compact.rs");
-    println!("cargo:rerun-if-changed=src/engine/hardcode_all.rs");
-    println!("cargo:rerun-if-changed=src/engine/hardcode_g01.rs");
-    println!("cargo:rerun-if-changed=www/hardcode.json");
     for p in ["sktmorph/data/dhatus.sqlite", "../skt-morph-data/data/skt_morph.db", "/home/edhiraj/Documents/projs/skt-morph-data/data/skt_morph.db"] {
         println!("cargo:rerun-if-changed={}", p);
     }
@@ -83,8 +80,5 @@ print(f"Generated compact: {len(rows)} from {db}")
         eprintln!("{}", String::from_utf8_lossy(&o.stderr));
     }
 
-    // hardcode.json is now minimal (lite+external = 100%) - generated via gen_hardcode_min.rs (26423 entries, 1.8M)
-    // Keep it as committed artifact; do not auto-regen from embedded hardcode_*.rs (which is 30641 full) to preserve no-bloat.
-    // To regenerate minimal after engine improvements: cargo run --bin gen_hardcode_min --features native-db --no-default-features
-    println!("hardcode.json kept as is (minimal 26423, use gen_hardcode_min to refresh after engine gains)");
+
 }

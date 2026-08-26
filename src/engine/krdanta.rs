@@ -1,6 +1,5 @@
 //! Port of sktmorph/engine/krdanta.py
 use crate::engine::phonology::apply_guna_to_stem;
-use crate::engine::steps::EngineStep;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use crate::engine::join::internal_sandhi;
@@ -94,32 +93,28 @@ fn kta_stem(dhatu: &str) -> String {
 }
 
 pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
-    let (forms, _) = derive(dhatu_query, pratyaya);
+    let forms = derive(dhatu_query, pratyaya);
     KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
-    let (forms, _) = derive(dhatu_query, pratyaya);
+    let forms = derive(dhatu_query, pratyaya);
     let forms = if prefixes.is_empty() { forms } else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() };
     KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
 }
 
-pub fn derive(dhatu_query: &str, pratyaya: &str) -> (Vec<String>, Vec<EngineStep>) {
-    let Some((dhatu, gana)) = load_dhatu(dhatu_query) else { return (vec![], vec![]); };
+pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
+    let Some((dhatu, gana)) = load_dhatu(dhatu_query) else { return vec![]; };
     let rule = pratyaya_rule(pratyaya);
     if rule.is_none() {
-        let steps = vec![EngineStep::new(&dhatu, vec!["1.3.1"], "dhatu")];
-        return (vec![], steps);
+        return vec![];
     }
-    let (suffix, sutras, mode) = rule.unwrap();
-    let mut steps = vec![EngineStep::new(&dhatu, vec!["1.3.1"], "dhatu")];
+    let (suffix, _sutras, mode) = rule.unwrap();
     let guna = apply_guna_to_stem(&dhatu);
-    if guna != dhatu { steps.push(EngineStep::new(&guna, vec!["7.2.115"], "guNa")); }
 
     let form = match mode {
         "present" => {
             let base = present_stem(&dhatu, gana);
-            steps.push(EngineStep::new(&base, vec!["3.1.68"], "sap"));
             if pratyaya == "Satf" {
                 if base.ends_with('a') { format!("{}at", &base[..base.len()-1]) } else { format!("{}at", base) }
             } else if pratyaya == "Satf~" {
@@ -136,7 +131,6 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> (Vec<String>, Vec<EngineStep
             } else {
                 internal_sandhi(&dhatu, "ta")
             };
-            steps.push(EngineStep::new(&base, vec!["3.2.102"], "kta"));
             if pratyaya.starts_with("ktavatu") { format!("{}vat", base) } else { base }
         }
         "guna" => format!("{}{}", guna, suffix),
@@ -156,9 +150,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> (Vec<String>, Vec<EngineStep
         "lyap" => format!("{}{}", dhatu, suffix),
         _ => format!("{}{}", guna, suffix),
     };
-    let mut meta = HashMap::new(); meta.insert("pratyaya".to_string(), pratyaya.to_string());
-    steps.push(EngineStep { form: form.clone(), sutras: sutras.iter().map(|s| s.to_string()).collect(), kind: "krdanta".to_string(), meta });
-    (vec![form], steps)
+    vec![form]
 }
 
 // Validate against skt-morph-data participles
@@ -168,6 +160,6 @@ pub fn validate_against_gold(dhatu_id: &str, pratyaya: &str) -> Option<(String, 
     let v: serde_json::Value = serde_json::from_str(&data).ok()?;
     let base = v["participles"]["krut"].get(pratyaya)?.as_array()?.get(0)?;
     let gold_m = base.get("m")?.as_str()?.to_string();
-    let (ours, _) = derive(dhatu_id, pratyaya);
+    let ours = derive(dhatu_id, pratyaya);
     Some((ours.get(0).cloned().unwrap_or_default(), gold_m))
 }

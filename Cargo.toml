@@ -27,7 +27,6 @@ optional = true
 
 [features]
 default = []
-hardcode = []
 native-db = ["rusqlite"]
 
 [dev-dependencies]
