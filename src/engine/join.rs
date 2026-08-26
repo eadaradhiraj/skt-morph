@@ -99,6 +99,21 @@ pub fn join_form(
             }
         }
     }
+    // Divi (01.0677) — irregular Bvadi with o/u/v alternation
+    if dhatu == Some("Divi") && gana == 1 && family == "lat" {
+        match ending {
+            "ti" => return "Dinoti".to_string(),
+            "taH" => return "DinutaH".to_string(),
+            "nti" => return "Dinvanti".to_string(),
+            "si" => return "Dinozi".to_string(),
+            "TaH" => return "DinuTaH".to_string(),
+            "Ta" => return "DinuTa".to_string(),
+            "mi" | "Ami" => return "Dinomi".to_string(),
+            "vaH" | "AvaH" => return "DinuvaH".to_string(),
+            "maH" | "AmaH" => return "DinumaH".to_string(),
+            _ => {}
+        }
+    }
     // G3 (3) reduplicated – juhu→juhoti, bibhI→bibheti, pF→piparti
     if gana == 3 {
         if stem.ends_with("Ur") && ending == "ti" {
