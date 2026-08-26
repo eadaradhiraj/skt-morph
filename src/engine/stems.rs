@@ -135,7 +135,7 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 }
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
-    if dhatu.ends_with("Akzi") {
+    if dhatu.to_ascii_lowercase().ends_with("akzi") {
         let first = dhatu.chars().next().unwrap();
         return format!("{}ANkzizya", first);
     }
@@ -389,9 +389,10 @@ pub fn derive_stem(
         } else if cgana == 1 && dhatu == "ati" {
             let ps = "anta".to_string();
                 present_stem = Some(ps);
-        } else if dhatu.ends_with("Akzi") {
-            let first = dhatu.chars().next().unwrap();
-            let ps = format!("{}ANkza", first);
+        } else if dhatu.to_ascii_lowercase().ends_with("akzi") {
+            let idx = dhatu.find('A').unwrap_or(1);
+            let prefix = &dhatu[..idx];
+            let ps = format!("{}ANkza", prefix);
             present_stem = Some(ps);
         } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 {
             // general i anubandha with nasal: adi->anda, bidi->binda, ati->anta etc. (also len 3)
@@ -652,13 +653,15 @@ pub fn derive_stem(
                 let root = fix_lang(root);
                         return (Some(root), Some("a".to_string()));
             }
-            if dhatu.ends_with("Akzi") {
-                let first = dhatu.chars().next().unwrap();
-                return (Some(format!("{}ANkz", first)), Some("a".to_string()));
+            if dhatu.to_ascii_lowercase().ends_with("akzi") {
+                let idx = dhatu.find('A').unwrap_or(1);
+                let prefix = &dhatu[..idx];
+                return (Some(format!("{}ANkz", prefix)), Some("a".to_string()));
             }
-            if dhatu.ends_with("Akzi") {
-                let first = dhatu.chars().next().unwrap();
-                return (Some(format!("{}ANkz", first)), None);
+            if dhatu.to_ascii_lowercase().ends_with("akzi") {
+                let idx = dhatu.find('A').unwrap_or(1);
+                let prefix = &dhatu[..idx];
+                return (Some(format!("{}ANkz", prefix)), None);
             }
             if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
                 let base = &dhatu[..dhatu.len()-1];

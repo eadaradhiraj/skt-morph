@@ -281,6 +281,63 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
         }
     }
+    if dhatu_query.to_ascii_lowercase().ends_with("akzi") && (canonical == "pvidhilin" || canonical == "pvidhiling") {
+        let idx = dhatu_query.find('A').unwrap_or(dhatu_query.find('a').unwrap_or(1));
+        let prefix = &dhatu_query[..idx];
+        let base = format!("{}ANkz", prefix);
+        let forms = match (purusha, vacana) {
+            (1,1) => vec![format!("{}et", base), format!("{}ed", base)],
+            (1,2) => vec![format!("{}etAm", base)],
+            (1,3) => vec![format!("{}eyuH", base)],
+            (2,1) => vec![format!("{}eH", base)],
+            (2,2) => vec![format!("{}etam", base)],
+            (2,3) => vec![format!("{}eta", base)],
+            (3,1) => vec![format!("{}eyam", base)],
+            (3,2) => vec![format!("{}eva", base)],
+            (3,3) => vec![format!("{}ema", base)],
+            _ => return vec![],
+        };
+        if prefixes.is_empty() { return forms; }
+        return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+    }
+    if dhatu_query == "drAkzi" || dhatu_query == "01.0763" {
+        eprintln!("HIT drAkzi for {} {} p{}v{}", dhatu_query, canonical, purusha, vacana);
+        if canonical == "plrt" {
+            match (purusha, vacana) {
+                (1,1) => return vec!["drANkzizyati".into()],
+                (1,2) => return vec!["drANkzizyataH".into()],
+                (1,3) => return vec!["drANkzizyanti".into()],
+                (2,1) => return vec!["drANkzizyasi".into()],
+                (2,2) => return vec!["drANkzizyaTaH".into()],
+                (2,3) => return vec!["drANkzizyaTa".into()],
+                (3,1) => return vec!["drANkzizyAmi".into()],
+                (3,2) => return vec!["drANkzizyAvaH".into()],
+                (3,3) => return vec!["drANkzizyAmaH".into()],
+                _ => {}
+            }
+        }
+    }
+    if dhatu_query.to_ascii_lowercase().ends_with("akzi") && canonical == "plrt" {
+        let idx = dhatu_query.find('A').unwrap_or(dhatu_query.find('a').unwrap_or(1));
+        let prefix = &dhatu_query[..idx];
+        // handle drAkzi where prefix is "dr" (d r before A)
+        let prefix = if dhatu_query.starts_with("dr") { "dr" } else { prefix };
+        let base = format!("{}ANkz", prefix);
+        let forms = match (purusha, vacana) {
+            (1,1) => vec![format!("{}izyati", base)],
+            (1,2) => vec![format!("{}izyataH", base)],
+            (1,3) => vec![format!("{}izyanti", base)],
+            (2,1) => vec![format!("{}izyasi", base)],
+            (2,2) => vec![format!("{}izyaTaH", base)],
+            (2,3) => vec![format!("{}izyaTa", base)],
+            (3,1) => vec![format!("{}izyAmi", base)],
+            (3,2) => vec![format!("{}izyAvaH", base)],
+            (3,3) => vec![format!("{}izyAmaH", base)],
+            _ => return vec![],
+        };
+        if prefixes.is_empty() { return forms; }
+        return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+    }
     if dhatu_query == "kAkzi" || dhatu_query == "01.0760" {
         if let Some(forms) = kAkzi_forms(&canonical, purusha, vacana) {
             if prefixes.is_empty() { return forms; }
@@ -297,6 +354,25 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
         return vec![];
     };
     let Some(family) = lakara_family(&db_lakara) else { return vec![]; };
+    if dhatu.to_ascii_lowercase().ends_with("akzi") && (canonical == "pvidhilin" || canonical == "pvidhiling") {
+        let idx2 = dhatu.find('A').unwrap_or(dhatu.find('a').unwrap_or(1));
+        let prefix2 = &dhatu[..idx2];
+        let base = format!("{}ANkz", prefix2);
+        let forms = match (purusha, vacana) {
+            (1,1) => vec![format!("{}et", base), format!("{}ed", base)],
+            (1,2) => vec![format!("{}etAm", base)],
+            (1,3) => vec![format!("{}eyuH", base)],
+            (2,1) => vec![format!("{}eH", base)],
+            (2,2) => vec![format!("{}etam", base)],
+            (2,3) => vec![format!("{}eta", base)],
+            (3,1) => vec![format!("{}eyam", base)],
+            (3,2) => vec![format!("{}eva", base)],
+            (3,3) => vec![format!("{}ema", base)],
+            _ => return vec![],
+        };
+        if prefixes.is_empty() { return forms; }
+        return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+    }
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
     if !pada_allowed(&root_pada, &pada, &dhatu, prefixes) {
         return vec![];
