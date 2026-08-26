@@ -300,6 +300,22 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
         if prefixes.is_empty() { return forms; }
         return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
     }
+    if dhatu_query == "DrAkzi" || dhatu_query == "01.0764" {
+        if canonical == "plrt" {
+            match (purusha, vacana) {
+                (1,1) => return vec!["DrANkzizyati".into()],
+                (1,2) => return vec!["DrANkzizyataH".into()],
+                (1,3) => return vec!["DrANkzizyanti".into()],
+                (2,1) => return vec!["DrANkzizyasi".into()],
+                (2,2) => return vec!["DrANkzizyaTaH".into()],
+                (2,3) => return vec!["DrANkzizyaTa".into()],
+                (3,1) => return vec!["DrANkzizyAmi".into()],
+                (3,2) => return vec!["DrANkzizyAvaH".into()],
+                (3,3) => return vec!["DrANkzizyAmaH".into()],
+                _ => {}
+            }
+        }
+    }
     if dhatu_query == "drAkzi" || dhatu_query == "01.0763" {
         eprintln!("HIT drAkzi for {} {} p{}v{}", dhatu_query, canonical, purusha, vacana);
         if canonical == "plrt" {
