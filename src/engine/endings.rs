@@ -383,6 +383,7 @@ pub fn family_endings(
         }
     }
     if family=="vidhilin" && pada=="P" && gana==9 { return Some(vidhilin_ni_p()); }
+    if family=="lrt" && pada=="P" && matches!(gana, 5|8) { return Some(lrt_kartari_p()); }
     if family=="vidhilin" && pada=="P" && matches!(gana, 5|8) { return Some(vidhilin_nu_p()); }
     if family=="lot" && pada=="P" && gana==10 { return Some(lot_kartari_p_caus()); }
     if family=="lang" && pada=="P" && gana==4 { return Some(crate::engine::lang_ya::lang_ya_p()); }

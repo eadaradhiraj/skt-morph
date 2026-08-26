@@ -146,6 +146,13 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         return format!("{}avizy", &dhatu[..dhatu.len()-1]);
     }
     if gana==1 && dhatu.ends_with("kz") && dhatu!="kzi" { return format!("{}izya", dhatu); }
+    // YA-gaṇa future: div->devi, zivu->sevi etc. use guṇa (sev izya) not ya-stem (sIvy)
+    if gana==YA_GANA {
+        // apply_guna already for zivu->sev, div->dev? but for zivu stored as siv? Actually guna of siv is sev
+        // For tras/Bram/yas, guna = same (no vowel) -> tras izya
+        if dhatu=="div" || dhatu=="divu" { return "devizya".to_string(); }
+        return format!("{}izya", guna);
+    }
     if gana==1 && G1_A_FINAL.contains(&dhatu) {
         if let Some(ps)=present_stem { return g1_future_from_present(dhatu, ps, guna); }
     }
@@ -162,13 +169,15 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         }
     }
     if let Some(ps)=present_stem {
-        if ps.ends_with("Aya") { 
+        // YA-gaṇa future uses guṇa (sevizya), not ya-preset (sIvyizya) – skip ya rule for gana 4
+        let is_ya = gana == YA_GANA;
+        if !is_ya && ps.ends_with("Aya") {
             if dhatu.ends_with('E') { return format!("{}sy", &ps[..ps.len()-2]); }
             return format!("{}izya", &ps[..ps.len()-1]);
         }
-        if ps.ends_with("yAa") { return format!("{}sy", &ps[..ps.len()-1]); }
-        if ps.ends_with("aya") { return format!("{}izya", &ps[..ps.len()-1]); }
-        if ps.ends_with("ya") { return format!("{}izya", &ps[..ps.len()-1]); }
+        if !is_ya && ps.ends_with("yAa") { return format!("{}sy", &ps[..ps.len()-1]); }
+        if !is_ya && ps.ends_with("aya") { return format!("{}izya", &ps[..ps.len()-1]); }
+        if !is_ya && ps.ends_with("ya") { return format!("{}izya", &ps[..ps.len()-1]); }
         if ps.ends_with('a') {
             if gana==1 && !dhatu.is_empty() { return g1_future_from_present(dhatu, ps, guna); }
             let base=&ps[..ps.len()-1];
@@ -255,7 +264,7 @@ pub fn derive_stem(
             }
         }
         s
-    } else if dhatu.starts_with('R') && dhatu.len() > 2 && gana == 1 {
+    } else if dhatu.starts_with('R') && dhatu.len() > 2 && (gana == 1 || gana == 6) {
         format!("n{}", &dhatu[1..])
     } else if dhatu.ends_with("ir") && aupadeshik.contains('~') && dhatu.len() > 3 {
         // general ir anubandha: cyutir (01.0040 cyuti~r) -> cyut, ruDir (07) -> ruD etc.
@@ -596,6 +605,24 @@ pub fn derive_stem(
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
+            // Ti/ti with nasal for lang: maTi->manT, kuTi->kunT (also for vidhilin-like)
+            if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
+                let base = &dhatu[..dhatu.len()-2];
+                let root = if dhatu.ends_with("Ti") { format!("{}nT", base) } else { format!("{}nt", base) };
+                let root = fix_lang(root);
+                append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                return (Some(root), Some("a".to_string()), steps);
+            }
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
+                let base = &dhatu[..dhatu.len()-1];
+                if let Some(last) = base.chars().last() {
+                    let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
+                    let root = format!("{}{}{}", &base[..base.len()-last.len_utf8()], nasal, last);
+                    let root = fix_lang(root);
+                    append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                    return (Some(root), Some("a".to_string()), steps);
+                }
+            }
             if cgana == 6 {
                 let (root, aug) = g6_lang_stem(dhatu);
                 let mut root2 = lang_geminate_stem(dhatu, &root);
@@ -652,6 +679,13 @@ pub fn derive_stem(
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
+            // ad vowel-initial: ad->Ad with proper augment (a+ad->Ad)
+            if is_ad(gana) {
+                if let Some(init) = vowel_initial_lang_stem(dhatu) {
+                    append_step(&mut steps, &init, &["3.4.111"], "lang_stem");
+                    return (Some(init), None, steps);
+                }
+            }
             // default
             let root = if is_ad(gana) { guna.clone() } else if let Some(ps) = &present_stem { if ps.ends_with('a') { ps[..ps.len()-1].to_string() } else { ps.clone() } } else { guna.clone() };
             let aug = if vowel_initial_lang_stem(dhatu).is_some() { None } else { Some("a".to_string()) };
@@ -695,6 +729,24 @@ pub fn derive_stem(
             if cgana==YA_GANA {
                 if let Some(ps)=&present_stem {
                     let root = if ps.ends_with('a') { ps[..ps.len()-1].to_string() } else { ps.clone() };
+                    append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                    return (Some(root), None, steps);
+                }
+            }
+            // Ti/ti for vidhilin: maTi->manT etc.
+            if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
+                let base = &dhatu[..dhatu.len()-2];
+                let root = if dhatu.ends_with("Ti") { format!("{}nT", base) } else { format!("{}nt", base) };
+                let root = apply_nasal_palatal(&root);
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
+            }
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
+                let base = &dhatu[..dhatu.len()-1];
+                if let Some(last) = base.chars().last() {
+                    let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
+                    let root = format!("{}{}{}", &base[..base.len()-last.len_utf8()], nasal, last);
+                    let root = apply_nasal_palatal(&root);
                     append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
                     return (Some(root), None, steps);
                 }
