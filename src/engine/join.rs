@@ -148,7 +148,16 @@ pub fn join_form(
                 "tAm" => return format!("{}tAm", stem),
                 "antu" | "vantu" => return format!("{}vantu", base),
                 "Ani" => return format!("{}avAni", base),
-                _ => {}
+                "utAt" | "utAd" => return format!("{}{}", base, ending),
+                "utAm" => return format!("{}{}", base, ending),
+                "utam" => return format!("{}{}", base, ending),
+                "uta" => return format!("{}{}", base, ending),
+                "u" => return format!("{}u", base),
+                _ => {
+                    if ending.starts_with('u') {
+                        return format!("{}{}", base, ending);
+                    }
+                }
             }
         }
         if stem.ends_with('R') {

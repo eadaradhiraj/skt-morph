@@ -306,7 +306,7 @@ pub fn derive_stem(
         dhatu[..dhatu.len()-1].to_string()
     } else if gana == YA_GANA && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
         let base = &dhatu[..dhatu.len()-1];
-        if base.starts_with('z') { format!("s{}", &base[1..]) } else { base.to_string() }
+        if base.starts_with('z') && !base.starts_with("zW") && !base.starts_with("zw") { format!("s{}", &base[1..]) } else { base.to_string() }
     } else if (gana == 2 || gana == 3) && dhatu.ends_with('a') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // hana~ -> han, vida~ -> vid (AD adds final a)
         dhatu[..dhatu.len()-1].to_string()
@@ -404,10 +404,10 @@ pub fn derive_stem(
                 present_stem = Some(ps);
             }
         } else {
-            // gana 6
+            // gana 6 (also may have a-final like Ruda->nuda, tuda->tuda)
             let base = g6_plot_base(dhatu);
             if base != dhatu { append_step(&mut steps, &base, &["7.2.115"], "guNa"); }
-            let ps = format!("{}a", base);
+            let ps = if base.ends_with('a') || base.ends_with('A') { base.clone() } else { format!("{}a", base) };
             let ps = apply_nasal_palatal(&ps);
             append_step(&mut steps, &ps, &["3.1.68","3.1.69"], "sap");
             present_stem = Some(ps);
@@ -605,6 +605,19 @@ pub fn derive_stem(
                 append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
                 return (Some(root), Some("a".to_string()), steps);
             }
+            if dhatu == "zasja" || dhatu == "sasja" {
+                let root = fix_lang("sajj".to_string());
+                append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                return (Some(root), Some("a".to_string()), steps);
+            }
+            // a-final (siDa->seD) for lang: apply guNa to stem without final a (non-causative, non-YA)
+            if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA {
+                let stem = &dhatu[..dhatu.len()-1];
+                let graded = apply_guna_to_stem(stem);
+                let root = fix_lang(graded);
+                append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                return (Some(root), Some("a".to_string()), steps);
+            }
             // Ti/ti with nasal for lang: maTi->manT, kuTi->kunT (also for vidhilin-like)
             if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
                 let base = &dhatu[..dhatu.len()-2];
@@ -732,6 +745,19 @@ pub fn derive_stem(
                     append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
                     return (Some(root), None, steps);
                 }
+            }
+            if dhatu == "zasja" || dhatu == "sasja" {
+                let root = apply_nasal_palatal(&"sajj".to_string());
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
+            }
+            // a-final (siDa->seD) for vidhilin (non-causative, non-YA)
+            if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA {
+                let stem = &dhatu[..dhatu.len()-1];
+                let graded = apply_guna_to_stem(stem);
+                let root = apply_nasal_palatal(&graded);
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
             }
             // Ti/ti for vidhilin: maTi->manT etc.
             if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
