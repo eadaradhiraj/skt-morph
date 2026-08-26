@@ -137,6 +137,11 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 }
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
+    // Ca doubling future: hurC->hUrCizya etc.
+    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
+        let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya")];
+        if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) { return v.to_string(); }
+    }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
     if gana==1 {
         if let Some(s)=g1_special_lrt(dhatu) { return s; }
@@ -636,6 +641,15 @@ pub fn derive_stem(
                     return (Some(root), Some("a".to_string()), steps);
                 }
             }
+            // Ca doubling: mleC->mlecC for lang (present mlecCa -> lang mlecC)
+            if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
+                let map: &[(&str, &str)] = &[("mleC", "mlecC"), ("laC", "lacC"), ("hrIC", "hrIcC"), ("hurC", "hUrC"), ("murC", "mUrC"), ("sPurC", "sPUrC"), ("yuC", "yucC"), ("uC", "ucC")];
+                if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) {
+                    let root = fix_lang(v.to_string());
+                    append_step(&mut steps, &root, &["3.4.111"], "lang_stem");
+                    return (Some(root), Some("a".to_string()), steps);
+                }
+            }
             if cgana == 6 {
                 let (root, aug) = g6_lang_stem(dhatu);
                 let mut root2 = lang_geminate_stem(dhatu, &root);
@@ -707,6 +721,18 @@ pub fn derive_stem(
             return (Some(root), aug, steps);
         }
         "vidhilin" => {
+            if bidadi {
+                let root = bidadi_lang_stem(dhatu);
+                let root = apply_nasal_palatal(&root);
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
+            }
+            if aya_present && !bidadi {
+                let root = bidadi_lang_stem(dhatu);
+                let root = apply_nasal_palatal(&root);
+                append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                return (Some(root), None, steps);
+            }
             if let Some(yam)=yam_cc_lang_stem(dhatu, antarganas) {
                 if cgana==1 {
                     append_step(&mut steps, &yam, &["7.2.9"], "vidhilin_stem");
@@ -773,6 +799,15 @@ pub fn derive_stem(
                     let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
                     let root = format!("{}{}{}", &base[..base.len()-last.len_utf8()], nasal, last);
                     let root = apply_nasal_palatal(&root);
+                    append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
+                    return (Some(root), None, steps);
+                }
+            }
+            // Ca doubling for vidhilin: mleC->mlecC
+            if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
+                let map: &[(&str, &str)] = &[("mleC", "mlecC"), ("laC", "lacC"), ("hrIC", "hrIcC"), ("hurC", "hUrC"), ("murC", "mUrC"), ("sPurC", "sPUrC"), ("yuC", "yucC"), ("uC", "ucC")];
+                if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) {
+                    let root = apply_nasal_palatal(v);
                     append_step(&mut steps, &root, &["3.4.104"], "vidhilin_stem");
                     return (Some(root), None, steps);
                 }
