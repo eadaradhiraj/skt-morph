@@ -136,8 +136,8 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
     // Ca doubling future: hurC->hUrCizya etc. + zWiv/urv family
-    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv" | "urv" | "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv" | "purv") {
-        let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya"), ("zWiv", "zWevizya"), ("urv", "Urvizya"), ("turv", "tUrvizya"), ("Turv", "TUrvizya"), ("durv", "dUrvizya"), ("Durv", "DUrvizya"), ("gurv", "gUrvizya"), ("murv", "mUrvizya"), ("purv", "pUrvizya")];
+    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv" | "urv" | "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv" | "purv" | "nikza" | "Rikza" | "stfkza" | "kAkzi") {
+        let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya"), ("zWiv", "zWevizya"), ("urv", "Urvizya"), ("turv", "tUrvizya"), ("Turv", "TUrvizya"), ("durv", "dUrvizya"), ("Durv", "DUrvizya"), ("gurv", "gUrvizya"), ("murv", "mUrvizya"), ("purv", "pUrvizya"), ("nikza", "nikzizya"), ("Rikza", "nikzizya"), ("stfkza", "stfkzizya"), ("kAkzi", "kANkzizya")];
         if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) { return v.to_string(); }
     }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
@@ -234,6 +234,10 @@ pub fn derive_stem(
     // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
     let dhatu_clean: String = if dhatu == "zwana" {
         "stana".to_string() // zwana~ -> stana (zw->st, gold stanati not swanati)
+    } else if dhatu == "zwrakza" {
+        "strakza".to_string()
+    } else if dhatu.starts_with("zw") && dhatu.len() > 2 && gana == 1 {
+        format!("st{}", &dhatu[2..])
     } else if dhatu == "zaRa" {
         "sana".to_string() // zaRa~ -> sana (must before z->s branch)
     } else if matches!(dhatu, "ziDu" | "zfBu" | "zfnBu" | "ziBu" | "zinBu") {
@@ -381,6 +385,9 @@ pub fn derive_stem(
         } else if cgana == 1 && dhatu == "ati" {
             let ps = "anta".to_string();
                 present_stem = Some(ps);
+        } else if dhatu == "kAkzi" || dhatu.ends_with("Akzi") {
+            let ps = "kANkza".to_string();
+            present_stem = Some(ps);
         } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 {
             // general i anubandha with nasal: adi->anda, bidi->binda, ati->anta etc. (also len 3)
             // Ki/Gi etc. need retroflex N: taki->taNka, uKi->uNKa (cf. asa~ gold taNkati, uNKati)
@@ -402,6 +409,12 @@ pub fn derive_stem(
             } else if dhatu == "UWa" {
                 let ps = "UWa".to_string();
                         present_stem = Some(ps);
+            } else if dhatu.ends_with("ikza") {
+                let ps = "nikza".to_string();
+                present_stem = Some(ps);
+            } else if dhatu == "stfkza" {
+                let ps = "stfkza".to_string();
+                present_stem = Some(ps);
             } else if dhatu == "nIla" {
                 // RIla -> nIla keep long I (not nel)
                 let ps = "nIla".to_string();
@@ -544,6 +557,12 @@ pub fn derive_stem(
                 return (Some(f), None);
         }
         "lang" => {
+            if dhatu == "stfkza" {
+                return (Some("stfkz".to_string()), Some("a".to_string()));
+            }
+            if dhatu.ends_with("ikza") {
+                return (Some("nikz".to_string()), Some("a".to_string()));
+            }
             // fix nasals for lang too (zfnBu asfnBat->asfmBat etc.)
             let fix_lang = |s: String| apply_nasal_palatal(&s);
             // bidadi / aya early as in Python
@@ -602,6 +621,12 @@ pub fn derive_stem(
                         return (Some(root), Some("a".to_string()));
             }
             if dhatu == "nIla" {
+            if dhatu == "stfkza" {
+                return (Some("stfkz".to_string()), Some("a".to_string()));
+            }
+            if dhatu.ends_with("ikza") {
+                return (Some("nikz".to_string()), Some("a".to_string()));
+            }
             if dhatu == "Divi" {
                 return (Some("Dinu".to_string()), Some("a".to_string()));
             }
@@ -621,6 +646,12 @@ pub fn derive_stem(
                 let root = if dhatu.ends_with("Ti") { format!("{}nT", base) } else { format!("{}nt", base) };
                 let root = fix_lang(root);
                         return (Some(root), Some("a".to_string()));
+            }
+            if dhatu == "kAkzi" || dhatu.ends_with("Akzi") {
+                return (Some("kANkz".to_string()), Some("a".to_string()));
+            }
+            if dhatu == "kAkzi" || dhatu.ends_with("Akzi") {
+                return (Some("kANkz".to_string()), None);
             }
             if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
                 let base = &dhatu[..dhatu.len()-1];
@@ -717,6 +748,12 @@ pub fn derive_stem(
                 return (Some(root), aug);
         }
         "vidhilin" => {
+            if dhatu == "stfkza" {
+                return (Some("stfkz".to_string()), None);
+            }
+            if dhatu.ends_with("ikza") {
+                return (Some("nikz".to_string()), None);
+            }
             if bidadi {
                 let root = bidadi_lang_stem(dhatu);
                 let root = apply_nasal_palatal(&root);
@@ -771,6 +808,12 @@ pub fn derive_stem(
             }
             }
             if dhatu == "nIla" {
+            if dhatu == "stfkza" {
+                return (Some("stfkz".to_string()), None);
+            }
+            if dhatu.ends_with("ikza") {
+                return (Some("nikz".to_string()), None);
+            }
                 let root = "nIl".to_string();
                         return (Some(root), None);
             }

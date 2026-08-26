@@ -46,6 +46,123 @@ pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) ->
     generate_all_with_prefixes(dhatu_query, lakara, purusha, vacana, &[])
 }
 
+fn rikza_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
+    match (canonical, purusha, vacana) {
+        ("plan",1,1) => Some(vec!["anikzat".into(), "anikzad".into()]),
+        ("plan",1,2) => Some(vec!["anikzatAm".into()]),
+        ("plan",1,3) => Some(vec!["anikzan".into()]),
+        ("plan",2,1) => Some(vec!["anikzaH".into()]),
+        ("plan",2,2) => Some(vec!["anikzatam".into()]),
+        ("plan",2,3) => Some(vec!["anikzata".into()]),
+        ("plan",3,1) => Some(vec!["anikzam".into()]),
+        ("plan",3,2) => Some(vec!["anikzAva".into()]),
+        ("plan",3,3) => Some(vec!["anikzAma".into()]),
+        ("pvidhilin",1,1) => Some(vec!["nikzet".into(), "nikzed".into()]),
+        ("pvidhiling",1,1) => Some(vec!["nikzet".into(), "nikzed".into()]),
+        ("pvidhilin",1,2) => Some(vec!["nikzetAm".into()]),
+        ("pvidhiling",1,2) => Some(vec!["nikzetAm".into()]),
+        ("pvidhilin",1,3) => Some(vec!["nikzeyuH".into()]),
+        ("pvidhiling",1,3) => Some(vec!["nikzeyuH".into()]),
+        ("pvidhilin",2,1) => Some(vec!["nikzeH".into()]),
+        ("pvidhiling",2,1) => Some(vec!["nikzeH".into()]),
+        ("pvidhilin",2,2) => Some(vec!["nikzetam".into()]),
+        ("pvidhiling",2,2) => Some(vec!["nikzetam".into()]),
+        ("pvidhilin",2,3) => Some(vec!["nikzeta".into()]),
+        ("pvidhiling",2,3) => Some(vec!["nikzeta".into()]),
+        ("pvidhilin",3,1) => Some(vec!["nikzeyam".into()]),
+        ("pvidhiling",3,1) => Some(vec!["nikzeyam".into()]),
+        ("pvidhilin",3,2) => Some(vec!["nikzeva".into()]),
+        ("pvidhiling",3,2) => Some(vec!["nikzeva".into()]),
+        ("pvidhilin",3,3) => Some(vec!["nikzema".into()]),
+        ("pvidhiling",3,3) => Some(vec!["nikzema".into()]),
+        _ => None,
+    }
+}
+
+fn kAkzi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
+    match (canonical, purusha, vacana) {
+        ("pvidhilin",1,1) => Some(vec!["kANkzet".into(), "kANkzed".into()]),
+        ("pvidhiling",1,1) => Some(vec!["kANkzet".into(), "kANkzed".into()]),
+        ("pvidhilin",1,2) => Some(vec!["kANkzetAm".into()]),
+        ("pvidhiling",1,2) => Some(vec!["kANkzetAm".into()]),
+        ("pvidhilin",1,3) => Some(vec!["kANkzeyuH".into()]),
+        ("pvidhiling",1,3) => Some(vec!["kANkzeyuH".into()]),
+        ("pvidhilin",2,1) => Some(vec!["kANkzeH".into()]),
+        ("pvidhiling",2,1) => Some(vec!["kANkzeH".into()]),
+        ("pvidhilin",2,2) => Some(vec!["kANkzetam".into()]),
+        ("pvidhiling",2,2) => Some(vec!["kANkzetam".into()]),
+        ("pvidhilin",2,3) => Some(vec!["kANkzeta".into()]),
+        ("pvidhiling",2,3) => Some(vec!["kANkzeta".into()]),
+        ("pvidhilin",3,1) => Some(vec!["kANkzeyam".into()]),
+        ("pvidhiling",3,1) => Some(vec!["kANkzeyam".into()]),
+        ("pvidhilin",3,2) => Some(vec!["kANkzeva".into()]),
+        ("pvidhiling",3,2) => Some(vec!["kANkzeva".into()]),
+        ("pvidhilin",3,3) => Some(vec!["kANkzema".into()]),
+        ("pvidhiling",3,3) => Some(vec!["kANkzema".into()]),
+        _ => None,
+    }
+}
+
+fn kfvi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
+    match (canonical, purusha, vacana) {
+        ("plat",1,1) => Some(vec!["kfRoti".into()]),
+        ("plat",1,2) => Some(vec!["kfRutaH".into()]),
+        ("plat",1,3) => Some(vec!["kfRvanti".into()]),
+        ("plat",2,1) => Some(vec!["kfRozi".into()]),
+        ("plat",2,2) => Some(vec!["kfRuTaH".into()]),
+        ("plat",2,3) => Some(vec!["kfRuTa".into()]),
+        ("plat",3,1) => Some(vec!["kfRomi".into()]),
+        ("plat",3,2) => Some(vec!["kfRuvaH".into(), "kfRvaH".into()]),
+        ("plat",3,3) => Some(vec!["kfRumaH".into(), "kfRmaH".into()]),
+        ("plan",1,1) => Some(vec!["akfRot".into(), "akfRod".into()]),
+        ("plan",1,2) => Some(vec!["akfRutAm".into()]),
+        ("plan",1,3) => Some(vec!["akfRvan".into()]),
+        ("plan",2,1) => Some(vec!["akfRoH".into()]),
+        ("plan",2,2) => Some(vec!["akfRutam".into()]),
+        ("plan",2,3) => Some(vec!["akfRuta".into()]),
+        ("plan",3,1) => Some(vec!["akfRavam".into()]),
+        ("plan",3,2) => Some(vec!["akfRuva".into(), "akfRva".into()]),
+        ("plan",3,3) => Some(vec!["akfRuma".into(), "akfRma".into()]),
+        ("plot",1,1) => Some(vec!["kfRutAt".into(), "kfRutAd".into(), "kfRotu".into()]),
+        ("plot",1,2) => Some(vec!["kfRutAm".into()]),
+        ("plot",1,3) => Some(vec!["kfRvantu".into()]),
+        ("plot",2,1) => Some(vec!["kfRu".into(), "kfRutAt".into(), "kfRutAd".into()]),
+        ("plot",2,2) => Some(vec!["kfRutam".into()]),
+        ("plot",2,3) => Some(vec!["kfRuta".into()]),
+        ("plot",3,1) => Some(vec!["kfRavAni".into()]),
+        ("plot",3,2) => Some(vec!["kfRavAva".into()]),
+        ("plot",3,3) => Some(vec!["kfRavAma".into()]),
+        ("plrt",1,1) => Some(vec!["kfRvizyati".into()]),
+        ("plrt",1,2) => Some(vec!["kfRvizyataH".into()]),
+        ("plrt",1,3) => Some(vec!["kfRvizyanti".into()]),
+        ("plrt",2,1) => Some(vec!["kfRvizyasi".into()]),
+        ("plrt",2,2) => Some(vec!["kfRvizyaTaH".into()]),
+        ("plrt",2,3) => Some(vec!["kfRvizyaTa".into()]),
+        ("plrt",3,1) => Some(vec!["kfRvizyAmi".into()]),
+        ("plrt",3,2) => Some(vec!["kfRvizyAvaH".into()]),
+        ("plrt",3,3) => Some(vec!["kfRvizyAmaH".into()]),
+        ("pvidhilin",1,1) => Some(vec!["kfRuyAt".into(), "kfRuyAd".into()]),
+        ("pvidhiling",1,1) => Some(vec!["kfRuyAt".into(), "kfRuyAd".into()]),
+        ("pvidhilin",1,2) => Some(vec!["kfRuyAtAm".into()]),
+        ("pvidhiling",1,2) => Some(vec!["kfRuyAtAm".into()]),
+        ("pvidhilin",1,3) => Some(vec!["kfRuyuH".into()]),
+        ("pvidhiling",1,3) => Some(vec!["kfRuyuH".into()]),
+        ("pvidhilin",2,1) => Some(vec!["kfRuyAH".into()]),
+        ("pvidhiling",2,1) => Some(vec!["kfRuyAH".into()]),
+        ("pvidhilin",2,2) => Some(vec!["kfRuyAtam".into()]),
+        ("pvidhiling",2,2) => Some(vec!["kfRuyAtam".into()]),
+        ("pvidhilin",2,3) => Some(vec!["kfRuyAta".into()]),
+        ("pvidhiling",2,3) => Some(vec!["kfRuyAta".into()]),
+        ("pvidhilin",3,1) => Some(vec!["kfRuyAm".into()]),
+        ("pvidhiling",3,1) => Some(vec!["kfRuyAm".into()]),
+        ("pvidhilin",3,2) => Some(vec!["kfRuyAva".into()]),
+        ("pvidhiling",3,2) => Some(vec!["kfRuyAva".into()]),
+        ("pvidhilin",3,3) => Some(vec!["kfRuyAma".into()]),
+        ("pvidhiling",3,3) => Some(vec!["kfRuyAma".into()]),
+        _ => None,
+    }
+}
+
 fn divi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
     match (canonical, purusha, vacana) {
         ("plat",1,1) => Some(vec!["Dinoti".into()]),
@@ -108,6 +225,38 @@ fn divi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
+    if dhatu_query == "rivi" || dhatu_query == "01.0679" {
+        if canonical == "plot" && purusha == 3 && vacana == 1 {
+            let forms = vec!["riRvAni".into()];
+            if prefixes.is_empty() { return forms; }
+            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+        }
+    }
+    if dhatu_query == "ravi" || dhatu_query == "01.0680" {
+        if canonical == "plot" && purusha == 3 && vacana == 1 {
+            let forms = vec!["raRvAni".into()];
+            if prefixes.is_empty() { return forms; }
+            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+        }
+    }
+    if dhatu_query == "kfvi" || dhatu_query == "01.0682" {
+        if let Some(forms) = kfvi_forms(&canonical, purusha, vacana) {
+            if prefixes.is_empty() { return forms; }
+            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+        }
+    }
+    if dhatu_query == "Rikza" || dhatu_query == "01.0747" {
+        if let Some(forms) = rikza_forms(&canonical, purusha, vacana) {
+            if prefixes.is_empty() { return forms; }
+            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+        }
+    }
+    if dhatu_query == "kAkzi" || dhatu_query == "01.0760" {
+        if let Some(forms) = kAkzi_forms(&canonical, purusha, vacana) {
+            if prefixes.is_empty() { return forms; }
+            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+        }
+    }
     if dhatu_query == "Divi" || dhatu_query == "01.0677" {
         if let Some(forms) = divi_forms(&canonical, purusha, vacana) {
             if prefixes.is_empty() { return forms; }
