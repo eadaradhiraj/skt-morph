@@ -282,7 +282,7 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
         }
     }
     if dhatu_query.to_ascii_lowercase().ends_with("akzi") && (canonical == "pvidhilin" || canonical == "pvidhiling") {
-        let idx = dhatu_query.find('A').unwrap_or(dhatu_query.find('a').unwrap_or(1));
+        let idx = dhatu_query.to_ascii_lowercase().find("akzi").unwrap_or(1);
         let prefix = &dhatu_query[..idx];
         let base = format!("{}ANkz", prefix);
         let forms = match (purusha, vacana) {
@@ -318,7 +318,7 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
         }
     }
     if dhatu_query.to_ascii_lowercase().ends_with("akzi") && canonical == "plrt" {
-        let idx = dhatu_query.find('A').unwrap_or(dhatu_query.find('a').unwrap_or(1));
+        let idx = dhatu_query.to_ascii_lowercase().find("akzi").unwrap_or(1);
         let prefix = &dhatu_query[..idx];
         // handle drAkzi where prefix is "dr" (d r before A)
         let prefix = if dhatu_query.starts_with("dr") { "dr" } else { prefix };
@@ -355,7 +355,7 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
     };
     let Some(family) = lakara_family(&db_lakara) else { return vec![]; };
     if dhatu.to_ascii_lowercase().ends_with("akzi") && (canonical == "pvidhilin" || canonical == "pvidhiling") {
-        let idx2 = dhatu.find('A').unwrap_or(dhatu.find('a').unwrap_or(1));
+        let idx2 = dhatu.to_ascii_lowercase().find("akzi").unwrap_or(1);
         let prefix2 = &dhatu[..idx2];
         let base = format!("{}ANkz", prefix2);
         let forms = match (purusha, vacana) {
