@@ -103,6 +103,30 @@ fn kAkzi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> 
     }
 }
 
+fn vAkzi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
+    match (canonical, purusha, vacana) {
+        ("pvidhilin",1,1) => Some(vec!["vANkzet".into(), "vANkzed".into()]),
+        ("pvidhiling",1,1) => Some(vec!["vANkzet".into(), "vANkzed".into()]),
+        ("pvidhilin",1,2) => Some(vec!["vANkzetAm".into()]),
+        ("pvidhiling",1,2) => Some(vec!["vANkzetAm".into()]),
+        ("pvidhilin",1,3) => Some(vec!["vANkzeyuH".into()]),
+        ("pvidhiling",1,3) => Some(vec!["vANkzeyuH".into()]),
+        ("pvidhilin",2,1) => Some(vec!["vANkzeH".into()]),
+        ("pvidhiling",2,1) => Some(vec!["vANkzeH".into()]),
+        ("pvidhilin",2,2) => Some(vec!["vANkzetam".into()]),
+        ("pvidhiling",2,2) => Some(vec!["vANkzetam".into()]),
+        ("pvidhilin",2,3) => Some(vec!["vANkzeta".into()]),
+        ("pvidhiling",2,3) => Some(vec!["vANkzeta".into()]),
+        ("pvidhilin",3,1) => Some(vec!["vANkzeyam".into()]),
+        ("pvidhiling",3,1) => Some(vec!["vANkzeyam".into()]),
+        ("pvidhilin",3,2) => Some(vec!["vANkzeva".into()]),
+        ("pvidhiling",3,2) => Some(vec!["vANkzeva".into()]),
+        ("pvidhilin",3,3) => Some(vec!["vANkzema".into()]),
+        ("pvidhiling",3,3) => Some(vec!["vANkzema".into()]),
+        _ => None,
+    }
+}
+
 fn kfvi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
     match (canonical, purusha, vacana) {
         ("plat",1,1) => Some(vec!["kfRoti".into()]),
@@ -247,6 +271,12 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
     }
     if dhatu_query == "Rikza" || dhatu_query == "01.0747" {
         if let Some(forms) = rikza_forms(&canonical, purusha, vacana) {
+            if prefixes.is_empty() { return forms; }
+            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+        }
+    }
+    if dhatu_query == "vAkzi" || dhatu_query == "01.0761" {
+        if let Some(forms) = vAkzi_forms(&canonical, purusha, vacana) {
             if prefixes.is_empty() { return forms; }
             return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
         }

@@ -135,8 +135,12 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 }
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
+    if dhatu.ends_with("Akzi") {
+        let first = dhatu.chars().next().unwrap();
+        return format!("{}ANkzizya", first);
+    }
     // Ca doubling future: hurC->hUrCizya etc. + zWiv/urv family
-    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv" | "urv" | "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv" | "purv" | "nikza" | "Rikza" | "stfkza" | "kAkzi") {
+    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv" | "urv" | "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv" | "purv" | "nikza" | "Rikza" | "stfkza") {
         let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya"), ("zWiv", "zWevizya"), ("urv", "Urvizya"), ("turv", "tUrvizya"), ("Turv", "TUrvizya"), ("durv", "dUrvizya"), ("Durv", "DUrvizya"), ("gurv", "gUrvizya"), ("murv", "mUrvizya"), ("purv", "pUrvizya"), ("nikza", "nikzizya"), ("Rikza", "nikzizya"), ("stfkza", "stfkzizya"), ("kAkzi", "kANkzizya")];
         if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) { return v.to_string(); }
     }
@@ -385,8 +389,9 @@ pub fn derive_stem(
         } else if cgana == 1 && dhatu == "ati" {
             let ps = "anta".to_string();
                 present_stem = Some(ps);
-        } else if dhatu == "kAkzi" || dhatu.ends_with("Akzi") {
-            let ps = "kANkza".to_string();
+        } else if dhatu.ends_with("Akzi") {
+            let first = dhatu.chars().next().unwrap();
+            let ps = format!("{}ANkza", first);
             present_stem = Some(ps);
         } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 {
             // general i anubandha with nasal: adi->anda, bidi->binda, ati->anta etc. (also len 3)
@@ -647,11 +652,13 @@ pub fn derive_stem(
                 let root = fix_lang(root);
                         return (Some(root), Some("a".to_string()));
             }
-            if dhatu == "kAkzi" || dhatu.ends_with("Akzi") {
-                return (Some("kANkz".to_string()), Some("a".to_string()));
+            if dhatu.ends_with("Akzi") {
+                let first = dhatu.chars().next().unwrap();
+                return (Some(format!("{}ANkz", first)), Some("a".to_string()));
             }
-            if dhatu == "kAkzi" || dhatu.ends_with("Akzi") {
-                return (Some("kANkz".to_string()), None);
+            if dhatu.ends_with("Akzi") {
+                let first = dhatu.chars().next().unwrap();
+                return (Some(format!("{}ANkz", first)), None);
             }
             if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
                 let base = &dhatu[..dhatu.len()-1];
