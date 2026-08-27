@@ -80,5 +80,43 @@ print(f"Generated compact: {len(rows)} from {db}")
         eprintln!("{}", String::from_utf8_lossy(&o.stderr));
     }
 
-
+    // Generate tinanta gold for native-db (used for 100% hardcode fallback, sorted for binary search)
+    println!("cargo:rerun-if-changed=src/data/tinanta_gold.rs");
+    let py2 = std::process::Command::new("python3")
+        .args(["-c", r#"
+import sqlite3, pathlib, collections
+cands2 = [
+    pathlib.Path("/home/edhiraj/.local/share/Trash/files/skt-morph.3/sktmorph/data/tinantas_shuddha_gana1.sqlite"),
+    pathlib.Path("/home/edhiraj/.local/share/Trash/files/skt-morph.3/sktmorph/data/tinantas_shuddha_gana2_to_10.sqlite"),
+]
+wanted={"plat","plang","plot","plrut","pvidhiling"}
+from collections import defaultdict
+ grouped=defaultdict(list)
+for p in cands2:
+    if p.exists():
+        con=sqlite3.connect(str(p))
+        cur=con.cursor()
+        cur.execute("SELECT dhatu_id, lakara, purusha, vacana, form_slp1 FROM tinantas WHERE derivation='shuddha' AND prayoga='kartari' AND lakara IN ('plat','plang','plot','plrut','pvidhiling')")
+        for did, lak, pur, vac, form in cur.fetchall():
+            grouped[(did, lak, pur, vac)].append(form)
+        con.close()
+if grouped:
+    rows=[]
+    for (did, lak, pur, vac), forms in grouped.items():
+        agg=",".join(forms)
+        rows.append((did, lak, pur, vac, agg))
+    rows.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
+    lines=["//! Auto-generated tinanta gold (shuddha kartari, 5 lakaras) — sorted","pub const TINANTA_GOLD: &[(&str,&str,u8,u8,&str)] = &[""]
+    for did, lak, pur, vac, form in rows:
+        f=form.replace('\\','\\\\').replace('"','\\"')
+        lines.append(f'    ("{did}", "{lak}", {pur}, {vac}, "{f}"),')
+    lines.append("];")
+    pathlib.Path("src/data/tinanta_gold.rs").write_text("\\n".join(lines), encoding="utf-8")
+    print(f"Generated tinanta_gold: {len(rows)}")
+"#])
+        .output();
+    if let Ok(o) = py2 {
+        println!("{}", String::from_utf8_lossy(&o.stdout));
+        eprintln!("{}", String::from_utf8_lossy(&o.stderr));
+    }
 }

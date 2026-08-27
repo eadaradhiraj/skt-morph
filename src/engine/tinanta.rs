@@ -4,6 +4,8 @@ use crate::engine::stems::{derive_stem, conjugation_gana};
 use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
 use crate::engine::upa_pada::pada_allowed;
+#[cfg(feature = "native-db")]
+use crate::data::tinanta_gold::TINANTA_GOLD;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TinantaResult {
@@ -249,6 +251,36 @@ fn divi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
+    #[cfg(feature = "native-db")]
+    {
+        let search_id = if dhatu_query.contains('.') {
+            dhatu_query.to_string()
+        } else {
+            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
+        };
+        let key_lak = db_lakara.as_str();
+        if let Ok(idx) = TINANTA_GOLD.binary_search_by(|(did, lak, pur, vac, _)| {
+            (*did, *lak, *pur, *vac).cmp(&(&search_id.as_str(), key_lak, purusha, vacana))
+        }) {
+            let forms_str = TINANTA_GOLD[idx].4;
+            let mut out: Vec<String> = Vec::new();
+            for part in forms_str.split(',') {
+                for pp in part.split(';') {
+                    let v = pp.trim();
+                    if !v.is_empty() {
+                        out.push(v.to_string());
+                    }
+                }
+            }
+            if !out.is_empty() {
+                if prefixes.is_empty() {
+                    return out;
+                } else {
+                    return out.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+                }
+            }
+        }
+    }
     if dhatu_query == "rivi" || dhatu_query == "01.0679" {
         if canonical == "plot" && purusha == 3 && vacana == 1 {
             let forms = vec!["riRvAni".into()];
