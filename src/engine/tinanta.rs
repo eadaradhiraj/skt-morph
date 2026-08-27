@@ -295,12 +295,6 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
         }
     }
-    if dhatu_query == "kfvi" || dhatu_query == "01.0682" {
-        if let Some(forms) = kfvi_forms(&canonical, purusha, vacana) {
-            if prefixes.is_empty() { return forms; }
-            return forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
-        }
-    }
     if dhatu_query == "Rikza" || dhatu_query == "01.0747" {
         if let Some(forms) = rikza_forms(&canonical, purusha, vacana) {
             if prefixes.is_empty() { return forms; }
