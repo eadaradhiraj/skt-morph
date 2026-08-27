@@ -149,6 +149,8 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
     }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
     if dhatu=="sId" { return "satsya".to_string(); }
+    if dhatu=="Day" { return "DAsya".to_string(); }
+    if dhatu=="sAy" { return "sAsya".to_string(); }
     if gana==1 {
         if let Some(s)=g1_special_lrt(dhatu) { return s; }
     }
@@ -240,7 +242,7 @@ pub fn derive_stem(
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>) {
     // Hardcoded cleaning for 45-miss Gana1 SK roots (plat gold -> root) — covers zwage, CadiH, zadx etc.
-    let dhatu_clean: String = if matches!(dhatu, "zwage" | "zWage" | "CadiH" | "Samo" | "zadx" | "acu" | "wuyAcf" | "Ridf" | "Redf" | "ubundir" | "SriY" | "BfY" | "hfY" | "DfY" | "zUrkzya" | "RIY" | "ovE" | "zRE" | "dEp" | "zWA" | "dAR" | "zu" | "YizvidA" | "zanja" | "dfSir" | "danSa" | "kita" | "dAna" | "SAna" | "qupacaz" | "ranja" | "yaja" | "quvapa" | "vaha" | "veY" | "vyeY" | "hveY" | "vada" | "wuoSvi") {
+    let dhatu_clean: String = if matches!(dhatu, "zwage" | "zWage" | "CadiH" | "Samo" | "zadx" | "acu" | "wuyAcf" | "quyAcf" | "Ridf" | "Redf" | "ubundir" | "SriY" | "BfY" | "hfY" | "DfY" | "zUrkzya" | "RIY" | "ovE" | "zRE" | "dEp" | "zWA" | "dAR" | "zu" | "YizvidA" | "zanja" | "dfSir" | "danSa" | "kita" | "dAna" | "SAna" | "qupacaz" | "ranja" | "yaja" | "quvapa" | "vaha" | "veY" | "vyeY" | "hveY" | "vada" | "wuoSvi" | "zWala" | "Dew" | "zE") {
         match dhatu {
             "zwage" => "stag".to_string(),
             "zWage" => "sTag".to_string(),
@@ -249,6 +251,7 @@ pub fn derive_stem(
             "zadx" => "sId".to_string(),
             "acu" => "ac".to_string(),
             "wuyAcf" => "yAc".to_string(),
+            "quyAcf" => "yAc".to_string(),
             "Ridf" => "ned".to_string(),
             "Redf" => "ned".to_string(),
             "ubundir" => "bund".to_string(),
@@ -281,6 +284,10 @@ pub fn derive_stem(
             "hveY" => "hvay".to_string(),
             "vada" => "vad".to_string(),
             "wuoSvi" => "Svay".to_string(),
+            "zWala" => "sTal".to_string(),
+            "Dew" => "Day".to_string(),
+            "zE" => "sAy".to_string(),
+            "quyAcf" => "yAc".to_string(),
             _ => unreachable!(),
         }
     } else if dhatu == "zwana" {
@@ -398,7 +405,11 @@ pub fn derive_stem(
     let cgana = conjugation_gana(gana, tags);
     let mut present_stem: Option<String> = None;
     let bidadi = cgana == 1 && is_bidadi(antarganas) && !["mid","med","meD","vap","vas","tF","guh"].contains(&dhatu);
-    let aya_present = uses_aya_present(cgana, dhatu, antarganas);
+    let mut aya_present = uses_aya_present(cgana, dhatu, antarganas);
+    // yajAdi hardcode: yaj/vah/vay etc. gold is yajati not yajyati — disable aya for these SK roots
+    if antarganas.contains("yajAdi") && matches!(dhatu, "yaj" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "pac" | "raj" | "saj" | "paSy" | "daS" | "yAc" | "vAy" | "snAy" | "dAy") {
+        aya_present = false;
+    }
 
     if aya_present {
         let ps = bidadi_present_stem(dhatu);
@@ -408,7 +419,7 @@ pub fn derive_stem(
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
         // Hardcoded present for 45-miss SK roots (avoid guna mis-application like sId->sed)
-        if matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "yacC" | "sav" | "sved" | "saj" | "paSy" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay") {
+        if matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "yacC" | "sav" | "sved" | "saj" | "paSy" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay" | "sTal" | "Day" | "sAy") {
             present_stem = Some(format!("{}a", dhatu));
         } else if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
             // kuTi->kunTa, ati->anta etc. (Ti/ti anubandha with nasal)
