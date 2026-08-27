@@ -1,16 +1,34 @@
-# SktMorph WASM — Sanskrit Conjugations, Participles, Declensions
+# SktMorph WASM — तिङन्त, कृदन्त, सुबन्त
 
-Rust + WebAssembly. Live Pāṇinian engine.
+Rust + WebAssembly morphology. Generates forms and analyses them. No prakriyā trace, no accents, no kośa commentary.
 
-## Focus
-Only four features — no prakriya/sutra/kosha/commentary:
+## Contract
 
-- **Conjugations** (`tinanta`): 10 gaṇas, 6 lakāras (lat/laṅ/loṭ/vidhi-liṅ/lṛṭ/liṭ), parasmai/ātmanepadī, shuddha/kartari — `src/engine/` (phonology → stems → endings → join) — with **prefix** support (`pra/sama/anv` sandhi via `prefix.rs`)
-- **Participles** (`krdanta`): 20 pratyayas (kta, ktavatu, Satṛ, Sānach, tumun, ktvā, lyap...) — with prefixes
-- **Declensions**: `subanta` (27 paradigms) + `sarvanama` (70 pronouns)
-- **Search**: `analyze(word)` reverse lookup + `search(prefix)` autocomplete via embedded compact dhatu index (2259 dhatus)
+| Layer | Script / names |
+| --- | --- |
+| JS demo (`www/`) | Input: **Devanagari** or **Harvard-Kyoto**. Display: Devanagari. Grammatical labels: Sanskrit in Devanagari only (प्रथमा, एकवचन, लट्, …). |
+| WASM / Rust | **SLP1 only** for all stems, forms, dhātus, upasargas. Codes internally (`plat`, `prathamA`, `pum`, puruṣa/vacana as 1–3). |
+
+`www/translit.js` converts in and out. `www/labels.js` maps codes → देवनागरी names. Multiple analyses are all returned.
+
+## Generate
+
+- **तिङन्त** (`tinanta`): 10 gaṇas, 6 lakāras (लट् / लङ् / लोट् / विधिलिङ् / लृट् / लिट्), parasmai/ātmanepada, śuddha kartari. Optional **upasargas** (user list → sandhi in `prefix.rs`).
+- **कृदन्त** (`krdanta`): kṛt pratyayas (क्त, क्तवतु, शतृ, शानच्, तुमुन्, क्त्वा, ल्यप्, …). Same prefix support.
+- **सुबन्त** (`subanta`): ending-class paradigms (including foreign stems such as ट्रम्प → ट्रम्पेण). **सर्वनाम** tables for pronouns.
+
+## Analyze
+
+Given one surface form (after JS → SLP1), return **every** parse that exists:
+
+- तिङन्त: धातु, लकार, पुरुष, वचन, पद, उपसर्ग if present
+- कृदन्त: धातु, कृत्, उपसर्ग if present
+- सुबन्त / सर्वनाम: प्रातिपदिक, लिङ्ग, विभक्ति, वचन
+
+Example: ट्रम्पेण → प्रातिपदिक ट्रम्प, तृतीया, एकवचन.
 
 ## Build
+
 ```bash
 rustup target add wasm32-unknown-unknown
 cargo install wasm-pack
@@ -18,7 +36,17 @@ cargo build
 wasm-pack build --target web  # → pkg/
 cargo run --bin validate --features native-db -- --full  # vs gold (skt-morph-data)
 ```
+
 Demo: `cd www && npm i && npm run dev`
 
 ## Data
-Gold reference: `../skt-morph-data` (scraped from ashtadhyayi.com, 10 ganas, 10M forms). Rust embeds compact `src/data/dhatus_compact.rs` (152KB) generated from SQLite at build time — no runtime DB, no hardcode overlay.
+
+Gold reference: `../skt-morph-data` (ashtadhyayi.com scrape). Runtime WASM embeds `src/data/dhatus_compact.rs` (~2259 dhātus). Gold tables (`tinanta_gold`, `krdanta_gold`, `subanta_gold`) are **not** in the default WASM build (`native-db` / `wasm-gold` only).
+
+## Iterations
+
+### 2026-08-27 — I/O and labels
+
+- Locked: JS Devanagari/HK in; WASM SLP1; labels Sanskrit Devanagari; all parses kept.
+- Demo: `www/translit.js`, `www/labels.js`, `www/demo.js` — convert before/after WASM; tables and analysis cards in देवनागरी.
+- Prefix fields still comma-separated; converted to SLP1 before `generate_*_with_prefix`.

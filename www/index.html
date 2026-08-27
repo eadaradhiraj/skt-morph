@@ -1,202 +1,97 @@
 <!doctype html>
-<html>
+<html lang="hi">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>skt-morph WASM</title>
 <style>
-body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;padding:0 1rem}
-nav button{margin-right:.5rem;padding:.4rem .8rem;border:1px solid #ccc;background:#f5f5f5;cursor:pointer}
+body{font-family:"Noto Sans Devanagari",system-ui,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem}
+nav button{margin-right:.5rem;margin-bottom:.35rem;padding:.4rem .8rem;border:1px solid #ccc;background:#f5f5f5;cursor:pointer}
 nav button.active{background:#222;color:#fff}
 section{margin-top:1rem;border:1px solid #ddd;padding:1rem}
-pre{background:#f7f7f7;padding:.8rem;overflow:auto;white-space:pre-wrap}
-input,select{padding:.4rem;margin:.2rem}
+pre{background:#f7f7f7;padding:.8rem;overflow:auto;white-space:pre-wrap;font-size:.85em}
+input,select{padding:.4rem;margin:.2rem;font-size:1rem}
+table{border-collapse:collapse;width:100%;margin-top:.5rem}
+th,td{border:1px solid #ccc;padding:.45rem .6rem;text-align:left}
+th{background:#f3f3f3}
+.empty{color:#999}
+.hint,.count{font-size:.9em;color:#555;margin:.4rem 0}
+.miss{color:#900;margin:.4rem 0}
+.parse{border:1px solid #e2e2e2;padding:.75rem 1rem;margin:.6rem 0;background:#fafafa}
+.parse h3{margin:0 0 .4rem;font-size:1.05rem}
+.parse dl{margin:0;display:grid;grid-template-columns:9rem 1fr;gap:.15rem .75rem}
+.parse dt{color:#666}
+.parse dd{margin:0;font-weight:600}
+.hits{padding-left:1.2rem}
+code{font-size:.85em;color:#666}
+details{margin-top:.6rem}
 </style>
 </head>
 <body>
-<h1>skt-morph <small>WASM — conjugations · participles · declensions</small></h1>
+<h1>skt-morph <small>तिङन्त · कृदन्त · सुबन्त</small></h1>
 <nav>
-<button id="tab-analyze" class="active">Analyze / Search</button>
-<button id="tab-verb">Conjugations</button>
-<button id="tab-noun">Declensions</button>
-<button id="tab-krdanta">Participles</button>
+<button id="tab-analyze" class="active">विश्लेषण</button>
+<button id="tab-verb">तिङन्त</button>
+<button id="tab-noun">सुबन्त</button>
+<button id="tab-krdanta">कृदन्त</button>
 </nav>
 
 <section id="sec-analyze">
-  <input id="q" placeholder="rAmaH / gacCati / Bavati (SLP1)" style="width:360px">
-  <button id="btn-analyze">Analyze</button>
-  <button id="btn-search">Search prefix</button>
-  <pre id="out-analyze"></pre>
+  <input id="q" placeholder="रामेण / rAmeNa / ट्रम्पेण" style="width:360px" lang="hi">
+  <button id="btn-analyze">विश्लेषण</button>
+  <button id="btn-search">धातु खोज</button>
+  <div id="out-analyze"></div>
 </section>
 
 <section id="sec-verb" hidden>
-  <input id="dhatu" placeholder="dhatu e.g. BU or 01.0001" value="BU">
+  <input id="dhatu" placeholder="धातु भू / bhU / 01.0001" value="भू">
   <select id="lakara">
-    <option value="plat">plat (lat)</option>
-    <option value="plan">plan (laṅ)</option>
-    <option value="plot">plot (loṭ)</option>
-    <option value="plrt">plrt (lṛṭ)</option>
-    <option value="pvidhilin">pvidhilin</option>
-    <option value="plit">plit (liṭ)</option>
+    <option value="plat">लट् (परस्मै)</option>
+    <option value="plan">लङ्</option>
+    <option value="plot">लोट्</option>
+    <option value="plrt">लृट्</option>
+    <option value="pvidhilin">विधिलिङ्</option>
+    <option value="plit">लिट्</option>
+    <option value="alat">लट् (आत्मने)</option>
   </select>
-  <input id="verb-prefix" placeholder="prefixes e.g. pra,sam (optional)" style="width:180px">
-  <button id="btn-verb">Paradigm (9)</button>
-  <button id="btn-verb1">Single (1sg)</button>
-  <div style="font-size:.8em;color:#666">Upasarga sandhi: sam+BU→saMBU, pra+i→pre, pari+hf→parihar, etc. (Pāṇini)</div>
-  <pre id="out-verb"></pre>
+  <input id="verb-prefix" placeholder="उपसर्ग प्र, सम्" style="width:180px">
+  <button id="btn-verb">गण (९)</button>
+  <button id="btn-verb1">एक (प्रथम एकवचन)</button>
+  <div class="hint">उपसर्ग: सम्+भू → सम्भू, प्र+इ → प्रे</div>
+  <div id="out-verb"></div>
 </section>
 
 <section id="sec-noun" hidden>
-  <input id="nbase" placeholder="prātipadika e.g. rAma" value="rAma">
-  <select id="linga"><option>pum</option><option>stri</option><option>nap</option></select>
-  <button id="btn-noun">Decline</button>
-  <pre id="out-noun"></pre>
+  <input id="nbase" placeholder="प्रातिपदिक राम / rAma / ट्रम्प" value="राम">
+  <select id="linga">
+    <option value="pum">पुंलिङ्ग</option>
+    <option value="stri">स्त्रीलिङ्ग</option>
+    <option value="nap">नपुंसकलिङ्ग</option>
+  </select>
+  <button id="btn-noun">सुबन्त</button>
+  <div id="out-noun"></div>
 </section>
 
 <section id="sec-krdanta" hidden>
-  <input id="kdhatu" placeholder="dhatu e.g. BU" value="BU">
+  <input id="kdhatu" placeholder="धातु भू / bhU" value="भू">
   <select id="pratyaya">
-    <option>kta</option><option>ktavatu</option><option>tumun</option><option>ktvA</option><option>lyap</option><option>Satf</option><option>SAnac</option><option>lyuw</option><option>tavya</option><option>anIyar</option>
+    <option value="kta">क्त</option>
+    <option value="ktavatu">क्तवतु</option>
+    <option value="tumun">तुमुन्</option>
+    <option value="ktvA">क्त्वा</option>
+    <option value="lyap">ल्यप्</option>
+    <option value="Satf">शतृ</option>
+    <option value="SAnac">शानच्</option>
+    <option value="lyuw">ल्युट्</option>
+    <option value="tavya">तव्य</option>
+    <option value="anIyar">अनीयर्</option>
   </select>
-  <input id="krd-prefix" placeholder="prefixes e.g. sam, pra" style="width:160px">
-  <button id="btn-krdanta">Generate</button>
-  <div style="font-size:.8em;color:#666">With prefix: sam+BU+ktvA → saMBUtvA (m→M), pra+i → pre</div>
-  <pre id="out-krdanta"></pre>
+  <input id="krd-prefix" placeholder="उपसर्ग सम्, प्र" style="width:160px">
+  <button id="btn-krdanta">कृदन्त</button>
+  <div class="hint">सम्+भू+क्त्वा → सम्भूत्वा</div>
+  <div id="out-krdanta"></div>
 </section>
 
-<script type="module">
-import init, { analyze, search, generate_verb, generate_verb_with_prefix, generate_verb_paradigm, generate_verb_paradigm_with_prefix, generate_noun, generate_pronoun, generate_krdanta, generate_krdanta_with_prefix } from '../pkg/skt_morph.js';
-await init();
-
-const tabs = ['analyze','verb','noun','krdanta'];
-tabs.forEach(t=>{
-  document.getElementById('tab-'+t).onclick=()=>{
-    tabs.forEach(x=>{
-      document.getElementById('sec-'+x).hidden = x!==t;
-      document.getElementById('tab-'+x).classList.toggle('active', x===t);
-    });
-  };
-});
-
-function asObj(m){ if(!m) return {}; if(m instanceof Map) return Object.fromEntries(m); return m; }
-function strfy(v){ return JSON.stringify(v, (k,x)=> x instanceof Map ? Object.fromEntries(x) : x, 2); }
-
-document.getElementById('btn-analyze').onclick=()=>{
-  const w=document.getElementById('q').value.trim();
-  if(!w) return;
-  const res=analyze(w);
-  document.getElementById('out-analyze').textContent=strfy(res);
-};
-document.getElementById('btn-search').onclick=()=>{
-  const w=document.getElementById('q').value.trim();
-  const res=search(w,10);
-  document.getElementById('out-analyze').textContent=strfy(res);
-};
-function renderVerbParadigm(res){
-  const el=document.getElementById('out-verb');
-  if(!Array.isArray(res) || res.length===0){ el.textContent=strfy(res); return; }
-  // build 3x3 table: rows purusha (1=prathama,2=madhyama,3=uttama), cols vacana (1=eka,2=dvi,3=bahu)
-  const get = (p,v)=> (res.find(e=>e.purusha===p && e.vacana===v)||{}).forms||[];
-  let html='<table border=1 cellpadding=6 style="border-collapse:collapse;width:100%"><tr><th></th><th>eka (sg)</th><th>dvi (du)</th><th>bahu (pl)</th></tr>';
-  const rowNames=["", "prathama (3rd)", "madhyama (2nd)", "uttama (1st)"];
-  for(let p=1;p<=3;p++){
-    html+='<tr><td><b>'+rowNames[p]+'</b></td>';
-    for(let v=1;v<=3;v++) html+='<td>'+(get(p,v).join(', ')||'<span style="color:#999">—</span>')+'</td>';
-    html+='</tr>';
-  }
-  html+='</table><details style="margin-top:.5rem"><summary>JSON</summary><pre>'+strfy(res)+'</pre></details>';
-  el.innerHTML=html;
-}
-function renderVerbSingle(res){
-  const el=document.getElementById('out-verb');
-  if(!res || !res.forms){ el.textContent=strfy(res); return; }
-  let html='<div>Forms: <b>'+res.forms.join(', ')+'</b> ('+res.dhatu+' · '+res.lakara+' · '+res.purusha+'/'+res.vacana+')</div><pre>'+strfy(res)+'</pre>';
-  el.innerHTML=html;
-}
-document.getElementById('btn-verb').onclick=()=>{
-  const d=document.getElementById('dhatu').value.trim()||'BU';
-  const l=document.getElementById('lakara').value;
-  const pref=document.getElementById('verb-prefix').value.trim();
-  const res=pref ? generate_verb_paradigm_with_prefix(d,l,pref) : generate_verb_paradigm(d,l);
-  renderVerbParadigm(res);
-};
-document.getElementById('btn-verb1').onclick=()=>{
-  const d=document.getElementById('dhatu').value.trim()||'BU';
-  const l=document.getElementById('lakara').value;
-  const pref=document.getElementById('verb-prefix').value.trim();
-  const res=pref ? generate_verb_with_prefix(d,l,1,1,pref) : generate_verb(d,l,1,1);
-  renderVerbSingle(res);
-};
-function renderDeclension(res){
-  const el=document.getElementById('out-noun');
-  const decl=asObj(res?.declension);
-  if(!res || !decl || Object.keys(decl).length===0){
-    const raw = res ? strfy(res) : 'null';
-    el.innerHTML = '<div style="color:#900">No declension for <b>'+document.getElementById('nbase').value+'</b> ('+document.getElementById('linga').value+')</div>'+
-      '<div style="font-size:.85em;color:#666">Try: rAma (a-pum), sItA (A-stri), hari (i-pum), nadi (I-stri), guru (u-pum), phala (a-nap), rAjan (an-pum), manas (as-nap), bhavat (at-pum)</div>'+
-      '<pre>'+raw+'</pre>';
-    return;
-  }
-  const order=["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
-  let html='<div style="margin:.5rem 0">Stem: <b>'+res.stem+'</b> ('+res.linga+')</div>';
-  html+='<table border=1 cellpadding=6 style="border-collapse:collapse;width:100%"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
-  for(const v of order){
-    const row=decl[v]||[];
-    html+='<tr><td>'+v+'</td>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
-  }
-  html+='</table><details style="margin-top:.5rem"><summary>JSON</summary><pre>'+strfy(res)+'</pre></details>';
-  el.innerHTML=html;
-}
-document.getElementById('btn-noun').onclick=()=>{
-  const b=document.getElementById('nbase').value.trim()||'rAma';
-  const l=document.getElementById('linga').value;
-  let res=generate_noun(b,l);
-  if(!res || !asObj(res.declension) || Object.keys(asObj(res.declension)).length===0) res=generate_pronoun(b,l);
-  if(res && res.table && !res.declension){
-    const tbl=asObj(res.table);
-    const el=document.getElementById('out-noun');
-    let html='<div>Pratipadika: <b>'+res.base+'</b> ('+res.linga+')</div>';
-    html+='<table border=1 cellpadding=6 style="border-collapse:collapse"><tr><th>vibhakti</th><th>eka</th><th>dvi</th><th>bahu</th></tr>';
-    const order=["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI"];
-    for(const v of order){
-      const row=tbl[v]||[];
-      html+='<tr><td>'+v+'</td>'+row.map(c=>'<td>'+c+'</td>').join('')+'</tr>';
-    }
-    html+='</table><pre>'+strfy(res)+'</pre>';
-    el.innerHTML=html;
-    return;
-  }
-  renderDeclension(res);
-};
-document.getElementById('btn-krdanta').onclick=()=>{
-  const d=document.getElementById('kdhatu').value.trim()||'BU';
-  const p=document.getElementById('pratyaya').value;
-  const pref=document.getElementById('krd-prefix').value.trim();
-  try{
-    const res=pref ? generate_krdanta_with_prefix(d,p,pref) : generate_krdanta(d,p);
-    const el=document.getElementById('out-krdanta');
-    if(!res || !res.forms || res.forms.length===0 || (res.forms[0]==="")){
-      el.innerHTML='<div style="color:#900">No participle for <b>'+d+'</b> + '+p+'</div><div style="font-size:.85em;color:#666">Try: BU,gam,pac with kta/ktavatu/tumun/ktvA/Satf/SAnac (SLP1). Use dhatu form without prefix, e.g. BU not bhavati.</div><pre>'+strfy(res)+'</pre>';
-      return;
-    }
-    const indecl=["ktvA","lyap","tumun","RamuL","am"];
-    let html='<div>Base: <b>'+res.forms[0]+'</b> ('+d+' + '+p+')</div>';
-    if(indecl.includes(p)) html+='<div style="font-size:.85em;color:#666">Indeclinable (avyaya) — not declined</div>';
-    else try{
-      const base=res.forms[0].replace(/H$/,'').replace(/M$/,'');
-      const decl=generate_noun(base, 'pum');
-      const d2=asObj(decl?.declension);
-      if(d2 && d2['prathamA']){
-        html+='<div style="margin:.5rem 0">Declined (pum, a-stem): '+d2['prathamA'].join(' / ')+'</div>';
-      }
-    }catch(e){}
-    html+='<pre>'+strfy(res)+'</pre>';
-    el.innerHTML=html;
-  }catch(e){
-    document.getElementById('out-krdanta').textContent='Error: '+e + ' — try BU + kta';
-  }
-};
-document.getElementById('out-analyze').textContent='Try: rAmaH → Analyze,  BU → Search,  dhatu BU plat → Conjugations';
-</script>
+<script type="module" src="./demo.js"></script>
 </body>
 </html>
