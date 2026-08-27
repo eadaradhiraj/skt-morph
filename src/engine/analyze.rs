@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::sync::OnceLock;
 
+use crate::engine::prefix::split_upasarga_candidates;
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Analysis {
     pub word: String,
@@ -18,59 +20,79 @@ pub struct Analysis {
     pub upasarga: Option<String>,
 }
 
-const UPASARGAS: &[&str] = &[
-    "pra", "parA", "apa", "sam", "anu", "ava", "nis", "nir", "dus", "dur",
-    "vi", "A", "aDi", "api", "ati", "su", "ud", "aBi", "prati", "pari", "upa", "ni",
-];
-
 fn normalize_nasal(s: &str) -> String {
     s.replace("saG", "saM").replace("saN", "saM").replace("saM", "sam")
 }
 
-fn prefix_combos() -> Vec<Vec<String>> {
-    let mut combos: Vec<Vec<String>> = Vec::new();
-    combos.push(vec![]);
-    for &p in UPASARGAS { combos.push(vec![p.to_string()]); }
-    combos.push(vec!["sam".to_string(), "A".to_string()]);
-    combos.push(vec!["vi".to_string(), "parA".to_string()]);
-    combos
+fn keys_for(form: &str) -> [String; 2] {
+    [form.to_string(), normalize_nasal(form)]
 }
 
-// Lazy global maps: base/prefixed form -> Vec<Analysis> (without word)
-// Built on first analyze call, ~2.4M forms, ~200ms in release
+/// Unprefixed surface → analyses. Prefixes are peeled at query time (not stored).
 static TINANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 static KRDANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 
+const LAKARAS: &[&str] = &[
+    "plat", "alat", "plan", "alan", "plot", "alot", "plrt", "alrt",
+    "pvidhilin", "avidhilin", "plit", "alit",
+];
+
+const KRTS: &[&str] = &[
+    "kta", "ktavatu", "Satf", "SAnac", "tumun", "ktvA", "lyap", "lyuw", "tavya", "anIyar", "Rvul",
+];
+
+fn push_form(map: &mut HashMap<String, Vec<Analysis>>, form: &str, a: Analysis) {
+    for key in keys_for(form) {
+        if key.is_empty() {
+            continue;
+        }
+        let entry = map.entry(key).or_default();
+        let dup = entry.iter().any(|e| {
+            e.word_type == a.word_type
+                && e.dhatu_id == a.dhatu_id
+                && e.lakara == a.lakara
+                && e.purusha == a.purusha
+                && e.vacana == a.vacana
+                && e.pratyaya == a.pratyaya
+        });
+        if !dup {
+            entry.push(a.clone());
+        }
+    }
+}
+
 fn build_tinanta_map() -> HashMap<String, Vec<Analysis>> {
     let mut map: HashMap<String, Vec<Analysis>> = HashMap::new();
-    let combos = prefix_combos();
-    let lakaras = ["plat","alat","plan","alan","plot","alot","plrt","alrt","pvidhilin","avidhilin"];
     for (dhatu_id, dhatu, _, _, _, _, _) in crate::data::DHATUS {
-        for lak in lakaras {
-            for p in 1..=3u8 { for v in 1..=3u8 {
-                let bases = crate::engine::tinanta::generate_all(dhatu_id, lak, p, v);
-                for base in bases {
-                    for pref in &combos {
-                        let form = if pref.is_empty() { base.clone() } else { crate::engine::prefix::apply_prefixes(pref, &base) };
-                        // also store normalized variant for saM/saG
-                        for key in [form.clone(), normalize_nasal(&form)] {
-                            let entry = map.entry(key).or_insert_with(Vec::new);
-                            // dedup by dhatu+lakara+p+v+upasarga
-                            let upa = if pref.is_empty() { None } else { Some(pref.join("+")) };
-                            let exists = entry.iter().any(|a: &Analysis| a.dhatu_id.as_deref()==Some(dhatu_id) && a.lakara.as_deref()==Some(lak) && a.purusha==Some(p) && a.vacana==Some(v) && a.upasarga==upa);
-                            if !exists {
-                                entry.push(Analysis {
-                                    word: String::new(), word_type: "tinanta".to_string(),
-                                    dhatu: Some(dhatu.to_string()), dhatu_id: Some(dhatu_id.to_string()),
-                                    pratyaya: None, pratipadika: None, linga: None, vibhakti: None,
-                                    vacana: Some(v), lakara: Some(lak.to_string()), purusha: Some(p),
-                                    upasarga: upa.clone(),
-                                });
-                            }
+        for lak in LAKARAS {
+            for p in 1..=3u8 {
+                for v in 1..=3u8 {
+                    let bases = crate::engine::tinanta::generate_all(dhatu_id, lak, p, v);
+                    for base in bases {
+                        if base.is_empty() {
+                            continue;
                         }
+                        push_form(
+                            &mut map,
+                            &base,
+                            Analysis {
+                                word: String::new(),
+                                word_type: "tinanta".to_string(),
+                                dhatu: Some(dhatu.to_string()),
+                                dhatu_id: Some(dhatu_id.to_string()),
+                                pratyaya: None,
+                                pratipadika: None,
+                                linga: None,
+                                vibhakti: None,
+                                vacana: Some(v),
+                                lakara: Some((*lak).to_string()),
+                                purusha: Some(p),
+                                upasarga: None,
+                            },
+                        );
                     }
                 }
-            }}
+            }
         }
     }
     map
@@ -78,84 +100,133 @@ fn build_tinanta_map() -> HashMap<String, Vec<Analysis>> {
 
 fn build_krdanta_map() -> HashMap<String, Vec<Analysis>> {
     let mut map: HashMap<String, Vec<Analysis>> = HashMap::new();
-    let combos = prefix_combos();
-    let pratyayas = ["kta","ktavatu","Satf","SAnac","tumun","ktvA","lyap","lyuw","tavya","anIyar","Rvul"];
     for (dhatu_id, dhatu, _, _, _, _, _) in crate::data::DHATUS {
-        for pr in pratyayas {
-            let bases = crate::engine::krdanta::derive(dhatu_id, pr);
-            for base in bases {
-                for pref in &combos {
-                    let form = if pref.is_empty() { base.clone() } else { crate::engine::prefix::apply_prefixes(pref, &base) };
-                    for key in [form.clone(), normalize_nasal(&form)] {
-                        let upa = if pref.is_empty() { None } else { Some(pref.join("+")) };
-                        let entry = map.entry(key).or_insert_with(Vec::new);
-                        if !entry.iter().any(|a| a.dhatu_id.as_deref()==Some(dhatu_id) && a.pratyaya.as_deref()==Some(pr) && a.upasarga==upa) {
-                            entry.push(Analysis {
-                                word: String::new(), word_type: "krdanta".to_string(),
-                                dhatu: Some(dhatu.to_string()), dhatu_id: Some(dhatu_id.to_string()),
-                                pratyaya: Some(pr.to_string()),
-                                pratipadika: None, linga: None, vibhakti: None, vacana: None,
-                                lakara: None, purusha: None, upasarga: upa.clone(),
-                            });
-                        }
-                    }
+        for pr in KRTS {
+            for base in crate::engine::krdanta::derive(dhatu_id, pr) {
+                if base.is_empty() {
+                    continue;
                 }
+                push_form(
+                    &mut map,
+                    &base,
+                    Analysis {
+                        word: String::new(),
+                        word_type: "krdanta".to_string(),
+                        dhatu: Some(dhatu.to_string()),
+                        dhatu_id: Some(dhatu_id.to_string()),
+                        pratyaya: Some((*pr).to_string()),
+                        pratipadika: None,
+                        linga: None,
+                        vibhakti: None,
+                        vacana: None,
+                        lakara: None,
+                        purusha: None,
+                        upasarga: None,
+                    },
+                );
             }
         }
     }
     map
 }
 
+fn attach_upasarga(a: &Analysis, prefs: &[String], word: &str) -> Analysis {
+    let mut b = a.clone();
+    b.word = word.to_string();
+    b.upasarga = if prefs.is_empty() {
+        None
+    } else {
+        Some(prefs.join("+"))
+    };
+    b
+}
+
 pub fn analyze_word(word: &str) -> Vec<Analysis> {
     let mut out: Vec<Analysis> = Vec::new();
     let mut seen: HashSet<String> = HashSet::new();
 
-    // 1. Subanta/sarvanama (fast, no map)
     for m in crate::declension::subanta::analyze(word) {
-        let key = format!("subanta:{}:{}:{}:{}", m.get("pratipadika").unwrap_or(&"".to_string()), m.get("linga").unwrap_or(&"".to_string()), m.get("vibhakti").unwrap_or(&"".to_string()), m.get("vacana").unwrap_or(&"".to_string()));
+        let key = format!(
+            "subanta:{}:{}:{}:{}",
+            m.get("pratipadika").map(String::as_str).unwrap_or(""),
+            m.get("linga").map(String::as_str).unwrap_or(""),
+            m.get("vibhakti").map(String::as_str).unwrap_or(""),
+            m.get("vacana").map(String::as_str).unwrap_or("")
+        );
         if seen.insert(key) {
             out.push(Analysis {
-                word: word.to_string(), word_type: "subanta".to_string(),
-                dhatu: None, dhatu_id: None, pratyaya: None,
-                pratipadika: m.get("pratipadika").cloned(), linga: m.get("linga").cloned(),
-                vibhakti: m.get("vibhakti").cloned(), vacana: m.get("vacana").and_then(|v| v.parse().ok()),
-                lakara: None, purusha: None, upasarga: None,
+                word: word.to_string(),
+                word_type: "subanta".to_string(),
+                dhatu: None,
+                dhatu_id: None,
+                pratyaya: None,
+                pratipadika: m.get("pratipadika").cloned(),
+                linga: m.get("linga").cloned(),
+                vibhakti: m.get("vibhakti").cloned(),
+                vacana: m.get("vacana").and_then(|v| v.parse().ok()),
+                lakara: None,
+                purusha: None,
+                upasarga: None,
             });
         }
     }
     for m in crate::declension::sarvanama::analyze(word) {
-        let key = format!("sarvanama:{}:{}:{}:{}", m.get("pratipadika").unwrap_or(&"".to_string()), m.get("linga").unwrap_or(&"".to_string()), m.get("vibhakti").unwrap_or(&"".to_string()), m.get("vacana").unwrap_or(&"".to_string()));
+        let key = format!(
+            "sarvanama:{}:{}:{}:{}",
+            m.get("pratipadika").map(String::as_str).unwrap_or(""),
+            m.get("linga").map(String::as_str).unwrap_or(""),
+            m.get("vibhakti").map(String::as_str).unwrap_or(""),
+            m.get("vacana").map(String::as_str).unwrap_or("")
+        );
         if seen.insert(key) {
             out.push(Analysis {
-                word: word.to_string(), word_type: "sarvanama".to_string(),
-                dhatu: None, dhatu_id: None, pratyaya: None,
-                pratipadika: m.get("pratipadika").cloned(), linga: m.get("linga").cloned(),
-                vibhakti: m.get("vibhakti").cloned(), vacana: m.get("vacana").and_then(|v| v.parse().ok()),
-                lakara: None, purusha: None, upasarga: None,
+                word: word.to_string(),
+                word_type: "sarvanama".to_string(),
+                dhatu: None,
+                dhatu_id: None,
+                pratyaya: None,
+                pratipadika: m.get("pratipadika").cloned(),
+                linga: m.get("linga").cloned(),
+                vibhakti: m.get("vibhakti").cloned(),
+                vacana: m.get("vacana").and_then(|v| v.parse().ok()),
+                lakara: None,
+                purusha: None,
+                upasarga: None,
             });
         }
     }
 
-    // 2. Tinanta via map (lazy)
     let tmap = TINANTA_MAP.get_or_init(build_tinanta_map);
-    for key in [word.to_string(), normalize_nasal(word)] {
-        if let Some(v) = tmap.get(&key) {
-            for a in v {
-                let sig = format!("tinanta:{}:{}:{}:{}:{:?}", a.dhatu_id.as_deref().unwrap_or(""), a.lakara.as_deref().unwrap_or(""), a.purusha.unwrap_or(0), a.vacana.unwrap_or(0), a.upasarga);
-                if seen.insert(sig) {
-                    let mut b = a.clone(); b.word = word.to_string(); out.push(b);
+    let kmap = KRDANTA_MAP.get_or_init(build_krdanta_map);
+
+    for (prefs, rest) in split_upasarga_candidates(word) {
+        for key in keys_for(&rest) {
+            if let Some(v) = tmap.get(&key) {
+                for a in v {
+                    let sig = format!(
+                        "tinanta:{}:{}:{}:{}:{:?}",
+                        a.dhatu_id.as_deref().unwrap_or(""),
+                        a.lakara.as_deref().unwrap_or(""),
+                        a.purusha.unwrap_or(0),
+                        a.vacana.unwrap_or(0),
+                        prefs
+                    );
+                    if seen.insert(sig) {
+                        out.push(attach_upasarga(a, &prefs, word));
+                    }
                 }
             }
-        }
-    }
-    // 3. Krdanta via map
-    let kmap = KRDANTA_MAP.get_or_init(build_krdanta_map);
-    for key in [word.to_string(), normalize_nasal(word)] {
-        if let Some(v) = kmap.get(&key) {
-            for a in v {
-                let sig = format!("krdanta:{}:{}:{:?}", a.dhatu_id.as_deref().unwrap_or(""), a.pratyaya.as_deref().unwrap_or(""), a.upasarga);
-                if seen.insert(sig) {
-                    let mut b = a.clone(); b.word = word.to_string(); out.push(b);
+            if let Some(v) = kmap.get(&key) {
+                for a in v {
+                    let sig = format!(
+                        "krdanta:{}:{}:{:?}",
+                        a.dhatu_id.as_deref().unwrap_or(""),
+                        a.pratyaya.as_deref().unwrap_or(""),
+                        prefs
+                    );
+                    if seen.insert(sig) {
+                        out.push(attach_upasarga(a, &prefs, word));
+                    }
                 }
             }
         }
@@ -170,15 +241,42 @@ pub fn search_prefix(prefix: &str, limit: usize) -> Vec<String> {
     for (_, dhatu, _, _, _, _, _) in crate::data::DHATUS {
         if dhatu.to_lowercase().starts_with(&prefix_lower) {
             results.push(dhatu.to_string());
-            if results.len() >= limit { return results; }
+            if results.len() >= limit {
+                return results;
+            }
         }
     }
     for stem in ["rAma", "hari", "guru", "nadI", "Bava", "gacC"] {
         if stem.starts_with(prefix) {
             results.push(stem.to_string());
-            if results.len() >= limit { break; }
+            if results.len() >= limit {
+                break;
+            }
         }
     }
     results.truncate(limit);
     results
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn rame_na_is_trtiya_ekavacana() {
+        let hits = crate::declension::subanta::analyze("rAmeRa");
+        assert!(hits.iter().any(|m| {
+            m.get("pratipadika").map(String::as_str) == Some("rAma")
+                && m.get("vibhakti").map(String::as_str) == Some("tfIyA")
+                && m.get("vacana").map(String::as_str) == Some("1")
+        }));
+    }
+
+    #[test]
+    fn trampe_na_is_foreign_instrumental() {
+        let hits = crate::declension::subanta::analyze("wrampeRa");
+        assert!(hits.iter().any(|m| {
+            m.get("pratipadika").map(String::as_str) == Some("wrampa")
+                && m.get("vibhakti").map(String::as_str) == Some("tfIyA")
+                && m.get("vacana").map(String::as_str) == Some("1")
+        }));
+    }
 }

@@ -48,12 +48,7 @@ pub struct ParadigmEntry {
 }
 
 fn load_dhatu_info(dhatu_query: &str) -> Option<(String, u8, String, String, String, String)> {
-    for (id, dhatu, gana, pada, tags, ant, aup) in crate::data::DHATUS {
-        if *id == dhatu_query || *dhatu == dhatu_query {
-            return Some((dhatu.to_string(), *gana, pada.to_string(), tags.to_string(), ant.to_string(), aup.to_string()));
-        }
-    }
-    Some((dhatu_query.to_string(), 1, "P".to_string(), "".to_string(), "".to_string(), "".to_string()))
+    Some(crate::engine::dhatu::load_or_fallback(dhatu_query))
 }
 
 pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> TinantaResult {
@@ -277,11 +272,7 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
     let (canonical, db_lakara) = normalize_lakara(lakara);
     #[cfg(feature = "native-db")]
     {
-        let search_id = if dhatu_query.contains('.') {
-            dhatu_query.to_string()
-        } else {
-            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
-        };
+        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
         let key_lak = db_lakara.as_str();
         if let Ok(idx) = TINANTA_GOLD.binary_search_by(|(did, lak, pur, vac, _)| {
             (*did, *lak, *pur, *vac).cmp(&(&search_id.as_str(), key_lak, purusha, vacana))
@@ -307,11 +298,7 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
     }
     #[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
     {
-        let search_id = if dhatu_query.contains('.') {
-            dhatu_query.to_string()
-        } else {
-            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
-        };
+        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
         let key = (search_id, db_lakara.to_string(), purusha, vacana);
         if let Some(form) = WASM_TINANTA_GOLD.get(&key) {
             let mut out: Vec<String> = Vec::new();
@@ -6355,4 +6342,28 @@ pub fn generate_paradigm_with_prefixes(dhatu: &str, lakara: &str, prefixes: &[St
         out.push(ParadigmEntry { purusha: p, vacana: v, forms });
     }}
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bu_lat_prathama_ekavacana() {
+        let f = generate_all("BU", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "Bavati"), "{:?}", f);
+    }
+
+    #[test]
+    fn gam_lat_prathama_ekavacana() {
+        let f = generate_all("gam", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "gacCati"), "{:?}", f);
+    }
+
+    #[test]
+    fn pra_bu_lat() {
+        let prefs = vec!["pra".to_string()];
+        let f = generate_all_with_prefixes("BU", "plat", 1, 1, &prefs);
+        assert!(f.iter().any(|x| x == "praBavati"), "{:?}", f);
+    }
 }

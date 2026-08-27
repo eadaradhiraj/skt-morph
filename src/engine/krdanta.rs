@@ -53,12 +53,8 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
 }
 
 fn load_dhatu(dhatu_query: &str) -> Option<(String, u8)> {
-    for (id, dhatu, gana, _, _, _, _) in crate::data::DHATUS {
-        if *id == dhatu_query || *dhatu == dhatu_query {
-            return Some((dhatu.to_string(), *gana));
-        }
-    }
-    Some((dhatu_query.to_string(), 1))
+    let (dhatu, gana, _, _, _, _) = crate::engine::dhatu::load_or_fallback(dhatu_query);
+    Some((dhatu, gana))
 }
 
 fn present_stem(dhatu: &str, gana: u8) -> String {
@@ -101,11 +97,7 @@ pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[Str
     #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
     {
         // Try gold with prefix first (for pra-/sam- etc.)
-        let search_id = if dhatu_query.contains('.') {
-            dhatu_query.to_string()
-        } else {
-            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
-        };
+        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
         let pref = if prefixes.is_empty() { "" } else { &prefixes.join("") };
         // Try exact prefix match via binary search (gold is sorted by did, pref, var)
         if let Ok(idx) = crate::data::krdanta_gold::KRDANTA_GOLD.binary_search_by(|(did, p, var, _, _, _)| {
@@ -126,11 +118,7 @@ pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[Str
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
     #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
     {
-        let search_id = if dhatu_query.contains('.') {
-            dhatu_query.to_string()
-        } else {
-            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
-        };
+        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
         // Binary search in KRDANTA_GOLD (sorted by did, prefix="", variant)
         // For now we handle shuddha without prefix; for prefixes, the gold includes prefix
         // We search for (did, "", pratyaya) — for with prefixes, generate_with_prefixes will handle via prefix logic, but gold also has prefix variants
@@ -212,4 +200,15 @@ pub fn validate_against_gold(dhatu_id: &str, pratyaya: &str) -> Option<(String, 
     let gold_m = base.get("m")?.as_str()?.to_string();
     let ours = derive(dhatu_id, pratyaya);
     Some((ours.get(0).cloned().unwrap_or_default(), gold_m))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bu_kta() {
+        let f = derive("BU", "kta");
+        assert!(f.iter().any(|x| x == "BUta" || x.starts_with("BUta")), "{:?}", f);
+    }
 }

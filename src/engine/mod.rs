@@ -1,4 +1,5 @@
 pub mod analyze;
+pub mod dhatu;
 pub mod endings;
 pub mod join;
 pub mod krdanta;

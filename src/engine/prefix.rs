@@ -130,6 +130,48 @@ pub fn apply_prefixes(prefixes: &[String], base: &str) -> String {
     cur
 }
 
+pub const UPASARGAS: &[&str] = &[
+    "pra", "parA", "apa", "sam", "anu", "ava", "nis", "nir", "dus", "dur",
+    "vi", "A", "aDi", "api", "ati", "su", "ud", "aBi", "prati", "pari", "upa", "ni",
+];
+
+/// Remainders `rest` such that `apply_forward_sandhi(prefix, rest) == word`.
+pub fn unapply_prefix(prefix: &str, word: &str) -> Vec<String> {
+    let mut out = Vec::new();
+    if prefix.is_empty() || word.len() <= prefix.len() {
+        return out;
+    }
+    for i in 1..word.len() {
+        let rest = &word[i..];
+        if rest.is_empty() {
+            continue;
+        }
+        if apply_forward_sandhi(prefix, rest) == word {
+            out.push(rest.to_string());
+        }
+    }
+    out
+}
+
+/// `(upasargas left-to-right, bare form)` including the unprefixed word.
+pub fn split_upasarga_candidates(word: &str) -> Vec<(Vec<String>, String)> {
+    let mut out = vec![(Vec::new(), word.to_string())];
+    for &p in UPASARGAS {
+        for rest in unapply_prefix(p, word) {
+            out.push((vec![p.to_string()], rest.clone()));
+            for &p2 in UPASARGAS {
+                if p2 == p {
+                    continue;
+                }
+                for rest2 in unapply_prefix(p2, &rest) {
+                    out.push((vec![p.to_string(), p2.to_string()], rest2));
+                }
+            }
+        }
+    }
+    out
+}
+
 // For analyze, we need split candidates - simplified version for generation is enough
 // Full split BFS is in analyze, here just for completeness
 
@@ -143,5 +185,15 @@ mod tests {
     #[test]
     fn test_pra_ets() {
         assert_eq!(apply_forward_sandhi("pra", "eti"), "preti");
+    }
+    #[test]
+    fn unapply_pra_gacchati() {
+        let rest = unapply_prefix("pra", "pragacCati");
+        assert!(rest.iter().any(|r| r == "gacCati"), "{:?}", rest);
+    }
+    #[test]
+    fn unapply_sam_bhu() {
+        let rest = unapply_prefix("sam", "saMBUtvA");
+        assert!(rest.iter().any(|r| r == "BUtvA"), "{:?}", rest);
     }
 }
