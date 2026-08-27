@@ -98,6 +98,26 @@ pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
+    #[cfg(feature = "native-db")]
+    {
+        // Try gold with prefix first (for pra-/sam- etc.)
+        let search_id = if dhatu_query.contains('.') {
+            dhatu_query.to_string()
+        } else {
+            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
+        };
+        let pref = if prefixes.is_empty() { "" } else { &prefixes.join("") };
+        // Try exact prefix match via binary search (gold is sorted by did, pref, var)
+        if let Ok(idx) = crate::data::krdanta_gold::KRDANTA_GOLD.binary_search_by(|(did, p, var, _, _, _)| {
+            (*did, *p, *var).cmp(&(&search_id.as_str(), pref.as_ref() as &str, pratyaya))
+        }) {
+            let (_, _, _, m, f, n) = crate::data::krdanta_gold::KRDANTA_GOLD[idx];
+            let candidate = if !m.is_empty() { m } else if !f.is_empty() { f } else if !n.is_empty() { n } else { "" };
+            if !candidate.is_empty() {
+                return KrdantaResult { forms: vec![candidate.to_string()], dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() };
+            }
+        }
+    }
     let forms = derive(dhatu_query, pratyaya);
     let forms = if prefixes.is_empty() { forms } else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() };
     KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
