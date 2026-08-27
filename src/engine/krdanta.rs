@@ -186,7 +186,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "guna" => format!("{}{}", guna, suffix),
         "guna_a" => format!("{}a", guna),
         "guna_tum" => {
-            let last_c = guna.chars().last().unwrap();
+            let last_c = guna.chars().last().unwrap_or('a');
             if guna.ends_with('a') || "iIuUfFeEoO".contains(last_c) {
                 let base = if guna.ends_with('a') { &guna[..guna.len()-1] } else { &guna };
                 format!("{}itum", base)
@@ -196,7 +196,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         },
         "guna_tavya" => if guna.ends_with('a') { format!("{}itavya", &guna[..guna.len()-1]) } else { format!("{}itavya", guna) },
         "root" => format!("{}{}", dhatu, suffix),
-        "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap(), dhatu, suffix),
+        "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap_or('a'), dhatu, suffix),
         "lyap" => format!("{}{}", dhatu, suffix),
         _ => format!("{}{}", guna, suffix),
     };
