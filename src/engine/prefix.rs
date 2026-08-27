@@ -100,26 +100,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
         }
     }
 
-    // ṇatva (r/f/z triggers n->R, blocked by cCjJY etc)
-    let mut chars: Vec<char> = result.chars().collect();
-    let prefix_len = result.len() - word.len();
-    let natva_prefixes = ["pra","parA","pari","nis","dus","antar"];
-    let mut trigger = false;
-    let blockers: std::collections::HashSet<char> = ['c','C','j','J','Y','S','w','W','q','Q','R','t','T','d','D','l','s','S'].iter().cloned().collect();
-    for i in 0..chars.len() {
-        let ch = chars[i];
-        if ch == 'r' || ch == 'f' || ch == 'F' || ch == 'z' {
-            if i < prefix_len && !natva_prefixes.contains(&prefix) { continue; }
-            trigger = true;
-        } else if trigger && ch == 'n' {
-            if i != chars.len() - 1 {
-                chars[i] = 'R';
-            }
-        } else if trigger && blockers.contains(&ch) {
-            trigger = false;
-        }
-    }
-    chars.into_iter().collect()
+    crate::engine::phonology::apply_natva_to_word(&result)
 }
 
 pub fn apply_prefixes(prefixes: &[String], base: &str) -> String {
@@ -185,6 +166,18 @@ mod tests {
     #[test]
     fn test_pra_ets() {
         assert_eq!(apply_forward_sandhi("pra", "eti"), "preti");
+    }
+    #[test]
+    fn pra_bhavanti_no_natva_on_tin_ending() {
+        assert_eq!(apply_forward_sandhi("pra", "Bavanti"), "praBavanti");
+        assert_eq!(apply_forward_sandhi("pra", "Bavizyanti"), "praBavizyanti");
+        assert_eq!(apply_forward_sandhi("pra", "BavAni"), "praBavAni");
+        let f = apply_prefixes(&["aBi".into(), "pra".into()], "Bavanti");
+        assert_eq!(f, "aBipraBavanti");
+    }
+    #[test]
+    fn pra_namati_has_natva() {
+        assert_eq!(apply_forward_sandhi("pra", "namati"), "praRamati");
     }
     #[test]
     fn unapply_pra_gacchati() {

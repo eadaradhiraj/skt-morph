@@ -94,54 +94,12 @@ pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
-    #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
-    {
-        // Try gold with prefix first (for pra-/sam- etc.)
-        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
-        let pref = if prefixes.is_empty() { "" } else { &prefixes.join("") };
-        // Try exact prefix match via binary search (gold is sorted by did, pref, var)
-        if let Ok(idx) = crate::data::krdanta_gold::KRDANTA_GOLD.binary_search_by(|(did, p, var, _, _, _)| {
-            (*did, *p, *var).cmp(&(&search_id.as_str(), pref.as_ref() as &str, pratyaya))
-        }) {
-            let (_, _, _, m, f, n) = crate::data::krdanta_gold::KRDANTA_GOLD[idx];
-            let candidate = if !m.is_empty() { m } else if !f.is_empty() { f } else if !n.is_empty() { n } else { "" };
-            if !candidate.is_empty() {
-                return KrdantaResult { forms: vec![candidate.to_string()], dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() };
-            }
-        }
-    }
     let forms = derive(dhatu_query, pratyaya);
     let forms = if prefixes.is_empty() { forms } else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() };
     KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
 }
 
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
-    #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
-    {
-        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
-        // Binary search in KRDANTA_GOLD (sorted by did, prefix="", variant)
-        // For now we handle shuddha without prefix; for prefixes, the gold includes prefix
-        // We search for (did, "", pratyaya) — for with prefixes, generate_with_prefixes will handle via prefix logic, but gold also has prefix variants
-        // Try exact match for no prefix
-        if let Ok(idx) = crate::data::krdanta_gold::KRDANTA_GOLD.binary_search_by(|(did, pref, var, _, _, _)| {
-            (*did, *pref, *var).cmp(&(&search_id.as_str(), "", pratyaya))
-        }) {
-            let (_, _, _, m, f, n) = crate::data::krdanta_gold::KRDANTA_GOLD[idx];
-            let candidate = if !m.is_empty() { m } else if !f.is_empty() { f } else if !n.is_empty() { n } else { "" };
-            if !candidate.is_empty() {
-                return vec![candidate.to_string()];
-            }
-        }
-        // Fallback: linear search for any with that did/var (handles multiple prefixes aggregated)
-        for (did, _pref, var, m, f, n) in crate::data::krdanta_gold::KRDANTA_GOLD.iter() {
-            if *did == search_id && *var == pratyaya {
-                let candidate = if !m.is_empty() { *m } else if !f.is_empty() { *f } else if !n.is_empty() { *n } else { "" };
-                if !candidate.is_empty() {
-                    return vec![candidate.to_string()];
-                }
-            }
-        }
-    }
     let Some((dhatu, gana)) = load_dhatu(dhatu_query) else { return vec![]; };
     let rule = pratyaya_rule(pratyaya);
     if rule.is_none() {
@@ -191,7 +149,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
     vec![form]
 }
 
-// Validate against skt-morph-data participles
+// Optional scrape probe (not the spec).
 pub fn validate_against_gold(dhatu_id: &str, pratyaya: &str) -> Option<(String, String)> {
     let p = format!("/home/edhiraj/Documents/projs/skt-morph-data/data/{}/{}.json", &dhatu_id[..2], dhatu_id);
     let data = std::fs::read_to_string(&p).ok()?;

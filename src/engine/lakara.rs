@@ -3,7 +3,7 @@ pub fn normalize_lakara(lakara: &str) -> (String, String) {
     let code = lakara.trim();
     // canonical -> db
     let map: &[(&str,&str)] = &[
-        ("plat","plat"),("plrt","plrut"),("plot","plot"),("plan","plang"),("pvidhilin","pvidhiling"),
+        ("plat","plat"),("plrt","plrut"),("plot","plot"),("plan","plang"),("pvidhilin","pvidhiling"),("plit","plit"),
         ("alat","alat"),("alrt","alrut"),("alot","alot"),("alan","alang"),("aling","aashirling"),("alit","alit"),
     ];
     for (c,db) in map { if *c==code { return (c.to_string(), db.to_string()); } }
@@ -11,7 +11,7 @@ pub fn normalize_lakara(lakara: &str) -> (String, String) {
     let rev: &[(&str,&str)] = &[
         ("plat","plat"),("plrut","plrt"),("plot","plot"),("plang","plan"),("pvidhiling","pvidhilin"),
         ("alat","alat"),("alrut","alrt"),("alot","alot"),("alang","alan"),("aashirling","aling"),("alit","alit"),
-        ("pashirling","pvidhilin"),("plit","plat"),
+        ("pashirling","pvidhilin"),("plit","plit"),
     ];
     for (db,c) in rev { if *db==code { return (c.to_string(), db.to_string()); } }
     (code.to_string(), code.to_string())

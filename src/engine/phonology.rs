@@ -537,9 +537,12 @@ pub fn apply_natva_to_word(word: &str) -> String {
             trigger = true;
         } else if trigger && ch == 'n' {
             if i != chars.len() - 1 {
-                let next_ch = chars[i+1];
-                // Pāṇini 8.4.2: vowel, y, v, m allow natva.
-                if "aAiIuUfFeEoOyvm".contains(next_ch) {
+                let next_ch = chars[i + 1];
+                let next_is_last = i + 1 == chars.len() - 1;
+                // तिङ् आनि (प्रभवानि): न्+इ at padānta is not णत्व. Root न्+इ in the middle still is (प्रणीतः).
+                if next_is_last && matches!(next_ch, 'i' | 'I') {
+                    // leave n
+                } else if "aAiIuUfFeEoOyvm".contains(next_ch) {
                     chars[i] = 'R';
                 }
             }

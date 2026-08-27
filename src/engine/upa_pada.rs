@@ -91,8 +91,7 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
     }
 
     // --- default ---
-    // TEMP: allow both P and A for shuddha kartari to match gold (many A roots like nATf have both plat/alat in tinantas).
-    // Proper 1.3.12-77 filtering vs gold's 50+ sūtras needs data-driven fix; for now be permissive to avoid 0/45.
+    // TEMP: allow both P and A. Tighten to 1.3.12–77 (Kaumudī ātmanepada section), not scrape occupancy.
     match root_pada {
         "P" => vec!["P".to_string(), "A".to_string()],
         "A" => vec!["P".to_string(), "A".to_string()],

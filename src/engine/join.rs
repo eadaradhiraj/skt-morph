@@ -267,5 +267,12 @@ pub fn join_variants(
     vacana: u8,
     antarganas: &str,
 ) -> Vec<String> {
+    if family == "lit" {
+        if let Some(out) = crate::engine::lit::kartari(dhatu, purusha, vacana, pada) {
+            if !out.is_empty() {
+                return out;
+            }
+        }
+    }
     variants.iter().map(|v| join_form(stem, v, gana, family, purusha, pada, augment, Some(dhatu), vacana, Some(antarganas))).collect()
 }

@@ -1,35 +1,11 @@
+//! तिङन्त: Pāṇini as arranged in the Siddhānta-Kaumudī (stem → ending → sandhi).
+//! Scrape DBs are for cross-check only — they never supply a form.
 use serde::{Deserialize, Serialize};
 use crate::engine::lakara::{lakara_family, normalize_lakara};
 use crate::engine::stems::{derive_stem, conjugation_gana};
 use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
 use crate::engine::upa_pada::pada_allowed;
-#[cfg(feature = "native-db")]
-use crate::data::tinanta_gold::TINANTA_GOLD;
-#[cfg(feature = "wasm-gold")]
-use once_cell::sync::Lazy;
-#[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
-static WASM_TINANTA_GOLD: Lazy<std::collections::HashMap<(String, String, u8, u8), String>> = Lazy::new(|| {
-    let gz = include_bytes!("../data/tinanta_gold.bin.gz");
-    let mut decoder = flate2::read::GzDecoder::new(&gz[..]);
-    let mut data = Vec::new();
-    use std::io::Read;
-    decoder.read_to_end(&mut data).unwrap();
-    let mut map = std::collections::HashMap::new();
-    let mut pos = 0;
-    while pos + 4 < data.len() {
-        let did_len = data[pos] as usize; pos += 1;
-        let did = String::from_utf8_lossy(&data[pos..pos+did_len]).to_string(); pos += did_len;
-        let lak_len = data[pos] as usize; pos += 1;
-        let lak = String::from_utf8_lossy(&data[pos..pos+lak_len]).to_string(); pos += lak_len;
-        let pur = data[pos]; pos += 1;
-        let vac = data[pos]; pos += 1;
-        let form_len = u16::from_le_bytes([data[pos], data[pos+1]]) as usize; pos += 2;
-        let form = String::from_utf8_lossy(&data[pos..pos+form_len]).to_string(); pos += form_len;
-        map.insert((did, lak, pur, vac), form);
-    }
-    map
-});
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TinantaResult {
@@ -73,55 +49,17 @@ fn attach_prefixes(prefixes: &[String], forms: Vec<String>) -> Vec<String> {
     else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() }
 }
 
-fn gold_forms(dhatu_query: &str, db_lakara: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
-    #[cfg(feature = "native-db")]
-    {
-        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
-        if let Ok(idx) = TINANTA_GOLD.binary_search_by(|(did, lak, pur, vac, _)| {
-            (*did, *lak, *pur, *vac).cmp(&(&search_id.as_str(), db_lakara, purusha, vacana))
-        }) {
-            let mut out: Vec<String> = Vec::new();
-            for part in TINANTA_GOLD[idx].4.split(',') {
-                for pp in part.split(';') {
-                    let v = pp.trim();
-                    if !v.is_empty() { out.push(v.to_string()); }
-                }
-            }
-            if !out.is_empty() { return Some(out); }
-        }
-    }
-    #[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
-    {
-        let search_id = crate::engine::dhatu::resolve_id(dhatu_query);
-        let key = (search_id, db_lakara.to_string(), purusha, vacana);
-        if let Some(form) = WASM_TINANTA_GOLD.get(&key) {
-            let mut out: Vec<String> = Vec::new();
-            for part in form.split(',') {
-                for pp in part.split(';') {
-                    let v = pp.trim();
-                    if !v.is_empty() { out.push(v.to_string()); }
-                }
-            }
-            if !out.is_empty() { return Some(out); }
-        }
-    }
-    let _ = (dhatu_query, db_lakara, purusha, vacana);
-    None
-}
-
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
-    if let Some(out) = gold_forms(dhatu_query, &db_lakara, purusha, vacana) {
-        return attach_prefixes(prefixes, out);
-    }
+    // Temporary per-root patches until the Kaumudī prakriyā covers that sūtra. Not scrape rows.
     if let Some(out) = crate::engine::tinanta_overrides::lookup_override(dhatu_query, &canonical, purusha, vacana, prefixes) {
         return out;
     }
     live_generate(dhatu_query, &canonical, &db_lakara, purusha, vacana, prefixes)
 }
 
-/// Stem → ending → join. No gold, no per-root override table.
-pub(crate) fn live_generate(
+/// Stem → vikaraṇa/lakāra ending → sandhi. No tables.
+pub fn live_generate(
     dhatu_query: &str,
     canonical: &str,
     db_lakara: &str,
@@ -136,6 +74,11 @@ pub(crate) fn live_generate(
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
     if !pada_allowed(&root_pada, &pada, &dhatu, prefixes) {
         return vec![];
+    }
+    if family == "lit" {
+        if let Some(forms) = crate::engine::lit::kartari(&dhatu, purusha, vacana, pada) {
+            return attach_prefixes(prefixes, forms);
+        }
     }
     let cgana = conjugation_gana(gana, &tags);
     let (stem_opt, augment) = derive_stem(&dhatu, gana, &family, "shuddha", &tags, &antarganas, &aupadeshik);
@@ -206,5 +149,61 @@ mod tests {
         let (canon, db) = normalize_lakara("plrt");
         let f = live_generate("gamx", &canon, &db, 1, 1, &[]);
         assert!(f.iter().any(|x| x == "gamizyati"), "{:?}", f);
+    }
+
+    #[test]
+    fn pra_bu_lat_third_plural_no_natva() {
+        let prefs = vec!["pra".to_string()];
+        let f = generate_all_with_prefixes("BU", "plat", 1, 3, &prefs);
+        assert!(f.iter().any(|x| x == "praBavanti"), "{:?}", f);
+        assert!(!f.iter().any(|x| x == "praBavaRti"), "{:?}", f);
+    }
+
+    #[test]
+    fn gam_lit_jagama() {
+        let f = generate_all("gam", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "jagAma"), "{:?}", f);
+        let f = generate_all("gam", "plit", 1, 3);
+        assert!(f.iter().any(|x| x == "jagmuH"), "{:?}", f);
+    }
+
+    #[test]
+    fn bu_lit_babhuva() {
+        let f = generate_all("BU", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "baBUva"), "{:?}", f);
+    }
+
+    #[test]
+    fn han_lit_jaghana() {
+        let f = generate_all("hana", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "jaGAna"), "{:?}", f);
+    }
+
+    #[test]
+    fn vac_yaj_lit() {
+        let f = generate_all("vaca", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "uvAca"), "{:?}", f);
+        let f = generate_all("yaja", "plit", 1, 2);
+        assert!(f.iter().any(|x| x == "IjatuH"), "{:?}", f);
+    }
+
+    #[test]
+    fn grah_ni_kf_lit() {
+        let f = generate_all("graha", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "jagrAha"), "{:?}", f);
+        let f = generate_all("RIY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "ninAya"), "{:?}", f);
+        let f = generate_all("qukfY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "cakAra"), "{:?}", f);
+    }
+
+    #[test]
+    fn yaj_kf_alit() {
+        let f = generate_all("yaja", "alit", 1, 1);
+        assert!(f.iter().any(|x| x == "Ije"), "{:?}", f);
+        let f = generate_all("qukfY", "alit", 1, 3);
+        assert!(f.iter().any(|x| x == "cakrire"), "{:?}", f);
+        let f = generate_all("RIY", "alit", 1, 1);
+        assert!(f.iter().any(|x| x == "ninye"), "{:?}", f);
     }
 }

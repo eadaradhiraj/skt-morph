@@ -1,4 +1,6 @@
-//! Per-dhātu surface overrides. Prefer live_generate; shrink this as stems/join catch up.
+//! Temporary per-dhātu patches where the Kaumudī prakriyā is still incomplete.
+//! Prefer `live_generate`; delete a block when the sūtra is in stems/join.
+//! Do not add scrape-only forms here.
 #![allow(non_snake_case, unused)]
 
 pub fn lookup_override(
