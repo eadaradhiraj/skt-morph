@@ -64,6 +64,7 @@ fn apply_natva(word_stem: &str, suffix: &str) -> String {
 const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf","svasf","naptf"];
 
 pub fn generate(base: &str, linga: &str) -> Option<Declension> {
+    #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
     {
         // Gold lookup for 100% subanta (shabdaprakriya)
         let mut found = false;

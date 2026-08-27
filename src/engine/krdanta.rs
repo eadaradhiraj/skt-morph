@@ -98,6 +98,7 @@ pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
+    #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
     {
         // Try gold with prefix first (for pra-/sam- etc.)
         let search_id = if dhatu_query.contains('.') {
@@ -123,6 +124,7 @@ pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[Str
 }
 
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
+    #[cfg(any(feature = "native-db", feature = "wasm-gold"))]
     {
         let search_id = if dhatu_query.contains('.') {
             dhatu_query.to_string()
