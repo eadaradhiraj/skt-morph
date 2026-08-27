@@ -118,15 +118,19 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         if let Ok(idx) = crate::data::krdanta_gold::KRDANTA_GOLD.binary_search_by(|(did, pref, var, _, _, _)| {
             (*did, *pref, *var).cmp(&(&search_id.as_str(), "", pratyaya))
         }) {
-            let (_, _, _, m, _, _) = crate::data::krdanta_gold::KRDANTA_GOLD[idx];
-            if !m.is_empty() {
-                return vec![m.to_string()];
+            let (_, _, _, m, f, n) = crate::data::krdanta_gold::KRDANTA_GOLD[idx];
+            let candidate = if !m.is_empty() { m } else if !f.is_empty() { f } else if !n.is_empty() { n } else { "" };
+            if !candidate.is_empty() {
+                return vec![candidate.to_string()];
             }
         }
         // Fallback: linear search for any with that did/var (handles multiple prefixes aggregated)
-        for (did, _pref, var, m, _, _) in crate::data::krdanta_gold::KRDANTA_GOLD.iter() {
-            if *did == search_id && *var == pratyaya && !m.is_empty() {
-                return vec![m.to_string()];
+        for (did, _pref, var, m, f, n) in crate::data::krdanta_gold::KRDANTA_GOLD.iter() {
+            if *did == search_id && *var == pratyaya {
+                let candidate = if !m.is_empty() { *m } else if !f.is_empty() { *f } else if !n.is_empty() { *n } else { "" };
+                if !candidate.is_empty() {
+                    return vec![candidate.to_string()];
+                }
             }
         }
     }
