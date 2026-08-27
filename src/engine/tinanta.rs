@@ -5,6 +5,30 @@ use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
 use crate::engine::upa_pada::pada_allowed;
 use crate::data::tinanta_gold::TINANTA_GOLD;
+#[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
+use once_cell::sync::Lazy;
+#[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
+static WASM_TINANTA_GOLD: Lazy<std::collections::HashMap<(String, String, u8, u8), String>> = Lazy::new(|| {
+    let gz = include_bytes!("../data/tinanta_gold.bin.gz");
+    let mut decoder = flate2::read::GzDecoder::new(&gz[..]);
+    let mut data = Vec::new();
+    use std::io::Read;
+    decoder.read_to_end(&mut data).unwrap();
+    let mut map = std::collections::HashMap::new();
+    let mut pos = 0;
+    while pos + 4 < data.len() {
+        let did_len = data[pos] as usize; pos += 1;
+        let did = String::from_utf8_lossy(&data[pos..pos+did_len]).to_string(); pos += did_len;
+        let lak_len = data[pos] as usize; pos += 1;
+        let lak = String::from_utf8_lossy(&data[pos..pos+lak_len]).to_string(); pos += lak_len;
+        let pur = data[pos]; pos += 1;
+        let vac = data[pos]; pos += 1;
+        let form_len = u16::from_le_bytes([data[pos], data[pos+1]]) as usize; pos += 2;
+        let form = String::from_utf8_lossy(&data[pos..pos+form_len]).to_string(); pos += form_len;
+        map.insert((did, lak, pur, vac), form);
+    }
+    map
+});
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TinantaResult {
@@ -250,6 +274,7 @@ fn divi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
+    #[cfg(feature = "native-db")]
     {
         let search_id = if dhatu_query.contains('.') {
             dhatu_query.to_string()
@@ -263,6 +288,33 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
             let forms_str = TINANTA_GOLD[idx].4;
             let mut out: Vec<String> = Vec::new();
             for part in forms_str.split(',') {
+                for pp in part.split(';') {
+                    let v = pp.trim();
+                    if !v.is_empty() {
+                        out.push(v.to_string());
+                    }
+                }
+            }
+            if !out.is_empty() {
+                if prefixes.is_empty() {
+                    return out;
+                } else {
+                    return out.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect();
+                }
+            }
+        }
+    }
+    #[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
+    {
+        let search_id = if dhatu_query.contains('.') {
+            dhatu_query.to_string()
+        } else {
+            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
+        };
+        let key = (search_id, db_lakara.to_string(), purusha, vacana);
+        if let Some(form) = WASM_TINANTA_GOLD.get(&key) {
+            let mut out: Vec<String> = Vec::new();
+            for part in form.split(',') {
                 for pp in part.split(';') {
                     let v = pp.trim();
                     if !v.is_empty() {
