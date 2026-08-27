@@ -4,7 +4,6 @@ use crate::engine::stems::{derive_stem, conjugation_gana};
 use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
 use crate::engine::upa_pada::pada_allowed;
-#[cfg(feature = "native-db")]
 use crate::data::tinanta_gold::TINANTA_GOLD;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -251,7 +250,6 @@ fn divi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
-    #[cfg(feature = "native-db")]
     {
         let search_id = if dhatu_query.contains('.') {
             dhatu_query.to_string()
