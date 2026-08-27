@@ -119,4 +119,72 @@ if grouped:
         println!("{}", String::from_utf8_lossy(&o.stdout));
         eprintln!("{}", String::from_utf8_lossy(&o.stderr));
     }
+
+    // Generate krdanta gold (participle_forms, 20 pratyayas) and subanta gold (shabdaprakriya)
+    println!("cargo:rerun-if-changed=src/data/krdanta_gold.rs");
+    println!("cargo:rerun-if-changed=src/data/subanta_gold.rs");
+    let py3 = std::process::Command::new("python3")
+        .args(["-c", r#"
+import sqlite3, pathlib, collections
+# Krdanta
+try:
+    con=sqlite3.connect("/home/edhiraj/Documents/projs/skt-morph-data/data/skt_morph.db")
+    cur=con.cursor()
+    cur.execute("SELECT dhatu_id, prefix, variant, m, f, n FROM participle_forms WHERE category='krut' LIMIT 1")
+    # check table exists
+    con.close()
+    has_krd=True
+    print("has krdanta")
+except Exception as e:
+    has_krd=False
+    print(f"no krdanta DB: {e}", file=__import__('sys').stderr)
+if has_krd:
+    import sqlite3, pathlib
+    con=sqlite3.connect("/home/edhiraj/Documents/projs/skt-morph-data/data/skt_morph.db")
+    cur=con.cursor()
+    cur.execute("SELECT dhatu_id, prefix, variant, m, f, n FROM participle_forms WHERE category='krut'")
+    rows=list(cur.fetchall())
+    con.close()
+    # Sort by did, prefix, variant
+    rows.sort(key=lambda x: (x[0], x[1], x[2]))
+    lines=["//! Auto-generated krdanta gold (krut, 20 pratyayas) — sorted","pub const KRDANTA_GOLD: &[(&str,&str,&str,&str,&str,&str)] = &["]
+    for did, pref, var, m, f, n in rows:
+        # Escape
+        def esc(s): return (s or "").replace('\\','\\\\').replace('"','\\"')
+        lines.append(f'    ("{did}", "{esc(pref)}", "{var}", "{esc(m)}", "{esc(f)}", "{esc(n)}"),')
+    lines.append("];")
+    pathlib.Path("src/data/krdanta_gold.rs").write_text("\\n".join(lines), encoding="utf-8")
+    print(f"Generated krdanta_gold: {len(rows)}")
+# Subanta (shabdaprakriya)
+try:
+    con=sqlite3.connect("/home/edhiraj/.local/share/Trash/files/skt-morph.3/sktmorph/data/shabdaprakriya.sqlite")
+    cur=con.cursor()
+    cur.execute("SELECT COUNT(*) FROM form_prakriya")
+    cnt=cur.fetchone()[0]
+    print(f"shabdaprakriya {cnt}")
+    has_sub=True
+    con.close()
+except Exception as e:
+    has_sub=False
+    print(f"no subanta DB: {e}", file=__import__('sys').stderr)
+if has_sub:
+    con=sqlite3.connect("/home/edhiraj/.local/share/Trash/files/skt-morph.3/sktmorph/data/shabdaprakriya.sqlite")
+    cur=con.cursor()
+    cur.execute("SELECT word_slp1, form_slp1, vibhakti, vacana FROM form_prakriya")
+    rows=list(cur.fetchall())
+    con.close()
+    rows.sort(key=lambda x: (x[0], x[2], x[3]))
+    lines=["//! Auto-generated subanta gold (shabdaprakriya) — sorted","pub const SUBANTA_GOLD: &[(&str,&str,&str,u8,&str)] = &["]
+    for word, form, vib, vac in rows:
+        def esc(s): return (s or "").replace('\\','\\\\').replace('"','\\"')
+        lines.append(f'    ("{esc(word)}", "{esc(form)}", "{vib}", {vac}, "{esc(form)}"),')
+    lines.append("];")
+    pathlib.Path("src/data/subanta_gold.rs").write_text("\\n".join(lines), encoding="utf-8")
+    print(f"Generated subanta_gold: {len(rows)}")
+"#])
+        .output();
+    if let Ok(o) = py3 {
+        println!("{}", String::from_utf8_lossy(&o.stdout));
+        eprintln!("{}", String::from_utf8_lossy(&o.stderr));
+    }
 }

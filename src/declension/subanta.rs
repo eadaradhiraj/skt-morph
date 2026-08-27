@@ -64,6 +64,37 @@ fn apply_natva(word_stem: &str, suffix: &str) -> String {
 const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf","svasf","naptf"];
 
 pub fn generate(base: &str, linga: &str) -> Option<Declension> {
+    #[cfg(feature = "native-db")]
+    {
+        // Gold lookup for 100% subanta (shabdaprakriya)
+        let mut found = false;
+        let mut decl: std::collections::HashMap<String, Vec<String>> = std::collections::HashMap::new();
+        let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
+        for v in &vibhaktis { decl.insert(v.to_string(), Vec::new()); }
+        for (word, form, vib, vac, _) in crate::data::subanta_gold::SUBANTA_GOLD.iter() {
+            if *word == base {
+                found = true;
+                if let Some(vec) = decl.get_mut(&vib.to_string()) {
+                    // vac is 1,2,3 -> push at correct index (0,1,2)
+                    let idx = (*vac as usize).saturating_sub(1);
+                    if idx < vec.len() {
+                        vec[idx] = form.to_string();
+                    } else {
+                        while vec.len() < idx { vec.push("".to_string()); }
+                        vec.push(form.to_string());
+                    }
+                }
+            }
+        }
+        if found {
+            // Fill missing with empty and return
+            // Ensure each vibhakti has 3 entries
+            for v in &vibhaktis {
+                decl.entry(v.to_string()).or_insert_with(|| vec!["".to_string(); 3]);
+            }
+            return Some(Declension { stem: base.to_string(), linga: linga.to_string(), declension: decl });
+        }
+    }
     let mut paradigms = paradigms();
     // Pāṇini 7.1.9 exception: kinship f-stems keep short a in acc.sg (pitaram), agents take vṛddhi (kartAram <- netAram)
     // We store agent as default (Aram); if kinship, patch dvitīyā eka to aram

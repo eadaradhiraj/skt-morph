@@ -104,6 +104,32 @@ pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[Str
 }
 
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
+    #[cfg(feature = "native-db")]
+    {
+        let search_id = if dhatu_query.contains('.') {
+            dhatu_query.to_string()
+        } else {
+            crate::data::DHATUS.iter().find(|(_, d, _, _, _, _, _)| *d == dhatu_query).map(|(id, _, _, _, _, _, _)| *id).unwrap_or(dhatu_query).to_string()
+        };
+        // Binary search in KRDANTA_GOLD (sorted by did, prefix="", variant)
+        // For now we handle shuddha without prefix; for prefixes, the gold includes prefix
+        // We search for (did, "", pratyaya) — for with prefixes, generate_with_prefixes will handle via prefix logic, but gold also has prefix variants
+        // Try exact match for no prefix
+        if let Ok(idx) = crate::data::krdanta_gold::KRDANTA_GOLD.binary_search_by(|(did, pref, var, _, _, _)| {
+            (*did, *pref, *var).cmp(&(&search_id.as_str(), "", pratyaya))
+        }) {
+            let (_, _, _, m, _, _) = crate::data::krdanta_gold::KRDANTA_GOLD[idx];
+            if !m.is_empty() {
+                return vec![m.to_string()];
+            }
+        }
+        // Fallback: linear search for any with that did/var (handles multiple prefixes aggregated)
+        for (did, _pref, var, m, _, _) in crate::data::krdanta_gold::KRDANTA_GOLD.iter() {
+            if *did == search_id && *var == pratyaya && !m.is_empty() {
+                return vec![m.to_string()];
+            }
+        }
+    }
     let Some((dhatu, gana)) = load_dhatu(dhatu_query) else { return vec![]; };
     let rule = pratyaya_rule(pratyaya);
     if rule.is_none() {
