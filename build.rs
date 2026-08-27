@@ -111,7 +111,7 @@ if grouped:
         f=form.replace('\\','\\\\').replace('"','\\"')
         lines.append(f'    ("{did}", "{lak}", {pur}, {vac}, "{f}"),')
     lines.append("];")
-    pathlib.Path("src/data/tinanta_gold.rs").write_text("\\n".join(lines), encoding="utf-8")
+    pathlib.Path("src/data/tinanta_gold.rs").write_text("\n".join(lines), encoding="utf-8")
     print(f"Generated tinanta_gold: {len(rows)}")
 "#])
         .output();
@@ -153,7 +153,7 @@ if has_krd:
         def esc(s): return (s or "").replace('\\','\\\\').replace('"','\\"')
         lines.append(f'    ("{did}", "{esc(pref)}", "{var}", "{esc(m)}", "{esc(f)}", "{esc(n)}"),')
     lines.append("];")
-    pathlib.Path("src/data/krdanta_gold.rs").write_text("\\n".join(lines), encoding="utf-8")
+    pathlib.Path("src/data/krdanta_gold.rs").write_text("\n".join(lines), encoding="utf-8")
     print(f"Generated krdanta_gold: {len(rows)}")
 # Subanta (shabdaprakriya)
 try:
@@ -179,7 +179,7 @@ if has_sub:
         def esc(s): return (s or "").replace('\\','\\\\').replace('"','\\"')
         lines.append(f'    ("{esc(word)}", "{esc(form)}", "{vib}", {vac}, "{esc(form)}"),')
     lines.append("];")
-    pathlib.Path("src/data/subanta_gold.rs").write_text("\\n".join(lines), encoding="utf-8")
+    pathlib.Path("src/data/subanta_gold.rs").write_text("\n".join(lines), encoding="utf-8")
     print(f"Generated subanta_gold: {len(rows)}")
 "#])
         .output();
