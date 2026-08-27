@@ -495,10 +495,10 @@ pub fn thematic_present_base(dhatu: &str, gana: u8, aupadeshik: &str) -> String 
 }
 
 pub fn thematic_join(stem_a: &str, ending: &str) -> String {
-    if !stem_a.ends_with('a') { return format!("{}{}", stem_a, ending); }
+    if !(stem_a.ends_with('a') || stem_a.ends_with('A')) { return format!("{}{}", stem_a, ending); }
     if ending.is_empty() { return stem_a.to_string(); }
     let first = ending.chars().next().unwrap();
-    // a + a -> a (elide one a)  e.g. gacCa + ante -> gacCante
+    // a/A + a -> a/A (elide one a)  e.g. gacCa + ante -> gacCante, SrA + atAm -> SrAtAm
     if first == 'a' { return format!("{}{}", stem_a, &ending[1..]); }
     // a + A/e/E/o/O/i/I/u/U/f/F -> drop stem a and keep vowel (sandhi: pra+eti->preti)
     // covers Atmanepada ete, etc.: gacCa + ete -> gacCete (not gacCaete)
@@ -517,6 +517,10 @@ pub fn apply_nasal_palatal(word: &str) -> String {
     }
     // n before labial p/P/b/B/m -> m (tunpa->tumpa, tunPa->tumPa)
     for (a, b) in [("np", "mp"), ("nP", "mP"), ("nb", "mb"), ("nB", "mB")] {
+        s = s.replace(a, b);
+    }
+    // n before s/S/h -> M (anusvAra 8.3.23 mo'nusvAraH: raMhati, SaMsati, dfMhati)
+    for (a, b) in [("ns", "Ms"), ("nS", "MS"), ("nh", "Mh")] {
         s = s.replace(a, b);
     }
     s

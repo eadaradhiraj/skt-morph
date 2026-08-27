@@ -231,7 +231,7 @@ pub fn join_form(
         }
     }
     // Core join - upgraded
-    let mut form = if stem.ends_with('a') && !ending.is_empty() {
+    let mut form = if (stem.ends_with('a') || stem.ends_with('A')) && !ending.is_empty() {
         thematic_join(stem, ending)
     } else {
         internal_sandhi(stem, ending)

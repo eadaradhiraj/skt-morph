@@ -82,6 +82,7 @@ fn g1_special_lrt(dhatu: &str) -> Option<String> {
     for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
     if ["Dinv"].contains(&dhatu) { return Some(format!("{}izya", dhatu)); }
     if dhatu.ends_with('A') && (2..=4).contains(&dhatu.len()) && !["SrA","jYA"].contains(&dhatu) { return Some(format!("{}sya", dhatu)); }
+    if dhatu.ends_with('E') && (2..=4).contains(&dhatu.len()) { return Some(format!("{}Asya", &dhatu[..dhatu.len()-1])); }
     None
 }
 fn g1_future_base(dhatu: &str, present_base: &str, guna: &str) -> String {
@@ -129,7 +130,7 @@ fn g1_future_suffix(base: &str, dhatu: &str) -> String {
 fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String {
     let present_base = if present_stem.ends_with('a') { &present_stem[..present_stem.len()-1] } else { present_stem };
     let base = g1_future_base(dhatu, present_base, guna);
-    if ["SrA","jYA"].contains(&dhatu) { return format!("{}zy", base); }
+    if ["SrA","jYA"].contains(&dhatu) { return format!("{}zya", base); }
     if dhatu.ends_with("nv") && dhatu.len()>=4 && (dhatu.starts_with('r')|| dhatu.ends_with("fnv")) { return format!("{}izya", base); }
     g1_future_suffix(&base, dhatu)
 }
@@ -255,6 +256,9 @@ pub fn derive_stem(
         "nadi".to_string() // wu- anubandha: wunadi~ -> nadi -> nanda (gold nandati)
     } else if dhatu.starts_with("wu") && dhatu.len() > 3 && (gana == 1 || gana == 2) && dhatu == "wukzu" {
         // wu- prefix stripping for wukzu~ -> kzu (gold kzOti)
+        dhatu[2..].to_string()
+    } else if dhatu.starts_with("wu") && dhatu.len() > 4 && aupadeshik == format!("{}~", dhatu) {
+        // generic wu- anubandha: wuvama~->vama, wuyAcf~->yAcf etc.
         dhatu[2..].to_string()
     } else if dhatu.starts_with("qu") && dhatu.len() > 3 {
         let rest = &dhatu[2..];
@@ -433,7 +437,10 @@ pub fn derive_stem(
                 // RIla -> nIla keep long I (not nel)
                 let ps = "nIla".to_string();
                         present_stem = Some(ps);
-            } else if (is_g1_a_final(dhatu) || dhatu.ends_with('a') || dhatu.ends_with('A')) && crate::engine::phonology::sad_present_base(dhatu).is_none() {
+            } else if is_g1_a_final(dhatu) {
+                // SrA/jYA keep long A: SrAti not Srati
+                present_stem = Some(dhatu.to_string());
+            } else if (dhatu.ends_with('a') || dhatu.ends_with('A')) && crate::engine::phonology::sad_present_base(dhatu).is_none() {
                 // a-final roots (eDa, sparDa, siDa) already end in a — don't duplicate shap 'a', but apply guNa to stem without final a (siDa->seDa)
                 // keep long I/U (nIla, RIva) as is, don't e/o it — but skip irregular pA etc. which use sad_present_base pib
                 let stem = &dhatu[..dhatu.len()-1];
