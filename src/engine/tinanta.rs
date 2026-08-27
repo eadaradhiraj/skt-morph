@@ -4,8 +4,9 @@ use crate::engine::stems::{derive_stem, conjugation_gana};
 use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
 use crate::engine::upa_pada::pada_allowed;
+#[cfg(feature = "native-db")]
 use crate::data::tinanta_gold::TINANTA_GOLD;
-#[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
+#[cfg(feature = "wasm-gold")]
 use once_cell::sync::Lazy;
 #[cfg(all(not(feature = "native-db"), feature = "wasm-gold"))]
 static WASM_TINANTA_GOLD: Lazy<std::collections::HashMap<(String, String, u8, u8), String>> = Lazy::new(|| {
