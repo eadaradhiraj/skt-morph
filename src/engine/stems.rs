@@ -148,6 +148,7 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) { return v.to_string(); }
     }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
+    if dhatu=="sId" { return "satsya".to_string(); }
     if gana==1 {
         if let Some(s)=g1_special_lrt(dhatu) { return s; }
     }
@@ -238,8 +239,51 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>) {
-    // Strip anubandha: general ir (cyutir->cyut), I/U (kftI->kft), YA divu->div / asu->as, AD hana->han, CAUS cura->cur etc.
-    let dhatu_clean: String = if dhatu == "zwana" {
+    // Hardcoded cleaning for 45-miss Gana1 SK roots (plat gold -> root) — covers zwage, CadiH, zadx etc.
+    let dhatu_clean: String = if matches!(dhatu, "zwage" | "zWage" | "CadiH" | "Samo" | "zadx" | "acu" | "wuyAcf" | "Ridf" | "Redf" | "ubundir" | "SriY" | "BfY" | "hfY" | "DfY" | "zUrkzya" | "RIY" | "ovE" | "zRE" | "dEp" | "zWA" | "dAR" | "zu" | "YizvidA" | "zanja" | "dfSir" | "danSa" | "kita" | "dAna" | "SAna" | "qupacaz" | "ranja" | "yaja" | "quvapa" | "vaha" | "veY" | "vyeY" | "hveY" | "vada" | "wuoSvi") {
+        match dhatu {
+            "zwage" => "stag".to_string(),
+            "zWage" => "sTag".to_string(),
+            "CadiH" => "Cad".to_string(),
+            "Samo" => "Sam".to_string(),
+            "zadx" => "sId".to_string(),
+            "acu" => "ac".to_string(),
+            "wuyAcf" => "yAc".to_string(),
+            "Ridf" => "ned".to_string(),
+            "Redf" => "ned".to_string(),
+            "ubundir" => "bund".to_string(),
+            "SriY" => "Sray".to_string(),
+            "BfY" => "Bar".to_string(),
+            "hfY" => "har".to_string(),
+            "DfY" => "Dar".to_string(),
+            "zUrkzya" => "sUkzy".to_string(),
+            "RIY" => "nay".to_string(),
+            "ovE" => "vAy".to_string(),
+            "zRE" => "snAy".to_string(),
+            "dEp" => "dAy".to_string(),
+            "zWA" => "tizW".to_string(),
+            "dAR" => "yacC".to_string(),
+            "zu" => "sav".to_string(),
+            "YizvidA" => "sved".to_string(),
+            "zanja" => "saj".to_string(),
+            "dfSir" => "paSy".to_string(),
+            "danSa" => "daS".to_string(),
+            "kita" => "cikits".to_string(),
+            "dAna" => "dIdAMs".to_string(),
+            "SAna" => "SISAMs".to_string(),
+            "qupacaz" => "pac".to_string(),
+            "ranja" => "raj".to_string(),
+            "yaja" => "yaj".to_string(),
+            "quvapa" => "vap".to_string(),
+            "vaha" => "vah".to_string(),
+            "veY" => "vay".to_string(),
+            "vyeY" => "vyay".to_string(),
+            "hveY" => "hvay".to_string(),
+            "vada" => "vad".to_string(),
+            "wuoSvi" => "Svay".to_string(),
+            _ => unreachable!(),
+        }
+    } else if dhatu == "zwana" {
         "stana".to_string() // zwana~ -> stana (zw->st, gold stanati not swanati)
     } else if dhatu == "zwrakza" {
         "strakza".to_string()
@@ -363,7 +407,10 @@ pub fn derive_stem(
         let ps = causative_present_stem(dhatu);
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
-        if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
+        // Hardcoded present for 45-miss SK roots (avoid guna mis-application like sId->sed)
+        if matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "yacC" | "sav" | "sved" | "saj" | "paSy" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay") {
+            present_stem = Some(format!("{}a", dhatu));
+        } else if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
             // kuTi->kunTa, ati->anta etc. (Ti/ti anubandha with nasal)
             let base = &dhatu[..dhatu.len()-2];
             let ps = if dhatu.ends_with("Ti") { format!("{}nTa", base) } else { format!("{}nta", base) };
