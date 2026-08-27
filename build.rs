@@ -89,9 +89,9 @@ cands2 = [
     pathlib.Path("/home/edhiraj/.local/share/Trash/files/skt-morph.3/sktmorph/data/tinantas_shuddha_gana1.sqlite"),
     pathlib.Path("/home/edhiraj/.local/share/Trash/files/skt-morph.3/sktmorph/data/tinantas_shuddha_gana2_to_10.sqlite"),
 ]
-wanted={"plat","plang","plot","plrut","pvidhiling"}
 from collections import defaultdict
- grouped=defaultdict(list)
+wanted={"plat","plang","plot","plrut","pvidhiling"}
+grouped=defaultdict(list)
 for p in cands2:
     if p.exists():
         con=sqlite3.connect(str(p))
