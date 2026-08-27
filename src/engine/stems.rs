@@ -136,6 +136,9 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 }
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
+    if dhatu == "gam" || dhatu == "gamx" {
+        return "gamizya".to_string();
+    }
     if dhatu.to_ascii_lowercase().ends_with("akzi") {
         let low = dhatu.to_ascii_lowercase();
         let idx = low.find("akzi").unwrap_or(1);
@@ -832,6 +835,11 @@ pub fn derive_stem(
                 return (Some(root), aug);
         }
         "vidhilin" => {
+            if dhatu.to_ascii_lowercase().ends_with("akzi") {
+                let idx = dhatu.find('A').unwrap_or(1);
+                let prefix = &dhatu[..idx];
+                return (Some(format!("{}ANkz", prefix)), None);
+            }
             if dhatu == "stfkza" {
                 return (Some("stfkz".to_string()), None);
             }

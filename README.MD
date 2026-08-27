@@ -56,3 +56,9 @@ Gold reference: `../skt-morph-data` (ashtadhyayi.com scrape). Runtime WASM embed
 - `src/engine/dhatu.rs`: resolve id / name / it-marker (`gam` → `gamx` 01.1137). Shared by tinanta, kṛdanta, gold keys.
 - Analyze no longer precomputes upasarga × every form (~2.4M). Index is **unprefixed** forms; `prefix::split_upasarga_candidates` peels उपसर्ग at query time.
 - Tests: भू/गम् लट्, प्र+भू, क्त, रामेण / ट्रम्पेण (SLP1 `wrampeRa`).
+
+### 2026-08-28 — Engine: live_generate vs overrides
+
+- `tinanta.rs` is the pipeline (gold → override table → `live_generate`). Per-root tables live in `tinanta_overrides.rs`.
+- *akzi विधिलिङ्* is a stem (`…ANkz`) + standard endings, not a special join.
+- गम् लृट् is **गमिष्यति** (`gamizya`), not the present stem गच्छ्. Dropped the `gamx` override block; live path covers it.

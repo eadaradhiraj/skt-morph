@@ -11,3 +11,4 @@ pub mod upa_pada;
 pub mod redup;
 pub mod stems;
 pub mod tinanta;
+pub mod tinanta_overrides;
