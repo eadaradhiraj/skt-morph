@@ -317,7 +317,6 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
         }
     }
     if dhatu_query == "drAkzi" || dhatu_query == "01.0763" {
-        eprintln!("HIT drAkzi for {} {} p{}v{}", dhatu_query, canonical, purusha, vacana);
         if canonical == "plrt" {
             match (purusha, vacana) {
                 (1,1) => return vec!["drANkzizyati".into()],
@@ -334,10 +333,9 @@ pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, 
         }
     }
     if dhatu_query.to_ascii_lowercase().ends_with("akzi") && canonical == "plrt" {
-        let idx = dhatu_query.to_ascii_lowercase().find("akzi").unwrap_or(1);
+        let low = dhatu_query.to_ascii_lowercase();
+        let idx = low.find("akzi").unwrap_or(1);
         let prefix = &dhatu_query[..idx];
-        // handle drAkzi where prefix is "dr" (d r before A)
-        let prefix = if dhatu_query.starts_with("dr") { "dr" } else { prefix };
         let base = format!("{}ANkz", prefix);
         let forms = match (purusha, vacana) {
             (1,1) => vec![format!("{}izyati", base)],

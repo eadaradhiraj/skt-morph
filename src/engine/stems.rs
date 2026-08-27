@@ -81,7 +81,7 @@ fn g1_special_lrt(dhatu: &str) -> Option<String> {
     let map: &[(&str,&str)] = &[("sru","srozy"),("su","sozy"),("Sru","Srozy"),("Dru","Drozy"),("du","dozy"),("dru","drozy"),("tyaj","tyakzy"),("skand","skantsy"),("nam","naMsy")];
     for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
     if ["Dinv"].contains(&dhatu) { return Some(format!("{}izya", dhatu)); }
-    if dhatu.ends_with('A') && (2..=4).contains(&dhatu.len()) && !["SrA","jYA"].contains(&dhatu) { return Some(format!("{}sy", dhatu)); }
+    if dhatu.ends_with('A') && (2..=4).contains(&dhatu.len()) && !["SrA","jYA"].contains(&dhatu) { return Some(format!("{}sya", dhatu)); }
     None
 }
 fn g1_future_base(dhatu: &str, present_base: &str, guna: &str) -> String {
@@ -136,8 +136,10 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
     if dhatu.to_ascii_lowercase().ends_with("akzi") {
-        let first = dhatu.chars().next().unwrap();
-        return format!("{}ANkzizya", first);
+        let low = dhatu.to_ascii_lowercase();
+        let idx = low.find("akzi").unwrap_or(1);
+        let prefix = &dhatu[..idx];
+        return format!("{}ANkzizya", prefix);
     }
     // Ca doubling future: hurC->hUrCizya etc. + zWiv/urv family
     if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv" | "urv" | "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv" | "purv" | "nikza" | "Rikza" | "stfkza") {
@@ -285,11 +287,17 @@ pub fn derive_stem(
     } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
         // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
         dhatu[..dhatu.len()-1].to_string()
+    } else if dhatu.ends_with('x') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
+        // Gasx~ -> Gas, adx~ -> ad, patx~ -> pat etc. (x anubandha for BvAdi)
+        dhatu[..dhatu.len()-1].to_string()
     } else if dhatu == "YiPalA" {
         "Pal".to_string()
     } else if dhatu.ends_with("mu") && gana == 1 && aupadeshik.contains('~') && dhatu.len() > 2 {
         // general mu anubandha for BvAdi: camu~->cam, kramu~->kram, Bramu~->Bram, ramu~->ram, syamu~->syam etc.
         // keep m, strip u (then guNa/vrddhi: kram->krAm)
+        dhatu[..dhatu.len()-1].to_string()
+    } else if dhatu.ends_with('u') && gana == 1 && aupadeshik == format!("{}~", dhatu) && dhatu.len() > 3 && !dhatu.ends_with("mu") {
+        // general u anubandha for jizu~->jiz, Sriz u-> Sriz etc. (must after mu handled separately but also here for zu)
         dhatu[..dhatu.len()-1].to_string()
     } else if dhatu == "Bfzu" {
         "Bfz".to_string() // Bfzu~ -> Bfz (strip u, then f->ar -> Barz)
@@ -425,9 +433,9 @@ pub fn derive_stem(
                 // RIla -> nIla keep long I (not nel)
                 let ps = "nIla".to_string();
                         present_stem = Some(ps);
-            } else if is_g1_a_final(dhatu) || dhatu.ends_with('a') || dhatu.ends_with('A') {
+            } else if (is_g1_a_final(dhatu) || dhatu.ends_with('a') || dhatu.ends_with('A')) && crate::engine::phonology::sad_present_base(dhatu).is_none() {
                 // a-final roots (eDa, sparDa, siDa) already end in a — don't duplicate shap 'a', but apply guNa to stem without final a (siDa->seDa)
-                // keep long I/U (nIla, RIva) as is, don't e/o it
+                // keep long I/U (nIla, RIva) as is, don't e/o it — but skip irregular pA etc. which use sad_present_base pib
                 let stem = &dhatu[..dhatu.len()-1];
                 let graded = if stem.contains('I') || stem.contains('U') { stem.to_string() } else { apply_guna_to_stem(stem) };
                 let ps = format!("{}a", graded);
@@ -639,8 +647,8 @@ pub fn derive_stem(
                 let root = "nIl".to_string();
                         return (Some(root), Some("a".to_string()));
             }
-            // a-final (siDa->seD) for lang: apply guNa to stem without final a (non-causative, non-YA) — keep long I/U
-            if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA {
+            // a-final (siDa->seD) for lang: apply guNa to stem without final a (non-causative, non-YA) — keep long I/U — skip irregular pA etc.
+            if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA && crate::engine::phonology::sad_present_base(dhatu).is_none() {
                 let stem = &dhatu[..dhatu.len()-1];
                 let graded = if stem.contains('I') || stem.contains('U') { stem.to_string() } else { apply_guna_to_stem(stem) };
                 let root = fix_lang(graded);
@@ -827,8 +835,8 @@ pub fn derive_stem(
                 let root = "nIl".to_string();
                         return (Some(root), None);
             }
-            // a-final (siDa->seD) for vidhilin (non-causative, non-YA) — keep long I/U
-            if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA {
+            // a-final (siDa->seD) for vidhilin (non-causative, non-YA) — keep long I/U — skip irregular pA etc.
+            if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA && crate::engine::phonology::sad_present_base(dhatu).is_none() {
                 let stem = &dhatu[..dhatu.len()-1];
                 let graded = if stem.contains('I') || stem.contains('U') { stem.to_string() } else { apply_guna_to_stem(stem) };
                 let root = apply_nasal_palatal(&graded);
