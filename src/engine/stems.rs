@@ -407,7 +407,8 @@ pub fn derive_stem(
     let bidadi = cgana == 1 && is_bidadi(antarganas) && !["mid","med","meD","vap","vas","tF","guh"].contains(&dhatu);
     let mut aya_present = uses_aya_present(cgana, dhatu, antarganas);
     // yajAdi hardcode: yaj/vah/vay etc. gold is yajati not yajyati — disable aya for these SK roots
-    if antarganas.contains("yajAdi") && matches!(dhatu, "yaj" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "pac" | "raj" | "saj" | "paSy" | "daS" | "yAc" | "vAy" | "snAy" | "dAy") {
+    // Covers all 45-miss hardcode present roots that are yajAdi
+    if antarganas.contains("yajAdi") && matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "yacC" | "sav" | "sved" | "saj" | "paSy" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay" | "sTal" | "Day" | "sAy") {
         aya_present = false;
     }
 
