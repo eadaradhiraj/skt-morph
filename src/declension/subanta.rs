@@ -62,12 +62,17 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // नौ: औ-anta, 6.1.78 आव् (नावम्, not 6.1.93 गाम्)
   m.insert(("O".to_string(),"pum".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"OByAm".to_string(),"OBiH".to_string(),],vec!["Ave".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"Ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
   m.insert(("O".to_string(),"stri".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"OByAm".to_string(),"OBiH".to_string(),],vec!["Ave".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"Ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
-  // हलन्त — j-anta (वणिज्, सुहृज्ज्-like) and d-anta (सुहृद्) — 8.2.30/8.2.39 jhal sandhi
-  // sūtra: 8.2.30 चोः कुः (j→k at pada), 8.2.39 झलां जशोऽन्ते (j→k/j etc.), 8.4.41 ष्टुत्व not here
-  // Future devs: j-stem shows g/k alternation (वणिक्/वणिजौ), d-stem shows t/d (सुहृत्/सुहृदौ)
-  // Extreme commenting kept for future halanta expansion — add h, bh etc. similarly
+  // हलन्त — j-anta (वणिज्), d-anta (सुहृद्) — 8.2.30/8.2.39 jhal sandhi
+  // sūtra: 8.2.30 चोः कुः (j→k at pada), 8.2.39 झलां जशोऽन्ते (j→k/j etc.)
+  // Future devs: j-stem g/k (वणिक्/वणिजौ), d-stem t/d (सुहृत्/सुहृदौ) — add h→k, B→p similarly
+  // Extreme commenting kept for future halanta expansion — h, B next
   m.insert(("j".to_string(),"pum".to_string()), vec![vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"zu".to_string(),],vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],]);
   m.insert(("d".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
+  // h-anta (लिह्) and B-anta (लभ्-type bh) — 8.2.31 हो ढः, 8.2.32 दादेर्धातोर्घः + जश्त्व
+  // sūtra: 8.2.31 h→Q/ḍh at jhal, pada h→k (दुह्→धुक्); Future devs: h shows ढ/क, B shows प्/भ्
+  // Extreme: keep tsu/zu for saptamī bahu, consistent with j/d paradigms above
+  m.insert(("h".to_string(),"pum".to_string()), vec![vec!["k".to_string(),"hO".to_string(),"haH".to_string(),],vec!["ham".to_string(),"hO".to_string(),"haH".to_string(),],vec!["hA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["he".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"hoH".to_string(),"hAm".to_string(),],vec!["hi".to_string(),"hoH".to_string(),"tsu".to_string(),],vec!["k".to_string(),"hO".to_string(),"haH".to_string(),],]);
+  m.insert(("B".to_string(),"pum".to_string()), vec![vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["Bam".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["BA".to_string(),"BByAm".to_string(),"BBiH".to_string(),],vec!["Be".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BoH".to_string(),"BAm".to_string(),],vec!["Bi".to_string(),"BoH".to_string(),"tsu".to_string(),],vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],]);
   m
 }
 
@@ -441,6 +446,13 @@ mod tests {
         has(&s, "prathamA", "suhft");
         has(&s, "dvitIyA", "suhfdam");
         has(&s, "tfIyA", "suhfdA");
+        // h-anta: lih-like (दुह्→धुक्) — 8.2.31; B-anta: laB-type bh→p at pada
+        let h = generate("lih", "pum").expect("lih");
+        has(&h, "prathamA", "lik");
+        has(&h, "tfIyA", "lihA");
+        let b = generate("laB", "pum").expect("laB");
+        has(&b, "prathamA", "lap");
+        has(&b, "tfIyA", "laBA");
     }
 
     #[test]
