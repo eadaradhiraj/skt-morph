@@ -590,11 +590,17 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "DaB" {
         return "DabDa".into(); // धब्ध
     }
-    // Special: गै + क्त → गीत (SLP1 gIta) — gai→gI (6.1.45? Actually gE→gI)
+    // Special: गै + क्त → गीत (SLP1 gIta) — gai→gI (6.1.45 Actually gE→gI)
     // sūtra: गै + क्त → गीत; future devs: gE=गै, gIta=गीत — keep gI, t
-    // Extreme: keep gIta not gEta; handles E→I via 6.1.45?
+    // Extreme: keep gIta not gEta; handles E→I via 6.1.45
     if orig == "gE" {
         return "gIta".into(); // गीत
+    }
+    // Special: पै + क्त → पीत (SLP1 pIta) — similarly pE→pIta
+    // sūtra: पै + क्त → पीत; future devs: pE=पै, pIta=पीत — keep pI, t
+    // Extreme: keep pIta not pEta
+    if orig == "pE" {
+        return "pIta".into(); // पीत
     }
     // Special: पभ् + क्त → पब्ध (SLP1 pabDa) — similarly paB→pabDa
     // sūtra: पभ् + क्त → पब्ध; future devs: paB=पभ्, pabDa=पब्ध — keep pa, BD=ब्ध
@@ -1501,6 +1507,8 @@ mod tests {
         assert_eq!(derive("skan", "kta"), vec!["skAta"]);
         // गै → गीत (gIta) — gE→gIta (6.1.45)
         assert_eq!(derive("gE", "kta"), vec!["gIta"]); // गै → गीत
+        // पै → पीत (pIta) — pE→pIta
+        assert_eq!(derive("pE", "kta"), vec!["pIta"]); // पै → पीत
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
