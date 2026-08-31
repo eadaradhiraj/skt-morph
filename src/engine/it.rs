@@ -9,7 +9,7 @@ fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
 
-/// अनिट् before स्य (लृट्). कृ / गम् / भू are सेट् here (करिष्यति, गमिष्यति, भविष्यति).
+/// अनिट् before स्य (लृट्). कृ / गम् / हन् / भू are सेट् here (7.2.58 / 7.2.70 / 7.2.35).
 pub fn anit_sya(root: &str) -> bool {
     matches!(
         root,
@@ -55,7 +55,8 @@ pub fn takes_it_nistha(root: &str) -> bool {
 }
 
 pub fn takes_it_sya(root: &str) -> bool {
-    matches!(root, "gam" | "kf" | "BU" | "pat" | "grah" | "eD") || !anit_sya(root)
+    // 7.2.58 गमेरिट्; 7.2.70 ऋद्धनोः स्ये (कृ, हन्); 7.2.35 otherwise if not 7.2.10.
+    matches!(root, "gam" | "kf" | "han" | "BU" | "pat" | "grah" | "eD") || !anit_sya(root)
 }
 
 pub fn takes_it_tavya(root: &str) -> bool {
@@ -129,27 +130,22 @@ pub fn sya_stem(root: &str) -> String {
     if root == "kfp" {
         root = "kalp".into();
     }
-    // दृश् द्रक्ष्यति stays named (गुण दर्श् would give दर्क्ष्य).
-    if root == "dfS" {
-        return "drakzya".into();
-    }
-    // 7.2.37 ग्रहोऽलिटि दीर्घः.
-    if root == "grah" {
-        return "grahIzya".into();
-    }
-    // हन् is अनिट् for सन् (जिघांसति) but लृट् हनिष्यति.
-    if root == "han" {
-        return "hanizya".into();
-    }
     if takes_it_sya(&root) {
         let g = apply_guna_to_stem(&root);
+        // 7.2.37 ग्रहोऽलिटि दीर्घः.
+        let it = if root == "grah" { "I" } else { "i" };
         if g.ends_with('a') {
-            format!("{}izya", &g[..g.len() - 1])
+            format!("{}{it}zya", &g[..g.len() - 1])
         } else {
-            format!("{g}izya")
+            format!("{g}{it}zya")
         }
     } else {
-        let mut g = apply_guna_to_stem(&root);
+        // 6.1.58 सृजिदृशोर्झल्यमकिति: अम्, then यण् (द्रश्, स्रज्) not गुण अर्.
+        let mut g = match root.as_str() {
+            "dfS" => "draS".into(),
+            "sfj" => "sraj".into(),
+            _ => apply_guna_to_stem(&root),
+        };
         // 7.4.49 सः स्यार्धधातुके — वत्स्यति, सत्स्यति.
         if g.ends_with('s') {
             g = format!("{}t", &g[..g.len() - 1]);
@@ -346,6 +342,10 @@ mod tests {
         assert_eq!(sya_stem("Siz"), "Sekzya");
         assert_eq!(sya_stem("kruS"), "krokzya");
         assert_eq!(sya_stem("stu"), "stozya");
+        assert_eq!(sya_stem("dfS"), "drakzya");
+        assert_eq!(sya_stem("sfj"), "srakzya");
+        assert_eq!(sya_stem("grah"), "grahIzya");
+        assert_eq!(sya_stem("han"), "hanizya");
     }
 
     #[test]

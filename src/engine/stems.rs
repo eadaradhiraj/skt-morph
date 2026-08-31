@@ -210,7 +210,7 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         if dhatu.ends_with("mB") { return format!("{}izya", dhatu); }
         let graded=apply_guna_to_stem(dhatu);
         if dhatu.ends_with('I') && dhatu.len()<=3 { return format!("{}zya", graded); }
-        return format!("{}izya", graded);
+        return crate::engine::it::sya_stem(dhatu);
     }
     if gana==N_GANA && matches!(guna.chars().last(), Some('d'|'D')) { return format!("{}tsya", &guna[..guna.len()-1]); }
     if guna.ends_with('v') {
