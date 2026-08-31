@@ -61,6 +61,8 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **आशीर्लिङ् kit:** 6.4.67 एर् लिङि देयात्/स्थेयात्/हेयात् (या stays यायात्); 7.4.28 रिङ् क्रियात्/रियात्/भ्रियात्; 6.1.15 उच्यात्.
 - **लट् 7.3.77–78:** गच्छति/यच्छति/पिबति/तिष्ठति/पश्यति from those sūtras (ष्ठा 6.1.64, दाण् 1.3.3), not named present stems.
 - **लट् upadeśa:** 1.3 + 6.1.64/65 root, then गुण/6.1.78 (श्रयति, नयति, धयति, वयति) or 7.3.78 (सीदति). 3.1.5–6 नित्य सन् चिकित्सति. यजादि is not aya (यजति).
+- **Sequential इत्:** 1.3.5 ञिटुडवः, then 6.1.64/65, then leftover vowel/a इत् — not a per-name table. ष्टन stanati, षिधु seDati, षण sanati; टुनदि nandati (7.1.58); टुओस्फूर्जा sPUrjati; ञिफला Palati. दैप् stays दायति (not 7.3.78 यच्छति).
+- **CI lint:** `cargo clippy --all-targets -- -D warnings` and tests with `RUSTFLAGS=-D warnings`. `#![deny(warnings)]` on the lib.
 
 
 

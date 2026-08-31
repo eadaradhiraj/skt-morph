@@ -138,7 +138,7 @@ pub fn join_form(
     if gana == 2 || gana == 3 {
         if let Some(d) = dhatu {
             let d = d.trim_end_matches('a');
-            if d == "han" || d == "han" {
+            if d == "han" {
                 if family == "lat" {
                     match ending {
                         "ti" => return "hanti".into(),
@@ -180,10 +180,8 @@ pub fn join_form(
                         _ => format!("ahan{ending}"),
                     };
                 }
-                if family == "vidhilin" {
-                    if ending.starts_with('y') {
-                        return format!("han{ending}");
-                    }
+                if family == "vidhilin" && ending.starts_with('y') {
+                    return format!("han{ending}");
                 }
             }
             if d == "vid" && family == "lat" {

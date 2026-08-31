@@ -3,7 +3,7 @@
 //! This file already handles lat/lot/lang/vidhilin/lrt/lit for gana 1,4,6 correctly and stubs others.
 
 use crate::engine::derived::nitya_san_present;
-use crate::engine::it::{dhatu_satva, surface_root};
+use crate::engine::it::dhatu_satva;
 use crate::engine::phonology::*;
 use crate::engine::redup::*;
 pub const THEMATIC_GANAS: &[u8] = &[1, 6];
@@ -44,12 +44,12 @@ fn g6_skip_future_guna(dhatu: &str) -> bool {
     if dhatu.starts_with('f') && dhatu.len() >= 2 { return true; }
     if dhatu.contains("mP") || dhatu.contains("fM") || dhatu.contains("Mh") { return true; }
     if dhatu[..dhatu.len().saturating_sub(1)].chars().any(|c| "IUA".contains(c)) { return true; }
-    if dhatu.contains("mB") && dhatu.chars().next().map_or(false, |c| c.is_uppercase()) { return true; }
+    if dhatu.contains("mB") && dhatu.chars().next().is_some_and(|c| c.is_uppercase()) { return true; }
     if dhatu.ends_with("uw") { return true; }
     if dhatu.ends_with("ump") || (dhatu.ends_with("mp") && dhatu.len() <= 4) { return true; }
-    if dhatu.len() >=3 && dhatu.len() <=4 && !dhatu.ends_with('d') && !dhatu.ends_with('t') && !dhatu.ends_with('D') && !dhatu.ends_with('T') {
-        if dhatu.starts_with('u') || dhatu.starts_with('i') || matches!(dhatu.chars().last(), Some('c'|'C'|'j'|'J')) { return true; }
-    }
+    if dhatu.len() >=3 && dhatu.len() <=4 && !dhatu.ends_with('d') && !dhatu.ends_with('t') && !dhatu.ends_with('D') && !dhatu.ends_with('T')
+        && (dhatu.starts_with('u') || dhatu.starts_with('i') || matches!(dhatu.chars().last(), Some('c'|'C'|'j'|'J')))
+    { return true; }
     false
 }
 
@@ -67,7 +67,7 @@ pub fn g6_future_stem(dhatu: &str) -> String {
     if dhatu == "Dru" { return format!("{}zya", dhatu); }
     if dhatu.ends_with("fh") { return format!("{}izya", apply_guna_to_stem(dhatu)); }
     if dhatu == "Cur" { return g6_future_suffix(dhatu); }
-    if dhatu.len()==3 && matches!(dhatu.chars().nth(1), Some('u'|'U')) && dhatu.chars().next().map_or(false, |c| c.is_uppercase()) && dhatu.chars().nth(2).map_or(false, |c| c.is_uppercase()) {
+    if dhatu.len()==3 && matches!(dhatu.chars().nth(1), Some('u'|'U')) && dhatu.chars().next().is_some_and(|c| c.is_uppercase()) && dhatu.chars().nth(2).is_some_and(|c| c.is_uppercase()) {
         let graded = apply_guna_to_stem(dhatu);
         if graded != dhatu { return format!("{}izya", graded); }
     }
@@ -276,38 +276,106 @@ fn anidit_upadha_lopa(root: &str) -> String {
     root.to_string()
 }
 
-/// 1.3 anubandha + 6.1.64/65, then present ādeśa (7.3.78, गुण, 6.1.78) on the root.
-fn g1_upadesha_root(dhatu: &str, aupadeshik: &str) -> Option<String> {
-    const KEYS: &[&str] = &[
-        "zwage", "zWage", "CadiH", "Samo", "zadx", "acu", "wuyAcf", "quyAcf", "Ridf", "Redf",
-        "ubundir", "SriY", "BfY", "hfY", "DfY", "zUrkzya", "RIY", "ovE", "zRE", "dEp", "zu",
-        "YizvidA", "zanja", "danSa", "qupacaz", "ranja", "yaja", "quvapa", "vaha", "veY", "vyeY",
-        "hveY", "vada", "wuoSvi", "Dew", "zE", "zWA", "zWala", "dAR",
-    ];
-    if !KEYS.contains(&dhatu) {
-        return None;
+/// 1.3 + 6.1.64/65, sequential (षः सः then इत्), not a one-shot name table.
+fn clean_upadesha(original: &str, gana: u8, aupadeshik: &str) -> String {
+    if gana == 1 {
+        if let Some(san) = nitya_san_present(original) {
+            return san;
+        }
     }
-    // 1.3 leftover visarga+इत्; दैप् प् इत् then 6.1.45 would make दा and steal 7.3.78 यच्छति.
-    if dhatu == "CadiH" {
-        return Some("Cad".into());
+    // 1.3.3 visarga; दैप् प् इत् must not then take 6.1.45 दा (7.3.78 यच्छति is दाण्).
+    if original == "CadiH" {
+        return "Cad".to_string();
     }
-    if dhatu == "dEp" {
-        return Some("dE".into());
+    if original == "dEp" {
+        return "dE".to_string();
     }
-    let mut s = dhatu_satva(&surface_root(dhatu));
+    let tilde = aupadeshik == format!("{original}~");
+    let tilde_any = aupadeshik.contains('~');
+    let mut s = original.to_string();
     if aupadeshik.starts_with("u~") && s.starts_with('u') && s.len() > 2 {
         s = s[1..].to_string();
     }
-    if s.ends_with('a') && aupadeshik.contains('~') && s.len() > 3 {
-        let core = &s[..s.len() - 1];
+    // 1.3.5 आदिर्ञिटुडवः before 6.1.64 so ञिष्विदा → ष्विदा → स्विद्.
+    if s.starts_with("qu") && s.len() > 3 {
+        s = s[2..].to_string();
+    }
+    if s.starts_with("wu") && s.len() > 3 {
+        s = s[2..].to_string();
+    }
+    if s.starts_with("Yi") && s.len() > 3 {
+        s = s[2..].to_string();
+    }
+    if s.starts_with('o') && s.len() > 2 && s.chars().nth(1).is_some_and(|c| !is_vowel_c(c)) {
+        s = s[1..].to_string();
+    }
+    s = dhatu_satva(&s);
+    if original.starts_with('z') && s.contains('R') {
+        s = s.replace('R', "n");
+    }
+    let dhatu = s.as_str();
+    let mut s = if (gana == 5 || gana == 8) && dhatu.ends_with('Y') && dhatu.len() > 2 {
+        let base = &dhatu[..dhatu.len() - 1];
+        if base.starts_with('z') {
+            format!("s{}", &base[1..])
+        } else {
+            base.to_string()
+        }
+    } else if let Some(stripped) = strip_final_it(dhatu, gana, tilde, tilde_any) {
+        stripped
+    } else if gana == YA_GANA && dhatu.ends_with('u') && tilde_any && dhatu.len() > 2 {
+        let base = &dhatu[..dhatu.len() - 1];
+        if base.starts_with('z') && !base.starts_with("zW") && !base.starts_with("zw") {
+            format!("s{}", &base[1..])
+        } else {
+            base.to_string()
+        }
+    } else {
+        dhatu.to_string()
+    };
+    // पचष्-type: 1.3.3 ष after a (qupacaz → pac).
+    if s.ends_with("az") && s.len() > 3 {
+        let core = &s[..s.len() - 2];
         if core.chars().any(is_vowel_c) {
             s = core.to_string();
         }
     }
-    if matches!(dhatu, "zanja" | "ranja" | "danSa") {
+    if matches!(original, "zanja" | "ranja" | "danSa") {
         s = anidit_upadha_lopa(&s);
     }
-    Some(s)
+    if s == "RI" {
+        "nI".to_string()
+    } else {
+        s
+    }
+}
+
+/// 1.3 leftover vowel/a इत्: one final sound, after 6.1.64.
+fn strip_final_it(dhatu: &str, gana: u8, tilde: bool, tilde_any: bool) -> Option<String> {
+    if dhatu.ends_with("ir") && tilde_any && dhatu.len() > 3 {
+        return Some(dhatu[..dhatu.len() - 2].to_string());
+    }
+    let last = dhatu.chars().last()?;
+    let strip = match last {
+        'I' | 'U' | 'F' | 'f' | 'x' if dhatu.len() > 2 && tilde => true,
+        'u' if dhatu.ends_with("vu") && gana == 1 && tilde_any && dhatu.len() > 3 => true,
+        'u' if dhatu.ends_with("mu") && gana == 1 && tilde_any && dhatu.len() > 2 => true,
+        'u' if gana == 1 && tilde && dhatu.len() > 2 && !dhatu.ends_with("mu") => true,
+        'u' if (gana == 5 || gana == 8) && tilde_any && dhatu.len() > 2 => true,
+        'u' if gana == 1 && (dhatu.ends_with("ncu") || dhatu.ends_with("ucu") || dhatu.ends_with("uju")) && dhatu.len() > 3 && tilde => true,
+        'e' | 'E' | 'o' if dhatu.len() > 2 && tilde => true,
+        'Y' | 'w' if dhatu.len() > 2 => true,
+        'A' if dhatu.len() > 3 && tilde_any => true,
+        'a' if ((gana == 2 || gana == 3) && dhatu.len() > 2 && tilde)
+            || (dhatu.len() > 3 && tilde)
+            || (gana == 10 && dhatu.len() > 3 && tilde_any) =>
+        {
+            true
+        }
+        _ if dhatu.len() > 3 && last.is_ascii_uppercase() && tilde => true,
+        _ => false,
+    };
+    strip.then(|| dhatu[..dhatu.len() - last.len_utf8()].to_string())
 }
 
 pub fn derive_stem(
@@ -319,135 +387,18 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>) {
-    let dhatu_clean: String = if gana == 1 {
-        if let Some(san) = nitya_san_present(dhatu) {
-            san
-        } else if let Some(r) = g1_upadesha_root(dhatu, aupadeshik) {
-            r
-        } else {
-            String::new()
-        }
-    } else {
-        String::new()
+    // 8.2.18 कृपो रो लः after upadeśa.
+    let dhatu_clean = {
+        let s = clean_upadesha(dhatu, gana, aupadeshik);
+        if s == "kfp" { "kalp".to_string() } else { s }
     };
-    let dhatu_clean: String = if !dhatu_clean.is_empty() {
-        dhatu_clean
-    } else if dhatu == "zwana" {
-        "stana".to_string() // zwana~ -> stana (zw->st, gold stanati not swanati)
-    } else if dhatu == "zwrakza" {
-        "strakza".to_string()
-    } else if dhatu.starts_with("zw") && dhatu.len() > 2 && gana == 1 {
-        format!("st{}", &dhatu[2..])
-    } else if dhatu == "zaRa" {
-        "sana".to_string() // zaRa~ -> sana (must before z->s branch)
-    } else if matches!(dhatu, "ziDu" | "zfBu" | "zfnBu" | "ziBu" | "zinBu") {
-        // ziDu~ -> ziD -> siD etc., zfBu~ -> zfB -> sfB -> sarB
-        let mut s = format!("s{}", &dhatu[1..]);
-        s = s[..s.len()-1].to_string(); // strip final u
-        s
-    } else if dhatu == "wunadi" {
-        "nadi".to_string() // wu- anubandha: wunadi~ -> nadi -> nanda (gold nandati)
-    } else if dhatu.starts_with("wu") && dhatu.len() > 3 && (gana == 1 || gana == 2) && dhatu == "wukzu" {
-        // wu- prefix stripping for wukzu~ -> kzu (gold kzOti)
-        dhatu[2..].to_string()
-    } else if dhatu.starts_with("wu") && dhatu.len() > 4 && aupadeshik == format!("{}~", dhatu) {
-        // generic wu- anubandha: wuvama~->vama, wuyAcf~->yAcf etc.
-        dhatu[2..].to_string()
-    } else if dhatu.starts_with("qu") && dhatu.len() > 3 {
-        let rest = &dhatu[2..];
-        if rest.ends_with('Y') { rest[..rest.len()-1].to_string() } else { rest.to_string() }
-    } else if dhatu == "divu" {
-        "div".to_string()
-    } else if dhatu == "zWivu" {
-        "zWiv".to_string()
-    } else if dhatu.ends_with("vu") && gana == 1 && aupadeshik.contains('~') && dhatu.len() > 3 {
-        // general vu anubandha: kzIvu~->kzIv, etc.
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.starts_with('z') && !dhatu.starts_with("zW") && !dhatu.starts_with("zw") && dhatu.len() > 2 && (gana == 1 || gana == 6) {
-        let mut s = format!("s{}", &dhatu[1..]);
-        // also strip final I/U/F/f/e anubandha if present (ziDU~ -> siD, zalf~ -> sal etc.) - keep lowercase u/i for specific ziDu/zfBu handled below
-        if s.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-            let last = s.chars().last().unwrap();
-            if matches!(last, 'I' | 'U' | 'F' | 'f' | 'e' | 'E') {
-                s = s[..s.len()-last.len_utf8()].to_string();
-            }
-        }
-        s
-    } else if dhatu.starts_with('R') && dhatu.len() > 2 && (gana == 1 || gana == 6) {
-        format!("n{}", &dhatu[1..])
-    } else if dhatu.ends_with("ir") && aupadeshik.contains('~') && dhatu.len() > 3 {
-        // general ir anubandha: cyutir (01.0040 cyuti~r) -> cyut, ruDir (07) -> ruD etc.
-        dhatu[..dhatu.len()-2].to_string()
-    } else if (dhatu.ends_with('I') || dhatu.ends_with('U') || dhatu.ends_with('F')) && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-        // kftI~ -> kft, ziDU~ -> ziD etc. (strip final I/U/F anubandha) - len>2 for short like oKf? actually f below
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.ends_with('f') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-        // jyutf~ -> jyut, oKf~ -> oK etc. (strip final f anubandha)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.ends_with('x') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-        // Gasx~ -> Gas, adx~ -> ad, patx~ -> pat etc. (x anubandha for BvAdi)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu == "YiPalA" {
-        "Pal".to_string()
-    } else if dhatu.ends_with("mu") && gana == 1 && aupadeshik.contains('~') && dhatu.len() > 2 {
-        // general mu anubandha for BvAdi: camu~->cam, kramu~->kram, Bramu~->Bram, ramu~->ram, syamu~->syam etc.
-        // keep m, strip u (then guNa/vrddhi: kram->krAm)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.ends_with('u') && gana == 1 && aupadeshik == format!("{}~", dhatu) && dhatu.len() > 3 && !dhatu.ends_with("mu") {
-        // general u anubandha for jizu~->jiz, Sriz u-> Sriz etc. (must after mu handled separately but also here for zu)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu == "Bfzu" {
-        "Bfz".to_string() // Bfzu~ -> Bfz (strip u, then f->ar -> Barz)
-    } else if dhatu == "wuosPUrjA" {
-        "sPUrj".to_string() // wuosPUrjA~ -> sPUrj (wu+o anubandha, gold sPUrjati)
-    } else if dhatu == "zaRu" {
-        // 08.0002 zaRu~ -> san (z->s, R->n) for sunoti gold
-        "san".to_string()
-    } else if (dhatu.ends_with('e') || dhatu.ends_with('E')) && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-        // cawe~ -> caw, kawe~ -> kaw etc. (e is anubandha)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if gana == 1 && dhatu.ends_with("ncu") && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
-        // ancu~ -> anc, vancu~ -> vanc etc. (u is anubandha, then nc->Yc via nasal palatal -> aYca)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if gana == 1 && (dhatu.ends_with("ucu") || dhatu.ends_with("uju")) && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
-        // mrucu~ -> mruc, kuju~ -> kuj etc. (final u is anubandha, then u->o guNa -> mroc, koj)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if (gana == 5 || gana == 8) && dhatu.ends_with('Y') && dhatu.len() > 2 {
-        // NU Y: zuY -> su (strip Y, z->s), ziY->si, SiY stays Si etc.
-        let base = &dhatu[..dhatu.len()-1];
-        if base.starts_with('z') { format!("s{}", &base[1..]) } else { base.to_string() }
-    } else if (gana == 5 || gana == 8) && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
-        // NU u: tanu~ -> tan, vanu~ -> van etc.
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.len() > 3 && dhatu.chars().last().map_or(false, |c| c.is_ascii_uppercase()) && aupadeshik == format!("{}~", dhatu) {
-        // general uppercase anubandha: qukrIY~? -> qukrI, etc. (strip last uppercase)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if gana == YA_GANA && dhatu.ends_with('u') && aupadeshik.contains('~') && dhatu.len() > 2 {
-        let base = &dhatu[..dhatu.len()-1];
-        if base.starts_with('z') && !base.starts_with("zW") && !base.starts_with("zw") { format!("s{}", &base[1..]) } else { base.to_string() }
-    } else if (gana == 2 || gana == 3) && dhatu.ends_with('a') && dhatu.len() > 2 && aupadeshik == format!("{}~", dhatu) {
-        // hana~ -> han, vida~ -> vid (AD adds final a)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if dhatu.ends_with('a') && dhatu.len() > 3 && aupadeshik == format!("{}~", dhatu) {
-        // general a stripping: tuda~ -> tud, cura~ -> cur etc. (for any gana with final a anubandha)
-        dhatu[..dhatu.len()-1].to_string()
-    } else if gana == 10 && dhatu.ends_with('a') && dhatu.len() > 3 && aupadeshik.contains('~') {
-        // 10th cura~ -> cur (strip final a) – fallback
-        dhatu[..dhatu.len()-1].to_string()
-    } else {
-        dhatu.to_string()
-    };
-    // 8.2.18 कृपो रो लः
-    let dhatu_clean = if dhatu_clean == "kfp" { "kalp".to_string() } else { dhatu_clean };
     let dhatu = dhatu_clean.as_str();
     if derivation != "shuddha" {
         return (None, None);
     }
     let guna = apply_guna_to_stem(dhatu);
-    if guna != dhatu {
-    }
     let cgana = conjugation_gana(gana, tags);
-    let mut present_stem: Option<String> = None;
+    let mut present_stem;
     let bidadi = cgana == 1 && is_bidadi(antarganas) && !["mid","med","meD","vap","vas","tF","guh"].contains(&dhatu);
     let aya_present = uses_aya_present(cgana, dhatu, antarganas);
 
@@ -925,7 +876,7 @@ pub fn derive_stem(
                 }
             }
             if dhatu == "zasja" || dhatu == "sasja" {
-                let root = apply_nasal_palatal(&"sajj".to_string());
+                let root = apply_nasal_palatal("sajj");
                         return (Some(root), None);
             }
             if dhatu == "UWa" {

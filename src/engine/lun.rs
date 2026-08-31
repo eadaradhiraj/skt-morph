@@ -330,11 +330,7 @@ fn ksa_stem(root: &str) -> String {
     } else {
         root.to_string()
     };
-    if root.ends_with('S') {
-        let mut s = root;
-        s.pop();
-        format!("{s}kz")
-    } else if root.ends_with('h') {
+    if root.ends_with('S') || root.ends_with('h') {
         let mut s = root;
         s.pop();
         format!("{s}kz")
@@ -434,7 +430,7 @@ pub fn kartari_tagged(
         let body = if anit_sic(&root) {
             let g = apply_guna_to_stem(&root);
             ruki_s(&internal_sandhi(&g, "s"))
-                .trim_end_matches(|c| c == 's' || c == 'z')
+                .trim_end_matches(['s', 'z'])
                 .to_string()
                 + "z"
         } else {

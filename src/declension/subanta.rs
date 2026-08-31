@@ -108,10 +108,7 @@ fn apply_natva(word_stem: &str, suffix: &str) -> String {
 /// 6.4.134 अल्लोपोऽनः, blocked by 6.4.137 न संयोगाद्वमन्तात् (आत्मन्, ब्रह्मन्, यज्वन्).
 fn an_al_lopa(pre: &str) -> bool {
     let c: Vec<char> = pre.chars().collect();
-    match c.as_slice() {
-        [.., a, 'v' | 'm'] if is_cons(*a) => false,
-        _ => true,
-    }
+    !matches!(c.as_slice(), [.., a, 'v' | 'm'] if is_cons(*a))
 }
 
 fn decline_an(stem: &str, linga: &str) -> Declension {
@@ -205,10 +202,8 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         }
         if let Some((_, mut table)) = best {
             // Pāṇini exception: kinship keeps short a
-            if is_kinship && best_ending == "f" && linga == "pum" {
-                if table.len() > 1 && !table[1].is_empty() {
-                    table[1][0] = "aram".to_string();
-                }
+            if is_kinship && best_ending == "f" && linga == "pum" && table.len() > 1 && !table[1].is_empty() {
+                table[1][0] = "aram".to_string();
             }
             let base_no_end = &cand[..cand.len()-best_ending.len()];
             let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
@@ -229,7 +224,7 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     // e.g. apolo (o) -> treat as a-stem with base "apol" + a-suffixes => apolaH
     let fallback_key = if linga == "stri" { ("A","stri") } else { ("a","pum") };
     if let Some(table) = paradigms.get(&(fallback_key.0.to_string(), fallback_key.1.to_string())) {
-        let base_no_end = if base.chars().last().map_or(false, |c| "aAiIuUeEoO".contains(c)) {
+        let base_no_end = if base.chars().last().is_some_and(|c| "aAiIuUeEoO".contains(c)) {
             &base[..base.len()-1]
         } else {
             base

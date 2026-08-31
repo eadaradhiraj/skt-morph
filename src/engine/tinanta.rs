@@ -173,7 +173,7 @@ pub fn live_generate(
     };
     let Some(family) = lakara_family(db_lakara) else { return vec![]; };
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
-    if !pada_allowed_artha(&root_pada, &pada, &dhatu, prefixes, artha) {
+    if !pada_allowed_artha(&root_pada, pada, &dhatu, prefixes, artha) {
         // 2.4.54 चक्षिङः ख्याञ् — लृट् of ख्या/क्ष्या is parasmai.
         if !(pada == "P" && family == "lrt" && matches!(dhatu.as_str(), "cakziN")) {
             return vec![];
@@ -576,8 +576,31 @@ mod tests {
         assert!(f.iter().any(|x| x == "dIdAMsati"), "{:?}", f);
         let f = generate_all("Dew", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "Dayati"), "{:?}", f);
+        let f = generate_all("CadiH", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "Cadati"), "{:?}", f);
+        let f = generate_all("dEp", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "dAyati"), "{:?}", f);
+        assert!(f.iter().all(|x| x != "yacCati"), "{:?}", f);
         let f = generate_all("zanja", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "sajati"), "{:?}", f);
+        let f = generate_all("zwana", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "stanati"), "{:?}", f);
+        let f = generate_all("zaRa", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "sanati"), "{:?}", f);
+        let f = generate_all("ziDu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "seDati"), "{:?}", f);
+        let f = generate_all("wunadi", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "nandati"), "{:?}", f);
+        let f = generate_all("wuosPUrjA", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "sPUrjati"), "{:?}", f);
+        let f = generate_all("YiPalA", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "Palati"), "{:?}", f);
+        let f = generate_all("Bfzu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "Barzati"), "{:?}", f);
+        let f = generate_all("zWivu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "zWIvati"), "{:?}", f);
+        let f = generate_all("divu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "dIvyati"), "{:?}", f);
         let f = generate_all("Sru", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "Sravati"), "{:?}", f);
         let f = generate_all("Sru", "plrt", 1, 1);

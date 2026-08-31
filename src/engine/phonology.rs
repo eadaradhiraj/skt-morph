@@ -8,7 +8,7 @@ fn is_vowel_final(c: char) -> bool {
 }
 
 pub fn ends_with_vowel(stem: &str) -> bool {
-    stem.chars().last().map_or(false, |c| is_vowel_final(c))
+    stem.chars().last().is_some_and(is_vowel_final)
 }
 
 pub fn apply_guna_to_stem(stem: &str) -> String {
@@ -154,7 +154,6 @@ pub fn yam_cc_future_stem(dhatu: &str, antarganas: &str) -> Option<String> {
 const G1_AYA_PRESENT: &[&str] = &["ji","Sri","nI","De","jri","ve","vye","hve","Svi"];
 const G1_A_FINAL: &[&str] = &["SrA","jYA"];
 const BIDADI_THEMATIC: &[&str] = &["mid","med","meD","vap","vas","tF","guh"];
-const YA_THEMATIC: &[&str] = &["tras","Bram","yas"];
 
 pub fn uses_aya_present(cgana: u8, dhatu: &str, antarganas: &str) -> bool {
     if BIDADI_THEMATIC.contains(&dhatu) { return false; }
@@ -424,7 +423,7 @@ pub fn causative_vidhilin_stem(dhatu: &str, tags: &str) -> String {
     if dhatu.ends_with('I') { return format!("{}ay", &dhatu[..dhatu.len()-1]); }
     if dhatu.len()==3 && dhatu.starts_with('C') {
         let aya=causative_aya_base(dhatu);
-        if aya.ends_with("aya") && aya[..aya.len()-3].to_ascii_lowercase()==dhatu.to_ascii_lowercase() { return dhatu.to_string(); }
+        if aya.ends_with("aya") && aya[..aya.len()-3].eq_ignore_ascii_case(dhatu) { return dhatu.to_string(); }
     }
     let aya=causative_aya_base(dhatu);
     if aya.ends_with("aya") { return aya[..aya.len()-1].to_string(); }
@@ -484,7 +483,9 @@ pub fn thematic_present_base(dhatu: &str, gana: u8, aupadeshik: &str) -> String 
         if ch=='i' { return format!("{}I{}", &dhatu[..idx], &dhatu[idx+1..]); }
         if ch=='u' { return format!("{}U{}", &dhatu[..idx], &dhatu[idx+1..]); }
     }
-    if dhatu.starts_with("kzI")||dhatu.starts_with("kzU") { if dhatu.ends_with("Iv")||dhatu.ends_with("Uv") { return apply_guna_to_stem(dhatu); }}
+    if (dhatu.starts_with("kzI") || dhatu.starts_with("kzU")) && (dhatu.ends_with("Iv") || dhatu.ends_with("Uv")) {
+        return apply_guna_to_stem(dhatu);
+    }
     if dhatu.len()==4 && matches!(dhatu.chars().next(), Some('k'|'g'|'c'|'j'|'w'|'q'|'t'|'p')) && matches!(dhatu.chars().nth(2), Some('a')) && matches!(dhatu.chars().nth(3), Some('m'|'n')) {
         return apply_vrddhi_to_stem(dhatu);
     }

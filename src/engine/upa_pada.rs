@@ -2,12 +2,13 @@
 //! Determines which padas (Parasmaipadī / Ātmanepadī) are valid for a given dhatu + upasarga combo.
 //!
 //! Phase 1 covers the reporter cases:
-//!   - gam (P) bare -> P only, sam+gam / sam+A+gam -> P+A (1.3.29 vA)
-//!   - ji  (P) bare -> P only, vi/parA + ji -> A only (1.3.19 nitya), other upasarga -> P
+//! - gam (P) bare -> P only, sam+gam / sam+A+gam -> P+A (1.3.29 vA)
+//! - ji  (P) bare -> P only, vi/parA + ji -> A only (1.3.19 nitya), other upasarga -> P
+//!
 //! Design is declarative so adding further sūtras is just adding entries.
 
 fn normalize_one(p: &str) -> String {
-    let t = p.trim().trim_matches(|c| c==',' || c==';').trim();
+    let t = p.trim().trim_matches([',', ';']).trim();
     // handle SLP1 variants with anusvāra/ṅ etc
     match t {
         "saG" | "saM" | "saN" | "sam" | "SaM" | "SaG" | "SAM" | "sAM" => "sam".to_string(),
@@ -23,7 +24,7 @@ fn normalized_prefixes(prefixes: &[String]) -> Vec<String> {
     let mut out = Vec::new();
     for raw in prefixes {
         // split compound entries like "sam;A" or "sam, A" or "sam A"
-        for part in raw.split(|c| c==',' || c==';' || c==' ') {
+        for part in raw.split([',', ';', ' ']) {
             let t = part.trim();
             if t.is_empty() { continue; }
             out.push(normalize_one(t));
@@ -50,24 +51,18 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     let d = dhatu.trim();
     let norm = normalized_prefixes(prefixes);
     let has_sam = has_prefix(&norm, "sam");
-    let _has_A = has_prefix(&norm, "A");
     let a = artha.trim();
     let kram_sense = matches!(a, "vftti" | "sarga" | "tAyana");
 
     // --- gam ---
     // 1.3.29 sam + gam -> optional Ātmanepada (vA). Includes sam+A+gam (samAgam)
     // bare gam or A+gam alone -> P only
-    if d == "gam" || d == "gamx" || d == "gamy" {
-        if root_pada == "P" {
-            if has_sam {
-                // sam+gam and sam+A+gam both allow P and A
-                return vec!["P".to_string(), "A".to_string()];
-            } else {
-                return vec!["P".to_string()];
-            }
-        } else if root_pada == "A" {
-            // no gam is A by default, but keep general
-            return vec!["A".to_string()];
+    if matches!(d, "gam" | "gamx" | "gamy") {
+        match root_pada {
+            "P" if has_sam => return vec!["P".to_string(), "A".to_string()],
+            "P" => return vec!["P".to_string()],
+            "A" => return vec!["A".to_string()],
+            _ => {}
         }
     }
 
@@ -76,28 +71,22 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     //   vi+ji = vijayate (A only), parA+ji = parAjayate (A only)
     //   bare ji or other upasarga (abhi, sam, etc) -> P only (jayati)
     // Cross-check: gold (ashtadhyayi.com) has ji ting only plat; vi+ji should be alat only.
-    if d == "ji" {
-        if root_pada == "P" {
-            let has_vi = has_prefix(&norm, "vi");
-            let has_parA = has_prefix(&norm, "parA");
-            if norm.is_empty() {
-                return vec!["P".to_string()];
-            }
-            if has_vi || has_parA {
-                // mandatory Ātmanepada -> P not allowed
-                return vec!["A".to_string()];
-            } else {
-                // other prefix -> still P (no rule)
-                return vec!["P".to_string()];
-            }
+    if d == "ji" && root_pada == "P" {
+        let has_vi = has_prefix(&norm, "vi");
+        if norm.is_empty() {
+            return vec!["P".to_string()];
         }
+        if has_vi || has_prefix(&norm, "parA") {
+            return vec!["A".to_string()];
+        }
+        return vec!["P".to_string()];
     }
 
     // --- sTA 1.3.22 समवप्रविभ्यः स्थः ---
-    if d == "sTA" || d == "zWA" {
-        if has_sam || has_prefix(&norm, "ava") || has_prefix(&norm, "pra") || has_prefix(&norm, "vi") {
-            return vec!["A".to_string()];
-        }
+    if matches!(d, "sTA" | "zWA")
+        && (has_sam || has_prefix(&norm, "ava") || has_prefix(&norm, "pra") || has_prefix(&norm, "vi"))
+    {
+        return vec!["A".to_string()];
     }
 
     // --- 1.3.29 समो गम्यृच्छिप्रच्छिस्वरत्यर्तिश्रुविदिभ्यः ---
@@ -116,10 +105,11 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     }
 
     // --- 1.3.66 भृञो यज्ञकर्मणि ---
-    if matches!(d, "Bf" | "BfY" | "quBfY") && (has_sam || has_prefix(&norm, "ni") || has_prefix(&norm, "ud")) {
-        if a == "yajYa" {
-            return vec!["A".to_string()];
-        }
+    if matches!(d, "Bf" | "BfY" | "quBfY")
+        && (has_sam || has_prefix(&norm, "ni") || has_prefix(&norm, "ud"))
+        && a == "yajYa"
+    {
+        return vec!["A".to_string()];
     }
 
     // --- 1.3.18 परिव्यवेभ्यः क्रियः ---
@@ -187,6 +177,7 @@ pub fn pada_allowed_artha(
 }
 
 #[cfg(test)]
+#[allow(non_snake_case)] // SLP1 fixtures (saG = सङ्)
 mod tests {
     use super::*;
 

@@ -38,9 +38,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
                 result = format!("{}r{}", &prefix[..prefix.len()-1], word);
             } else if w_start == 'c' || w_start == 'C' {
                 result = format!("{}S{}", &prefix[..prefix.len()-1], word);
-            } else if w_start == 'w' || w_start == 'W' {
-                result = format!("{}z{}", &prefix[..prefix.len()-1], word);
-            } else if ['k','K','p','P'].contains(&w_start) {
+            } else if matches!(w_start, 'w' | 'W' | 'k' | 'K' | 'p' | 'P') {
                 result = format!("{}z{}", &prefix[..prefix.len()-1], word);
             }
         }
@@ -61,9 +59,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
             result = format!("{}e{}", &prefix[..prefix.len()-1], w_rest);
         } else if w_start == 'E' {
             result = format!("{}E{}", &prefix[..prefix.len()-1], w_rest);
-        } else if w_start == 'o' {
-            result = format!("{}O{}", &prefix[..prefix.len()-1], w_rest);
-        } else if w_start == 'O' {
+        } else if w_start == 'o' || w_start == 'O' {
             result = format!("{}O{}", &prefix[..prefix.len()-1], w_rest);
         }
     } else if p_end == 'i' || p_end == 'I' {

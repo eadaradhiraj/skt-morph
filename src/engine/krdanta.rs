@@ -371,7 +371,7 @@ pub fn decline(
     linga: &str,
     prefixes: &[String],
 ) -> Option<crate::declension::subanta::Declension> {
-    if !lingas(pratyaya).iter().any(|&l| l == linga) {
+    if !lingas(pratyaya).contains(&linga) {
         return None;
     }
     let res = generate_with_prefixes(dhatu_query, pratyaya, prefixes);
@@ -494,10 +494,10 @@ pub fn validate_against_gold(dhatu_id: &str, pratyaya: &str) -> Option<(String, 
     let p = format!("/home/edhiraj/Documents/projs/skt-morph-data/data/{}/{}.json", &dhatu_id[..2], dhatu_id);
     let data = std::fs::read_to_string(&p).ok()?;
     let v: serde_json::Value = serde_json::from_str(&data).ok()?;
-    let base = v["participles"]["krut"].get(pratyaya)?.as_array()?.get(0)?;
+    let base = v["participles"]["krut"].get(pratyaya)?.as_array()?.first()?;
     let gold_m = base.get("m")?.as_str()?.to_string();
     let ours = derive(dhatu_id, pratyaya);
-    Some((ours.get(0).cloned().unwrap_or_default(), gold_m))
+    Some((ours.first().cloned().unwrap_or_default(), gold_m))
 }
 
 #[cfg(test)]

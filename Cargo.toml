@@ -48,3 +48,8 @@ path = "src/bin/time_analyze.rs"
 [profile.release]
 opt-level = 3
 lto = true
+
+[lints.clippy]
+# SLP1 chopping (`[..len-1]`) is the usual it-strip; not worth strip_suffix churn.
+manual_strip = "allow"
+too_many_arguments = "allow"

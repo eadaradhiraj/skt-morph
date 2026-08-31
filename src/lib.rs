@@ -1,3 +1,4 @@
+#![deny(warnings)]
 use wasm_bindgen::prelude::*;
 
 pub mod data;
@@ -12,11 +13,7 @@ extern "C" {
 }
 
 #[wasm_bindgen(start)]
-pub fn init() {
-    // panic hook for better errors in browser
-    #[cfg(feature = "console_error_panic_hook")]
-    console_error_panic_hook::set_once();
-}
+pub fn init() {}
 
 /// Generate verb conjugation paradigm (9 forms) for a dhatu + lakara
 /// dhatu: SLP1 string like "BU" or dhatu_id "01.0001"
