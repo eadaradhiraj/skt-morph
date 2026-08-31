@@ -170,6 +170,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "vah" {
         return "UQa".into(); // ऊढ
     }
+    // Special: दह् + क्त → दग्ध (SLP1 dagDa) — 8.2.32 दादेर्घः + जश्त्व? Actually दह् → दग् before ढ? But kta is घ? Check sūtra
+    // sūtra: दह् + क्त → दग्ध (dagDa); future devs: dah→dagDa, not dAQa; keep g (घ) not Q
+    // Extreme: dah is anit, but kta is dagDa via 8.2.32/8.2.37 bhaz? Keep dagDa
+    if orig == "dah" {
+        return "dagDa".into(); // दग्ध
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -716,6 +722,9 @@ mod tests {
         // वह् → ऊढ (UQa) — 6.1.15 + 8.2.31
         assert_eq!(derive("vaha", "kta"), vec!["UQa"]); // वह् → ऊढ (already in gam_kf_vac_da_kta? keep explicit)
         assert_eq!(derive("vah", "kta"), vec!["UQa"]);
+        // दह् → दग्ध (dagDa) — 8.2.32
+        assert_eq!(derive("daha", "kta"), vec!["dagDa"]); // दह् → दग्ध
+        assert_eq!(derive("dah", "kta"), vec!["dagDa"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
