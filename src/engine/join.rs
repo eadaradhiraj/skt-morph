@@ -167,39 +167,11 @@ pub fn join_form(
     _vacana: u8,
     _antarganas: Option<&str>,
 ) -> String {
-    // अदादि: `adadi::join_form`. अद् stays here (द्+थ् / लङ् अपृक्त).
+    // अदादि: `adadi::join_form`.
     if gana == 2 {
         if let Some(d) = dhatu {
             if let Some(f) = crate::engine::adadi::join_form(d, family, ending, purusha, _vacana, augment) {
                 return crate::engine::phonology::apply_natva_to_word(&f);
-            }
-        }
-    }
-    if gana == 2 || gana == 3 {
-        if let Some(d) = dhatu {
-            let d = d.trim_end_matches('a');
-            if d == "ad" {
-                if family == "lang" {
-                    return match ending {
-                        "at" | "ad" => "Adat".into(),
-                        "aH" => "AdaH".into(),
-                        "atAm" => "AttAm".into(),
-                        "atam" => "Attam".into(),
-                        "ata" => "Atta".into(),
-                        "an" => "Adan".into(),
-                        "am" => "Adam".into(),
-                        "va" => "Adva".into(),
-                        "ma" => "Adma".into(),
-                        _ => format!("Ad{}", ending.trim_start_matches('a')),
-                    };
-                }
-                if family == "vidhilin" && ending.starts_with('y') {
-                    return format!("ad{ending}");
-                }
-                if family == "lrt" {
-                    return crate::engine::phonology::thematic_join("atsya", ending);
-                }
-                return internal_sandhi("ad", ending);
             }
         }
     }

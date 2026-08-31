@@ -1,7 +1,7 @@
 //! अदादि (गण 2): शप् लुक् (2.4.72), pit गुण (7.3.86), jhal sandhi (8.2 / 8.4).
-//! अद् stays in `join.rs` until `jhal` covers द्+थ् / लङ् अपृक्त. This covers द्विष्, दुह्, यु, या, वच्, मृज्, वी,
-//! विद्, रुदादि, शास्, वश्, जागृ, अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्,
-//! हन् (6.4.98 / 7.3.54), अस् (6.4.111 / 7.3.96), इण् (7.3.84 / 6.1.77).
+//! द्विष्, दुह्, अद् (8.4.55 खरि च), यु, या, वच्, मृज्, वी, विद्, रुदादि, शास्, वश्, जागृ,
+//! अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्, हन् (6.4.98 / 7.3.54), अस् (6.4.111 / 7.3.96),
+//! इण् (7.3.84 / 6.4.81).
 #![allow(non_snake_case)]
 
 use crate::engine::it::dhatu_satva;
@@ -13,6 +13,11 @@ fn is_vowel(c: char) -> bool {
 
 fn is_cons(c: char) -> bool {
     !is_vowel(c)
+}
+
+/// खर्: voiceless stops and sibilants (8.4.55 खरि च).
+fn is_khar(c: char) -> bool {
+    matches!(c, 'k' | 'K' | 'c' | 'C' | 'w' | 'W' | 't' | 'T' | 'p' | 'P' | 'S' | 'z' | 's')
 }
 
 fn root_of(dhatu: &str) -> String {
@@ -122,7 +127,8 @@ fn jhal(stem: &str, suf: &str, lih: bool) -> String {
         ('h', 's') => format!("{body}kz{rest}"),
         ('h', 'D') if lih => format!("{body}Q{rest}"),
         ('h', 'D') => format!("{body}gD{rest}"),
-        ('d', 't') => format!("{body}t{suf}"),
+        // 8.4.55 खरि च: द् → त् before खर् (अत्ति, अत्सि, अत्थः, अत्स्यति).
+        ('d', f) if is_khar(f) => format!("{body}t{suf}"),
         _ => format!("{stem}{suf}"),
     }
 }
@@ -388,6 +394,8 @@ fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> O
         },
         "lang" => {
             let inner = match ending {
+                // 6.1.68 does not drop अपृक्त after द् (आदत् / आदः, not *आत्).
+                "at" | "ad" | "aH" if root.ends_with('d') => format!("{root}{ending}"),
                 "at" | "ad" | "aH" => padanta(&strong0, lih),
                 "am" => format!("{strong0}am"),
                 "an" if mfj => format!("{strong0}an"),
@@ -1268,7 +1276,7 @@ fn join_in(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opt
     Some(form)
 }
 
-/// Full surface form for गण 2, or `None` to fall through (अद्).
+/// Full surface form for गण 2.
 pub fn join_form(
     dhatu: &str,
     family: &str,
@@ -1295,7 +1303,7 @@ pub fn join_forms(
         return vec![];
     }
     let r = root_of(dhatu);
-    if r.is_empty() || r == "ad" {
+    if r.is_empty() {
         return vec![];
     }
     if r == "stu" {
@@ -1366,6 +1374,16 @@ mod tests {
 
     #[test]
     fn dviz_duh_yu_ya() {
+        assert_eq!(join_form("ada", "lat", "ti", 1, 1, None).as_deref(), Some("atti"));
+        assert_eq!(join_form("ada", "lat", "TaH", 2, 2, None).as_deref(), Some("atTaH"));
+        assert_eq!(join_form("ada", "lat", "si", 2, 1, None).as_deref(), Some("atsi"));
+        assert_eq!(join_form("ada", "lat", "anti", 1, 3, None).as_deref(), Some("adanti"));
+        assert_eq!(join_form("ada", "lot", "Di", 2, 1, None).as_deref(), Some("adDi"));
+        assert_eq!(join_form("ada", "lang", "at", 1, 1, None).as_deref(), Some("Adat"));
+        assert_eq!(join_form("ada", "lang", "aH", 2, 1, None).as_deref(), Some("AdaH"));
+        assert_eq!(join_form("ada", "lang", "atAm", 1, 2, None).as_deref(), Some("AttAm"));
+        assert_eq!(join_form("ada", "vidhilin", "yAt", 1, 1, None).as_deref(), Some("adyAt"));
+        assert_eq!(join_form("ada", "lrt", "ti", 1, 1, None).as_deref(), Some("atsyati"));
         assert_eq!(join_form("dviza", "lat", "ti", 1, 1, None).as_deref(), Some("dvezwi"));
         assert_eq!(join_form("dviza", "lat", "taH", 1, 2, None).as_deref(), Some("dvizwaH"));
         assert_eq!(join_form("dviza", "lat", "anti", 1, 3, None).as_deref(), Some("dvizanti"));

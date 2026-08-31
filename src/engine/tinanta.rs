@@ -385,6 +385,12 @@ mod tests {
     fn gana_2_3_5_7_8_9_lat() {
         let f = generate_all("ada", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "atti"), "{:?}", f);
+        let f = generate_all("ada", "plat", 2, 2);
+        assert!(f.iter().any(|x| x == "atTaH"), "{:?}", f);
+        let f = generate_all("ada", "plot", 2, 1);
+        assert!(f.iter().any(|x| x == "adDi"), "{:?}", f);
+        let f = generate_all("ada", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "atsyati"), "{:?}", f);
         let f = generate_all("hu", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "juhoti"), "{:?}", f);
         let f = generate_all("zuY", "plat", 1, 1);
