@@ -68,6 +68,8 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **लृट् अनिट् स्य:** dropped the named भ्वादि future map. अनिट् goes through `sya_stem` (8.3.59 आदेशप्रत्यययोः स्रोष्यति; 8.3.23 नंस्यति; त्यक्ष्यति, स्कन्त्स्यति).
 - **अदादि इत् / 7.3.89 / 7.3.93:** sequential 1.3.5 then 6.1.64 (not `surface_root` / `prakriya_root`); उतो वृद्धिर्लुकि नोति क्ष्णोति सौति; ब्रुव ईट् ब्रवीति, लृट् 2.4.53 वक्ष्यति. अदादि षु is `02.0036` (भ्वादि `zu` stays सवति).
 - **गण 7 उँ इत्:** 1.3.2 initial उँ (उछृदिर् छृणत्ति), not a name list for उछृद्/उत्तृद्.
+- **लृट् 8.2 / 7.4.49 / 8.4.58:** dropped the named `sya_stem` futures. षढोः कः सि कर्क्ष्यति; दादेर् घः + भष् धक्ष्यति; सः स्यार्धधातुके वत्स्यति; परसवर्ण सङ्क्ष्यति. दृश् द्रक्ष्यति and ग्रहोऽलिटि stay. 7.3.77 is शिति (गमिष्यति not गच्छिष्यति).
+- **गण 7 श्नम्:** इत्-strip then न्-infix (णत्व after र); nasal उपधा skips a second nasal; 8.2.30 palatal (शिनष्टि, पिनष्टि, भनक्ति, युनक्ति). Dropped named Sinaz/pinaz/Banak.
 
 
 

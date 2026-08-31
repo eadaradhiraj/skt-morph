@@ -76,7 +76,6 @@ pub fn g6_future_stem(dhatu: &str) -> String {
 }
 
 // --- G1 future helpers ---
-const G1_KZYA_ROOTS: &[&str] = &["Siz","viz","kruS","ruh","saYj","sanj"];
 const G1_A_FINAL: &[&str] = &["SrA","jYA"];
 
 fn g1_special_lrt(dhatu: &str) -> Option<String> {
@@ -114,13 +113,6 @@ fn g1_future_suffix(base: &str, dhatu: &str) -> String {
     if crate::engine::it::anit_sya(dhatu) {
         return crate::engine::it::sya_stem(dhatu);
     }
-    if G1_KZYA_ROOTS.contains(&dhatu) {
-        if dhatu=="saYj" || dhatu=="sanj" { return "saNkzya".to_string(); }
-        let graded=apply_guna_to_stem(dhatu);
-        let body = if graded.ends_with('S') || graded.ends_with('h') || graded.ends_with('z') { &graded[..graded.len()-1] } else { graded.as_str() };
-        let body = if dhatu.ends_with("uS") { &graded[..graded.len()-1] } else { body };
-        return format!("{}kzya", body);
-    }
     if dhatu=="yam" { return format!("{}izya", base); }
     if ["sad","Sad","Gas","SfD"].contains(&dhatu) {
         if base.ends_with('d') || base.ends_with('D') { return format!("{}tsya", &base[..base.len()-1]); }
@@ -142,24 +134,6 @@ fn g1_future_from_present(dhatu: &str, present_stem: &str, guna: &str) -> String
 }
 
 pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str) -> String {
-    if dhatu == "gam" || dhatu == "gamx" {
-        return "gamizya".to_string();
-    }
-    if matches!(dhatu, "tizW" | "sTA" | "zWA") {
-        return "sTAsya".into();
-    }
-    if matches!(dhatu, "yacC" | "dA" | "dAR") {
-        return "dAsya".into();
-    }
-    if dhatu == "pib" || dhatu == "pA" {
-        return "pAsya".into();
-    }
-    if dhatu == "Day" {
-        return "DAsya".into();
-    }
-    if dhatu == "paSy" || dhatu == "dfS" {
-        return "drakzya".into();
-    }
     if dhatu.to_ascii_lowercase().ends_with("akzi") {
         let low = dhatu.to_ascii_lowercase();
         let idx = low.find("akzi").unwrap_or(1);
@@ -167,9 +141,18 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         return format!("{}ANkzizya", prefix);
     }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
-    if dhatu=="sId" { return "satsya".to_string(); }
-    if dhatu=="Day" { return "DAsya".to_string(); }
     if dhatu=="sAy" { return "sAsya".to_string(); }
+    // 7.3.77 is शिति; लृट् uses the root (गमिष्यति not गच्छिष्यति).
+    if matches!(dhatu, "gam" | "gamx") {
+        return crate::engine::it::sya_stem(dhatu);
+    }
+    if gana==N_GANA {
+        if matches!(dhatu.chars().last(), Some('d') | Some('D')) {
+            let g = apply_guna_to_stem(dhatu);
+            return format!("{}tsya", &g[..g.len() - 1]);
+        }
+        return crate::engine::it::sya_stem(dhatu);
+    }
     if gana==1 {
         if let Some(s)=g1_special_lrt(dhatu) { return s; }
     }
@@ -490,14 +473,8 @@ pub fn derive_stem(
         };
         present_stem = Some(ps);
     } else if gana == N_GANA {
-        // 3.1.78 रुधादिभ्यः श्नम्. उछृद्/उत्तृद्: 1.3.2 उँ in `clean_upadesha`.
-        let ps = if dhatu == "Siz" || dhatu == "Sizx" {
-            "Sinaz".to_string()
-        } else if dhatu == "piz" || dhatu == "pizx" {
-            "pinaz".to_string()
-        } else if dhatu == "Banjo" || dhatu == "Banj" {
-            "Banak".to_string()
-        } else if dhatu.ends_with('D') {
+        // 3.1.78 रुधादिभ्यः श्नम्. Join infixes न; 8.2.30 on palatal. उछृद्: 1.3.2 in `clean_upadesha`.
+        let ps = if dhatu.ends_with('D') {
             format!("{}Ra", &dhatu[..dhatu.len() - 1])
         } else {
             format!("{}a", guna)

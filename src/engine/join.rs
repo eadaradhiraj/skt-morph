@@ -100,7 +100,7 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         ('D', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
         ('c', 't') | ('j', 't') => format!("{}kt{}", stem_body, &suffix[1..]),
         ('c', 'T') | ('j', 'T') => format!("{}kT{}", stem_body, &suffix[1..]),
-        ('c', 's') | ('j', 's') | ('S', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
+        ('c', 's') | ('j', 's') | ('S', 's') | ('z', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
         ('z', 't') | ('S', 't') => format!("{}zw{}", stem_body, &suffix[1..]),
         ('z', 'T') | ('S', 'T') => format!("{}zW{}", stem_body, &suffix[1..]),
         ('h', 't') => format!("{}gD{}", stem_body, &suffix[1..]),
@@ -115,6 +115,44 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         ('m', 's') => format!("{}Ms{}", stem_body, &suffix[1..]),
         _ => format!("{}{}", stem, suffix),
     }
+}
+
+/// 3.1.78 श्नम्: strip leftover इत्, then infix न before the last consonant.
+fn gana7_root(raw: &str) -> String {
+    let mut s = raw.trim_end_matches('~').to_string();
+    if s.ends_with("ir") && s.len() > 3 {
+        s = s[..s.len() - 2].to_string();
+    } else if s.ends_with('a') && s.len() > 2 {
+        s = s[..s.len() - 1].to_string();
+    }
+    // 1.3.2/3 Sizx, Banjo, kftI, anjU.
+    while let Some(last) = s.chars().last() {
+        if s.len() <= 2 {
+            break;
+        }
+        let rest_len = s.len() - last.len_utf8();
+        let prev = s[..rest_len].chars().last();
+        let strip = match last {
+            'x' | 'o' | 'O' | 'I' | 'U' | 'Y' => {
+                prev.is_some_and(|c| !"aAiIuUfFeEoO".contains(c))
+            }
+            _ => false,
+        };
+        if strip {
+            s.truncate(rest_len);
+        } else {
+            break;
+        }
+    }
+    // 1.3.2 initial उँ इत् (उछृदिर्, उत्तृदिर्), not undI.
+    if s.starts_with("uC")
+        || (s.starts_with("ut")
+            && s.len() >= 4
+            && s.chars().nth(2).is_some_and(|c| !"aAiIuUfFeEoO".contains(c)))
+    {
+        s = s[1..].to_string();
+    }
+    s
 }
 
 pub fn join_form(
@@ -271,16 +309,6 @@ pub fn join_form(
                     _ => {}
                 }
             }
-            if d == "brU" || d == "bravI" || stem.ends_with("bravI") {
-                match ending {
-                    "ti" => return "bravIti".into(),
-                    "taH" => return "brUtaH".into(),
-                    "anti" | "nti" => return "bruvanti".into(),
-                    "si" => return "bravIzi".into(),
-                    "mi" | "Ami" => return "bravImi".into(),
-                    _ => {}
-                }
-            }
             if d == "i" || d == "iR" || stem == "e" {
                 match ending {
                     "ti" => return "eti".into(),
@@ -383,58 +411,57 @@ pub fn join_form(
             }
         }
     }
-    // N (7) श्नम्: रुणद्धि, रुन्द्धः, रुन्धन्ति
+    // N (7) श्नम्: रुणद्धि, रुन्द्धः, रुन्धन्ति; शिनष्टि, भनक्ति.
     if gana == 7 {
         if family == "lrt" {
             return format!("{}{}", stem, ending);
         }
-        let raw = dhatu.unwrap_or("");
-        let stripped = if raw.ends_with("ir") && raw.len() > 3 {
-            &raw[..raw.len() - 2]
-        } else if raw.ends_with('a') && raw.len() > 2 {
-            &raw[..raw.len() - 1]
-        } else {
-            raw
-        };
-        // 1.3.2 initial उँ इत् (उछृदिर्, उत्तृदिर्), not undI.
-        let root = if stripped.starts_with("uC")
-            || (stripped.starts_with("ut")
-                && stripped.len() >= 4
-                && stripped.chars().nth(2).is_some_and(|c| !"aAiIuUfFeEoO".contains(c)))
-        {
-            &stripped[1..]
-        } else {
-            stripped
-        };
+        let root = gana7_root(dhatu.unwrap_or(""));
         if !root.is_empty() {
             let chars: Vec<char> = root.chars().collect();
             if chars.len() >= 2 {
                 let last = chars[chars.len() - 1];
                 let body: String = chars[..chars.len() - 1].iter().collect();
-                let strong = format!("{body}Ra{last}");
-                let weak = format!("{body}n{last}");
+                let nasal_upadha = body
+                    .chars()
+                    .last()
+                    .is_some_and(|c| matches!(c, 'n' | 'm' | 'N' | 'Y' | 'R' | 'M'));
+                let strong = if nasal_upadha {
+                    format!("{body}a{last}")
+                } else {
+                    format!("{body}na{last}")
+                };
+                let weak = if nasal_upadha {
+                    format!("{body}{last}")
+                } else {
+                    format!("{body}n{last}")
+                };
                 let pit = matches!(ending, "ti" | "si" | "mi" | "Ami" | "tu" | "tAt" | "tAd");
                 let base = if pit { &strong } else { &weak };
+                let out = |s: String| crate::engine::phonology::apply_natva_to_word(&s);
                 match ending {
-                    "ti" => return internal_sandhi(&strong, "ti"),
-                    "si" => return internal_sandhi(&strong, "si"),
-                    "mi" | "Ami" => return format!("{strong}mi"),
-                    "taH" | "TaH" => return internal_sandhi(&weak, "taH"),
-                    "nti" | "anti" => return format!("{weak}anti"),
-                    "thaH" => return internal_sandhi(&weak, "TaH"),
-                    "tha" | "Ta" => return internal_sandhi(&weak, "Ta"),
-                    "vaH" | "AvaH" => return internal_sandhi(&weak, "vaH"),
-                    "maH" | "AmaH" => return internal_sandhi(&weak, "maH"),
-                    "tu" => return internal_sandhi(&strong, "tu"),
-                    "antu" => return format!("{weak}antu"),
-                    "tAm" => return internal_sandhi(&weak, "tAm"),
-                    "yAt" | "yAd" => return format!("{weak}yA{}", &ending[1..]),
+                    "ti" => return out(internal_sandhi(&strong, "ti")),
+                    "si" => return out(internal_sandhi(&strong, "si")),
+                    "mi" | "Ami" => return out(format!("{strong}mi")),
+                    "taH" | "TaH" => return out(internal_sandhi(&weak, "taH")),
+                    "nti" | "anti" => return out(format!("{weak}anti")),
+                    "thaH" => return out(internal_sandhi(&weak, "TaH")),
+                    "tha" | "Ta" => return out(internal_sandhi(&weak, "Ta")),
+                    "vaH" | "AvaH" => return out(internal_sandhi(&weak, "vaH")),
+                    "maH" | "AmaH" => return out(internal_sandhi(&weak, "maH")),
+                    "tu" => return out(internal_sandhi(&strong, "tu")),
+                    "antu" => return out(format!("{weak}antu")),
+                    "tAm" => return out(internal_sandhi(&weak, "tAm")),
+                    "yAt" | "yAd" => return out(format!("{weak}yA{}", &ending[1..])),
                     "at" | "ad" if family == "lang" => {
-                        let body: String = strong.chars().take(strong.chars().count().saturating_sub(1)).collect();
-                        return format!("{}{}t", augment.unwrap_or(""), body);
+                        let body: String = strong
+                            .chars()
+                            .take(strong.chars().count().saturating_sub(1))
+                            .collect();
+                        return out(format!("{}{}t", augment.unwrap_or(""), body));
                     }
                     _ => {
-                        return internal_sandhi(base, ending);
+                        return out(internal_sandhi(base, ending));
                     }
                 }
             }

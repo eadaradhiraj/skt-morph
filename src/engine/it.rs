@@ -16,10 +16,10 @@ pub fn anit_sya(root: &str) -> bool {
         "pac" | "vac" | "yaj" | "vap" | "vah" | "vas" | "tyaj" | "dah" | "nI" | "Sru" | "dA"
             | "DA" | "sTA" | "pA" | "i" | "ad" | "han" | "diS" | "duh" | "lih" | "gA" | "hu"
             | "mA" | "yA" | "as" | "vid" | "pad" | "sic" | "vis" | "mfj" | "yuj" | "Baj"
-            | "raYj" | "saYj" | "kfz" | "dfS" | "sfj" | "masj" | "majj" | "ruh" | "guh" | "nah"
-            | "vasc" | "vraSc" | "Ced" | "Cid" | "vft" | "syand" | "kfp" | "kalp"
+            | "raYj" | "saYj" | "sanj" | "kfz" | "dfS" | "sfj" | "masj" | "majj" | "ruh" | "guh"
+            | "nah" | "vasc" | "vraSc" | "Ced" | "Cid" | "vft" | "syand" | "kfp" | "kalp"
             | "dviz" | "dih" | "sru" | "su" | "dru" | "du" | "Dru" | "nam" | "skand"
-            | "daMS" | "mih" | "tviz" | "Sap"
+            | "daMS" | "mih" | "tviz" | "Sap" | "Siz" | "viz" | "kruS" | "sad"
     )
 }
 
@@ -112,61 +112,60 @@ fn last_vowel_index(s: &str) -> Option<usize> {
 
 /// लृट् स्य stem (without the final a of thematic ति). गमिष्य, पक्ष्य, स्थास्य.
 pub fn sya_stem(root: &str) -> String {
-    match root {
-        "gam" | "gamx" => return "gamizya".into(),
-        "kf" => return "karizya".into(),
-        "BU" => return "Bavizya".into(),
-        "sTA" | "zWA" | "tizW" => return "sTAsya".into(),
-        "dA" | "yacC" => return "dAsya".into(),
-        "pA" | "pib" => return "pAsya".into(),
-        "DA" | "Day" => return "DAsya".into(),
-        "dfS" | "paSy" => return "drakzya".into(),
-        "grah" => return "grahIzya".into(),
-        "ad" => return "atsya".into(),
-        "as" => return "Bavizya".into(),
-        "han" => return "hanizya".into(),
-        "i" => return "ezya".into(),
-        "nI" => return "nezya".into(),
-        "Sru" => return "Srozya".into(),
-        "vac" => return "vakzya".into(),
-        "pac" => return "pakzya".into(),
-        "yaj" => return "yakzya".into(),
-        "vft" => return "vartsya".into(),
-        "syand" => return "syantsya".into(),
-        "kfp" | "kalp" => return "kalpsya".into(),
-        "dah" => return "Dakzya".into(),
-        "daMS" => return "daNkzya".into(),
-        "kfz" => return "karkzya".into(),
-        "mih" => return "mekzya".into(),
-        "Baj" => return "Bakzya".into(),
-        "raYj" => return "raNkzya".into(),
-        "tviz" => return "tvekzya".into(),
-        "vap" => return "vapsya".into(),
-        "vah" => return "vakzya".into(),
-        "vas" => return "vatsya".into(),
-        "Sap" => return "Sapsya".into(),
-        "tyaj" => return "tyakzya".into(),
-        "skand" => return "skantsya".into(),
-        "nam" => return "naMsya".into(),
-        _ => {}
+    // Present-stem aliases and 2.4.52 अस्तेर्भूः (लृट् of अस् is भू).
+    let root = match root {
+        "gamx" => "gam",
+        "tizW" | "zWA" => "sTA",
+        "yacC" | "dAR" => "dA",
+        "pib" => "pA",
+        "Day" => "DA",
+        "paSy" => "dfS",
+        "sId" => "sad",
+        "as" => "BU",
+        other => other,
+    };
+    let mut root = dhatu_satva(root);
+    // 8.2.18 कृपो रो लः.
+    if root == "kfp" {
+        root = "kalp".into();
     }
-    if takes_it_sya(root) {
-        let g = apply_guna_to_stem(root);
+    // दृश् द्रक्ष्यति stays named (गुण दर्श् would give दर्क्ष्य).
+    if root == "dfS" {
+        return "drakzya".into();
+    }
+    // 7.2.37 ग्रहोऽलिटि दीर्घः.
+    if root == "grah" {
+        return "grahIzya".into();
+    }
+    // हन् is अनिट् for सन् (जिघांसति) but लृट् हनिष्यति.
+    if root == "han" {
+        return "hanizya".into();
+    }
+    if takes_it_sya(&root) {
+        let g = apply_guna_to_stem(&root);
         if g.ends_with('a') {
             format!("{}izya", &g[..g.len() - 1])
         } else {
             format!("{g}izya")
         }
     } else {
-        let g = apply_guna_to_stem(root);
+        let mut g = apply_guna_to_stem(&root);
+        // 7.4.49 सः स्यार्धधातुके — वत्स्यति, सत्स्यति.
+        if g.ends_with('s') {
+            g = format!("{}t", &g[..g.len() - 1]);
+        }
+        // 8.2.32 दादेर्धातोर्घः + 8.2.37 भष् — धक्ष्यति, धोक्ष्यति.
+        if g.starts_with('d') && g.ends_with('h') {
+            g = format!("D{}", &g[1..]);
+        }
         let joined = internal_sandhi(&g, "sya");
         let joined = if joined.ends_with("sya") || joined.ends_with("zya") || joined.ends_with("kzya") {
             joined
         } else {
             format!("{g}sya")
         };
-        // 8.3.59 आदेशप्रत्यययोः — स्य → ष्य after इण् (स्रोष्यति).
-        sya_ruki(&joined)
+        // 8.3.59 आदेशप्रत्यययोः; 8.4.58 परसवर्णः (दङ्क्ष्यति, रङ्क्ष्यति).
+        parasavarna_yayi(&sya_ruki(&joined))
     }
 }
 
@@ -178,6 +177,22 @@ fn sya_ruki(stem: &str) -> String {
         matches!(c, 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r' | 'k')
     }) {
         format!("{body}zya")
+    } else {
+        stem.to_string()
+    }
+}
+
+/// 8.3.24 नश्चापदान्तस्य झलि + 8.4.58 परसवर्णः — सङ्क्ष्य, दङ्क्ष्य, रङ्क्ष्य.
+fn parasavarna_yayi(stem: &str) -> String {
+    let Some(body) = stem.strip_suffix("kzya") else {
+        return stem.to_string();
+    };
+    if body
+        .chars()
+        .last()
+        .is_some_and(|c| matches!(c, 'n' | 'M' | 'Y'))
+    {
+        format!("{}Nkzya", &body[..body.len() - 1])
     } else {
         stem.to_string()
     }
@@ -321,7 +336,15 @@ mod tests {
         assert_eq!(sya_stem("sTA"), "sTAsya");
         assert_eq!(sya_stem("vft"), "vartsya");
         assert_eq!(sya_stem("syand"), "syantsya");
-        assert_eq!(sya_stem("kfp"), "kalpsya");
+        assert_eq!(sya_stem("dah"), "Dakzya");
+        assert_eq!(sya_stem("kfz"), "karkzya");
+        assert_eq!(sya_stem("vas"), "vatsya");
+        assert_eq!(sya_stem("daMS"), "daNkzya");
+        assert_eq!(sya_stem("raYj"), "raNkzya");
+        assert_eq!(sya_stem("as"), "Bavizya");
+        assert_eq!(sya_stem("han"), "hanizya");
+        assert_eq!(sya_stem("Siz"), "Sekzya");
+        assert_eq!(sya_stem("kruS"), "krokzya");
     }
 
     #[test]
