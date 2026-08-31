@@ -55,7 +55,9 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // च-anta स्त्री (वाच्) — 8.2.30 चोः कुः वाक्, 8.4.56 वाऽवसाने वाग्; भ्-initial ग्; loc वाक्षु.
   m.insert(("c".to_string(),"stri".to_string()), vec![vec!["k,g".to_string(),"cO".to_string(),"caH".to_string(),],vec!["cam".to_string(),"cO".to_string(),"caH".to_string(),],vec!["cA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"coH".to_string(),"cAm".to_string(),],vec!["ci".to_string(),"coH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"cO".to_string(),"caH".to_string(),],]);
   m.insert(("ad".to_string(),"nap".to_string()), vec![vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adam".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ade".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"adoh".to_string(),"Am".to_string(),],vec!["adi".to_string(),"adoh".to_string(),"atsu".to_string(),],vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],]);
-  m.insert(("z".to_string(),"pum".to_string()), vec![vec!["H".to_string(),"qO".to_string(),"qaH".to_string(),],vec!["am".to_string(),"qO".to_string(),"qaH".to_string(),],vec!["qA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["e".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["aH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["aH".to_string(),"oH".to_string(),"Am".to_string(),],vec!["i".to_string(),"oH".to_string(),"su".to_string(),],vec!["H".to_string(),"qO".to_string(),"qaH".to_string(),],]);
+  // ष-anta (द्विष्) — 8.2.39 जश्त्व ष्→ड्, 8.4.56 वाऽवसाने ट्; भ्-initial ड्; सप्तमी ट्सु.
+  m.insert(("z".to_string(),"pum".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
+  m.insert(("z".to_string(),"stri".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
   m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atam".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["ate".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"Am".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],]);
   m.insert(("us".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["usA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["use".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"usoH".to_string(),"usAm".to_string(),],vec!["usi".to_string(),"usoH".to_string(),"uHsu".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],]);
   m.insert(("is".to_string(),"nap".to_string()), vec![vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["isA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ise".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"isoH".to_string(),"isAm".to_string(),],vec!["isi".to_string(),"isoH".to_string(),"iHsu".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],]);
@@ -546,6 +548,15 @@ mod tests {
         has(&kp, "dvitIyA", "kakupam");
         has(&kp, "tfIyA", "kakupA");
         has(&kp, "saptamI", "kakupsu");
+        // ष-anta: द्विष् — द्विट्/द्विड्, द्विषौ, द्विट्भ्याम्, द्विट्सु (not visarga *द्विः).
+        let dz = generate("dviz", "pum").expect("dviz");
+        has(&dz, "prathamA", "dviw");
+        has(&dz, "prathamA", "dviq");
+        has(&dz, "prathamA", "dvizO");
+        has(&dz, "dvitIyA", "dvizam");
+        has(&dz, "tfIyA", "dvizA");
+        has(&dz, "tfIyA", "dviqByAm");
+        has(&dz, "saptamI", "dviwsu");
     }
 
     #[test]
