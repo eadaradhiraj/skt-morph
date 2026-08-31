@@ -71,6 +71,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **लृट् 8.2 / 7.4.49 / 8.4.58:** dropped the named `sya_stem` futures. षढोः कः सि कर्क्ष्यति; दादेर् घः + भष् धक्ष्यति; सः स्यार्धधातुके वत्स्यति; परसवर्ण सङ्क्ष्यति. दृश् द्रक्ष्यति and ग्रहोऽलिटि stay. 7.3.77 is शिति (गमिष्यति not गच्छिष्यति).
 - **गण 7 श्नम्:** इत्-strip then न्-infix (णत्व after र); nasal उपधा skips a second nasal; 8.2.30 palatal (शिनष्टि, पिनष्टि, भनक्ति, युनक्ति). Dropped named Sinaz/pinaz/Banak.
 - **7.3.95 स्तुश्च:** optional ईट् (स्तवीति and स्तौति; लृट् स्तोष्यति). Dropped named `stavI`. दिव् लृट् देविष्यति from गुण not the य-present; अद् अत्स्यति from `sya_stem`.
+- **अदादि हन् / अस् / इण्:** 6.4.98+7.3.54 घ्नन्ति/हतः, 6.4.36 जहि, 8.3.24 हंसि; 6.4.111 सन्ति, 7.3.96 आसीत्, 6.4.119+6.4.101 एधि, लृट् 2.4.52 भविष्यति; 7.3.84 एति, 6.4.81 यन्ति, 6.1.78 अयानि, 6.4.72 आयन्. Dropped those `join.rs` tables. अद् still there.
 
 
 

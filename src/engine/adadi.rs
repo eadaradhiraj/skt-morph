@@ -1,6 +1,7 @@
 //! अदादि (गण 2): शप् लुक् (2.4.72), pit गुण (7.3.86), jhal sandhi (8.2 / 8.4).
-//! as / han / iṇ stay in `join.rs`; this covers द्विष्, दुह्, यु, या, वच्, मृज्, वी,
-//! विद्, रुदादि, शास्, वश्, जागृ, अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्.
+//! अद् stays in `join.rs` until `jhal` covers द्+थ् / लङ् अपृक्त. This covers द्विष्, दुह्, यु, या, वच्, मृज्, वी,
+//! विद्, रुदादि, शास्, वश्, जागृ, अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्,
+//! हन् (6.4.98 / 7.3.54), अस् (6.4.111 / 7.3.96), इण् (7.3.84 / 6.1.77).
 #![allow(non_snake_case)]
 
 use crate::engine::it::dhatu_satva;
@@ -1120,7 +1121,154 @@ fn join_stu(family: &str, ending: &str, augment: Option<&str>) -> Vec<String> {
     out
 }
 
-/// Full surface form for गण 2, or `None` to fall through (अस्, हन्, इण्, अद्).
+/// 6.4.98 गमहनजनखनघसां लोपः क्ङिति before अपित् झल् (हतः);
+/// झि अन्ति/अन्तु/अन्: 6.4.98 + 7.3.54 हो हन्तेः → घ् (घ्नन्ति).
+/// यासुट् keeps न् (हन्यात्). पित् keeps हन् (हन्ति, हनानि).
+fn han_anga(family: &str, ending: &str) -> &'static str {
+    if family == "vidhilin" || pit(family, ending) {
+        return "han";
+    }
+    if matches!(ending, "anti" | "nti" | "antu" | "an") {
+        return "Gn";
+    }
+    let tin = if family == "lang" { strip_a(ending) } else { ending };
+    if tin.chars().next().is_some_and(|c| matches!(c, 't' | 'T' | 'd' | 'D')) {
+        return "ha";
+    }
+    "han"
+}
+
+/// हन्: 6.4.98 / 7.3.54; 8.3.24 हंसि; 6.4.36 हन्तेर्जः जहि; 6.1.68 अहन्.
+fn join_han(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "han" {
+        return None;
+    }
+    if family == "lrt" {
+        return Some(thematic_join(&crate::engine::it::sya_stem("han"), ending));
+    }
+    if family == "vidhilin" {
+        return Some(format!("han{ending}"));
+    }
+    if ending == "Di" {
+        return Some("jahi".into());
+    }
+    if family == "lang" && matches!(ending, "at" | "ad" | "aH") {
+        return Some(apply_aug("han".into(), family, augment));
+    }
+    let anga = han_anga(family, ending);
+    let tin = match ending {
+        "nti" => "anti",
+        "an" => "an",
+        _ if family == "lang" => strip_a(ending),
+        other => other,
+    };
+    let inner = if anga == "han" && tin.starts_with('s') {
+        format!("haM{tin}")
+    } else {
+        format!("{anga}{tin}")
+    };
+    Some(apply_aug(inner, family, augment))
+}
+
+/// 6.4.111 श्नसोरल्लोपः — अ of अस् drops before अपित्.
+fn as_anga(family: &str, ending: &str) -> &'static str {
+    if pit(family, ending) {
+        "as"
+    } else {
+        "s"
+    }
+}
+
+/// अस्: 6.4.111; 8.4.65 असि; 7.3.96 आसीत्; 6.4.119+6.4.101 एधि; लृट् 2.4.52 भू.
+fn join_as(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "as" {
+        return None;
+    }
+    if family == "lrt" {
+        return Some(thematic_join(&crate::engine::it::sya_stem("as"), ending));
+    }
+    if ending == "Di" {
+        return Some("eDi".into());
+    }
+    if family == "lang" {
+        match ending {
+            "at" => return Some(apply_aug("asIt".into(), family, augment)),
+            "ad" => return Some(apply_aug("asId".into(), family, augment)),
+            "aH" => return Some(apply_aug("asIH".into(), family, augment)),
+            _ => {}
+        }
+    }
+    let stem = as_anga(family, ending);
+    let tin = match ending {
+        "an" | "am" => ending,
+        _ if family == "lang" => strip_a(ending),
+        other => other,
+    };
+    let inner = if stem == "as" && tin.starts_with('s') {
+        format!("a{tin}")
+    } else {
+        format!("{stem}{tin}")
+    };
+    if family == "lang" && inner.starts_with('s') {
+        // 6.4.72 आट्; 1.1.56 स्थानिवत् after 6.4.111.
+        Some(format!("A{inner}"))
+    } else {
+        Some(apply_aug(inner, family, augment))
+    }
+}
+
+/// इण्: 7.3.84 गुण; 6.4.81 इणो यण् (यन्ति, not इयङ्); 6.1.78 अयानि; 6.4.72 आट् आयन्.
+fn join_in(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "i" {
+        return None;
+    }
+    let strong = "e";
+    let weak = "i";
+    let form = match family {
+        "lrt" => thematic_join(&crate::engine::it::sya_stem("i"), ending),
+        "vidhilin" => format!("{weak}{ending}"),
+        "lat" => match ending {
+            "ti" => format!("{strong}ti"),
+            "si" => format!("{strong}zi"),
+            "mi" | "Ami" => format!("{strong}mi"),
+            "anti" | "nti" => "yanti".into(),
+            _ => format!("{weak}{ending}"),
+        },
+        "lot" => match ending {
+            "tu" => format!("{strong}tu"),
+            "antu" => "yantu".into(),
+            "Di" => format!("{weak}hi"),
+            "Ani" => crate::engine::it::join_eco(strong, "Ani"),
+            "Ava" => crate::engine::it::join_eco(strong, "Ava"),
+            "Ama" => crate::engine::it::join_eco(strong, "Ama"),
+            _ => format!("{weak}{ending}"),
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" => format!("{strong}t"),
+                "ad" => format!("{strong}d"),
+                "aH" => format!("{strong}H"),
+                "an" => "yan".into(),
+                "am" => crate::engine::it::join_eco(strong, "am"),
+                "atAm" => format!("{weak}tAm"),
+                "atam" => format!("{weak}tam"),
+                "ata" => format!("{weak}ta"),
+                "va" => format!("{weak}va"),
+                "ma" => format!("{weak}ma"),
+                _ => format!("{weak}{}", strip_a(ending)),
+            };
+            if inner.starts_with('y') {
+                format!("A{inner}")
+            } else {
+                apply_aug(inner, family, augment)
+            }
+        }
+        _ => return None,
+    };
+    Some(form)
+}
+
+/// Full surface form for गण 2, or `None` to fall through (अद्).
 pub fn join_form(
     dhatu: &str,
     family: &str,
@@ -1147,11 +1295,20 @@ pub fn join_forms(
         return vec![];
     }
     let r = root_of(dhatu);
-    if r.is_empty() || matches!(r.as_str(), "as" | "han" | "i" | "ad") {
+    if r.is_empty() || r == "ad" {
         return vec![];
     }
     if r == "stu" {
         return join_stu(family, ending, augment);
+    }
+    if let Some(f) = join_han(&r, family, ending, augment) {
+        return vec![apply_natva_to_word(&f)];
+    }
+    if let Some(f) = join_as(&r, family, ending, augment) {
+        return vec![apply_natva_to_word(&f)];
+    }
+    if let Some(f) = join_in(&r, family, ending, augment) {
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_adhi_i(dhatu, &r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
@@ -1264,5 +1421,28 @@ mod tests {
         assert_eq!(join_form("zasti", "lat", "ti", 1, 1, None).as_deref(), Some("saMsti"));
         assert_eq!(join_form("cakziN", "lrt", "ti", 1, 1, None).as_deref(), Some("kSAsyati"));
         assert_eq!(join_form("cakziN", "lat", "te", 1, 1, None).as_deref(), Some("cazwe"));
+        assert_eq!(join_form("hana", "lat", "ti", 1, 1, None).as_deref(), Some("hanti"));
+        assert_eq!(join_form("hana", "lat", "anti", 1, 3, None).as_deref(), Some("Gnanti"));
+        assert_eq!(join_form("hana", "lat", "si", 2, 1, None).as_deref(), Some("haMsi"));
+        assert_eq!(join_form("hana", "lot", "Di", 2, 1, None).as_deref(), Some("jahi"));
+        assert_eq!(join_form("hana", "lang", "at", 1, 1, None).as_deref(), Some("ahan"));
+        assert_eq!(join_form("hana", "lang", "an", 1, 3, None).as_deref(), Some("aGnan"));
+        assert_eq!(join_form("hana", "vidhilin", "yAt", 1, 1, None).as_deref(), Some("hanyAt"));
+        assert_eq!(join_form("hana", "lrt", "ti", 1, 1, None).as_deref(), Some("hanizyati"));
+        assert_eq!(join_form("asa", "lat", "ti", 1, 1, None).as_deref(), Some("asti"));
+        assert_eq!(join_form("asa", "lat", "anti", 1, 3, None).as_deref(), Some("santi"));
+        assert_eq!(join_form("asa", "lot", "Di", 2, 1, None).as_deref(), Some("eDi"));
+        assert_eq!(join_form("asa", "lang", "at", 1, 1, None).as_deref(), Some("AsIt"));
+        assert_eq!(join_form("asa", "lang", "atAm", 1, 2, None).as_deref(), Some("AstAm"));
+        assert_eq!(join_form("asa", "lang", "an", 1, 3, None).as_deref(), Some("Asan"));
+        assert_eq!(join_form("asa", "vidhilin", "yAt", 1, 1, None).as_deref(), Some("syAt"));
+        assert_eq!(join_form("asa", "lrt", "ti", 1, 1, None).as_deref(), Some("Bavizyati"));
+        assert_eq!(join_form("iR", "lat", "ti", 1, 1, None).as_deref(), Some("eti"));
+        assert_eq!(join_form("iR", "lat", "anti", 1, 3, None).as_deref(), Some("yanti"));
+        assert_eq!(join_form("iR", "lot", "Ani", 3, 1, None).as_deref(), Some("ayAni"));
+        assert_eq!(join_form("iR", "lang", "at", 1, 1, None).as_deref(), Some("Et"));
+        assert_eq!(join_form("iR", "lang", "an", 1, 3, None).as_deref(), Some("Ayan"));
+        assert_eq!(join_form("iR", "vidhilin", "yAt", 1, 1, None).as_deref(), Some("iyAt"));
+        assert_eq!(join_form("iR", "lrt", "ti", 1, 1, None).as_deref(), Some("ezyati"));
     }
 }

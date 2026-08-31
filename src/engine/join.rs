@@ -167,7 +167,7 @@ pub fn join_form(
     _vacana: u8,
     _antarganas: Option<&str>,
 ) -> String {
-    // AD (2,3) — अत्ति, अस्ति, हन्ति, एति, ब्रवीति, वक्ति
+    // अदादि: `adadi::join_form`. अद् stays here (द्+थ् / लङ् अपृक्त).
     if gana == 2 {
         if let Some(d) = dhatu {
             if let Some(f) = crate::engine::adadi::join_form(d, family, ending, purusha, _vacana, augment) {
@@ -178,105 +178,6 @@ pub fn join_form(
     if gana == 2 || gana == 3 {
         if let Some(d) = dhatu {
             let d = d.trim_end_matches('a');
-            if d == "han" {
-                if family == "lat" {
-                    match ending {
-                        "ti" => return "hanti".into(),
-                        "taH" => return "hataH".into(),
-                        "nti" | "anti" => return "Gnanti".into(),
-                        "si" => return "haMsi".into(),
-                        "thaH" | "TaH" => return "haTaH".into(),
-                        "tha" | "Ta" => return "haTa".into(),
-                        "mi" | "Ami" => return "hanmi".into(),
-                        "vaH" | "AvaH" => return "hanvaH".into(),
-                        "maH" | "AmaH" => return "hanmaH".into(),
-                        _ => {}
-                    }
-                }
-                if family == "lot" {
-                    match ending {
-                        "tu" => return "hantu".into(),
-                        "tAt" => return "hatAt".into(),
-                        "tAd" => return "hatAd".into(),
-                        "tAm" => return "hatAm".into(),
-                        "tam" => return "hatam".into(),
-                        "ta" => return "hata".into(),
-                        "antu" => return "Gnantu".into(),
-                        "Di" => return "jahi".into(),
-                        _ => {}
-                    }
-                }
-                if family == "lang" {
-                    return match ending {
-                        "at" | "ad" => "ahan".into(),
-                        "an" => "aGnan".into(),
-                        "atAm" => "ahatAm".into(),
-                        "aH" => "ahan".into(),
-                        "atam" => "ahatam".into(),
-                        "ata" => "ahata".into(),
-                        "am" => "ahanam".into(),
-                        "va" => "ahanva".into(),
-                        "ma" => "ahanma".into(),
-                        _ => format!("ahan{ending}"),
-                    };
-                }
-                if family == "vidhilin" && ending.starts_with('y') {
-                    return format!("han{ending}");
-                }
-            }
-            if d == "vid" && family == "lat" {
-                match (ending, purusha) {
-                    ("ti", 1) => return "vetti".into(),
-                    ("taH", 1) => return "vittaH".into(),
-                    ("si", 2) => return "vetTa".into(),
-                    _ => {}
-                }
-            }
-            if d == "as" {
-                if family == "lat" {
-                    return match ending {
-                        "ti" => "asti".into(),
-                        "taH" => "staH".into(),
-                        "anti" | "nti" => "santi".into(),
-                        "si" => "asi".into(),
-                        "thaH" | "TaH" => "sTaH".into(),
-                        "tha" | "Ta" => "sTa".into(),
-                        "mi" | "Ami" => "asmi".into(),
-                        "vaH" | "AvaH" => "svaH".into(),
-                        "maH" | "AmaH" => "smaH".into(),
-                        _ => format!("as{ending}"),
-                    };
-                }
-                if family == "lang" {
-                    return match ending {
-                        "at" | "ad" => "AsIt".into(),
-                        "atAm" => "AstAm".into(),
-                        "an" => "Asan".into(),
-                        "aH" => "AsIH".into(),
-                        "atam" => "Astam".into(),
-                        "ata" => "Asta".into(),
-                        "am" => "Asam".into(),
-                        "va" => "Asva".into(),
-                        "ma" => "Asma".into(),
-                        _ => format!("As{ending}"),
-                    };
-                }
-                if family == "vidhilin" {
-                    return match ending {
-                        "yAt" => "syAt".into(),
-                        "yAd" => "syAd".into(),
-                        "yAtAm" => "syAtAm".into(),
-                        "yuH" => "syuH".into(),
-                        "yAH" => "syAH".into(),
-                        "yAtam" => "syAtam".into(),
-                        "yAta" => "syAta".into(),
-                        "yAm" => "syAm".into(),
-                        "yAva" => "syAva".into(),
-                        "yAma" => "syAma".into(),
-                        _ => format!("s{ending}"),
-                    };
-                }
-            }
             if d == "ad" {
                 if family == "lang" {
                     return match ending {
@@ -299,27 +200,6 @@ pub fn join_form(
                     return crate::engine::phonology::thematic_join("atsya", ending);
                 }
                 return internal_sandhi("ad", ending);
-            }
-            if d == "vac" {
-                match ending {
-                    "ti" => return "vakti".into(),
-                    "taH" => return "vaktaH".into(),
-                    "si" => return "vakzi".into(),
-                    "anti" | "nti" => return "vacanti".into(),
-                    _ => {}
-                }
-            }
-            if d == "i" || d == "iR" || stem == "e" {
-                match ending {
-                    "ti" => return "eti".into(),
-                    "taH" => return "itaH".into(),
-                    "anti" | "nti" => return "yanti".into(),
-                    "si" => return "ezi".into(),
-                    "mi" | "Ami" => return "emi".into(),
-                    "vaH" => return "ivaH".into(),
-                    "maH" => return "imaH".into(),
-                    _ => {}
-                }
             }
         }
     }
