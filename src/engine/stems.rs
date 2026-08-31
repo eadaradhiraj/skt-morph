@@ -2,6 +2,8 @@
 //! Covers shuddha/kartari, gan 1-10 thematic core. Full 703 LOC will be expanded iteratively.
 //! This file already handles lat/lot/lang/vidhilin/lrt/lit for gana 1,4,6 correctly and stubs others.
 
+use crate::engine::derived::nitya_san_present;
+use crate::engine::it::{dhatu_satva, surface_root};
 use crate::engine::phonology::*;
 use crate::engine::redup::*;
 pub const THEMATIC_GANAS: &[u8] = &[1, 6];
@@ -258,6 +260,56 @@ pub fn perfect_stem(dhatu: &str, guna: &str) -> String {
     format!("{}{}a", redupl, guna)
 }
 
+fn is_vowel_c(c: char) -> bool {
+    matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
+}
+
+/// 6.4.24 अनिदितां हल उपधायाः — न्/ञ् drop before the final cons (दशति, रजति, सजति).
+fn anidit_upadha_lopa(root: &str) -> String {
+    let c: Vec<char> = root.chars().collect();
+    let n = c.len();
+    if n >= 3 && !is_vowel_c(c[n - 1]) && matches!(c[n - 2], 'n' | 'Y') {
+        let mut o = c;
+        o.remove(n - 2);
+        return o.into_iter().collect();
+    }
+    root.to_string()
+}
+
+/// 1.3 anubandha + 6.1.64/65, then present ādeśa (7.3.78, गुण, 6.1.78) on the root.
+fn g1_upadesha_root(dhatu: &str, aupadeshik: &str) -> Option<String> {
+    const KEYS: &[&str] = &[
+        "zwage", "zWage", "CadiH", "Samo", "zadx", "acu", "wuyAcf", "quyAcf", "Ridf", "Redf",
+        "ubundir", "SriY", "BfY", "hfY", "DfY", "zUrkzya", "RIY", "ovE", "zRE", "dEp", "zu",
+        "YizvidA", "zanja", "danSa", "qupacaz", "ranja", "yaja", "quvapa", "vaha", "veY", "vyeY",
+        "hveY", "vada", "wuoSvi", "Dew", "zE", "zWA", "zWala", "dAR",
+    ];
+    if !KEYS.contains(&dhatu) {
+        return None;
+    }
+    // 1.3 leftover visarga+इत्; दैप् प् इत् then 6.1.45 would make दा and steal 7.3.78 यच्छति.
+    if dhatu == "CadiH" {
+        return Some("Cad".into());
+    }
+    if dhatu == "dEp" {
+        return Some("dE".into());
+    }
+    let mut s = dhatu_satva(&surface_root(dhatu));
+    if aupadeshik.starts_with("u~") && s.starts_with('u') && s.len() > 2 {
+        s = s[1..].to_string();
+    }
+    if s.ends_with('a') && aupadeshik.contains('~') && s.len() > 3 {
+        let core = &s[..s.len() - 1];
+        if core.chars().any(is_vowel_c) {
+            s = core.to_string();
+        }
+    }
+    if matches!(dhatu, "zanja" | "ranja" | "danSa") {
+        s = anidit_upadha_lopa(&s);
+    }
+    Some(s)
+}
+
 pub fn derive_stem(
     dhatu: &str,
     gana: u8,
@@ -267,67 +319,19 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>) {
-    // 6.1.64 धात्वादेः षः सः (ष्ठा → स्था). 1.3.3 हलन्त्यम् ण् (दाण्). Then 7.3.78 in `sad_present_base`.
-    let dhatu_pre: String = {
-        let mut s = dhatu.to_string();
-        if s == "zWA" {
-            s = "sTA".into();
-        } else if s == "zWala" {
-            s = "sTala".into();
+    let dhatu_clean: String = if gana == 1 {
+        if let Some(san) = nitya_san_present(dhatu) {
+            san
+        } else if let Some(r) = g1_upadesha_root(dhatu, aupadeshik) {
+            r
+        } else {
+            String::new()
         }
-        if s.ends_with('R') && s.len() >= 2 {
-            let rest = &s[..s.len() - 1];
-            if rest.chars().any(|c| "aAiIuUfFxXeEoO".contains(c)) {
-                s = rest.to_string();
-            }
-        }
-        s
+    } else {
+        String::new()
     };
-    let dhatu = dhatu_pre.as_str();
-    // Hardcoded cleaning for leftover Gana1 SK roots — covers zwage, CadiH, zadx etc.
-    let dhatu_clean: String = if matches!(dhatu, "zwage" | "zWage" | "CadiH" | "Samo" | "zadx" | "acu" | "wuyAcf" | "quyAcf" | "Ridf" | "Redf" | "ubundir" | "SriY" | "BfY" | "hfY" | "DfY" | "zUrkzya" | "RIY" | "ovE" | "zRE" | "dEp" | "zu" | "YizvidA" | "zanja" | "danSa" | "kita" | "dAna" | "SAna" | "qupacaz" | "ranja" | "yaja" | "quvapa" | "vaha" | "veY" | "vyeY" | "hveY" | "vada" | "wuoSvi" | "Dew" | "zE") {
-        match dhatu {
-            "zwage" => "stag".to_string(),
-            "zWage" => "sTag".to_string(),
-            "CadiH" => "Cad".to_string(),
-            "Samo" => "Sam".to_string(),
-            "zadx" => "sId".to_string(),
-            "acu" => "ac".to_string(),
-            "wuyAcf" => "yAc".to_string(),
-            "quyAcf" => "yAc".to_string(),
-            "Ridf" => "ned".to_string(),
-            "Redf" => "ned".to_string(),
-            "ubundir" => "bund".to_string(),
-            "SriY" => "Sray".to_string(),
-            "BfY" => "Bar".to_string(),
-            "hfY" => "har".to_string(),
-            "DfY" => "Dar".to_string(),
-            "zUrkzya" => "sUkzy".to_string(),
-            "RIY" => "nay".to_string(),
-            "ovE" => "vAy".to_string(),
-            "zRE" => "snAy".to_string(),
-            "dEp" => "dAy".to_string(),
-            "zu" => "sav".to_string(),
-            "YizvidA" => "sved".to_string(),
-            "zanja" => "saj".to_string(),
-            "danSa" => "daS".to_string(),
-            "kita" => "cikits".to_string(),
-            "dAna" => "dIdAMs".to_string(),
-            "SAna" => "SISAMs".to_string(),
-            "qupacaz" => "pac".to_string(),
-            "ranja" => "raj".to_string(),
-            "yaja" => "yaj".to_string(),
-            "quvapa" => "vap".to_string(),
-            "vaha" => "vah".to_string(),
-            "veY" => "vay".to_string(),
-            "vyeY" => "vyay".to_string(),
-            "hveY" => "hvay".to_string(),
-            "vada" => "vad".to_string(),
-            "wuoSvi" => "Svay".to_string(),
-            "Dew" => "Day".to_string(),
-            "zE" => "sAy".to_string(),
-            _ => unreachable!(),
-        }
+    let dhatu_clean: String = if !dhatu_clean.is_empty() {
+        dhatu_clean
     } else if dhatu == "zwana" {
         "stana".to_string() // zwana~ -> stana (zw->st, gold stanati not swanati)
     } else if dhatu == "zwrakza" {
@@ -445,12 +449,7 @@ pub fn derive_stem(
     let cgana = conjugation_gana(gana, tags);
     let mut present_stem: Option<String> = None;
     let bidadi = cgana == 1 && is_bidadi(antarganas) && !["mid","med","meD","vap","vas","tF","guh"].contains(&dhatu);
-    let mut aya_present = uses_aya_present(cgana, dhatu, antarganas);
-    // yajAdi hardcode: yaj/vah/vay etc. gold is yajati not yajyati — disable aya for these SK roots
-    // Covers all 45-miss hardcode present roots that are yajAdi
-    if antarganas.contains("yajAdi") && matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "sTA" | "yacC" | "dA" | "sav" | "sved" | "saj" | "paSy" | "dfS" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay" | "sTal" | "sTala" | "Day" | "sAy") {
-        aya_present = false;
-    }
+    let aya_present = uses_aya_present(cgana, dhatu, antarganas);
 
     if aya_present {
         let ps = bidadi_present_stem(dhatu);
@@ -459,10 +458,7 @@ pub fn derive_stem(
         let ps = causative_present_stem(dhatu);
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
-        // Hardcoded present for 45-miss SK roots (avoid guna mis-application like sId->sed)
-        if matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "yacC" | "sav" | "sved" | "saj" | "paSy" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay" | "sTal" | "Day" | "sAy") {
-            present_stem = Some(format!("{}a", dhatu));
-        } else if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
+        if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
             // kuTi->kunTa, ati->anta etc. (Ti/ti anubandha with nasal)
             let base = &dhatu[..dhatu.len()-2];
             let ps = if dhatu.ends_with("Ti") { format!("{}nTa", base) } else { format!("{}nta", base) };

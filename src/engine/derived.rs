@@ -152,6 +152,24 @@ fn san_is_adesha(root: &str) -> Option<String> {
     }
 }
 
+/// 3.1.5 गुप्तिज्किद्भ्यः सन्; 3.1.6 मान्बधदान्शान्भ्यो दीर्घश्चाभ्यासस्य.
+/// Present aṅga without शप् अ (चिकित्स, दीदांस्, शीशांस्).
+pub(crate) fn nitya_san_present(dhatu: &str) -> Option<String> {
+    let (root, dirgha) = match dhatu {
+        "kita" => ("kit", false),
+        "dAna" => ("dAn", true),
+        "SAna" => ("SAn", true),
+        _ => return None,
+    };
+    let mut abh = san_abhyasa(root);
+    if dirgha && abh.ends_with('i') {
+        abh.pop();
+        abh.push('I');
+    }
+    let body = thematic_sa(root);
+    Some(format!("{abh}{}", body.trim_end_matches('a')))
+}
+
 /// सन् present aṅga.
 pub fn san_stem(root: &str) -> String {
     if let Some(s) = san_is_adesha(root) {

@@ -106,7 +106,8 @@ pub(crate) fn prakriya_root(dhatu: &str) -> String {
     // जक्षादि: जागृ / दरिद्रा keep the final vowel; it is not इत्.
     let skip_it = matches!(s.as_str(), "jAgf" | "daridrA");
     if !skip_it {
-        for it in ["ir", "x", "Y", "R", "N", "k", "o", "A", "I", "U", "F", "e", "E", "i", "u", "f"] {
+        // 1.3.7 चुटू (ट् = w); 1.3.3 हलन्त्यम् ण्/ञ्/क्/ङ्; 1.3.2 अच् इत्.
+        for it in ["ir", "x", "Y", "R", "N", "k", "w", "o", "A", "I", "U", "F", "e", "E", "i", "u", "f"] {
             if s.len() > it.len() && s.ends_with(it) {
                 let rest = &s[..s.len() - it.len()];
                 if rest.chars().any(|c| "aAiIuUfFeEoOxX".contains(c)) {

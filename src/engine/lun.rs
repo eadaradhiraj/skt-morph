@@ -310,8 +310,7 @@ fn is_lit_l(dhatu: &str) -> bool {
 fn ang_stem(root: &str, dhatu: &str, antarganas: &str) -> Option<String> {
     match root {
         "gam" | "vid" | "sfj" => return Some(root.to_string()),
-        "dfS" => return Some("darS".into()),
-        "sf" => return Some("sar".into()),
+        "dfS" | "sf" => return Some(apply_guna_to_stem(root)),
         "f" => return Some("f".into()),
         _ => {}
     }

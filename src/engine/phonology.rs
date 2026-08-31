@@ -150,14 +150,15 @@ pub fn yam_cc_future_stem(dhatu: &str, antarganas: &str) -> Option<String> {
     if dhatu=="yam" && !is_gawadi(antarganas) { Some("yaMsya".to_string()) } else { None }
 }
 
-const G1_AYA_PRESENT: &[&str] = &["ji","Sri","nI","De","jri"];
+/// 6.1.78 एचोऽयवायावः after गुण: श्रयति, नयति, धयति; वे/व्ये/ह्वे/श्वि.
+const G1_AYA_PRESENT: &[&str] = &["ji","Sri","nI","De","jri","ve","vye","hve","Svi"];
 const G1_A_FINAL: &[&str] = &["SrA","jYA"];
 const BIDADI_THEMATIC: &[&str] = &["mid","med","meD","vap","vas","tF","guh"];
 const YA_THEMATIC: &[&str] = &["tras","Bram","yas"];
 
 pub fn uses_aya_present(cgana: u8, dhatu: &str, antarganas: &str) -> bool {
     if BIDADI_THEMATIC.contains(&dhatu) { return false; }
-    cgana==1 && (is_bidadi(antarganas) || is_yajadi(antarganas) || G1_AYA_PRESENT.contains(&dhatu))
+    cgana==1 && (is_bidadi(antarganas) || G1_AYA_PRESENT.contains(&dhatu))
 }
 pub fn is_g1_a_final(dhatu: &str) -> bool { G1_A_FINAL.contains(&dhatu) }
 pub fn is_g1_aya_present(dhatu: &str) -> bool { G1_AYA_PRESENT.contains(&dhatu) }

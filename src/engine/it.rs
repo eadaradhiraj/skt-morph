@@ -242,6 +242,29 @@ pub fn surface_root(dhatu: &str) -> String {
     }
 }
 
+/// 6.1.64 धात्वादेः षः सः; 6.1.65 णो नः. ष्ठिवु keeps ष् (Kashika).
+pub fn dhatu_satva(root: &str) -> String {
+    if root.starts_with("zWiv") {
+        return root.to_string();
+    }
+    if root.starts_with("zw") {
+        return format!("st{}", &root[2..]);
+    }
+    if root.starts_with("zW") {
+        return format!("sT{}", &root[2..]);
+    }
+    if root.starts_with("zR") {
+        return format!("sn{}", &root[2..]);
+    }
+    if root.starts_with('z') {
+        return format!("s{}", &root[1..]);
+    }
+    if root.starts_with('R') {
+        return format!("n{}", &root[1..]);
+    }
+    root.to_string()
+}
+
 /// Unused helper kept for tests of vowel scan.
 #[allow(dead_code)]
 fn has_vowel(s: &str) -> bool {
