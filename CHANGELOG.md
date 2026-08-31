@@ -39,6 +39,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **क्त सन्→सत (san→sata):** सन् + क्त → सत (SLP1 `sata`) not `santa`; added `nistha_base` special for `san` with short a header; `sana`/`san`→`sata` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त हन्→हत (han→hata):** हन् + क्त → हत (SLP1 `hata`) not `hanita`; added `nistha_base` explicit special for `han` with n-lopa header; `hana`/`han`→`hata` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त गम्→गत (gam→gata):** गम् + क्त → गत (SLP1 `gata`) not `gamta`; added `nistha_base` explicit special for `gam` with m-lopa header; `gama`/`gam`→`gata` asserts; extreme commenting kept; 97 tests — pushed.
+- **क्त रुच्→रुक्त (ruc→rukta):** रुच् + क्त → रुक्त (SLP1 `rukta`) not `ructa`; added `nistha_base` special for `ruc` with 8.2.30 header; `ruca`/`ruc`→`rukta` asserts; extreme commenting kept; 97 tests — pushed.
 - **यङ्लुक् extended (vac/Śru):** added `vac→vAvac→vAvakti` (8.2.30 c→k) and `Śru→SoSrū` intensive stems; enriched yaNluk sūtra comments (2.4.74, 8.2.30); 97 tests — pushed.
 
 ## 2026-08-31
