@@ -292,6 +292,35 @@ fn decline_an(stem: &str, linga: &str) -> Declension {
     }
 }
 
+/// 7.1.85–87 पथिमथोः / इतोऽत् / थो न्थः; ऋभुक्षिन् same सर्वनामस्थान. पुं only.
+fn decline_pathadi(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "pum" {
+        return None;
+    }
+    let (nom, strong, weak, pada) = match cand {
+        "paTin" => ("panTAH", "panTAn", "paT", "paTi"),
+        "maTin" => ("manTAH", "manTAn", "maT", "maTi"),
+        "fBukzin" => ("fBukzAH", "fBukzAR", "fBukz", "fBukzi"),
+        _ => return None,
+    };
+    let du = format!("{strong}O");
+    let pl = format!("{strong}aH");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![nom.to_string(), du.clone(), pl.clone()]);
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), du.clone(), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada}zu")]);
+    decl.insert("samboDana".into(), vec![nom.to_string(), du, pl]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -323,6 +352,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if cand.ends_with("an") && (linga == "pum" || linga == "nap") {
             return Some(decline_an(&cand, linga));
+        }
+        if let Some(d) = decline_pathadi(&cand, linga) {
+            return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
         let mut best_len = 0;
@@ -735,5 +767,32 @@ mod tests {
         has(&j, "zazWI", "jagatAm");
         has(&j, "saptamI", "jagatsu");
         has(&generate("mahat", "nap").unwrap(), "prathamA", "mahAnti");
+    }
+
+    #[test]
+    fn pathadi_pantha_mantha_rbhukshin() {
+        // 7.1.85–87 पथिन्: पन्थाः/पन्थानम्, weak पथः, पद पथिभ्याम्/पथिषु.
+        let p = generate("paTin", "pum").expect("paTin");
+        has(&p, "prathamA", "panTAH");
+        has(&p, "prathamA", "panTAnO");
+        has(&p, "prathamA", "panTAnaH");
+        has(&p, "dvitIyA", "panTAnam");
+        has(&p, "dvitIyA", "paTaH");
+        has(&p, "tfIyA", "paTA");
+        has(&p, "tfIyA", "paTiByAm");
+        has(&p, "saptamI", "paTi");
+        has(&p, "saptamI", "paTizu");
+        has(&p, "samboDana", "panTAH");
+        let m = generate("maTin", "pum").expect("maTin");
+        has(&m, "prathamA", "manTAH");
+        has(&m, "dvitIyA", "manTAnam");
+        has(&m, "tfIyA", "maTA");
+        // ऋभुक्षिन्: ऋभुक्षाः, ऋभुक्षाणम् (णत्व in strong).
+        let r = generate("fBukzin", "pum").expect("fBukzin");
+        has(&r, "prathamA", "fBukzAH");
+        has(&r, "prathamA", "fBukzARO");
+        has(&r, "dvitIyA", "fBukzARam");
+        has(&r, "tfIyA", "fBukzA");
+        has(&r, "saptamI", "fBukzizu");
     }
 }
