@@ -80,6 +80,13 @@ pub fn nic_stem(root: &str) -> String {
         "han" => return "GAtaya".into(),
         "i" => return "gamaya".into(),
         "pA" => return "pAyaya".into(),
+        // 7.3.37 शाच्छासाह्वाव्यावेपां युक्. शो/छो/षो after 6.1.45 आदेच.
+        "So" | "SA" => return "SAyaya".into(),
+        "Co" | "CA" => return "CAyaya".into(),
+        "zo" | "so" | "sA" => return "sAyaya".into(),
+        "hvA" | "hve" => return "hvAyaya".into(),
+        "vyA" | "vye" => return "vyAyaya".into(),
+        _ if root.ends_with("vep") => return "vepaya".into(),
         _ => {}
     }
     if is_mit(root) {
@@ -344,6 +351,14 @@ mod tests {
         assert!(f.iter().any(|x| x == "pipakzati"), "{:?}", f);
         let f = kartari("dfSir", "Ric", "lat", 1, 1, "P").unwrap();
         assert!(f.iter().any(|x| x == "darSayati"), "{:?}", f);
+        assert_eq!(nic_stem("So"), "SAyaya");
+        assert_eq!(nic_stem("Co"), "CAyaya");
+        assert_eq!(nic_stem("zo"), "sAyaya");
+        assert_eq!(nic_stem("hve"), "hvAyaya");
+        let f = kartari("So", "Ric", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "SAyayati"), "{:?}", f);
+        let f = kartari("hveY", "Ric", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "hvAyayati"), "{:?}", f);
     }
 
     #[test]

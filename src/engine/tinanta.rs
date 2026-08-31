@@ -313,6 +313,12 @@ mod tests {
         assert!(f.iter().any(|x| x == "ninAya"), "{:?}", f);
         let f = generate_all("qukfY", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "cakAra"), "{:?}", f);
+        let f = generate_all("dfSir", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "dadarSa"), "{:?}", f);
+        let f = generate_all("dfSir", "plit", 1, 2);
+        assert!(f.iter().any(|x| x == "dadfSatuH"), "{:?}", f);
+        let f = generate_all("tF", "plit", 1, 2);
+        assert!(f.iter().any(|x| x == "teratuH"), "{:?}", f);
     }
 
     #[test]
@@ -510,6 +516,8 @@ mod tests {
         assert!(f.iter().any(|x| x == "dApayati"), "{:?}", f);
         let f = generate_all_derived("hana", "Ric", "plat", 1, 1, &[]);
         assert!(f.iter().any(|x| x == "GAtayati"), "{:?}", f);
+        let f = generate_all_derived("So", "Ric", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "SAyayati"), "{:?}", f);
     }
 
     #[test]

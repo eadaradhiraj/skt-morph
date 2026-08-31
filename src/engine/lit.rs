@@ -9,8 +9,11 @@
 //! 6.1.64 धात्वादेः षः सः; 2.4.41 वेञो वयिः; 6.1.37 लिटि वयो यः;
 //! 6.1.38 वश्चास्यान्यतरस्यां किति; 6.1.39 वेञः; 6.1.33 अभ्यस्तस्य च (ह्वे);
 //! 6.1.46 न व्यो लिटि; 7.4.69 दीर्घ इणः किति; 7.4.70 अत आदेः; 7.4.71 तस्मान्नुड् द्विहलः;
-//! 6.4.78 अभ्यासस्यासवर्णे; 6.4.81 इणो यण्; 2.4.53 ब्रुवो वचिः; 3.1.35–36 आम्;
+//! 7.4.66 उरत्; 6.4.122 तृफलभजत्रपश्च; 6.4.78 अभ्यासस्यासवर्णे; 6.4.81 इणो यण्;
+//! 2.4.53 ब्रुवो वचिः; 3.1.35–36 आम्;
 //! 3.4.81 लिटस्तझयोरेशिरेच्; 3.4.82 णलतुसुस्थलथुसणल्वमाः; 7.1.91 णलुत्तमो वा.
+
+use crate::engine::phonology::apply_guna_to_stem;
 
 /// Kartari forms for one cell. `purusha` 1 = प्रथम (3rd), 3 = उत्तम (1st).
 /// `None` → caller’s generic stem+ending path.
@@ -414,6 +417,52 @@ fn vacadi_angas(root: &str) -> Option<Angas> {
     })
 }
 
+/// अभ्यास vowel: i/u stay; ṛ → a (7.4.66 उरत्).
+fn abhyasa_ik(root: &str) -> String {
+    let onset: String = root.chars().take_while(|&c| is_cons(c)).collect();
+    if onset.is_empty() {
+        return abhyasa(root);
+    }
+    let cons = first_abhyasa_cons(&onset);
+    let v = match root.chars().find(|&c| !is_cons(c)) {
+        Some('i') | Some('I') => 'i',
+        Some('u') | Some('U') => 'u',
+        Some('f') | Some('F') => 'a',
+        _ => 'a',
+    };
+    format!("{cons}{v}")
+}
+
+/// इगुपध हल्-anta: णल् गुण (ददर्श), kit no गुण (ददृशतुः). Not 7.2.115 (aṅga is not अजन्त).
+fn ig_upadha_halanta(root: &str) -> Option<Angas> {
+    let c: Vec<char> = root.chars().collect();
+    if c.len() < 2 || !c.last().is_some_and(|&ch| is_cons(ch)) {
+        return None;
+    }
+    let vowels: Vec<(usize, char)> = c
+        .iter()
+        .copied()
+        .enumerate()
+        .filter(|(_, ch)| !is_cons(*ch))
+        .collect();
+    if vowels.len() != 1 {
+        return None;
+    }
+    let (vi, v) = vowels[0];
+    if vi == 0 || !matches!(v, 'i' | 'u' | 'f') {
+        return None;
+    }
+    let abh = abhyasa_ik(root);
+    let strong = satva_stutva(&format!("{}{}", abh, apply_guna_to_stem(root)));
+    let weak = satva_stutva(&format!("{abh}{root}"));
+    Some(Angas {
+        strong,
+        weak: weak.clone(),
+        full: weak,
+        thal_anit: None,
+    })
+}
+
 fn first_abhyasa_cons(onset: &str) -> char {
     let chars: Vec<char> = onset.chars().collect();
     let c0 = if chars.len() >= 2 && is_sar(chars[0]) && is_khay(chars[1]) {
@@ -453,6 +502,15 @@ fn i_u_f_angas(root: &str) -> Option<Angas> {
             strong: "Ar".into(),
             weak: "Ar".into(),
             full: "Ar".into(),
+            thal_anit: None,
+        });
+    }
+    // 6.4.122 तृफलभजत्रपश्च — तॄ kit is तेर, not तत्र.
+    if root == "tF" || root == "tf" {
+        return Some(Angas {
+            strong: "tatAr".into(),
+            weak: "ter".into(),
+            full: "tatar".into(),
             thal_anit: None,
         });
     }
@@ -628,6 +686,9 @@ fn angas(root: &str) -> Option<Angas> {
             });
         }
         _ => {}
+    }
+    if let Some(a) = ig_upadha_halanta(&root) {
+        return Some(a);
     }
     if is_cluster_cac(&root) {
         let abh = abhyasa(&root);
@@ -932,6 +993,27 @@ mod tests {
         assert_eq!(kartari("anjU", 1, 1, "P").unwrap(), vec!["AnYja"]);
         assert!(kartari("tyaja", 1, 1, "P").unwrap().iter().any(|x| x == "tatyAja"));
         assert_eq!(kartari("daridrA", 1, 1, "P").unwrap(), vec!["daridrO"]);
+    }
+
+    #[test]
+    fn ig_upadha_and_tr_lit() {
+        assert!(kartari("dfSir", 1, 1, "P").unwrap().iter().any(|x| x == "dadarSa"), "{:?}", kartari("dfSir", 1, 1, "P"));
+        assert_eq!(kartari("dfSir", 1, 2, "P").unwrap(), vec!["dadfSatuH"]);
+        assert_eq!(kartari("dfSir", 1, 3, "P").unwrap(), vec!["dadfSuH"]);
+        assert_eq!(kartari("dfSir", 1, 1, "A").unwrap(), vec!["dadfSe"]);
+        assert!(kartari("kfza", 1, 1, "P").unwrap().iter().any(|x| x == "cakarza"), "{:?}", kartari("kfza", 1, 1, "P"));
+        assert_eq!(kartari("kfza", 1, 2, "P").unwrap(), vec!["cakfzatuH"]);
+        assert!(kartari("vida", 1, 1, "P").unwrap().iter().any(|x| x == "viveda"), "{:?}", kartari("vida", 1, 1, "P"));
+        assert_eq!(kartari("vida", 1, 2, "P").unwrap(), vec!["vividatuH"]);
+        assert!(kartari("buDa", 1, 1, "P").unwrap().iter().any(|x| x == "buboDa"), "{:?}", kartari("buDa", 1, 1, "P"));
+        assert_eq!(kartari("buDa", 1, 2, "P").unwrap(), vec!["bubuDatuH"]);
+        assert!(kartari("diSa", 1, 1, "P").unwrap().iter().any(|x| x == "dideSa"), "{:?}", kartari("diSa", 1, 1, "P"));
+        assert!(kartari("tF", 1, 1, "P").unwrap().iter().any(|x| x == "tatAra"), "{:?}", kartari("tF", 1, 1, "P"));
+        assert_eq!(kartari("tF", 1, 2, "P").unwrap(), vec!["teratuH"]);
+        assert!(kartari("Pala", 1, 1, "P").unwrap().iter().any(|x| x == "paPAla"), "{:?}", kartari("Pala", 1, 1, "P"));
+        assert_eq!(kartari("Pala", 1, 2, "P").unwrap(), vec!["PelatuH"]);
+        assert!(kartari("Baja", 1, 1, "P").unwrap().iter().any(|x| x == "baBAja"), "{:?}", kartari("Baja", 1, 1, "P"));
+        assert_eq!(kartari("Baja", 1, 2, "P").unwrap(), vec!["BejatuH"]);
     }
 
     #[test]
