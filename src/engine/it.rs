@@ -23,7 +23,15 @@ fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
 
-/// अनिट् before स्य (लृट्). कृ / गम् / हन् / भू are सेट् here (7.2.58 / 7.2.70 / 7.2.35).
+/// 7.2.10 एकाच उपदेशेऽनुदात्तात् — अनिट् before आर्धधातुक वलादि (स्य).
+///
+/// Accent is not in `dhatus_compact` (the `~` on aupadeśa is पद/इत् ँ, 1.3.12,
+/// not the root's anudātta). This closed list is the Kaumudī anudātta ekāc
+/// set the engine actually uses — not scrape gold.
+///
+/// Not in this list (सेट् स्य): कृ (7.2.70 ऋद्धनोः), गम् (7.2.58 गमेरिट्),
+/// भू (7.2.35), ग्रह् (7.2.37). हन् is अनिट् here but 7.2.70 still gives हनिष्यति
+/// via `takes_it_sya`.
 pub fn anit_sya(root: &str) -> bool {
     matches!(
         root,
@@ -146,20 +154,30 @@ fn last_vowel_index(s: &str) -> Option<usize> {
         .map(|(i, _)| i)
 }
 
-/// लृट् स्य stem (without the final a of thematic ति). गमिष्य, पक्ष्य, स्थास्य.
-pub fn sya_stem(root: &str) -> String {
-    // Present-stem aliases and 2.4.52 अस्तेर्भूः (लृट् of अस् is भू).
-    let root = match root {
-        "gamx" => "gam",
+/// Undo 7.3.77–78 शित् present ādeśa (and 2.4.52 अस्तेर्भूः) so लृट् स्य
+/// attaches to the dhātu: तिष्ठति → स्थास्यति, पिबति → पास्यति, अस्ति → भविष्यति.
+/// Inverse of `phonology::sad_present_base`; 7.3.77 is शिति, not आर्धधातुक.
+fn root_from_sit_present(root: &str) -> &str {
+    match root {
+        "gamx" | "gacC" => "gam",
         "tizW" | "zWA" => "sTA",
         "yacC" | "dAR" => "dA",
         "pib" => "pA",
         "Day" => "DA",
         "paSy" => "dfS",
         "sId" => "sad",
+        "jiGr" => "GrA",
+        "Dam" => "DmA",
+        "fcC" => "f",
+        // 2.4.52 अस्तेर्भूः — लृट् of अस् is भू (भविष्यति), not *सिष्यति / *असिष्यति.
         "as" => "BU",
         other => other,
-    };
+    }
+}
+
+/// लृट् स्य stem (without the final a of thematic ति). गमिष्य, पक्ष्य, स्थास्य.
+pub fn sya_stem(root: &str) -> String {
+    let root = root_from_sit_present(root);
     let mut root = dhatu_satva(root);
     // 8.2.18 कृपो रो लः.
     if root == "kfp" {
@@ -476,6 +494,13 @@ mod tests {
         assert_eq!(sya_stem("masj"), "maNkzya");
         assert_eq!(sya_stem("grah"), "grahIzya");
         assert_eq!(sya_stem("han"), "hanizya");
+        // 7.3.77–78 inverse: present aṅga must not leak into लृट्.
+        assert_eq!(sya_stem("tizW"), "sTAsya");
+        assert_eq!(sya_stem("pib"), "pAsya");
+        assert_eq!(sya_stem("paSy"), "drakzya");
+        assert_eq!(sya_stem("gacC"), "gamizya");
+        assert_eq!(sya_stem("yacC"), "dAsya");
+        assert_eq!(sya_stem("sId"), "satsya");
     }
 
     #[test]

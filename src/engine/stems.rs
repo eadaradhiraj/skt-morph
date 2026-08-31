@@ -212,9 +212,8 @@ fn g1_special_lrt(dhatu: &str) -> Option<String> {
 // ---------------------------------------------------------------------------
 fn g1_future_base(dhatu: &str, present_base: &str, guna: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
+    // 7.3.78 पिबति is शिति only — लृट् is पास्यति via sya_stem, not *पिबिष्यति.
     if dhatu=="sad" { return dhatu.to_string(); }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
-    if dhatu=="pA" { return "pib".to_string(); }
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if dhatu=="yaB" { return "yap".to_string(); }
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.

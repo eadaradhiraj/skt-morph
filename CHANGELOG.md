@@ -21,7 +21,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
   - **8.2.36 षः:** सृष्ट/इष्ट; पृच्छ् पृष्ट (not palatal *prcKta).
   - **8.2.34 नहो धः:** नह् → नद्ध (not *नाढ).
   - **6.1.16 व्यध्:** विध् → विद्ध (with 8.2.40).
-  - **named ādeśa left:** 2.4.36 जग्ध, 8.2.52 पक्व, सह् सोढ, भञ्ज् भग्न, 6.4.19 द्यूत, 8.2.34 नद्ध.
+- **लृट् 7.3.77–78 / 2.4.52:** `sya_stem` undoes शित् present ādeśa (तिष्ठ/पिब/पश्य/गच्छ → स्थास्य/पास्य/द्रक्ष्य/गमिष्य) and अस्→भू भविष्यति. Dropped `g1_future_base` पा→पिब (शिति only). `anit_sya` documents 7.2.10 vs empty accent tags.
 
 ## 2026-08-31
 
