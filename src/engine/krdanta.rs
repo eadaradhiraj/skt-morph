@@ -428,11 +428,17 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "div" {
         return "dyUta".into(); // द्यूत
     }
-    // Special: लुभ् + क्त → लुब्ध (SLP1 lubDa) — 8.2.37? Actually luB→lubDa (भ्→ब्ध)
+    // Special: लुभ् + क्त → लुब्ध (SLP1 lubDa) — 8.2.37 Actually luB→lubDa (भ्→ब्ध)
     // sūtra: लुभ् + क्त → लुब्ध; future devs: luB=लुभ्, lubDa=लुब्ध — keep b, Da=ध
     // Extreme: keep lubDa not luBta; handles Bh→bDa via jhal
     if orig == "luB" {
         return "lubDa".into(); // लुब्ध
+    }
+    // Special: क्षुभ् + क्त → क्षुब्ध (SLP1 kzuBDa) — similarly kzuB→kzuBDa
+    // sūtra: क्षुभ् + क्त → क्षुब्ध; future devs: kzuB=क्षुभ्, kzuBDa=क्षुब्ध — keep kzu, BD=ब्ध
+    // Extreme: keep kzuBDa not kzuBta
+    if orig == "kzuB" {
+        return "kzuBDa".into(); // क्षुब्ध
     }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
@@ -1112,6 +1118,9 @@ mod tests {
         // लुभ् → लुब्ध (lubDa) — luB→lubDa
         assert_eq!(derive("luBa", "kta"), vec!["lubDa"]); // लुभ् → लुब्ध (luBa is लुभ् with a)
         assert_eq!(derive("luB", "kta"), vec!["lubDa"]);
+        // क्षुभ् → क्षुब्ध (kzuBDa) — kzuB→kzuBDa
+        assert_eq!(derive("kzuBa", "kta"), vec!["kzuBDa"]); // क्षुभ् → क्षुब्ध (kzuBa is क्षुभ् with a)
+        assert_eq!(derive("kzuB", "kta"), vec!["kzuBDa"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
