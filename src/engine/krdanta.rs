@@ -278,6 +278,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "san" {
         return "sata".into(); // सत
     }
+    // Special: हन् + क्त → हत (SLP1 hata) — explicitly hata via n-lopa
+    // sūtra: हन् + क्त → हत; future devs: han=हन्, hata=हत — keep short a, no n, explicit for clarity
+    // Extreme: han is 7.4.42-like? Keep hata not hanita; kit_anga already gives ha but explicit documents sūtra
+    if orig == "han" {
+        return "hata".into(); // हत
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -878,6 +884,9 @@ mod tests {
         // सन् → सत (sata) — san→sata
         assert_eq!(derive("sana", "kta"), vec!["sata"]); // सन् → सत (sana is सन् with a)
         assert_eq!(derive("san", "kta"), vec!["sata"]);
+        // हन् → हत (hata) — han→hata
+        assert_eq!(derive("hana", "kta"), vec!["hata"]); // हन् → हत (hana is हन् with a)
+        assert_eq!(derive("han", "kta"), vec!["hata"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
