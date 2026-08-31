@@ -164,6 +164,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "sah" {
         return "soQa".into(); // सोढ
     }
+    // Special: वह् + क्त → ऊढ (SLP1 UQa) — 6.1.15 vah→U, 8.2.31 ho ḍha
+    // sūtra: वह् on kit → ऊढ; future devs: vah→UQa, not vaQa — samprasāraṇa U
+    // Extreme: keep UQa (ऊढ) with long U, Q=ढ; generic would give vAQa — wrong
+    if orig == "vah" {
+        return "UQa".into(); // ऊढ
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -707,6 +713,9 @@ mod tests {
         // सह् → सोढ (soQa) — 8.2.31 + guṇa
         assert_eq!(derive("saha", "kta"), vec!["soQa"]); // सह् → सोढ (saha is सह् with a)
         assert_eq!(derive("sah", "kta"), vec!["soQa"]);
+        // वह् → ऊढ (UQa) — 6.1.15 + 8.2.31
+        assert_eq!(derive("vaha", "kta"), vec!["UQa"]); // वह् → ऊढ (already in gam_kf_vac_da_kta? keep explicit)
+        assert_eq!(derive("vah", "kta"), vec!["UQa"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
