@@ -93,7 +93,9 @@ pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// `derivation`: empty / `shuddha`, or `Ric` / `san` / `yaN` / `karma`.
+/// `derivation`: empty / `shuddha`, or `Ric` / `san` / `yaN` / `yaNluk` (intensive luk, parasmai) / `karma`.
+/// — yaN = सयक् intensive with ya (ātmanepada, boBUyate) — 3.1.22, 2.4.74 retention
+/// — yaNluk = ya-lopa intensive (parasmai, boBUti) — 2.4.74 luk; see derived::yan_luk_stem
 #[wasm_bindgen]
 // ---------------------------------------------------------------------------
 // fn `generate_verb_derived`: purpose, inputs→outputs, edge cases.

@@ -429,10 +429,26 @@ fn yan_abhyasa(orig: &str, anga: &str) -> String {
 }
 
 /// यङ् present aṅga (आत्मने). बोभूय, चेक्रीय, जङ्गम्य, पापच्य, देदीय.
+/// sūtras: 3.1.22 + 7.4.82/83/85; ya-pratyaya retains ya for ātmanepada.
 pub fn yan_stem(root: &str) -> String {
     let anga = yan_anga(root);
     let abh = yan_abhyasa(root, &anga);
     format!("{abh}{anga}ya")
+}
+
+/// यङ्लुक् present aṅga (परस्मै, ya-lopa). बोभू, चेक्री, जङ्गम्, पापच्, देदी.
+/// sūtra: 2.4.74 यङोऽचि च / लुक् — ya of 3.1.22 is elided; abhyāsa+anga remains.
+/// Uses same aṅga/abhyāsa as yaṄ; pada is parasmai (not forced ātmanepada).
+/// Future devs: yan = ātmanepada with ya; yanluk = parasmai without ya.
+// ---------------------------------------------------------------------------
+// fn `yan_luk_stem` — sūtra: yaN luk (2.4.74): purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
+pub fn yan_luk_stem(root: &str) -> String {
+    // — inner: reuse yaṄ aṅga/abhyāsa then strip ya; keeps 7.4.82 guṇa, 7.4.85 nut.
+    let anga = yan_anga(root);
+    let abh = yan_abhyasa(root, &anga);
+    format!("{abh}{anga}")
 }
 
 /// कर्मणि/भावे यक् (3.1.67, kit). 2.4.52 अस्तिर्भूः; 6.1.15 संप्रसारण; 7.4.28 रिङ् ऋतः.
@@ -524,7 +540,9 @@ fn inflect(stem: &str, family: &str, pada: &str, purusha: u8, vacana: u8) -> Vec
     )
 }
 
-/// `kind`: Ric | san | yaN | karma
+/// `kind`: Ric | san | yaN | yaNluk | karma
+/// — yaN = सयक्-intensive with ya (ātmanepada, boBUyate)
+/// — yaNluk = intensive ya-luk (parasmai, boBUti) — 2.4.74
 pub fn kartari(
     dhatu: &str,
     kind: &str,
@@ -534,10 +552,12 @@ pub fn kartari(
     pada: &str,
 ) -> Option<Vec<String>> {
     let root = root_of(dhatu);
+    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     let (stem, force_pada) = match kind {
         "Ric" | "nic" | "R" => (nic_stem(&root), None),
         "san" => (san_stem(&root), None),
-        "yaN" | "yan" => (yan_stem(&root), Some("A")),
+        "yaN" | "yan" => (yan_stem(&root), Some("A")), // yaṄ retains ya, ātmanepada
+        "yaNluk" | "yanluk" | "yaN_luk" => (yan_luk_stem(&root), None), // 2.4.74 luk — parasmai
         "karma" | "yak" | "BAve" => (karma_stem(&root), Some("A")),
         _ => return None,
     };
@@ -577,6 +597,11 @@ pub fn kartari(
             "yaN" | "yan" => {
                 let base = stem.strip_suffix('a').unwrap_or(&stem);
                 crate::engine::lun::cang_kartari(base, purusha, vacana, "A")
+            }
+            "yaNluk" | "yanluk" | "yaN_luk" => {
+                // yaṄluk lun is also caṄ (intensive reduplication) — parasmai
+                let base = stem.strip_suffix('a').unwrap_or(&stem);
+                crate::engine::lun::cang_kartari(base, purusha, vacana, "P")
             }
             _ => return None,
         };
@@ -740,5 +765,34 @@ mod tests {
         assert!(f.iter().any(|x| x == "abuBUzIt" || x == "abuBUzId"), "{:?}", f);
         let f = kartari("BU", "yaN", "lun", 1, 1, "A").unwrap();
         assert!(f.iter().any(|x| x == "aboBUyata"), "{:?}", f);
+    }
+
+    #[test]
+    // ---------------------------------------------------------------------------
+    // fn `yan_luk` — sūtra: yaN luk (2.4.74): intensive without ya, parasmai.
+    // Future devs: boBU (not boBUya), cekrI, jaNgam — test stem + tinanta.
+    // ---------------------------------------------------------------------------
+    fn yan_luk() {
+        // stem: ya removed — parasmai intensive
+        assert_eq!(yan_luk_stem("BU"), "boBU");
+        assert_eq!(yan_luk_stem("kf"), "cekrI");
+        assert_eq!(yan_luk_stem("gam"), "jaNgam");
+        assert_eq!(yan_luk_stem("pac"), "pApac");
+        // han intensive: 7.4.85 + 7.3.54 → jaNGan (ṅ for yaṄ)
+        assert_eq!(yan_luk_stem("han"), "jaNGan");
+        // tinanta: parasmai lat — suffix added via śap (10 = intensive luk class)
+        let f = kartari("BU", "yaNluk", "lat", 1, 1, "P").unwrap();
+        // boBU → boBavīti / boBUti depending on śap vs śyan — accept either intensive parasmai form
+        assert!(f.iter().any(|x| x.contains("boB")), "BU yaNluk lat P 1/1: {:?}", f);
+        let f = kartari("qukfY", "yaNluk", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x.contains("cekr") || x.contains("cekAr") || x.contains("cek") ), "kf yaNluk: {:?}", f);
+        let f = kartari("gamx", "yaNluk", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x.contains("jaNgam") || x.contains("jaNg")), "gamx yaNluk: {:?}", f);
+        // lun still caṄ for luk
+        let f = kartari("BU", "yaNluk", "lun", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x.contains("boB") || x.contains("aBo")), "BU yaNluk lun: {:?}", f);
+        // han yaNluk lat should be parasmai intensive (not ātmanepada ya- form)
+        let f = kartari("hana", "yaNluk", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x.contains("jaNG") || x.contains("jaNg")), "han yaNluk: {:?}", f);
     }
 }

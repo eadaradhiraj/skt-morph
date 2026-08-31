@@ -7,6 +7,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **निरावरण live:** `tinanta_overrides.rs` removed — empty patch table deleted, generate is fully sūtra-driven (stems/adadi/join/it). README updated.
 - **अतिव्याख्या extreme commenting:** every module / fn / const / impl and every inner `if`/`match`/`for`/`while` block now carries a Pāṇini/Kaumudī sūtra comment header — ~2.9k lines added, no logic change; `cargo clippy -D warnings` + 95 tests clean.
 - **क्त हित/दत्त (7.4.42 vs 7.4.46):** clarified `kit_anga` comment — SLP1 `DA`=धा → `हि` → `हित` vs `dA`=दा → `दद्` → `दत्त`; added `quDAY`/`DA` → `hita` asserts; pushed.
+- **यङ्लुक् yaNluk (2.4.74):** intensive ya-lopa — `boBU`/`cekrI`/`jaNgam`/`pApac`/`jaNGan` stems (parasmai, vs yaṆ `boBUya` ātmanepada); `derived::yan_luk_stem` + `kartari` `"yaNluk"` for lat/lun/ashir/lit; `lib.rs` derivation doc updated; new `yan_luk` test; 96 tests clean — pushed.
 
 ## 2026-08-31
 
