@@ -291,6 +291,8 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         for ((ending, l), table) in &paradigms {
             // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if l != linga { continue; }
+            // त्रिंशत्/चत्वारिंशत्/पञ्चाशत् — त-anta संख्या, not शतृ `at` (भवन्).
+            if ending == "at" && cand.ends_with("Sat") { continue; }
             // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if cand.ends_with(ending) && ending.len() > best_len {
                 best = Some((ending.clone(), table.clone()));
@@ -600,5 +602,26 @@ mod tests {
         let r = generate("rAma", "pum").expect("rAma");
         has(&r, "zazWI", "rAmARAm");
         has(&r, "tfIyA", "rAmeRa");
+    }
+
+    #[test]
+    fn sankhya_20_30_100_noun() {
+        // विंशति i-stem स्त्री; त्रिंशत् त-anta (not शतृ *triMSAn); शत a-stem नपुं.
+        let v = generate("viMSati", "stri").expect("viMSati");
+        has(&v, "prathamA", "viMSatiH");
+        has(&v, "dvitIyA", "viMSatim");
+        has(&v, "saptamI", "viMSatO");
+        let t = generate("triMSat", "stri").expect("triMSat");
+        has(&t, "prathamA", "triMSat");
+        has(&t, "dvitIyA", "triMSatam");
+        has(&t, "tfIyA", "triMSatA");
+        assert!(!t.declension.get("prathamA").unwrap().iter().any(|x| x.ends_with("An")));
+        let c = generate("catvAriMSat", "stri").expect("40");
+        has(&c, "prathamA", "catvAriMSat");
+        let s = generate("Sata", "nap").expect("Sata");
+        has(&s, "prathamA", "Satam");
+        has(&s, "prathamA", "SatAni");
+        let z = generate("zazwi", "stri").expect("zazwi");
+        has(&z, "prathamA", "zazwiH");
     }
 }
