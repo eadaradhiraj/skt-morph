@@ -686,6 +686,9 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "skan" {
         return "skAta".into(); // स्कात
     }
+    // क्षण् + क्त is सेट् → क्षणित? Actually kzaN is सेट्, not anit — keep kzaRita via it path
+    // sūtra: kzaN is सेट्, so kta is kzaRita not kZAta; future devs: do not add kZAta special for kzaN
+    // Extreme: keep kzaRita (via takes_it_nistha) — no special needed
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
