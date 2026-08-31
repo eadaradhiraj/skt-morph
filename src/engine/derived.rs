@@ -34,12 +34,125 @@ fn palatalize_kuho(c: char) -> char {
     }
 }
 
-fn abhyasa_i(root: &str) -> String {
-    let Some(c0) = root.chars().next() else {
-        return "i".into();
+fn is_sar(c: char) -> bool {
+    matches!(c, 's' | 'S' | 'z')
+}
+
+fn is_khay(c: char) -> bool {
+    matches!(c, 'k' | 'K' | 'c' | 'C' | 'w' | 'W' | 't' | 'T' | 'p' | 'P')
+}
+
+fn first_abhyasa_cons(root: &str) -> char {
+    let chars: Vec<char> = root.chars().take_while(|&c| is_cons(c)).collect();
+    let c0 = if chars.len() >= 2 && is_sar(chars[0]) && is_khay(chars[1]) {
+        chars[1]
+    } else {
+        chars.first().copied().unwrap_or('i')
     };
-    let c = palatalize_kuho(deaspirate(c0));
-    format!("{c}i")
+    palatalize_kuho(deaspirate(c0))
+}
+
+fn last_vowel(root: &str) -> Option<char> {
+    root.chars().rev().find(|c| !is_cons(*c))
+}
+
+/// सन् अभ्यास: u-roots keep u (बुभूष, शुश्रूष); else i (चिकीर्ष, जिगमिष). 7.4.59/62.
+fn san_abhyasa(root: &str) -> String {
+    let c = first_abhyasa_cons(root);
+    let v = match last_vowel(root) {
+        Some('u') | Some('U') | Some('o') => 'u',
+        _ => 'i',
+    };
+    format!("{c}{v}")
+}
+
+fn ruki_stutva(s: &str) -> String {
+    let chars: Vec<char> = s.chars().collect();
+    let mut out: Vec<char> = Vec::with_capacity(chars.len());
+    for (i, &ch) in chars.iter().enumerate() {
+        let mut c = ch;
+        if c == 's'
+            && i > 0
+            && matches!(chars[i - 1], 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r')
+        {
+            c = 'z';
+        }
+        if matches!(c, 't' | 'T' | 'd' | 'D' | 'n') && out.last() == Some(&'z') {
+            c = match c {
+                't' => 'w',
+                'T' => 'W',
+                'd' => 'q',
+                'D' => 'Q',
+                'n' => 'R',
+                x => x,
+            };
+        }
+        out.push(c);
+    }
+    out.into_iter().collect()
+}
+
+fn thematic_sa(body: &str) -> String {
+    let joined = crate::engine::join::internal_sandhi(body, "sa");
+    if joined.ends_with('a') {
+        joined
+    } else {
+        format!("{joined}a")
+    }
+}
+
+/// 7.4.54 सनि मीमाघुर्भलभशकपतपदामच इस् (no अभ्यास). 2.4.55 दाधा घ्वदाप्; आप् ईप्स.
+fn san_is_adesha(root: &str) -> Option<String> {
+    match root {
+        "labh" => Some("lipsa".into()),
+        "pat" => Some("pitsa".into()),
+        "pad" => Some("pitsa".into()),
+        "Sak" => Some("Sikza".into()),
+        "dA" => Some("ditsa".into()),
+        "DA" => Some("Ditsa".into()),
+        "Ap" => Some("Ipsa".into()),
+        "mA" => Some("mitsa".into()),
+        "mI" => Some("mitsa".into()),
+        _ => None,
+    }
+}
+
+/// सन् present aṅga.
+pub fn san_stem(root: &str) -> String {
+    if let Some(s) = san_is_adesha(root) {
+        return s;
+    }
+    // 7.3.54/32 हन् → जिघांस
+    if root == "han" {
+        return "jiGAMsa".into();
+    }
+    // 6.1.16 ग्रह् → जिघृक्ष
+    if root == "grah" {
+        return "jiGfkza".into();
+    }
+    let abh = san_abhyasa(root);
+    // ऋ-final: चिकीर्ष (ṛ → ईर् before sa)
+    if root.ends_with('f') || root.ends_with('F') {
+        let onset: String = root.chars().take_while(|&c| is_cons(c)).collect();
+        return ruki_stutva(&format!("{abh}{onset}Irza"));
+    }
+    let last = root.chars().last();
+    if last.is_some_and(|c| matches!(c, 'A' | 'i' | 'I' | 'u' | 'U' | 'e' | 'o')) {
+        // 6.4.2-like: श्रु → श्रूष्
+        let anga = if last == Some('u') {
+            let mut s = root.to_string();
+            s.pop();
+            s.push('U');
+            s
+        } else {
+            root.to_string()
+        };
+        return ruki_stutva(&format!("{abh}{}", thematic_sa(&anga)));
+    }
+    if crate::engine::it::anit_sya(root) && last_is_cons(root) {
+        return format!("{abh}{}", thematic_sa(root));
+    }
+    ruki_stutva(&format!("{abh}{root}iza"))
 }
 
 fn abhyasa_guna(root: &str) -> String {
@@ -111,41 +224,8 @@ pub fn nic_stem(root: &str) -> String {
     }
 }
 
-/// सन् present aṅga. बुभूष, चिकीर्ष, जिगमिष, जिघांस, दित्स.
-pub fn san_stem(root: &str) -> String {
-    match root {
-        "BU" => "buBUza".into(),
-        "kf" => "cikIrza".into(),
-        "gam" => "jigamiza".into(),
-        "nI" => "ninIza".into(),
-        "han" => "jiGAMsa".into(),
-        "dA" => "ditsa".into(),
-        "pA" => "pipAsa".into(),
-        "sTA" => "tizWAsa".into(),
-        "vac" => "vivakza".into(),
-        "pac" => "pipakza".into(),
-        "pat" => "pitsa".into(),
-        "jYA" => "jijYAsa".into(),
-        "dfS" => "didfkza".into(),
-        "grah" => "jiGfkza".into(),
-        "BI" => "biBIza".into(),
-        "labh" => "lipsa".into(),
-        "Sru" => "SuSrUza".into(),
-        _ if crate::engine::it::anit_sya(root) && last_is_cons(root) => {
-            let abh = abhyasa_i(root);
-            let joined = crate::engine::join::internal_sandhi(root, "sa");
-            let body = if joined.ends_with('a') {
-                joined
-            } else {
-                format!("{joined}a")
-            };
-            format!("{abh}{body}")
-        }
-        _ => {
-            let abh = abhyasa_i(root);
-            format!("{abh}{root}iza")
-        }
-    }
+fn abhyasa_i(root: &str) -> String {
+    format!("{}i", first_abhyasa_cons(root))
 }
 
 /// यङ् present aṅga (आत्मने). बोभूय, चेक्रीय, जङ्गम्य.
@@ -375,6 +455,27 @@ mod tests {
         assert!(f.iter().any(|x| x == "kriyate"), "{:?}", f);
         let f = kartari("BU", "karma", "lat", 1, 1, "A").unwrap();
         assert!(f.iter().any(|x| x == "BUyate"), "{:?}", f);
+        assert_eq!(san_stem("BU"), "buBUza");
+        assert_eq!(san_stem("kf"), "cikIrza");
+        assert_eq!(san_stem("Sru"), "SuSrUza");
+        assert_eq!(san_stem("nI"), "ninIza");
+        assert_eq!(san_stem("dA"), "ditsa");
+        assert_eq!(san_stem("pA"), "pipAsa");
+        assert_eq!(san_stem("sTA"), "tizWAsa");
+        assert_eq!(san_stem("labh"), "lipsa");
+        assert_eq!(san_stem("pat"), "pitsa");
+        assert_eq!(san_stem("Sak"), "Sikza");
+        assert_eq!(san_stem("Ap"), "Ipsa");
+        assert_eq!(san_stem("gam"), "jigamiza");
+        assert_eq!(san_stem("pac"), "pipakza");
+        assert_eq!(san_stem("jYA"), "jijYAsa");
+        assert_eq!(san_stem("BI"), "biBIza");
+        let f = kartari("Apx", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "Ipsati"), "{:?}", f);
+        let f = kartari("Sru", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "SuSrUzati"), "{:?}", f);
+        let f = kartari("zWA", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "tizWAsati"), "{:?}", f);
     }
 
     #[test]

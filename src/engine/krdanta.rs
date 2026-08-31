@@ -75,39 +75,66 @@ fn kta_base(dhatu: &str) -> String {
             r = core.to_string();
         }
     }
+    // 6.1.15 वचिस्वपियजादीनां
+    let r = match r.as_str() {
+        "vac" => "uc".into(),
+        "yaj" => "ij".into(),
+        "vap" => "up".into(),
+        "vah" => "uh".into(),
+        "svap" | "zvap" => "sup".into(),
+        other => other.to_string(),
+    };
+    // SLP1 भ is B; older "labh" = लभ्
+    let r = if r.ends_with("bh") {
+        format!("{}B", &r[..r.len() - 2])
+    } else {
+        r
+    };
     match r.as_str() {
-        "gam" => "gata".into(),
-        "han" => "hata".into(),
-        "vac" => "ukta".into(),
-        "yaj" => "izwa".into(),
-        "vap" => "upta".into(),
-        "vas" => "uzita".into(),
+        "gam" | "han" => format!("{}ta", &r[..r.len() - 1]), // 6.4.37 न्-lopa
         "dA" => "datta".into(),
         "DA" => "hita".into(),
         "sTA" => "sTita".into(),
         "pA" => "pIta".into(),
-        "nI" | "i" => format!("{r}ta"),
-        "kf" => "kfta".into(),
-        "BU" => "BUta".into(),
         "grah" => "gfhIta".into(),
-        "Sru" => "Sruta".into(),
-        "pat" => "patita".into(),
-        "dfS" => "dfzwa".into(),
-        "naS" => "nazwa".into(),
-        "vah" => "UQa".into(),
-        "guh" => "gUQa".into(),
-        "dah" => "dagDa".into(),
-        "labh" => "labDa".into(),
-        "bandh" => "badDa".into(),
-        "svap" => "supta".into(),
-        "sfj" => "sfzwa".into(),
-        "kfz" => "kfzwa".into(),
+        "vas" => "uzita".into(),
         "jYA" => "jYAta".into(),
-        "lih" => "lIQa".into(),
-        "duh" => "dugDa".into(),
+        "pat" => "patita".into(),
+        "bandh" => "badDa".into(),
+        // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः
+        "sfj" | "mfj" | "Brasj" | "vraSc" => {
+            let mut s = r.clone();
+            s.pop();
+            format!("{s}zwa")
+        }
+        "ij" => "izwa".into(),
+        _ if r.ends_with('h')
+            && r.chars().rev().nth(1).is_some_and(|c| "aAiIuUfFeEoO".contains(c)) =>
+        {
+            kta_ho_dha(&r)
+        }
         _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
         _ => internal_sandhi(&r, "ta"),
     }
+}
+
+/// 8.2.31 हो ढः; 8.2.32 दादेर्धातोर्घः; 6.3.111 ढ्रलोपे lengthen.
+fn kta_ho_dha(root: &str) -> String {
+    if root.starts_with('d') {
+        return internal_sandhi(root, "ta");
+    }
+    let mut body: String = root.chars().take(root.chars().count() - 1).collect();
+    if let Some(v) = body.chars().last() {
+        let long = match v {
+            'i' => 'I',
+            'u' => 'U',
+            'a' => 'A',
+            other => other,
+        };
+        body.pop();
+        body.push(long);
+    }
+    format!("{body}Qa")
 }
 
 fn ktva_base(dhatu: &str) -> String {

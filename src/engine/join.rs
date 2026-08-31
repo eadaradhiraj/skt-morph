@@ -101,11 +101,13 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         ('c', 't') | ('j', 't') => format!("{}kt{}", stem_body, &suffix[1..]),
         ('c', 'T') | ('j', 'T') => format!("{}kT{}", stem_body, &suffix[1..]),
         ('c', 's') | ('j', 's') | ('S', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
-        ('z', 't') => format!("{}zw{}", stem_body, &suffix[1..]),
-        ('z', 'T') => format!("{}zW{}", stem_body, &suffix[1..]),
+        ('z', 't') | ('S', 't') => format!("{}zw{}", stem_body, &suffix[1..]),
+        ('z', 'T') | ('S', 'T') => format!("{}zW{}", stem_body, &suffix[1..]),
         ('h', 't') => format!("{}gD{}", stem_body, &suffix[1..]),
         ('h', 'T') => format!("{}gD{}", stem_body, &suffix[1..]),
         ('h', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
+        ('B', 't') => format!("{}bD{}", stem_body, &suffix[1..]),
+        ('B', 'T') => format!("{}bD{}", stem_body, &suffix[1..]),
         _ => format!("{}{}", stem, suffix),
     }
 }
