@@ -77,6 +77,14 @@ fn luk(root: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
     }
 }
 
+pub(crate) fn cang_kartari(stem: &str, purusha: u8, vacana: u8, pada: &str) -> Vec<String> {
+    if pada == "A" {
+        ang_atmane(stem, purusha, vacana)
+    } else {
+        ang_thematic(stem, purusha, vacana)
+    }
+}
+
 fn ang_thematic(stem: &str, purusha: u8, vacana: u8) -> Vec<String> {
     let a = with_augment(stem);
     match (purusha, vacana) {
@@ -110,7 +118,7 @@ fn ang_atmane(stem: &str, purusha: u8, vacana: u8) -> Vec<String> {
 }
 
 /// सिच् + ईट् parasmai: अकार्षीत्, अनैषीत्, अवधीत्.
-fn sic_it_p(body: &str, purusha: u8, vacana: u8) -> Vec<String> {
+pub(crate) fn sic_it_p(body: &str, purusha: u8, vacana: u8) -> Vec<String> {
     let a = match body.chars().next() {
         Some(c) if is_vowel(c) => body.to_string(),
         _ => with_augment(body),
@@ -130,7 +138,7 @@ fn sic_it_p(body: &str, purusha: u8, vacana: u8) -> Vec<String> {
 }
 
 /// आत्मने सिच्: सेट् अभविष्ट; तनादि लुक् अकृत.
-fn sic_a(body: &str, purusha: u8, vacana: u8) -> Vec<String> {
+pub(crate) fn sic_a(body: &str, purusha: u8, vacana: u8) -> Vec<String> {
     let a = with_augment(body);
     match (purusha, vacana) {
         (1, 1) => vec![internal_sandhi(&a, "ta")],

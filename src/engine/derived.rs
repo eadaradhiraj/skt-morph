@@ -167,6 +167,38 @@ pub fn karma_stem(root: &str) -> String {
     }
 }
 
+/// 7.4.1 णौ चङ्युपधाया ह्रस्वः: णिच् aṅga without अय, then चङ् reduplication (7.4.93–94).
+fn nic_shortened(root: &str) -> String {
+    match root {
+        "BU" => "Bav".into(),
+        "kf" => "kar".into(),
+        "nI" => "nay".into(),
+        "dA" => "dap".into(),
+        "DA" => "Dap".into(),
+        "sTA" => "sTap".into(),
+        "pA" => "pay".into(),
+        "han" => "Gat".into(),
+        "i" => "gam".into(),
+        "Sru" => "Srav".into(),
+        "vac" => "vac".into(),
+        "pat" => "pat".into(),
+        "grah" => "grah".into(),
+        "dfS" => "dfS".into(),
+        _ if is_mit(root) => root.to_string(),
+        r if r.ends_with('A') => format!("{}p", &r[..r.len() - 1]),
+        r if r.ends_with('I') || r.ends_with('i') => format!("{}ay", &r[..r.len() - 1]),
+        r if r.ends_with('U') || r.ends_with('u') => apply_guna_to_stem(r),
+        r if r.ends_with('f') || r.ends_with('F') => apply_guna_to_stem(r),
+        r => r.to_string(),
+    }
+}
+
+fn nic_cang_stem(root: &str) -> String {
+    let inner = nic_shortened(root);
+    let abh = abhyasa_i(&inner).chars().next().map(|c| format!("{c}I")).unwrap_or_else(|| "I".into());
+    format!("{abh}{inner}")
+}
+
 fn inflect(stem: &str, family: &str, pada: &str, purusha: u8, vacana: u8) -> Vec<String> {
     let (use_stem, aug) = match family {
         "lat" | "lot" => (stem.to_string(), None),
@@ -212,9 +244,6 @@ pub fn kartari(
     vacana: u8,
     pada: &str,
 ) -> Option<Vec<String>> {
-    if matches!(family, "lit" | "lun" | "ashir") {
-        return None;
-    }
     let root = root_of(dhatu);
     let (stem, force_pada) = match kind {
         "Ric" | "nic" | "R" => (nic_stem(&root), None),
@@ -224,6 +253,40 @@ pub fn kartari(
         _ => return None,
     };
     let pada = force_pada.unwrap_or(pada);
+    if family == "ashir" {
+        if matches!(kind, "karma" | "yak" | "BAve") {
+            return None;
+        }
+        return crate::engine::ashir::from_anga(&stem, purusha, vacana, pada);
+    }
+    if family == "lit" {
+        if matches!(kind, "karma" | "yak" | "BAve") {
+            return None;
+        }
+        let forms = crate::engine::lit::am_forms(&stem, purusha, vacana, pada);
+        return if forms.is_empty() { None } else { Some(forms) };
+    }
+    if family == "lun" {
+        let forms = match kind {
+            "Ric" | "nic" | "R" => {
+                crate::engine::lun::cang_kartari(&nic_cang_stem(&root), purusha, vacana, pada)
+            }
+            "san" => {
+                let base = stem.strip_suffix('a').unwrap_or(&stem);
+                if pada == "A" {
+                    crate::engine::lun::sic_a(base, purusha, vacana)
+                } else {
+                    crate::engine::lun::sic_it_p(base, purusha, vacana)
+                }
+            }
+            "yaN" | "yan" => {
+                let base = stem.strip_suffix('a').unwrap_or(&stem);
+                crate::engine::lun::cang_kartari(base, purusha, vacana, "A")
+            }
+            _ => return None,
+        };
+        return if forms.is_empty() { None } else { Some(forms) };
+    }
     let forms = inflect(&stem, family, pada, purusha, vacana);
     if forms.is_empty() {
         None
@@ -263,5 +326,30 @@ mod tests {
         assert!(f.iter().any(|x| x == "kriyate"), "{:?}", f);
         let f = kartari("BU", "karma", "lat", 1, 1, "A").unwrap();
         assert!(f.iter().any(|x| x == "BUyate"), "{:?}", f);
+    }
+
+    #[test]
+    fn nic_lit_am_lun_cang() {
+        let f = kartari("BU", "Ric", "lit", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "BAvayAYcakAra"), "{:?}", f);
+        let f = kartari("qukfY", "Ric", "lit", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "kArayAYcakre"), "{:?}", f);
+        let f = kartari("BU", "san", "lit", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "buBUzAYcakAra"), "{:?}", f);
+        assert_eq!(nic_cang_stem("kf"), "cIkar");
+        assert_eq!(nic_cang_stem("BU"), "bIBav");
+        assert_eq!(nic_cang_stem("gam"), "jIgam");
+        let f = kartari("qukfY", "Ric", "lun", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "acIkarat" || x == "acIkarad"), "{:?}", f);
+        let f = kartari("BU", "Ric", "lun", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "abIBavat" || x == "abIBavad"), "{:?}", f);
+        let f = kartari("gamx", "Ric", "lun", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "ajIgamat" || x == "ajIgamad"), "{:?}", f);
+        let f = kartari("BU", "Ric", "ashir", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "BAvayAt" || x == "BAvayAd"), "{:?}", f);
+        let f = kartari("BU", "san", "lun", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "abuBUzIt" || x == "abuBUzId"), "{:?}", f);
+        let f = kartari("BU", "yaN", "lun", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "aboBUyata"), "{:?}", f);
     }
 }

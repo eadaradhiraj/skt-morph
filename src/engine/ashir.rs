@@ -92,6 +92,30 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
     Some(vec![form])
 }
 
+/// णिच्/सन् aṅga + यासुट् / सीयुट्. `anga` may end in a (भावय → भावयात्).
+pub(crate) fn from_anga(anga: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<String>> {
+    let end = endings(pada, purusha, vacana)?;
+    let base = anga.strip_suffix('a').unwrap_or(anga);
+    if pada == "A" {
+        let st = format!("{base}iz");
+        return Some(vec![format!("{st}{end}")]);
+    }
+    let form = if base.ends_with('y') && end.starts_with('y') {
+        format!("{}{}", base, &end[1..])
+    } else {
+        format!("{base}{end}")
+    };
+    if (purusha, vacana) == (1, 1) {
+        let alt = if form.ends_with('t') {
+            format!("{}d", &form[..form.len() - 1])
+        } else {
+            format!("{form}d")
+        };
+        return Some(vec![form, alt]);
+    }
+    Some(vec![form])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

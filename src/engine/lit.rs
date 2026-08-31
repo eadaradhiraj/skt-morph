@@ -21,7 +21,7 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
         other => other.to_string(),
     };
     if takes_am(&root) {
-        return Some(am_paradigm(&root, purusha, vacana, pada));
+        return Some(am_forms(&root, purusha, vacana, pada));
     }
     let list = all_angas(&root)?;
     let mut out = Vec::new();
@@ -184,8 +184,10 @@ fn join_am(am: &str, aux: &str) -> String {
     format!("{am}{aux}")
 }
 
-fn am_paradigm(root: &str, purusha: u8, vacana: u8, pada: &str) -> Vec<String> {
-    let am = format!("{root}Am");
+/// णिच्/सन्/यङ् लिट्: aṅga + आम् + कृ/अस्/भू. `anga` may end in a (भावय → भावयाम्).
+pub(crate) fn am_forms(anga: &str, purusha: u8, vacana: u8, pada: &str) -> Vec<String> {
+    let base = anga.strip_suffix('a').unwrap_or(anga);
+    let am = format!("{base}Am");
     let mut out = Vec::new();
     let push_aux = |out: &mut Vec<String>, aux_dhatu: &str, p: &str| {
         if let Some(forms) = kartari(aux_dhatu, purusha, vacana, p) {

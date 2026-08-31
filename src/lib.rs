@@ -62,7 +62,7 @@ pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &st
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// तद्धित (त्व / तल् / मतुप् / मयट् / इन्)
+/// तद्धित (त्व / तल् / मतुप् / मयट् / इन् / तरप् / तमप् / छ / क)
 #[wasm_bindgen]
 pub fn generate_taddhita(pratipadika: &str, pratyaya: &str) -> JsValue {
     let result = engine::taddhita::generate(pratipadika, pratyaya);

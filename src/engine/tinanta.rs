@@ -417,6 +417,14 @@ mod tests {
         assert!(f.iter().any(|x| x == "BAvayet" || x == "BAvayed"), "{:?}", f);
         let f = generate_all_derived("gam", "karma", "avidhilin", 1, 1, &[]);
         assert!(f.iter().any(|x| x == "gamyeta"), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "plit", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "BAvayAYcakAra"), "{:?}", f);
+        let f = generate_all_derived("qukfY", "Ric", "plun", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "acIkarat" || x == "acIkarad"), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "pashirling", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "BAvayAt" || x == "BAvayAd"), "{:?}", f);
+        let f = generate_all_derived("BU", "san", "plun", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "abuBUzIt" || x == "abuBUzId"), "{:?}", f);
     }
 
     #[test]

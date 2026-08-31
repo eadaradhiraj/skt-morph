@@ -1,4 +1,4 @@
-//! तद्धित (minimal Kaumudī set): त्व, तल्, मतुप्, मयट्, इन्.
+//! तद्धित (minimal Kaumudī set): त्व, तल्, मतुप्, मयट्, इन्, तरप्, तमप्, छ, क.
 #![allow(non_snake_case)]
 
 use serde::{Deserialize, Serialize};
@@ -41,6 +41,10 @@ pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
         }
         "mayaT" | "maya" => vec![format!("{s}maya")],
         "ini" | "in" => vec![format!("{}in", a_stem_base(p))],
+        "tarap" | "tara" => vec![format!("{s}tara")],
+        "tamap" | "tama" => vec![format!("{s}tama")],
+        "Ca" | "Iya" | "cha" => vec![format!("{}Iya", a_stem_base(p))],
+        "ka" => vec![format!("{s}ka")],
         _ => vec![],
     }
 }
@@ -63,5 +67,9 @@ mod tests {
         assert_eq!(derive("rAmaH", "tal"), vec!["rAmatA"]);
         assert_eq!(derive("SrI", "matup"), vec!["SrImat"]);
         assert_eq!(derive("daRqa", "ini"), vec!["daRqin"]);
+        assert_eq!(derive("rAma", "tarap"), vec!["rAmatara"]);
+        assert_eq!(derive("rAma", "tamap"), vec!["rAmatama"]);
+        assert_eq!(derive("rAma", "Ca"), vec!["rAmIya"]);
+        assert_eq!(derive("rAma", "ka"), vec!["rAmaka"]);
     }
 }
