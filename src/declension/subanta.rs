@@ -321,6 +321,27 @@ fn decline_pathadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// 7.1.93 अनङ् सौ सखा; 7.1.92 सख्युरसम्बुद्धौ सख्युः; voc 7.3.109 सखे. Not i-stem *सखिः.
+fn decline_sakhi(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "saKi" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["saKA".into(), "saKAyO".into(), "saKAyaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["saKAyam".into(), "saKAyO".into(), "saKIn".into()]);
+    decl.insert("tfIyA".into(), vec!["saKyA".into(), "saKiByAm".into(), "saKiBiH".into()]);
+    decl.insert("caturTI".into(), vec!["saKye".into(), "saKiByAm".into(), "saKiByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["saKyuH".into(), "saKiByAm".into(), "saKiByaH".into()]);
+    decl.insert("zazWI".into(), vec!["saKyuH".into(), "saKyoH".into(), "saKInAm".into()]);
+    decl.insert("saptamI".into(), vec!["saKyO".into(), "saKyoH".into(), "saKizu".into()]);
+    decl.insert("samboDana".into(), vec!["saKe".into(), "saKAyO".into(), "saKAyaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -354,6 +375,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(decline_an(&cand, linga));
         }
         if let Some(d) = decline_pathadi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_sakhi(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -794,5 +818,23 @@ mod tests {
         has(&r, "dvitIyA", "fBukzARam");
         has(&r, "tfIyA", "fBukzA");
         has(&r, "saptamI", "fBukzizu");
+    }
+
+    #[test]
+    fn sakhi_sakha_not_i_stem() {
+        // 7.1.93 सखा; 7.1.92 सख्युः; voc सखे. Not *सखिः.
+        let s = generate("saKi", "pum").expect("saKi");
+        has(&s, "prathamA", "saKA");
+        has(&s, "prathamA", "saKAyO");
+        has(&s, "prathamA", "saKAyaH");
+        has(&s, "dvitIyA", "saKAyam");
+        has(&s, "dvitIyA", "saKIn");
+        has(&s, "tfIyA", "saKyA");
+        has(&s, "tfIyA", "saKiByAm");
+        has(&s, "paYcamI", "saKyuH");
+        has(&s, "zazWI", "saKInAm");
+        has(&s, "saptamI", "saKyO");
+        has(&s, "saptamI", "saKizu");
+        has(&s, "samboDana", "saKe");
     }
 }
