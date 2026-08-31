@@ -183,7 +183,11 @@ fn kta_ho_dha(root: &str) -> String {
     format!("{body}Qa")
 }
 
-/// 7.4.40 द्यतिस्यतिमास्थामित्ति किति; 7.4.42 दधातेर्हिः; 7.4.46 दो दद् घोः; 6.4.37 न्-lopa.
+/// 7.4.40 द्यतिस्यतिमास्थामित्ति किति — दा/धा/स्था/मा/पा → इत्त् on कित् (क्त/क्तिन्).
+/// 7.4.42 दधातेर्हिः — घु `धा` (SLP1 `DA`) on कित् → `हि`; निष्ठा `हि+त` → `हित` (8.2.31 ढत्व not triggered as no `ह्`-`त` jhal).
+/// 7.4.46 दो दद् घोः — `दा` (SLP1 `dA`, दाण्) on कित् → `दद्`; `दद्+त` → `दत्त` (8.2.30 `द्+त` → `त्त`).
+/// 6.4.37 न्-lopa — `गम्/हन्` → `ग/ह` before कित्; `बन्ध्` → `बध्`.
+/// Keeps SLP1 `DA`=धा vs `dA`=दा distinct — critical for `हित` vs `दत्त`.
 fn kit_anga(root: &str) -> String {
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match root {
@@ -654,7 +658,11 @@ mod tests {
         assert_eq!(derive("gam", "kta"), vec!["gata"]);
         assert_eq!(derive("qukfY", "kta"), vec!["kfta"]);
         assert_eq!(derive("vaca", "kta"), vec!["ukta"]);
-        assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
+        // 7.4.46 दा → दत्त vs 7.4.42 धा → हित — SLP1 dA (द) vs DA (ध) distinct.
+        assert_eq!(derive("qudAY", "kta"), vec!["datta"]); // दाण्/दा
+        assert_eq!(derive("quDAY", "kta"), vec!["hita"]); // धेट्/धा — 7.4.42
+        assert_eq!(derive("dA", "kta"), vec!["datta"]);
+        assert_eq!(derive("DA", "kta"), vec!["hita"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
