@@ -83,6 +83,12 @@ pub fn generate_krdanta_with_prefix(dhatu: &str, pratyaya: &str, prefixes: &str)
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
+/// लिङ्गs this kṛt takes (`pum`/`stri`/`nap`). Empty array = अव्यय.
+#[wasm_bindgen]
+pub fn krdanta_lingas(pratyaya: &str) -> JsValue {
+    serde_wasm_bindgen::to_value(engine::krdanta::lingas(pratyaya)).unwrap_or(JsValue::NULL)
+}
+
 /// Decline a kṛdanta where it takes सुप् (क्त, शतृ, तृच्, …). Avyaya (क्त्वा, तुमुन्, ल्यप्) → null.
 #[wasm_bindgen]
 pub fn generate_krdanta_declension(dhatu: &str, pratyaya: &str, linga: &str, prefixes: &str) -> JsValue {

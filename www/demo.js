@@ -9,6 +9,7 @@ import init, {
   generate_krdanta,
   generate_krdanta_with_prefix,
   generate_krdanta_declension,
+  krdanta_lingas,
 } from "../pkg/skt_morph.js";
 import { toSlp1, toDeva, prefixesToSlp1, formsToDeva } from "./translit.js";
 import * as L from "./labels.js";
@@ -320,6 +321,34 @@ document.getElementById("btn-noun").onclick = () => {
   renderDeclension(res);
 };
 
+function asList(v) {
+  if (!v) return [];
+  if (Array.isArray(v)) return [...v];
+  if (typeof v.length === "number") return Array.from(v);
+  return [];
+}
+
+function syncKrdLinga() {
+  const p = document.getElementById("pratyaya").value;
+  const sel = document.getElementById("krd-linga");
+  const allowed = asList(krdanta_lingas(p));
+  const labels = { pum: "पुंलिङ्ग", stri: "स्त्रीलिङ्ग", nap: "नपुंसकलिङ्ग" };
+  if (allowed.length === 0) {
+    sel.hidden = true;
+    sel.innerHTML = "";
+    return;
+  }
+  const prev = sel.value;
+  sel.hidden = false;
+  sel.innerHTML = allowed
+    .map((l) => `<option value="${l}">${labels[l] || l}</option>`)
+    .join("");
+  if (allowed.includes(prev)) sel.value = prev;
+}
+
+document.getElementById("pratyaya").onchange = syncKrdLinga;
+syncKrdLinga();
+
 document.getElementById("btn-krdanta").onclick = () => {
   const d = dhatuQuery();
   const p = document.getElementById("pratyaya").value;
@@ -333,9 +362,9 @@ document.getElementById("btn-krdanta").onclick = () => {
         `<pre>${esc(strfy(res))}</pre>`;
       return;
     }
-    const indecl = ["ktvA", "lyap", "tumun", "Ramul", "am"];
+    const allowed = asList(krdanta_lingas(p));
     let html = `<div>रूप: <b>${esc(formsToDeva(res.forms).join(", "))}</b> (${esc(toDeva(d))} + ${esc(L.pratyaya(p))})</div>`;
-    if (indecl.includes(p)) {
+    if (allowed.length === 0) {
       html += '<div class="hint">अव्यय — न सुबन्तम्</div>';
     } else {
       const linga = document.getElementById("krd-linga").value;

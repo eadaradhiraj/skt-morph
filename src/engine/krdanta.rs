@@ -198,7 +198,20 @@ pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[Str
 }
 
 pub fn is_avyaya(pratyaya: &str) -> bool {
-    matches!(pratyaya, "ktvA" | "lyap" | "tumun" | "Ramul" | "am" | "gsnu")
+    matches!(pratyaya, "ktvA" | "lyap" | "tumun" | "Ramul" | "am")
+}
+
+/// लिङ्गs this kṛt takes. Empty = अव्यय (no सुप्).
+pub fn lingas(pratyaya: &str) -> &'static [&'static str] {
+    if is_avyaya(pratyaya) {
+        return &[];
+    }
+    match pratyaya {
+        "ktin" => &["stri"],
+        "lyuw" | "lyu" => &["nap"],
+        "GaY" => &["pum"],
+        _ => &["pum", "stri", "nap"],
+    }
 }
 
 fn is_at_participle(pratyaya: &str) -> bool {
@@ -225,8 +238,8 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
     if linga == "stri"
         && matches!(
             pratyaya,
-            "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "lyuw" | "lyu" | "Rvul" | "vun"
-                | "ac" | "GaY" | "anIya"
+            "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
+                | "yat" | "Ryat"
         )
     {
         if let Some(base) = form.strip_suffix('a') {
@@ -254,14 +267,14 @@ fn satr_nap(stem: &str) -> Option<crate::declension::subanta::Declension> {
     Some(d)
 }
 
-/// सुबन्त of a kṛdanta pratipadika. `None` for अव्यय.
+/// सुबन्त of a kṛdanta pratipadika. `None` for अव्यय or a लिङ्ग the kṛt does not take.
 pub fn decline(
     dhatu_query: &str,
     pratyaya: &str,
     linga: &str,
     prefixes: &[String],
 ) -> Option<crate::declension::subanta::Declension> {
-    if is_avyaya(pratyaya) {
+    if !lingas(pratyaya).iter().any(|&l| l == linga) {
         return None;
     }
     let res = generate_with_prefixes(dhatu_query, pratyaya, prefixes);
@@ -437,5 +450,24 @@ mod tests {
         let d = decline("gam", "ktavatu", "pum", &[]).expect("gatavAn");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "gatavAn"), "{:?}", pr);
+    }
+
+    #[test]
+    fn krdanta_lingas_by_pratyaya() {
+        assert!(lingas("lyap").is_empty());
+        assert!(lingas("ktvA").is_empty());
+        assert!(lingas("tumun").is_empty());
+        assert_eq!(lingas("lyuw"), &["nap"]);
+        assert_eq!(lingas("ktin"), &["stri"]);
+        assert_eq!(lingas("GaY"), &["pum"]);
+        assert_eq!(lingas("kta"), &["pum", "stri", "nap"]);
+        assert!(decline("qukfY", "lyuw", "pum", &[]).is_none());
+        assert!(decline("qukfY", "lyuw", "stri", &[]).is_none());
+        let d = decline("qukfY", "lyuw", "nap", &[]).expect("karaRam");
+        assert_eq!(d.linga, "nap");
+        assert!(decline("qukfY", "ktin", "pum", &[]).is_none());
+        let d = decline("qukfY", "ktin", "stri", &[]).expect("kfti");
+        assert_eq!(d.stem, "kfti");
+        assert!(decline("BU", "lyap", "nap", &[]).is_none());
     }
 }
