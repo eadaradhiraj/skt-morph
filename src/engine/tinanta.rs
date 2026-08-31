@@ -648,6 +648,10 @@ mod tests {
         assert!(f.iter().any(|x| x == "aduhata"), "{:?}", f);
         let f = generate_all("duha", "avidhilin", 1, 1);
         assert!(f.iter().any(|x| x == "duhIta"), "{:?}", f);
+        let f = generate_all("liha", "alot", 1, 1);
+        assert!(f.iter().any(|x| x == "lIQAm"), "{:?}", f);
+        let f = generate_all("liha", "alan", 1, 1);
+        assert!(f.iter().any(|x| x == "alIQa"), "{:?}", f);
         let f = generate_all("yu", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "yOti"), "{:?}", f);
         let f = generate_all("yA", "plat", 1, 1);

@@ -1584,6 +1584,9 @@ mod tests {
         assert_eq!(join_form("duha", "lang", "ata", 2, 3, None).as_deref(), Some("adugDa"));
         assert_eq!(join_form("duha", "lang", "TAH", 2, 1, None).as_deref(), Some("aDukzaTAH"));
         assert_eq!(join_form("duha", "vidhilin", "Ita", 1, 1, None).as_deref(), Some("duhIta"));
+        assert_eq!(join_form("liha", "lot", "tAm", 1, 1, None).as_deref(), Some("lIQAm"));
+        assert_eq!(join_form("liha", "lang", "ta", 1, 1, None).as_deref(), Some("alIQa"));
+        assert_eq!(join_form("liha", "vidhilin", "Ita", 1, 1, None).as_deref(), Some("lihIta"));
         assert_eq!(join_form("liha", "lat", "ti", 1, 1, None).as_deref(), Some("leQi"));
         assert_eq!(join_form("yu", "lat", "ti", 1, 1, None).as_deref(), Some("yOti"));
         assert_eq!(join_form("yu", "lat", "anti", 1, 3, None).as_deref(), Some("yuvanti"));
