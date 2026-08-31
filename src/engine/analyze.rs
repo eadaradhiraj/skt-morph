@@ -38,7 +38,8 @@ const LAKARAS: &[&str] = &[
 ];
 
 const KRTS: &[&str] = &[
-    "kta", "ktavatu", "Satf", "SAnac", "tumun", "ktvA", "lyap", "lyuw", "tavya", "anIyar", "Rvul", "tfc",
+    "kta", "ktavatu", "Satf", "SAnac", "tumun", "ktvA", "lyap", "lyuw", "tavya", "anIyar", "Rvul",
+    "tfc", "ktin", "GaY", "vun", "ukaY", "Ryat", "yat", "ac",
 ];
 
 fn push_form(map: &mut HashMap<String, Vec<Analysis>>, form: &str, a: Analysis) {

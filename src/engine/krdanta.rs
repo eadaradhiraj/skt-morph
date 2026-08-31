@@ -90,15 +90,10 @@ fn kta_base(dhatu: &str) -> String {
     } else {
         r
     };
+    let r = kit_anga(&r);
     match r.as_str() {
-        "gam" | "han" => format!("{}ta", &r[..r.len() - 1]), // 6.4.37 न्-lopa
-        "dA" => "datta".into(),
-        "DA" => "hita".into(),
-        "sTA" => "sTita".into(),
-        "pA" => "pIta".into(),
         "grah" => "gfhIta".into(),
         "vas" => "uzita".into(),
-        "jYA" => "jYAta".into(),
         "pat" => "patita".into(),
         "bandh" => "badDa".into(),
         // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः
@@ -135,6 +130,123 @@ fn kta_ho_dha(root: &str) -> String {
         body.push(long);
     }
     format!("{body}Qa")
+}
+
+/// 7.4.40 द्यतिस्यतिमास्थामित्ति किति; 7.4.42 दधातेर्हिः; 7.4.46 दो दद् घोः; 6.4.37 न्-lopa.
+fn kit_anga(root: &str) -> String {
+    match root {
+        "dA" => "dad".into(),
+        "DA" => "hi".into(),
+        "sTA" => "sTi".into(),
+        "mA" => "mi".into(),
+        "pA" => "pI".into(),
+        "gam" | "han" => root[..root.len() - 1].to_string(),
+        other => other.to_string(),
+    }
+}
+
+fn ktin_form(root: &str) -> String {
+    internal_sandhi(&kit_anga(root), "ti")
+}
+
+fn is_ac(c: char) -> bool {
+    matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
+}
+
+/// 7.2.115/116 वृद्धि (i/ī → ऐ, u/ū → औ, ṛ → आर्, a → आ).
+fn vrddhi_ac(root: &str) -> String {
+    let chars: Vec<char> = root.chars().collect();
+    for idx in (0..chars.len()).rev() {
+        let repl = match chars[idx] {
+            'a' => Some("A"),
+            'i' | 'I' | 'e' => Some("E"),
+            'u' | 'U' | 'o' => Some("O"),
+            'f' | 'F' => Some("Ar"),
+            _ => None,
+        };
+        if let Some(r) = repl {
+            let mut o = String::new();
+            o.extend(chars[..idx].iter().copied());
+            o.push_str(r);
+            o.extend(chars[idx + 1..].iter().copied());
+            return o;
+        }
+    }
+    root.to_string()
+}
+
+/// 7.3.52 चजोः कु घिण्ण्यतोः.
+fn cajo_ku(s: &str) -> String {
+    match s.chars().last() {
+        Some('c') => format!("{}k", &s[..s.len() - 1]),
+        Some('j') => format!("{}g", &s[..s.len() - 1]),
+        _ => s.to_string(),
+    }
+}
+
+/// 6.1.78 एचोऽयवायावः; 6.1.79 वान्तो यि प्रत्यये; 6.1.101 अकः सवर्णे दीर्घः.
+fn join_eco(stem: &str, suffix: &str) -> String {
+    let Some(s0) = suffix.chars().next() else {
+        return stem.to_string();
+    };
+    let Some(last) = stem.chars().last() else {
+        return suffix.to_string();
+    };
+    let body: String = stem.chars().take(stem.chars().count() - 1).collect();
+    if s0 == 'y' {
+        return match last {
+            'o' => format!("{body}av{suffix}"),
+            'O' => format!("{body}Av{suffix}"),
+            _ => format!("{stem}{suffix}"),
+        };
+    }
+    if !is_ac(s0) {
+        return format!("{stem}{suffix}");
+    }
+    match last {
+        'e' => format!("{body}ay{suffix}"),
+        'o' => format!("{body}av{suffix}"),
+        'E' => format!("{body}Ay{suffix}"),
+        'O' => format!("{body}Av{suffix}"),
+        'a' | 'A' if s0 == 'a' || s0 == 'A' => format!("{body}A{}", &suffix[s0.len_utf8()..]),
+        _ => format!("{stem}{suffix}"),
+    }
+}
+
+/// णित्/ञित् kṛt aṅga: 7.2.115 अचो ञ्णिति, 7.2.116 अत उपधायाः, 7.3.86 इगुपध गुण,
+/// 7.3.33 आतो युक्, 7.3.32/54 हन् → घात्.
+fn nit_krt_anga(root: &str, pratyaya: &str) -> String {
+    if root == "han" {
+        return "GAt".into();
+    }
+    let last = root.chars().last().unwrap_or('a');
+    let mut anga = if is_ac(last) {
+        if last == 'A' {
+            format!("{root}y")
+        } else {
+            vrddhi_ac(root)
+        }
+    } else {
+        match root.chars().rev().nth(1) {
+            Some('a') => vrddhi_ac(root),
+            Some('i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o') => apply_guna_to_stem(root),
+            _ => root.to_string(),
+        }
+    };
+    if matches!(pratyaya, "GaY" | "Ryat") {
+        anga = cajo_ku(&anga);
+    }
+    anga
+}
+
+fn nit_krt_form(root: &str, pratyaya: &str) -> String {
+    let suffix = match pratyaya {
+        "Rvul" => "aka",
+        "ukaY" => "uka",
+        "Ryat" => "ya",
+        _ => "a",
+    };
+    join_eco(&nit_krt_anga(root, pratyaya), suffix)
 }
 
 fn ktva_base(dhatu: &str) -> String {
@@ -293,7 +405,8 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         return vec![];
     }
     let (suffix, _sutras, mode) = rule.unwrap();
-    let guna = apply_guna_to_stem(&dhatu);
+    let root = surface_root(&dhatu);
+    let guna = apply_guna_to_stem(&root);
 
     let form = match mode {
         "present" => {
@@ -332,18 +445,19 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
             if pratyaya.starts_with("ktavatu") { format!("{base}vat") } else { base }
         }
         "guna" => {
-            let r = surface_root(&dhatu);
             match pratyaya {
-                "lyuw" | "lyu" => crate::engine::it::lyuw_form(&r),
-                "tfc" => crate::engine::it::tfc_form(&r),
-                "ktin" => format!("{}ti", r),
-                _ => format!("{}{}", guna, suffix),
+                "lyuw" | "lyu" => crate::engine::it::lyuw_form(&root),
+                "tfc" => crate::engine::it::tfc_form(&root),
+                "ktin" => ktin_form(&root),
+                "GaY" | "Rvul" | "ukaY" | "Ryat" => nit_krt_form(&root, pratyaya),
+                "yat" if root.ends_with('A') => format!("{}eya", &root[..root.len() - 1]),
+                _ => join_eco(&guna, suffix),
             }
         }
-        "guna_a" => format!("{}a", guna),
+        "guna_a" => join_eco(&guna, "a"),
         "guna_tum" => tum_base(&dhatu, &guna),
-        "guna_tavya" => crate::engine::it::tavya_form(&surface_root(&dhatu)),
-        "anIya" => crate::engine::it::anIya_form(&surface_root(&dhatu)),
+        "guna_tavya" => crate::engine::it::tavya_form(&root),
+        "anIya" => crate::engine::it::anIya_form(&root),
         "root" if pratyaya == "ktvA" => ktva_base(&dhatu),
         "root" => format!("{}{}", dhatu, suffix),
         "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap_or('a'), dhatu, suffix),
@@ -469,5 +583,46 @@ mod tests {
         let d = decline("qukfY", "ktin", "stri", &[]).expect("kfti");
         assert_eq!(d.stem, "kfti");
         assert!(decline("BU", "lyap", "nap", &[]).is_none());
+    }
+
+    #[test]
+    fn nit_krts_vrddhi_and_kitin() {
+        assert_eq!(derive("BU", "GaY"), vec!["BAva"]);
+        assert_eq!(derive("BU", "Rvul"), vec!["BAvaka"]);
+        assert_eq!(derive("BU", "vun"), vec!["Bavaka"]);
+        assert_eq!(derive("BU", "ukaY"), vec!["BAvuka"]);
+        assert_eq!(derive("BU", "Ryat"), vec!["BAvya"]);
+        assert_eq!(derive("BU", "yat"), vec!["Bavya"]);
+        assert_eq!(derive("RIY", "GaY"), vec!["nAya"]);
+        assert_eq!(derive("RIY", "Rvul"), vec!["nAyaka"]);
+        assert_eq!(derive("RIY", "vun"), vec!["nayaka"]);
+        assert_eq!(derive("qudAY", "GaY"), vec!["dAya"]);
+        assert_eq!(derive("qudAY", "Rvul"), vec!["dAyaka"]);
+        assert_eq!(derive("qudAY", "vun"), vec!["dAka"]);
+        assert_eq!(derive("qudAY", "yat"), vec!["deya"]);
+        assert_eq!(derive("tyaja", "GaY"), vec!["tyAga"]);
+        assert_eq!(derive("tyaja", "Ryat"), vec!["tyAgya"]);
+        assert_eq!(derive("tyaja", "Rvul"), vec!["tyAjaka"]);
+        assert_eq!(derive("qupacaz", "GaY"), vec!["pAka"]);
+        assert_eq!(derive("qupacaz", "Rvul"), vec!["pAcaka"]);
+        assert_eq!(derive("qupacaz", "Ryat"), vec!["pAkya"]);
+        assert_eq!(derive("qukfY", "GaY"), vec!["kAra"]);
+        assert_eq!(derive("qukfY", "Rvul"), vec!["kAraka"]);
+        assert_eq!(derive("qukfY", "vun"), vec!["karaka"]);
+        assert_eq!(derive("qukfY", "Ryat"), vec!["kArya"]);
+        assert_eq!(derive("hana", "GaY"), vec!["GAta"]);
+        assert_eq!(derive("hana", "Rvul"), vec!["GAtaka"]);
+        assert_eq!(derive("hana", "vun"), vec!["hanaka"]);
+        assert_eq!(derive("gam", "GaY"), vec!["gAma"]);
+        assert_eq!(derive("dfSir", "GaY"), vec!["darSa"]);
+        assert_eq!(derive("Sru", "Rvul"), vec!["SrAvaka"]);
+        assert_eq!(derive("Sru", "Ryat"), vec!["SrAvya"]);
+        assert_eq!(derive("gam", "ktin"), vec!["gati"]);
+        assert_eq!(derive("qudAY", "ktin"), vec!["datti"]);
+        assert_eq!(derive("tyaja", "ktin"), vec!["tyakti"]);
+        assert_eq!(derive("dfSir", "ktin"), vec!["dfzwi"]);
+        assert_eq!(derive("qukfY", "ktin"), vec!["kfti"]);
+        assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
+        assert_eq!(derive("zWA", "kta"), vec!["sTita"]);
     }
 }
