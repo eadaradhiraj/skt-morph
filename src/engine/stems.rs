@@ -172,11 +172,6 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         let prefix = &dhatu[..idx];
         return format!("{}ANkzizya", prefix);
     }
-    // Ca doubling future: hurC->hUrCizya etc. + zWiv/urv family
-    if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC" | "zWiv" | "urv" | "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv" | "purv" | "nikza" | "Rikza" | "stfkza") {
-        let map: &[(&str, &str)] = &[("mleC", "mlecCizya"), ("laC", "lacCizya"), ("hrIC", "hrIcCizya"), ("hurC", "hUrCizya"), ("murC", "mUrCizya"), ("sPurC", "sPUrCizya"), ("yuC", "yucCizya"), ("uC", "ucCizya"), ("zWiv", "zWevizya"), ("urv", "Urvizya"), ("turv", "tUrvizya"), ("Turv", "TUrvizya"), ("durv", "dUrvizya"), ("Durv", "DUrvizya"), ("gurv", "gUrvizya"), ("murv", "mUrvizya"), ("purv", "pUrvizya"), ("nikza", "nikzizya"), ("Rikza", "nikzizya"), ("stfkza", "stfkzizya"), ("kAkzi", "kANkzizya")];
-        if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) { return v.to_string(); }
-    }
     if dhatu=="kzi" { return format!("{}zya", apply_guna_to_stem(dhatu)); }
     if dhatu=="sId" { return "satsya".to_string(); }
     if dhatu=="Day" { return "DAsya".to_string(); }
@@ -326,6 +321,9 @@ fn clean_upadesha(original: &str, gana: u8, aupadeshik: &str) -> String {
             s = core.to_string();
         }
     }
+    // 8.2.78 then 6.1.73/75 then 8.4.40 (हुर्छ → हूर्छ; म्लेछ → म्लेच्छ).
+    s = rv_upadha_dirgha(&s);
+    s = che_tuk(&s);
     s = stoh_scuna(&s);
     if s == "RI" {
         "nI".to_string()
@@ -399,40 +397,16 @@ pub fn derive_stem(
         let ps = causative_present_stem(dhatu);
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
-        let shap = sapi_upadha_lopa(dhatu);
+        let shap = sapi_upadha_lopa(&sthivu_klamu_shiti(dhatu));
         let dhatu = shap.as_str();
         if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
-            // kuTi->kunTa, ati->anta etc. (Ti/ti anubandha with nasal)
+            // kuTi->kunTa (टि इत् + 7.1.58). ati is इदित् below.
             let base = &dhatu[..dhatu.len()-2];
             let ps = if dhatu.ends_with("Ti") { format!("{}nTa", base) } else { format!("{}nta", base) };
                 present_stem = Some(ps);
         } else if let Some(snu) = dhinvi_krnvi_snu_base(dhatu) {
             // 3.1.80 धिन्विकृण्व्योर च after 7.1.58.
             present_stem = Some(format!("{snu}u"));
-        } else if dhatu == "zWiv" {
-            let ps = "zWIva".to_string();
-            present_stem = Some(ps);
-        } else if dhatu == "urv" {
-            let ps = "Urva".to_string();
-            present_stem = Some(ps);
-        } else if dhatu == "purv" {
-            let ps = "pUrva".to_string();
-            present_stem = Some(ps);
-        } else             if matches!(dhatu, "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv") {
-                let mut chars: Vec<char> = dhatu.chars().collect();
-                if chars.len() >= 2 && chars[1] == 'u' { chars[1] = 'U'; }
-                let base: String = chars.into_iter().collect();
-                let ps2 = format!("{}a", base);
-                present_stem = Some(ps2);
-        } else if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
-            // Ca doubling: mleC->mlecCati, laC->lacCati, hrIC->hrIcCati etc. (gold has cC, dhatu_clean stripped final a)
-            // sPurC->sPUrCa, yuC->yucCa, uC->ucCa
-            let map: &[(&str, &str)] = &[("mleC", "mlecCa"), ("laC", "lacCa"), ("hrIC", "hrIcCa"), ("hurC", "hUrCa"), ("murC", "mUrCa"), ("sPurC", "sPUrCa"), ("yuC", "yucCa"), ("uC", "ucCa")];
-            let ps = map.iter().find(|(k, _)| *k == dhatu).map(|(_, v)| v.to_string()).unwrap_or_else(|| format!("{}a", dhatu));
-                present_stem = Some(ps);
-        } else if cgana == 1 && dhatu == "ati" {
-            let ps = "anta".to_string();
-                present_stem = Some(ps);
         } else if dhatu.to_ascii_lowercase().ends_with("akzi") {
             let idx = dhatu.find('A').unwrap_or(1);
             let prefix = &dhatu[..idx];
@@ -452,19 +426,6 @@ pub fn derive_stem(
         } else if cgana == 1 {
             if let Some(aya) = thematic_aya_present_stem(dhatu) {
                         present_stem = Some(aya);
-            } else if dhatu == "UWa" {
-                let ps = "UWa".to_string();
-                        present_stem = Some(ps);
-            } else if dhatu.ends_with("ikza") {
-                let ps = "nikza".to_string();
-                present_stem = Some(ps);
-            } else if dhatu == "stfkza" {
-                let ps = "stfkza".to_string();
-                present_stem = Some(ps);
-            } else if dhatu == "nIla" {
-                // RIla -> nIla keep long I (not nel)
-                let ps = "nIla".to_string();
-                        present_stem = Some(ps);
             } else if is_g1_a_final(dhatu) {
                 // SrA/jYA keep long A: SrAti not Srati
                 present_stem = Some(dhatu.to_string());
@@ -608,14 +569,8 @@ pub fn derive_stem(
                 return (Some(f), None);
         }
         "lang" => {
-            let shap = sapi_upadha_lopa(dhatu);
+            let shap = sapi_upadha_lopa(&sthivu_klamu_shiti(dhatu));
             let dhatu = shap.as_str();
-            if dhatu == "stfkza" {
-                return (Some("stfkz".to_string()), Some("a".to_string()));
-            }
-            if dhatu.ends_with("ikza") {
-                return (Some("nikz".to_string()), Some("a".to_string()));
-            }
             // fix nasals for lang too (zfnBu asfnBat->asfmBat etc.)
             let fix_lang = |s: String| apply_nasal_palatal(&s);
             // bidadi / aya early as in Python
@@ -665,20 +620,6 @@ pub fn derive_stem(
                 let root = lang_geminate_stem(dhatu, &root);
                         return (Some(root), Some("a".to_string()));
             }
-            if dhatu == "UWa" {
-                let root = "UW".to_string();
-                        return (Some(root), Some("a".to_string()));
-            }
-            if dhatu == "nIla" {
-                let root = "nIl".to_string();
-                return (Some(root), Some("a".to_string()));
-            }
-            if dhatu == "stfkza" {
-                return (Some("stfkz".to_string()), Some("a".to_string()));
-            }
-            if dhatu.ends_with("ikza") {
-                return (Some("nikz".to_string()), Some("a".to_string()));
-            }
             if let Some(snu) = dhinvi_krnvi_snu_base(dhatu) {
                 return (Some(format!("{snu}u")), Some("a".to_string()));
             }
@@ -709,31 +650,6 @@ pub fn derive_stem(
                 if let Some(root) = idito_num(dhatu) {
                     let root = fix_lang(root);
                     return (Some(root), Some("a".to_string()));
-                }
-            }
-            if dhatu == "zWiv" {
-                let root = fix_lang("zWIv".to_string());
-                return (Some(root), Some("a".to_string()));
-            }
-            if dhatu == "urv" {
-                let root = "Urv".to_string();
-                return (Some(root), Some("a".to_string()));
-            }
-            if dhatu == "purv" {
-                return (Some("pUrv".to_string()), Some("a".to_string()));
-            }
-            if matches!(dhatu, "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv") {
-                let mut chars: Vec<char> = dhatu.chars().collect();
-                if chars.len() >= 2 && chars[1] == 'u' { chars[1] = 'U'; }
-                let root: String = chars.into_iter().collect();
-                return (Some(root), Some("a".to_string()));
-            }
-            // Ca doubling: mleC->mlecC for lang (present mlecCa -> lang mlecC)
-            if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
-                let map: &[(&str, &str)] = &[("mleC", "mlecC"), ("laC", "lacC"), ("hrIC", "hrIcC"), ("hurC", "hUrC"), ("murC", "mUrC"), ("sPurC", "sPUrC"), ("yuC", "yucC"), ("uC", "ucC")];
-                if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) {
-                    let root = fix_lang(v.to_string());
-                                return (Some(root), Some("a".to_string()));
                 }
             }
             if cgana == 6 {
@@ -799,18 +715,12 @@ pub fn derive_stem(
                 return (Some(root), aug);
         }
         "vidhilin" => {
-            let shap = sapi_upadha_lopa(dhatu);
+            let shap = sapi_upadha_lopa(&sthivu_klamu_shiti(dhatu));
             let dhatu = shap.as_str();
             if dhatu.to_ascii_lowercase().ends_with("akzi") {
                 let idx = dhatu.find('A').unwrap_or(1);
                 let prefix = &dhatu[..idx];
                 return (Some(format!("{}ANkz", prefix)), None);
-            }
-            if dhatu == "stfkza" {
-                return (Some("stfkz".to_string()), None);
-            }
-            if dhatu.ends_with("ikza") {
-                return (Some("nikz".to_string()), None);
             }
             if bidadi {
                 let root = bidadi_lang_stem(dhatu);
@@ -854,20 +764,11 @@ pub fn derive_stem(
                                 return (Some(root), None);
                 }
             }
-            if dhatu == "UWa" {
-                return (Some("UW".to_string()), None);
-            }
             if let Some(snu) = dhinvi_krnvi_snu_base(dhatu) {
                 return (Some(format!("{snu}u")), None);
             }
             if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && dhatu.chars().next().is_some_and(is_vowel_c) && !aupadeshik.contains('~') {
                 return (Some(apply_guna_to_stem(&dhatu[..dhatu.len() - 1])), None);
-            }
-            if dhatu == "stfkza" {
-                return (Some("stfkz".to_string()), None);
-            }
-            if dhatu == "nIla" {
-                return (Some("nIl".to_string()), None);
             }
             // a-final (siDa->seD) for vidhilin (non-causative, non-YA) — keep long I/U — skip irregular pA etc.
             if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA && crate::engine::phonology::sad_present_base(dhatu).is_none() {
@@ -887,31 +788,6 @@ pub fn derive_stem(
                 if let Some(root) = idito_num(dhatu) {
                     let root = apply_nasal_palatal(&root);
                     return (Some(root), None);
-                }
-            }
-            if dhatu == "zWiv" {
-                let root = apply_nasal_palatal("zWIv");
-                return (Some(root), None);
-            }
-            if dhatu == "urv" {
-                let root = "Urv".to_string();
-                return (Some(root), None);
-            }
-            if dhatu == "purv" {
-                return (Some("pUrv".to_string()), None);
-            }
-            if matches!(dhatu, "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv") {
-                let mut chars: Vec<char> = dhatu.chars().collect();
-                if chars.len() >= 2 && chars[1] == 'u' { chars[1] = 'U'; }
-                let root: String = chars.into_iter().collect();
-                return (Some(root), None);
-            }
-            // Ca doubling for vidhilin: mleC->mlecC
-            if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
-                let map: &[(&str, &str)] = &[("mleC", "mlecC"), ("laC", "lacC"), ("hrIC", "hrIcC"), ("hurC", "hUrC"), ("murC", "mUrC"), ("sPurC", "sPUrC"), ("yuC", "yucC"), ("uC", "ucC")];
-                if let Some((_, v)) = map.iter().find(|(k, _)| *k == dhatu) {
-                    let root = apply_nasal_palatal(v);
-                                return (Some(root), None);
                 }
             }
             if is_thematic(cgana) {

@@ -528,9 +528,51 @@ pub fn sapi_upadha_lopa(root: &str) -> String {
     }
 }
 
-/// 8.4.40 स्तोः श्चुना श्चुः (षस्ज → सज्ज्).
+/// 8.4.40 स्तोः श्चुना श्चुः (षस्ज → सज्ज्; तुक्+छ → च्छ).
 pub fn stoh_scuna(root: &str) -> String {
-    root.replace("sj", "jj").replace("sc", "cc")
+    root.replace("tC", "cC").replace("sj", "jj").replace("sc", "cc")
+}
+
+/// 8.2.78 उपधायां च — इक् before र्/व् + हल् is lengthened (ऊर्वति, हूर्छति, कूर्दते).
+pub fn rv_upadha_dirgha(root: &str) -> String {
+    let mut c: Vec<char> = root.chars().collect();
+    for i in 0..c.len().saturating_sub(2) {
+        if matches!(c[i], 'i' | 'u' | 'f' | 'x')
+            && matches!(c[i + 1], 'r' | 'v')
+            && !is_vowel_final(c[i + 2])
+        {
+            c[i] = match c[i] {
+                'i' => 'I',
+                'u' => 'U',
+                'f' => 'F',
+                'x' => 'X',
+                other => other,
+            };
+        }
+    }
+    c.into_iter().collect()
+}
+
+/// 6.1.73 छे च / 6.1.75 दीर्घात् — तुक् before छ immediately after a vowel.
+pub fn che_tuk(root: &str) -> String {
+    let c: Vec<char> = root.chars().collect();
+    let mut out = String::new();
+    for i in 0..c.len() {
+        if c[i] == 'C' && i > 0 && is_vowel_final(c[i - 1]) {
+            out.push('t');
+        }
+        out.push(c[i]);
+    }
+    out
+}
+
+/// 7.3.75 ष्ठिवुक्लम्याचमां शिति — ष्ठिवु / क्लम् lengthen before शित् (आचम् needs आ).
+pub fn sthivu_klamu_shiti(root: &str) -> String {
+    match root {
+        "zWiv" => "zWIv".into(),
+        "klam" => "klAm".into(),
+        other => other.to_string(),
+    }
 }
 
 /// 7.1.58 इदितो नुम् धातोः — nasal before the last consonant after dropping i-इत्.
