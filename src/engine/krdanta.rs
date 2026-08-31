@@ -158,6 +158,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "pad" {
         return "panna".into(); // पन्न
     }
+    // Special: सह् + क्त → सोढ (SLP1 soQa) — 8.2.31 हो ढः + 6.3.111 lengthening, guṇa a→o
+    // sūtra: सह् + क्त → सोढ; future devs: sah→soQa, not sAQa (guṇa, not vṛddhi)
+    // Extreme: keep soQa (सोढ) with o, Q=ढ; generic kta_ho_dha would give sAQa (साढ) — wrong
+    if orig == "sah" {
+        return "soQa".into(); // सोढ
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -698,6 +704,9 @@ mod tests {
         assert_eq!(derive("pada", "kta"), vec!["panna"]); // पद् → पन्न (pada is पद्)
         assert_eq!(derive("Sad", "kta"), vec!["Sanna"]);
         assert_eq!(derive("pad", "kta"), vec!["panna"]);
+        // सह् → सोढ (soQa) — 8.2.31 + guṇa
+        assert_eq!(derive("saha", "kta"), vec!["soQa"]); // सह् → सोढ (saha is सह् with a)
+        assert_eq!(derive("sah", "kta"), vec!["soQa"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
