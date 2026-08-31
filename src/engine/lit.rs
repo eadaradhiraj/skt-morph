@@ -92,6 +92,10 @@ pub(crate) fn prakriya_root(dhatu: &str) -> String {
     if s.starts_with("qu") && s.len() > 3 {
         s = s[2..].to_string();
     }
+    // 1.3.5 आदिर्ञिटुडवः — टु (wuoSvi → Svi, wukzu → kzu).
+    if s.starts_with("wu") && s.len() > 3 {
+        s = s[2..].to_string();
+    }
     if s.starts_with("Yi") && s.len() > 3 {
         s = s[2..].to_string();
     }

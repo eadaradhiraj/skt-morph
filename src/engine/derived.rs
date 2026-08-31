@@ -208,19 +208,36 @@ fn last_is_cons(root: &str) -> bool {
     root.chars().last().is_some_and(is_cons)
 }
 
+/// 6.1.45 आदेच for 7.3.37 roots (शो/छो/षो/ह्वे/व्ये).
+fn yuk_base(root: &str) -> String {
+    match root {
+        "So" | "SA" => "SA".into(),
+        "Co" | "CA" => "CA".into(),
+        "zo" | "so" | "sA" => "sA".into(),
+        "hve" | "hvA" => "hvA".into(),
+        "vye" | "vyA" => "vyA".into(),
+        other => other.to_string(),
+    }
+}
+
+/// 7.3.37 शाच्छासाह्वाव्यावेपां युक् (and पा पाने पाययति, not पापयति).
+fn takes_yuk(root: &str) -> bool {
+    matches!(root, "SA" | "CA" | "sA" | "hvA" | "vyA" | "pA") || root.ends_with("vep")
+}
+
 /// णिच् aṅga: 7.2.115/116 वृद्धि, 6.4.92 मित्, 7.3.36 पुक्, 7.3.86 लघूपध गुण.
 pub fn nic_stem(root: &str) -> String {
-    match root {
-        "i" => return "gamaya".into(),
-        "pA" => return "pAyaya".into(),
-        // 7.3.37 शाच्छासाह्वाव्यावेपां युक्. शो/छो/षो after 6.1.45 आदेच.
-        "So" | "SA" => return "SAyaya".into(),
-        "Co" | "CA" => return "CAyaya".into(),
-        "zo" | "so" | "sA" => return "sAyaya".into(),
-        "hvA" | "hve" => return "hvAyaya".into(),
-        "vyA" | "vye" => return "vyAyaya".into(),
-        _ if root.ends_with("vep") => return "vepaya".into(),
-        _ => {}
+    let root = yuk_base(root);
+    let root = root.as_str();
+    if takes_yuk(root) {
+        return if root.ends_with("vep") {
+            format!("{root}aya")
+        } else {
+            format!("{root}yaya")
+        };
+    }
+    if root == "i" {
+        return "gamaya".into();
     }
     if is_mit(root) {
         return format!("{root}aya");
@@ -338,30 +355,15 @@ pub fn karma_stem(root: &str) -> String {
     format!("{r}ya")
 }
 
-/// 7.4.1 णौ चङ्युपधाया ह्रस्वः: णिच् aṅga without अय, then चङ् reduplication (7.4.93–94).
+/// 7.4.1 णौ चङ्युपधाया ह्रस्वः: णिच् aṅga without अय, then ह्रस्व of आ.
 fn nic_shortened(root: &str) -> String {
-    match root {
-        "BU" => "Bav".into(),
-        "kf" => "kar".into(),
-        "nI" => "nay".into(),
-        "dA" => "dap".into(),
-        "DA" => "Dap".into(),
-        "sTA" => "sTap".into(),
-        "pA" => "pay".into(),
-        "han" => "Gat".into(),
-        "i" => "gam".into(),
-        "Sru" => "Srav".into(),
-        "vac" => "vac".into(),
-        "pat" => "pat".into(),
-        "grah" => "grah".into(),
-        "dfS" => "dfS".into(),
-        _ if is_mit(root) => root.to_string(),
-        r if r.ends_with('A') => format!("{}p", &r[..r.len() - 1]),
-        r if r.ends_with('I') || r.ends_with('i') => format!("{}ay", &r[..r.len() - 1]),
-        r if r.ends_with('U') || r.ends_with('u') => apply_guna_to_stem(r),
-        r if r.ends_with('f') || r.ends_with('F') => apply_guna_to_stem(r),
-        r => r.to_string(),
+    let stem = nic_stem(root);
+    let inner = stem.strip_suffix("aya").unwrap_or(&stem);
+    let mut c: Vec<char> = inner.chars().collect();
+    if let Some(i) = c.iter().rposition(|&ch| ch == 'A') {
+        c[i] = 'a';
     }
+    c.into_iter().collect()
 }
 
 fn nic_cang_stem(root: &str) -> String {
