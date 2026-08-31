@@ -174,6 +174,11 @@ fn jhal(stem: &str, suf: &str, lih: bool) -> String {
         ('j', 's') => format!("{body}kz{rest}"),
         ('j', 'D') => format!("{body}qQ{rest}"),
         ('h', 't') | ('h', 'T') if lih => format!("{body}Q{rest}"),
+        // 8.2.32/41 + थास्: धुक्षथाः (before generic ह्+थ् → ग्ध).
+        ('h', 'T') if stem.starts_with('d') && suf.starts_with("TA") => {
+            let mid: String = body.chars().skip(1).collect();
+            format!("D{mid}kza{suf}")
+        }
         ('h', 't') | ('h', 'T') => format!("{body}gD{rest}"),
         // 8.2.32 दादेर्धातोर्घः + 8.2.41 षढोः कः सि — धुक्षे, धोक्ष्यति (not *dukze).
         ('h', 's') if stem.starts_with('d') => {
@@ -182,6 +187,11 @@ fn jhal(stem: &str, suf: &str, lih: bool) -> String {
         }
         ('h', 's') => format!("{body}kz{rest}"),
         ('h', 'D') if lih => format!("{body}Q{rest}"),
+        // 8.2.32 दादेर् + 8.2.37 भष् — धुग्ध्वे / धुग्ध्वम् (not *dugDve).
+        ('h', 'D') if stem.starts_with('d') => {
+            let mid: String = body.chars().skip(1).collect();
+            format!("D{mid}gD{rest}")
+        }
         ('h', 'D') => format!("{body}gD{rest}"),
         // 8.4.55 खरि च: द् → त् before खर् (अत्ति, अत्सि, अत्थः, अत्स्यति).
         ('d', f) if is_khar(f) => format!("{body}t{suf}"),
@@ -463,7 +473,7 @@ fn cons_stems(root: &str) -> (String, String, bool) {
 // fn `join_cons` — tin/sUP endings: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
-fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>, purusha: u8, vacana: u8) -> Option<String> {
     let (strong0, t_weak, lih) = cons_stems(root);
     let mfj = root == "mfj";
     let pl3_strong = mfj && matches!(ending, "anti" | "nti" | "antu" | "an");
@@ -500,6 +510,8 @@ fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> O
                 "an" => format!("{gen}an"),
                 "atAm" => jhal(&t_weak, "tAm", lih),
                 "atam" => jhal(&t_weak, "tam", lih),
+                // आत्मने प्रथम बहु अत (अदुहत) vs परस्मै मध्यम बहु अत (अदुग्ध).
+                "ata" if purusha == 1 && vacana == 3 => jhal(&t_weak, "ata", lih),
                 "ata" => jhal(&t_weak, "ta", lih),
                 "va" => format!("{gen}va"),
                 "ma" => format!("{gen}ma"),
@@ -1435,8 +1447,8 @@ pub fn join_forms(
     dhatu: &str,
     family: &str,
     ending: &str,
-    _purusha: u8,
-    _vacana: u8,
+    purusha: u8,
+    vacana: u8,
     augment: Option<&str>,
 ) -> Vec<String> {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -1489,7 +1501,7 @@ pub fn join_forms(
         return vec![apply_natva_to_word(&f)];
     }
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
-    if let Some(f) = join_vid(&r, family, ending, _purusha, augment) {
+    if let Some(f) = join_vid(&r, family, ending, purusha, augment) {
         return vec![apply_natva_to_word(&f)];
     }
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -1519,7 +1531,7 @@ pub fn join_forms(
     } else if r.ends_with('I') || r == "vI" {
         join_i(&r, family, ending, augment)
     } else if r.chars().last().is_some_and(is_cons) {
-        join_cons(&r, family, ending, augment)
+        join_cons(&r, family, ending, augment, purusha, vacana)
     } else {
         None
     };
@@ -1560,8 +1572,18 @@ mod tests {
         assert_eq!(join_form("duha", "lat", "ate", 1, 3, None).as_deref(), Some("duhate"));
         assert_eq!(join_form("duha", "lat", "Ate", 1, 2, None).as_deref(), Some("duhAte"));
         assert_eq!(join_form("duha", "lat", "se", 2, 1, None).as_deref(), Some("Dukze"));
+        assert_eq!(join_form("duha", "lat", "Dve", 2, 3, None).as_deref(), Some("DugDve"));
         assert_eq!(join_form("liha", "lat", "te", 1, 1, None).as_deref(), Some("lIQe"));
         assert_eq!(join_form("duha", "lrt", "te", 1, 1, None).as_deref(), Some("Dokzyate"));
+        assert_eq!(join_form("duha", "lot", "tAm", 1, 1, None).as_deref(), Some("dugDAm"));
+        assert_eq!(join_form("duha", "lot", "atAm", 1, 3, None).as_deref(), Some("duhatAm"));
+        assert_eq!(join_form("duha", "lot", "sva", 2, 1, None).as_deref(), Some("Dukzva"));
+        assert_eq!(join_form("duha", "lot", "Dvam", 2, 3, None).as_deref(), Some("DugDvam"));
+        assert_eq!(join_form("duha", "lang", "ta", 1, 1, None).as_deref(), Some("adugDa"));
+        assert_eq!(join_form("duha", "lang", "ata", 1, 3, None).as_deref(), Some("aduhata"));
+        assert_eq!(join_form("duha", "lang", "ata", 2, 3, None).as_deref(), Some("adugDa"));
+        assert_eq!(join_form("duha", "lang", "TAH", 2, 1, None).as_deref(), Some("aDukzaTAH"));
+        assert_eq!(join_form("duha", "vidhilin", "Ita", 1, 1, None).as_deref(), Some("duhIta"));
         assert_eq!(join_form("liha", "lat", "ti", 1, 1, None).as_deref(), Some("leQi"));
         assert_eq!(join_form("yu", "lat", "ti", 1, 1, None).as_deref(), Some("yOti"));
         assert_eq!(join_form("yu", "lat", "anti", 1, 3, None).as_deref(), Some("yuvanti"));

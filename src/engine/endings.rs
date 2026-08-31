@@ -81,6 +81,53 @@ pub fn lat_ad_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+/// अदादि आत्मने लोट्: ताम्/आताम्/अताम् not thematic अताम्/एताम्/अन्ताम्.
+/// दुग्धाम्, दुहाताम्, दुहताम्; धुक्ष्व; दुहै.
+pub fn lot_ad_a() -> Vec<(Vec<String>, Vec<String>)> {
+    vec![
+        (vec!["tAm".into()], vec!["3.4.78".into()]),
+        (vec!["AtAm".into()], vec!["3.4.78".into()]),
+        (vec!["atAm".into()], vec!["3.4.78".into()]),
+        (vec!["sva".into()], vec!["3.4.78".into()]),
+        (vec!["ATAm".into()], vec!["3.4.78".into()]),
+        (vec!["Dvam".into()], vec!["3.4.78".into()]),
+        (vec!["E".into()], vec!["3.4.78".into()]),
+        (vec!["AvahE".into()], vec!["3.4.78".into()]),
+        (vec!["AmahE".into()], vec!["3.4.78".into()]),
+    ]
+}
+
+/// अदादि आत्मने लङ्: त/आताम्/अत not thematic अत/एताम्/अन्त.
+/// अदुग्ध, अदुहाताम्, अदुहत; अधुक्षथाः.
+pub fn lang_ad_a() -> Vec<(Vec<String>, Vec<String>)> {
+    vec![
+        (vec!["ta".into()], vec!["3.4.111".into()]),
+        (vec!["AtAm".into()], vec!["3.4.111".into()]),
+        (vec!["ata".into()], vec!["3.4.111".into()]),
+        (vec!["TAH".into()], vec!["3.4.111".into()]),
+        (vec!["ATAm".into()], vec!["3.4.111".into()]),
+        (vec!["Dvam".into()], vec!["3.4.111".into()]),
+        (vec!["i".into()], vec!["3.4.111".into()]),
+        (vec!["vahi".into()], vec!["3.4.111".into()]),
+        (vec!["mahi".into()], vec!["3.4.111".into()]),
+    ]
+}
+
+/// अदादि आत्मने विधिलिङ्: सीयुट् ई (दुहीत), not thematic एत.
+pub fn vidhilin_ad_a() -> Vec<(Vec<String>, Vec<String>)> {
+    vec![
+        (vec!["Ita".into()], vec!["3.4.104".into()]),
+        (vec!["IyAtAm".into()], vec!["3.4.104".into()]),
+        (vec!["Iran".into()], vec!["3.4.104".into()]),
+        (vec!["ITAH".into()], vec!["3.4.104".into()]),
+        (vec!["IyATAm".into()], vec!["3.4.104".into()]),
+        (vec!["IDvam".into()], vec!["3.4.104".into()]),
+        (vec!["Iya".into()], vec!["3.4.104".into()]),
+        (vec!["Ivahi".into()], vec!["3.4.104".into()]),
+        (vec!["Imahi".into()], vec!["3.4.104".into()]),
+    ]
+}
+
 // ---------------------------------------------------------------------------
 // fn `lot_kartari_p`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -576,6 +623,9 @@ pub fn family_endings(
         ("lot","kartari","P","thematic") => lot_kartari_p(),
         ("lot","kartari","A","thematic") => lot_kartari_a(),
         ("lot","kartari","P","ad") => lot_ad_p(),
+        ("lot","kartari","A","ad") => lot_ad_a(),
+        ("lang","kartari","A","ad") => lang_ad_a(),
+        ("vidhilin","kartari","A","ad") => vidhilin_ad_a(),
         ("lot","kartari","P","nu") => lot_nu_p(),
         ("lrt","kartari","P","thematic") => lrt_kartari_p(),
         ("lrt","kartari","A","thematic") => lrt_kartari_a(),
@@ -614,6 +664,7 @@ pub fn family_endings(
                     ("lang","kartari","P","thematic") => return Some(lang_kartari_p()),
                     ("lang","kartari","A","thematic") => return Some(lang_kartari_a()),
                     ("vidhilin","kartari","P","thematic") => return Some(vidhilin_kartari_p()),
+                    ("vidhilin","kartari","A","thematic") => return Some(vidhilin_kartari_a()),
                     _ => return None,
                 }
             }
