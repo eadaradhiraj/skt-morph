@@ -122,9 +122,16 @@ fn derive_Dak(s: &str) -> String {
 }
 
 /// यञ् (गर्गादि): वृद्धि + य after dropping a/ā. Code `yaY` so it does not clash with verbal यङ्.
+/// sūtra 4.1.105 गर्गादिभ्यो यञ्; vrddhi on first vowel (7.2.116) then y.
 fn derive_yaY(s: &str) -> String {
     format!("{}ya", vrddhi_adi(&drop_final_a(s)))
 }
+
+// ---------------------------------------------------------------------------
+// Aliases for API ergonomics — same sūtra, different traditional code
+// Future devs: keep SLP1 codes stable; alias mapping lives in derive() match below.
+// sūtra refs: अण् 4.1.83, ढक् 4.1.120, यञ् 4.1.105
+// ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
 // fn `derive`: purpose, inputs→outputs, edge cases.
@@ -138,9 +145,12 @@ pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
     }
     let s = strip_visarga(p);
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
+    // Every arm has sūtra header for future devs; aliases keep JS/WASM ergonomic.
     match pratyaya {
+        // 5.1.119 तस्य भावस्त्वतलौ — त्व/तल्
         "tva" => vec![format!("{s}tva")],
         "tal" | "tA" => vec![format!("{s}tA")],
+        // 5.2.94 तदस्यास्त्यस्मिन्निति मतुप्
         "matup" | "mat" => {
             // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if s.ends_with('a') {
@@ -151,13 +161,18 @@ pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
         }
         "mayaT" | "maya" => vec![format!("{s}maya")],
         "ini" | "in" => vec![format!("{}in", a_stem_base(p))],
+        // 5.3.57 द्विवचनविभज्य ... तरप्/तमप्
         "tarap" | "tara" => vec![format!("{s}tara")],
         "tamap" | "tama" => vec![format!("{s}tama")],
+        // 5.1.8/4.1.97 छ/ईय — e.g. रामीय
         "Ca" | "Iya" | "cha" => vec![format!("{}Iya", a_stem_base(p))],
         "ka" => vec![format!("{s}ka")],
-        "aR" | "aN" => vec![derive_aR(&s)],
-        "Dak" => vec![derive_Dak(&s)],
-        "yaY" => vec![derive_yaY(&s)],
+        // अण् 4.1.83 — वृद्धि + अ; aliases: aR/aN/a (JS ergonomics)
+        "aR" | "aN" | "a" => vec![derive_aR(&s)],
+        // ढक् 4.1.120 — वृद्धि + एय; alias eya
+        "Dak" | "eya" => vec![derive_Dak(&s)],
+        // यञ् 4.1.105 — वृद्धि + य; aliases: yaY/Rya/yat for API tolerance
+        "yaY" | "Rya" | "yat" => vec![derive_yaY(&s)],
         _ => vec![],
     }
 }
@@ -200,15 +215,22 @@ mod tests {
 
     #[test]
     // ---------------------------------------------------------------------------
-    // fn `aR_Dak_yaY`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // fn `aR_Dak_yaY`: sūtra 4.1.83/120/105 — vṛddhi + suffix; tests aR/Dak/yaY + aliases
+    // Future devs: aliases a/eya/Rya/yat must stay in sync with derive() match arms above.
     // ---------------------------------------------------------------------------
     fn aR_Dak_yaY() {
         assert_eq!(derive("diti", "aR"), vec!["dEtya"]);
         assert_eq!(derive("upagu", "aR"), vec!["Opagava"]);
         assert_eq!(derive("garga", "aR"), vec!["gArga"]);
+        // alias a → aR
+        assert_eq!(derive("garga", "a"), vec!["gArga"]);
         assert_eq!(derive("vinatA", "Dak"), vec!["vEnateya"]);
         assert_eq!(derive("dakza", "Dak"), vec!["dAkzeya"]);
+        // alias eya → Dak
+        assert_eq!(derive("vinatA", "eya"), vec!["vEnateya"]);
         assert_eq!(derive("garga", "yaY"), vec!["gArgya"]);
+        // aliases Rya/yat → yaY
+        assert_eq!(derive("garga", "Rya"), vec!["gArgya"]);
+        assert_eq!(derive("garga", "yat"), vec!["gArgya"]);
     }
 }
