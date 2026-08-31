@@ -188,6 +188,10 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "jyA" {
         return "jIna".into();
     }
+    // शुष् + निष्ठा क (not ष्टुत्व *शुष्ट). धृष् stays धृष्ट via ष्+त.
+    if orig == "Suz" {
+        return "Suzka".into();
+    }
     // क्षण् is सेट् (not 7.2.10): क्त is क्षणित via takes_it_nistha, not *क्षात.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -252,6 +256,8 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         _ if let Some(s) = drop_anidit_upadha_nasal(&orig) => internal_sandhi(&s, "ta"),
         // 8.2.36 शां षः — श् + त → ष्ट before इट् (नष्ट, दिष्ट, स्पृष्ट). Not ष-final सेट् (भाषित).
         _ if r.ends_with('S') => internal_sandhi(&r, "ta"),
+        // ष् + त → ष्ट before इट् (कृष्ट, तुष्ट, द्विष्ट). शुष्क is named above.
+        _ if r.ends_with('z') => internal_sandhi(&r, "ta"),
         // 8.2.30 चोः कुः — palatal + झल् त of क्त → velar (मुक्त, युक्त, सिक्त).
         // Must precede 7.2.35 इट्: takes_it_nistha would otherwise yield *mucita/*yujita.
         // च/छ/ज/झ → क/ख/ग/घ; internal_sandhi maps c/j + t → kt. छ/झ rare in निष्ठा.
@@ -265,6 +271,8 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         _ if r.ends_with('B') => internal_sandhi(&r, "ta"),
         // 8.2.40 झषस्तथोर्धोऽधः — ध् + त → द्ध (विद्ध after 6.1.16, बद्ध). Before इट् (*viDita).
         _ if r.ends_with('D') => internal_sandhi(&r, "ta"),
+        // द् + त → त्त before इट् (नुत्त, तुत्त, सत्त). भिद्/छिद्/ओदित् are nna above.
+        _ if r.ends_with('d') => internal_sandhi(&r, "ta"),
         _ if r.ends_with('h')
             && r.chars().rev().nth(1).is_some_and(|c| "aAiIuUfFeEoO".contains(c)) =>
         {
@@ -888,6 +896,15 @@ mod tests {
         assert_eq!(derive("gup", "kta"), vec!["gupta"]);
         assert_eq!(derive("cit", "kta"), vec!["citta"]);
         assert_eq!(derive("kamp", "kta"), vec!["kampita"]);
+        // ष्+त → ष्ट (कृष्ट); शुष् is शुष्क not *शुष्ट. द्+त → त्त (नुत्त); भिद् stays भिन्न.
+        assert_eq!(derive("kfz", "kta"), vec!["kfzwa"]);
+        assert_eq!(derive("tuz", "kta"), vec!["tuzwa"]);
+        assert_eq!(derive("puz", "kta"), vec!["puzwa"]);
+        assert_eq!(derive("dviz", "kta"), vec!["dvizwa"]);
+        assert_eq!(derive("Suz", "kta"), vec!["Suzka"]);
+        assert_eq!(derive("nud", "kta"), vec!["nutta"]);
+        assert_eq!(derive("tud", "kta"), vec!["tutta"]);
+        assert_eq!(derive("sad", "kta"), vec!["satta"]);
         assert_eq!(derive("lih", "kta"), vec!["lIQa"]);
         assert_eq!(derive("guh", "kta"), vec!["gUQa"]);
         // 6.1.45 आदेच + 6.4.66 गा/पा → गीत/पीत; other ऐ → आत (कै कात).
