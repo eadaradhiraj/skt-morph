@@ -794,5 +794,12 @@ mod tests {
         // han yaNluk lat should be parasmai intensive (not ātmanepada ya- form)
         let f = kartari("hana", "yaNluk", "lat", 1, 1, "P").unwrap();
         assert!(f.iter().any(|x| x.contains("jaNG") || x.contains("jaNg")), "han yaNluk: {:?}", f);
+        // vac yaNluk: vAvac (reduplicated) — parasmai intensive, present shows 8.2.30 c→k before ti
+        assert_eq!(yan_luk_stem("vac"), "vAvac");
+        let f = kartari("vaca", "yaNluk", "lat", 1, 1, "P").unwrap();
+        // vAvac + ti → vAvakti (jhal sandhi), so check vAv prefix not literal vAvac
+        assert!(f.iter().any(|x| x.contains("vAv") && x.contains("vak")), "vac yaNluk lat: {:?}", f);
+        // sru yaNluk: SoSrU -> SoSrU (without ya) — intensive without ya
+        assert_eq!(yan_luk_stem("Sru"), "SoSrU");
     }
 }

@@ -12,6 +12,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **तद्धित aliases (4.1.83/105/120):** `aR`→`a`/`aN`, `Dak`→`eya`, `yaY`→`Rya`/`yat` ergonomic aliases; enriched sūtra headers in `taddhita.rs` (vrddhi, 5.1.119, 5.2.94); expanded `aR_Dak_yaY` test; 97 tests — pushed.
 - **सुबन्त हलन्त h/B (8.2.31/39):** added `(h,pum)` लिह्→लिक्/लिहा and `(B,pum)` लभ्→लप्/लभा pum paradigms with sūtra headers; extended `halanta_j_d_stems` to cover h/B; extreme commenting kept; 97 tests — pushed.
 - **सुबन्त हलन्त r/s (8.2.66/39):** added `(r,pum)` गिर्→गिः/गिरा and `(s,pum)` तपस्→तपः/तपसम् paradigms (ru→visarga, 8.2.66); extended `halanta_j_d_stems` to cover r/s; extreme commenting kept; 97 tests — pushed.
+- **यङ्लुक् extended (vac/Śru):** added `vac→vAvac→vAvakti` (8.2.30 c→k) and `Śru→SoSrū` intensive stems; enriched yaNluk sūtra comments (2.4.74, 8.2.30); 97 tests — pushed.
 
 ## 2026-08-31
 
