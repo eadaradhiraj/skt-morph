@@ -292,6 +292,35 @@ fn decline_an(stem: &str, linga: &str) -> Declension {
     }
 }
 
+/// 6.4.133 श्वयुवमघोनामतद्धिते — सम्प्रसारण in weak; पद श्व/युव/मघव. पुं.
+fn decline_sva_yuv_magha(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "pum" {
+        return None;
+    }
+    let (strong, weak, pada, voc) = match cand {
+        "Svan" => ("Sv", "Sun", "Sva", "Svan"),
+        "yuvan" => ("yuv", "yUn", "yuva", "yuvan"),
+        "maGavan" => ("maGav", "maGon", "maGava", "maGavan"),
+        _ => return None,
+    };
+    let du = format!("{strong}AnO");
+    let pl = format!("{strong}AnaH");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{strong}A"), du.clone(), pl.clone()]);
+    decl.insert("dvitIyA".into(), vec![format!("{strong}Anam"), du.clone(), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada}su")]);
+    decl.insert("samboDana".into(), vec![voc.to_string(), du, pl]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// 7.1.85–87 पथिमथोः / इतोऽत् / थो न्थः; ऋभुक्षिन् same सर्वनामस्थान. पुं only.
 fn decline_pathadi(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "pum" {
@@ -371,6 +400,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         if cand.is_empty() { continue; }
         let cand = ngeep_stri(&cand, linga);
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
+        if let Some(d) = decline_sva_yuv_magha(&cand, linga) {
+            return Some(d);
+        }
         if cand.ends_with("an") && (linga == "pum" || linga == "nap") {
             return Some(decline_an(&cand, linga));
         }
@@ -836,5 +868,33 @@ mod tests {
         has(&s, "saptamI", "saKyO");
         has(&s, "saptamI", "saKizu");
         has(&s, "samboDana", "saKe");
+    }
+
+    #[test]
+    fn sva_yuvan_maghavan_samprasarana() {
+        // 6.4.133 श्वन्: श्वा/श्वानम्, weak शुना not *श्वना (आत्मन्-type).
+        let s = generate("Svan", "pum").expect("Svan");
+        has(&s, "prathamA", "SvA");
+        has(&s, "prathamA", "SvAnO");
+        has(&s, "dvitIyA", "SvAnam");
+        has(&s, "dvitIyA", "SunaH");
+        has(&s, "tfIyA", "SunA");
+        has(&s, "tfIyA", "SvaByAm");
+        has(&s, "saptamI", "Suni");
+        has(&s, "saptamI", "Svasu");
+        has(&s, "samboDana", "Svan");
+        let y = generate("yuvan", "pum").expect("yuvan");
+        has(&y, "prathamA", "yuvA");
+        has(&y, "dvitIyA", "yuvAnam");
+        has(&y, "tfIyA", "yUnA");
+        has(&y, "caturTI", "yUne");
+        has(&y, "saptamI", "yUni");
+        has(&y, "saptamI", "yuvasu");
+        let m = generate("maGavan", "pum").expect("maGavan");
+        has(&m, "prathamA", "maGavA");
+        has(&m, "dvitIyA", "maGavAnam");
+        has(&m, "tfIyA", "maGonA");
+        has(&m, "saptamI", "maGoni");
+        has(&m, "samboDana", "maGavan");
     }
 }
