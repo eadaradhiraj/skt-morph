@@ -17,7 +17,7 @@ ashtadhyayi.com data (`skt_morph.db`) is an optional **cross-check**. If live �
 
 In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लोट्, विधिलिङ्, लृट्, लिट्, लुङ्, आशीर्लिङ्; parasmai and ātmanepada), listed kṛt pratyayas, ending-class सुबन्त (including foreign stems such as ट्रम्प → ट्रम्पेण), सर्वनाम. Started: णिच् / सन् / यङ्, कर्मणि यक्. Optional अर्थ on 1.3 meaning-conditioned pada.
 
-Later: fuller यङ् (now yaN + yaNluk luk 2.4.74, e.g. `boBU`/`vAvac`), remaining क्त ādeśa (जग्ध/पक्व/सोढ/भग्न/द्यूत/नद्ध/जीन; class sandhi 8.2.30/36/37/40/42/45, 6.4.37/42, 6.1.15/16/45), fuller सुबन्त (now `j/d/t/h/B/r/s/as/is/us` halanta). Derived tinanta stays out of the analyze index.
+Later: fuller यङ् (now yaN + yaNluk luk 2.4.74, e.g. `boBU`/`vAvac`), remaining क्त ādeśa (जग्ध/पक्व/सोढ/भग्न/द्यूत/नद्ध/जीन; class sandhi 8.2.30/36/37/40/42/45, 6.4.37/42, 6.1.15/16/45), fuller सुबन्त (now `j/d/t/p/h/B/r/s/S/as/is/us` halanta). Derived tinanta stays out of the analyze index.
 
 All तिङन्त is now live (`stems`/`adadi`/`join`/sutras) — no override table and no scrape rows in the generate path.
 
@@ -34,7 +34,7 @@ All तिङन्त is now live (`stems`/`adadi`/`join`/sutras) — no overri
 
 - **तिङन्त** — stem → ending → sandhi (`live_generate`). Optional upasargas (`prefix.rs`). 1.3 अर्थ is engine-only (no demo dropdown). Optional derivation: णिच् / सन् / यङ् / यङ्लुक् (luk 2.4.74, parasmai `boBU`/`vAvac` vs yaN `boBUya` ātmane) / कर्मणि (`derived.rs`; not indexed in analyze) — all with extreme sūtra comments.
 - **कृदन्त** — kṛt such as क्त (class sandhi before इट्: मुक्त/लब्ध/भिन्न/गत/गीत/उत/उष्ट; named ādeśa जग्ध/पक्व/सोढ/भग्न/द्यूत/नद्ध/जीन), क्तवतु, शतृ, शानच्, तुमुन्, क्त्वा, ल्यप्, तव्य, तृच्, … Same prefixes. Sūtra comments on every `nistha_base` arm.
-- **सुबन्त / सर्वनाम** — ending-class (now `j/d/t/h/B/r/s/as/is/us/an/in` halanta + `a/ A/ i/ I/ u/ U/ f` etc., plus `o/O` for गो/नौ) or pronoun paradigms — all with extreme 8.2.30/39/66 headers.
+- **सुबन्त / सर्वनाम** — ending-class (now `j/d/t/p/h/B/r/s/S/as/is/us/an/in` halanta + `a/ A/ i/ I/ u/ U/ f` etc., plus `o/O` for गो/नौ) or pronoun paradigms — all with extreme 8.2.30/39/66 headers.
 
 ## Analyze
 

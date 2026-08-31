@@ -52,7 +52,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("at".to_string(),"pum".to_string()), vec![vec!["An".to_string(),"antO".to_string(),"antaH".to_string(),],vec!["antam".to_string(),"antO".to_string(),"ataH".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["an".to_string(),"antO".to_string(),"antaH".to_string(),],]);
   m.insert(("an".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"AnO".to_string(),"AnaH".to_string(),],vec!["Anam".to_string(),"AnO".to_string(),"YaH".to_string(),],vec!["YA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["Ye".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["YaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["YaH".to_string(),"YoH".to_string(),"YAm".to_string(),],vec!["Yi,Yani".to_string(),"YoH".to_string(),"asu".to_string(),],vec!["an".to_string(),"AnO".to_string(),"AnaH".to_string(),],]);
   m.insert(("an".to_string(),"nap".to_string()), vec![vec!["a".to_string(),"nI".to_string(),"Ani".to_string(),],vec!["a".to_string(),"nI".to_string(),"Ani".to_string(),],vec!["nA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ne".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["naH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["naH".to_string(),"noH".to_string(),"nAm".to_string(),],vec!["ni".to_string(),"noH".to_string(),"asu".to_string(),],vec!["a,an".to_string(),"nI".to_string(),"Ani".to_string(),],]);
-  m.insert(("c".to_string(),"stri".to_string()), vec![vec!["g".to_string(),"caH".to_string(),"caH".to_string(),],vec!["cam".to_string(),"ce".to_string(),"caH".to_string(),],vec!["cA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"coH".to_string(),"gAm".to_string(),],vec!["ci".to_string(),"coH".to_string(),"su".to_string(),],vec!["g".to_string(),"caH".to_string(),"caH".to_string(),],]);
+  // च-anta स्त्री (वाच्) — 8.2.30 चोः कुः वाक्, 8.4.56 वाऽवसाने वाग्; भ्-initial ग्; loc वाक्षु.
+  m.insert(("c".to_string(),"stri".to_string()), vec![vec!["k,g".to_string(),"cO".to_string(),"caH".to_string(),],vec!["cam".to_string(),"cO".to_string(),"caH".to_string(),],vec!["cA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"coH".to_string(),"cAm".to_string(),],vec!["ci".to_string(),"coH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"cO".to_string(),"caH".to_string(),],]);
   m.insert(("ad".to_string(),"nap".to_string()), vec![vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adam".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ade".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"adoh".to_string(),"Am".to_string(),],vec!["adi".to_string(),"adoh".to_string(),"atsu".to_string(),],vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],]);
   m.insert(("z".to_string(),"pum".to_string()), vec![vec!["H".to_string(),"qO".to_string(),"qaH".to_string(),],vec!["am".to_string(),"qO".to_string(),"qaH".to_string(),],vec!["qA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["e".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["aH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["aH".to_string(),"oH".to_string(),"Am".to_string(),],vec!["i".to_string(),"oH".to_string(),"su".to_string(),],vec!["H".to_string(),"qO".to_string(),"qaH".to_string(),],]);
   m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atam".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["ate".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"Am".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],]);
@@ -78,6 +79,11 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // Extreme: keep tsu/zu for saptamī bahu, consistent with j/d paradigms above
   m.insert(("h".to_string(),"pum".to_string()), vec![vec!["k".to_string(),"hO".to_string(),"haH".to_string(),],vec!["ham".to_string(),"hO".to_string(),"haH".to_string(),],vec!["hA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["he".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"hoH".to_string(),"hAm".to_string(),],vec!["hi".to_string(),"hoH".to_string(),"tsu".to_string(),],vec!["k".to_string(),"hO".to_string(),"haH".to_string(),],]);
   m.insert(("B".to_string(),"pum".to_string()), vec![vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["Bam".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["BA".to_string(),"BByAm".to_string(),"BBiH".to_string(),],vec!["Be".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BoH".to_string(),"BAm".to_string(),],vec!["Bi".to_string(),"BoH".to_string(),"tsu".to_string(),],vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],]);
+  // प-anta (ककुप्) — already प् at पद (8.2.39). Distinct from भ्-anta (लभ्→लप्).
+  m.insert(("p".to_string(),"pum".to_string()), vec![vec!["p".to_string(),"pO".to_string(),"paH".to_string(),],vec!["pam".to_string(),"pO".to_string(),"paH".to_string(),],vec!["pA".to_string(),"pByAm".to_string(),"pBiH".to_string(),],vec!["pe".to_string(),"pByAm".to_string(),"pByaH".to_string(),],vec!["paH".to_string(),"pByAm".to_string(),"pByaH".to_string(),],vec!["paH".to_string(),"poH".to_string(),"pAm".to_string(),],vec!["pi".to_string(),"poH".to_string(),"psu".to_string(),],vec!["p".to_string(),"pO".to_string(),"paH".to_string(),],]);
+  // श-anta (दिश्) — 8.2.36 शां षः then 8.2.39/8.4.56 दिक्/दिग्; भ्-initial दिग्भ्याम्; सप्तमी दिक्षु.
+  m.insert(("S".to_string(),"stri".to_string()), vec![vec!["k,g".to_string(),"SO".to_string(),"SaH".to_string(),],vec!["Sam".to_string(),"SO".to_string(),"SaH".to_string(),],vec!["SA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["Se".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["SaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["SaH".to_string(),"SoH".to_string(),"SAm".to_string(),],vec!["Si".to_string(),"SoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"SO".to_string(),"SaH".to_string(),],]);
+  m.insert(("S".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"SO".to_string(),"SaH".to_string(),],vec!["Sam".to_string(),"SO".to_string(),"SaH".to_string(),],vec!["SA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["Se".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["SaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["SaH".to_string(),"SoH".to_string(),"SAm".to_string(),],vec!["Si".to_string(),"SoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"SO".to_string(),"SaH".to_string(),],]);
   // r-anta (गिर्) and s-anta (तपस्-like, but s as pum) — 8.2.66 ससजुषोः रुः, 8.2.39 जश्त्व
   // sūtra: 8.2.66 s→ru at pada (तपस्→तपर्→तपः), r stays r; Future devs: r shows no visarga change at pada? Actually r→ḥ via ru.
   // Extreme commenting: r/s show s→ḥ vs r→r alternation; keeps saptamī tsu consistent
@@ -516,6 +522,30 @@ mod tests {
         has(&s, "prathamA", "sarit");
         has(&s, "dvitIyA", "saritam");
         has(&s, "tfIyA", "saritA");
+        // वाच्: 8.2.30/8.4.56 वाक्/वाग्, द्विवचन वाचौ (not *वाचः), सप्तमी वाक्षु.
+        let v = generate("vAc", "stri").expect("vAc");
+        has(&v, "prathamA", "vAk");
+        has(&v, "prathamA", "vAg");
+        has(&v, "prathamA", "vAcO");
+        has(&v, "dvitIyA", "vAcam");
+        has(&v, "tfIyA", "vAcA");
+        has(&v, "tfIyA", "vAgByAm");
+        has(&v, "zazWI", "vAcAm");
+        has(&v, "saptamI", "vAkzu");
+        // दिश्: दिक्/दिग्, दिग्भ्याम्, दिक्षु.
+        let d2 = generate("diS", "stri").expect("diS");
+        has(&d2, "prathamA", "dik");
+        has(&d2, "prathamA", "dig");
+        has(&d2, "dvitIyA", "diSam");
+        has(&d2, "tfIyA", "diSA");
+        has(&d2, "tfIyA", "digByAm");
+        has(&d2, "saptamI", "dikzu");
+        // प-anta: ककुप् (पद already प्).
+        let kp = generate("kakup", "pum").expect("kakup");
+        has(&kp, "prathamA", "kakup");
+        has(&kp, "dvitIyA", "kakupam");
+        has(&kp, "tfIyA", "kakupA");
+        has(&kp, "saptamI", "kakupsu");
     }
 
     #[test]
