@@ -155,14 +155,6 @@ pub fn san_stem(root: &str) -> String {
     ruki_stutva(&format!("{abh}{root}iza"))
 }
 
-fn abhyasa_guna(root: &str) -> String {
-    let Some(c0) = root.chars().next() else {
-        return "a".into();
-    };
-    let c = palatalize_kuho(deaspirate(c0));
-    format!("{c}o")
-}
-
 fn root_of(dhatu: &str) -> String {
     let mut r = surface_root(dhatu);
     if r.ends_with('a') && r.len() >= 3 {
@@ -228,47 +220,87 @@ fn abhyasa_i(root: &str) -> String {
     format!("{}i", first_abhyasa_cons(root))
 }
 
-/// यङ् present aṅga (आत्मने). बोभूय, चेक्रीय, जङ्गम्य.
-pub fn yan_stem(root: &str) -> String {
-    match root {
-        "BU" => "boBUya".into(),
-        "kf" => "cekrIya".into(),
-        "gam" => "jaNgamya".into(),
-        "han" => "jaNGanya".into(),
-        "nI" => "nenIya".into(),
-        "pac" => "pApacya".into(),
-        "dA" => "dedIya".into(),
-        _ => {
-            let abh = abhyasa_guna(root);
-            format!("{abh}{root}ya")
-        }
+/// 7.4.27 रीङ् ऋतः; आ → ई; 7.3.54 हन् (यङ् is ङित्); short i/u lengthen.
+fn yan_anga(root: &str) -> String {
+    if root == "han" {
+        return "Gan".into();
     }
+    if root.ends_with('f') || root.ends_with('F') {
+        let onset: String = root.chars().take_while(|&c| is_cons(c)).collect();
+        return format!("{onset}rI");
+    }
+    if root.ends_with('A') {
+        let mut s = root.to_string();
+        s.pop();
+        s.push('I');
+        return s;
+    }
+    if root.ends_with('u') {
+        let mut s = root.to_string();
+        s.pop();
+        s.push('U');
+        return s;
+    }
+    if root.ends_with('i') {
+        let mut s = root.to_string();
+        s.pop();
+        s.push('I');
+        return s;
+    }
+    root.to_string()
 }
 
-/// कर्मणि/भावे यक्. भूय, क्रिय, गम्य, दीय, उच्य.
-pub fn karma_stem(root: &str) -> String {
-    match root {
-        "BU" => "BUya".into(),
-        "kf" => "kriya".into(),
-        "gam" => "gamya".into(),
-        "dA" => "dIya".into(),
-        "DA" => "DIya".into(),
-        "sTA" => "sTIya".into(),
-        "pA" => "pIya".into(),
-        "han" => "hanya".into(),
-        "nI" => "nIya".into(),
-        "vac" => "ucya".into(),
-        "yaj" => "ijya".into(),
-        "pac" => "pacya".into(),
-        "as" => "BUya".into(),
-        "i" => "Iya".into(),
-        _ if root.ends_with('A') => {
-            let mut s = root.to_string();
-            s.pop();
-            format!("{s}Iya")
-        }
-        _ => format!("{root}ya"),
+/// 7.4.82 गुणो यङ्लुकोः (इगुपध अभ्यास); 7.4.83 दीर्घोऽकितः; 7.4.85 नुगतोऽनुनासिकान्तस्य.
+fn yan_abhyasa(orig: &str, anga: &str) -> String {
+    let c = first_abhyasa_cons(orig);
+    if orig.chars().last().is_some_and(|ch| matches!(ch, 'n' | 'm' | 'N' | 'Y' | 'R')) {
+        let n = match anga.chars().next() {
+            Some('k' | 'K' | 'g' | 'G' | 'h') => 'N',
+            Some('c' | 'C' | 'j' | 'J') => 'Y',
+            Some('w' | 'W' | 'q' | 'Q') => 'R',
+            Some('p' | 'P' | 'b' | 'B' | 'm') => 'm',
+            _ => 'n',
+        };
+        return format!("{c}a{n}");
     }
+    let av = match last_vowel(anga) {
+        Some('i' | 'I' | 'e') => 'e',
+        Some('u' | 'U' | 'o') => 'o',
+        Some('a' | 'A') => 'A',
+        _ => 'a',
+    };
+    format!("{c}{av}")
+}
+
+/// यङ् present aṅga (आत्मने). बोभूय, चेक्रीय, जङ्गम्य, पापच्य, देदीय.
+pub fn yan_stem(root: &str) -> String {
+    let anga = yan_anga(root);
+    let abh = yan_abhyasa(root, &anga);
+    format!("{abh}{anga}ya")
+}
+
+/// कर्मणि/भावे यक् (3.1.67, kit). 2.4.52 अस्तिर्भूः; 6.1.15 संप्रसारण; 7.4.28 रिङ् ऋतः.
+pub fn karma_stem(root: &str) -> String {
+    let r = match root {
+        "as" => "BU".into(),
+        "vac" => "uc".into(),
+        "yaj" => "ij".into(),
+        "vap" => "up".into(),
+        "vah" => "uh".into(),
+        "svap" | "zvap" => "sup".into(),
+        "i" => "I".into(),
+        other => other.to_string(),
+    };
+    if r.ends_with('A') {
+        let mut s = r;
+        s.pop();
+        return format!("{s}Iya");
+    }
+    if r.ends_with('f') || r.ends_with('F') {
+        let onset: String = r.chars().take_while(|&c| is_cons(c)).collect();
+        return format!("{onset}riya");
+    }
+    format!("{r}ya")
 }
 
 /// 7.4.1 णौ चङ्युपधाया ह्रस्वः: णिच् aṅga without अय, then चङ् reduplication (7.4.93–94).
@@ -476,6 +508,27 @@ mod tests {
         assert!(f.iter().any(|x| x == "SuSrUzati"), "{:?}", f);
         let f = kartari("zWA", "san", "lat", 1, 1, "P").unwrap();
         assert!(f.iter().any(|x| x == "tizWAsati"), "{:?}", f);
+        assert_eq!(yan_stem("BU"), "boBUya");
+        assert_eq!(yan_stem("kf"), "cekrIya");
+        assert_eq!(yan_stem("gam"), "jaNgamya");
+        assert_eq!(yan_stem("han"), "jaNGanya");
+        assert_eq!(yan_stem("nI"), "nenIya");
+        assert_eq!(yan_stem("pac"), "pApacya");
+        assert_eq!(yan_stem("dA"), "dedIya");
+        assert_eq!(yan_stem("Sru"), "SoSrUya");
+        assert_eq!(karma_stem("dA"), "dIya");
+        assert_eq!(karma_stem("vac"), "ucya");
+        assert_eq!(karma_stem("as"), "BUya");
+        let f = kartari("qukfY", "yaN", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "cekrIyate"), "{:?}", f);
+        let f = kartari("qupacaz", "yaN", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "pApacyate"), "{:?}", f);
+        let f = kartari("hana", "yaN", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "jaNGanyate"), "{:?}", f);
+        let f = kartari("qudAY", "karma", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "dIyate"), "{:?}", f);
+        let f = kartari("vaca", "karma", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "ucyate"), "{:?}", f);
     }
 
     #[test]
