@@ -23,6 +23,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
   - **6.1.16 व्यध्/वे/वश्/ज्या:** विध् → विद्ध (with 8.2.40); वे → उत (इक् before इट्); वश् → उष्ट (8.2.36); ज्या → जीन (named; जि+त would be *जित). विच् stays विक्त (8.2.30).
 - **अदादि आत्मने दुह्/लिह् (8.2.31/32):** `lat_ad_a` ते/आते/अते (not thematic एते/अन्ते) — दुग्धे, दुहाते, दुहते, धुक्षे, धोक्ष्यते, लीढे. `jhal` ह्+स् on द-initial is 8.2.32. लृट् आत्मने keeps thematic स्य (`lrt_kartari_a`).
 - **सुबन्त इन् nap (7.1.23):** दण्डिन् नपुंसक दण्डि/दण्डिनी/दण्डीनि (not पुं दण्डी). Oblique same as इन् पुं.
+- **सुबन्त त-anta:** मरुत्/सरित् — पद already त् (8.2.39); `at` शतृ keeps the longer ending.
 
 ## 2026-08-31
 
