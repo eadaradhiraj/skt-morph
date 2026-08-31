@@ -146,7 +146,7 @@ pub fn yam_cc_lang_stem(dhatu: &str, antarganas: &str) -> Option<String> {
     if (dhatu=="yam" || dhatu=="dA") && !is_gawadi(antarganas) { Some("yacC".to_string()) } else { None }
 }
 pub fn yam_cc_future_stem(dhatu: &str, antarganas: &str) -> Option<String> {
-    if dhatu=="yam" && !is_gawadi(antarganas) { Some("yaMsy".to_string()) } else { None }
+    if dhatu=="yam" && !is_gawadi(antarganas) { Some("yaMsya".to_string()) } else { None }
 }
 
 const G1_AYA_PRESENT: &[&str] = &["ji","Sri","nI","De","jri"];
@@ -229,7 +229,7 @@ pub fn sad_present_base(dhatu: &str) -> Option<String> {
         "gam" => return Some("gacC".to_string()),
         _ => {}
     }
-    if dhatu.ends_with('u') && dhatu.len()<=4 && dhatu!="gu" && dhatu!="Sru" {
+    if dhatu.ends_with('u') && dhatu.len()<=4 && dhatu!="gu" {
         return Some(format!("{}av", &dhatu[..dhatu.len()-1]));
     }
     None

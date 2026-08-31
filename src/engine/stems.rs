@@ -78,7 +78,11 @@ const G1_KZYA_ROOTS: &[&str] = &["Siz","viz","kruS","ruh","saYj"];
 const G1_A_FINAL: &[&str] = &["SrA","jYA"];
 
 fn g1_special_lrt(dhatu: &str) -> Option<String> {
-    let map: &[(&str,&str)] = &[("sru","srozy"),("su","sozy"),("Sru","Srozy"),("Dru","Drozy"),("du","dozy"),("dru","drozy"),("tyaj","tyakzy"),("skand","skantsy"),("nam","naMsy")];
+    let map: &[(&str,&str)] = &[
+        ("sru","srozya"),("su","sozya"),("Sru","Srozya"),("Dru","Drozya"),("du","dozya"),
+        ("dru","drozya"),("tyaj","tyakzya"),("skand","skantsya"),("nam","naMsya"),
+        ("vft","vartsya"),("syand","syantsya"),("kfp","kalpsya"),("kalp","kalpsya"),
+    ];
     for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
     if ["Dinv"].contains(&dhatu) { return Some(format!("{}izya", dhatu)); }
     if dhatu.ends_with('A') && (2..=4).contains(&dhatu.len()) && !["SrA","jYA"].contains(&dhatu) { return Some(format!("{}sya", dhatu)); }
@@ -415,6 +419,8 @@ pub fn derive_stem(
     } else {
         dhatu.to_string()
     };
+    // 8.2.18 कृपो रो लः
+    let dhatu_clean = if dhatu_clean == "kfp" { "kalp".to_string() } else { dhatu_clean };
     let dhatu = dhatu_clean.as_str();
     if derivation != "shuddha" {
         return (None, None);

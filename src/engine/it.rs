@@ -17,7 +17,7 @@ pub fn anit_sya(root: &str) -> bool {
             | "DA" | "sTA" | "pA" | "i" | "ad" | "han" | "diS" | "duh" | "lih" | "gA" | "hu"
             | "mA" | "yA" | "as" | "vid" | "pad" | "sic" | "vis" | "mfj" | "yuj" | "Baj"
             | "raYj" | "saYj" | "kfz" | "dfS" | "sfj" | "masj" | "majj" | "ruh" | "guh" | "nah"
-            | "vasc" | "vraSc" | "Ced" | "Cid"
+            | "vasc" | "vraSc" | "Ced" | "Cid" | "vft" | "syand" | "kfp" | "kalp"
     )
 }
 
@@ -112,6 +112,9 @@ pub fn sya_stem(root: &str) -> String {
         "vac" => return "vakzya".into(),
         "pac" => return "pakzya".into(),
         "yaj" => return "yakzya".into(),
+        "vft" => return "vartsya".into(),
+        "syand" => return "syantsya".into(),
+        "kfp" | "kalp" => return "kalpsya".into(),
         _ => {}
     }
     if takes_it_sya(root) {
@@ -230,6 +233,9 @@ mod tests {
         assert_eq!(sya_stem("kf"), "karizya");
         assert_eq!(sya_stem("pac"), "pakzya");
         assert_eq!(sya_stem("sTA"), "sTAsya");
+        assert_eq!(sya_stem("vft"), "vartsya");
+        assert_eq!(sya_stem("syand"), "syantsya");
+        assert_eq!(sya_stem("kfp"), "kalpsya");
     }
 
     #[test]

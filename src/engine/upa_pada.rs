@@ -41,12 +41,18 @@ fn has_prefix(norm: &[String], target: &str) -> bool {
 }
 
 /// Compute allowed padas for this (root_pada, dhatu, prefixes) combo.
-/// Returns Vec containing "P" and/or "A". Empty means no valid pada (shouldn't happen).
+/// Empty `artha` does not fire meaning-conditioned 1.3 rules (38, 43, 66, 75).
 pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<String> {
+    allowed_padas_artha(root_pada, dhatu, prefixes, "")
+}
+
+pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], artha: &str) -> Vec<String> {
     let d = dhatu.trim();
     let norm = normalized_prefixes(prefixes);
     let has_sam = has_prefix(&norm, "sam");
     let _has_A = has_prefix(&norm, "A");
+    let a = artha.trim();
+    let kram_sense = matches!(a, "vftti" | "sarga" | "tAyana");
 
     // --- gam ---
     // 1.3.29 sam + gam -> optional Ātmanepada (vA). Includes sam+A+gam (samAgam)
@@ -109,9 +115,11 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
         return vec!["A".to_string()];
     }
 
-    // --- 1.3.66 भृञो यज्ञकर्मणि? sam/ni/ud + Bf → A in non-saṃskāra; treat as vA ---
+    // --- 1.3.66 भृञो यज्ञकर्मणि ---
     if matches!(d, "Bf" | "BfY" | "quBfY") && (has_sam || has_prefix(&norm, "ni") || has_prefix(&norm, "ud")) {
-        return vec!["P".to_string(), "A".to_string()];
+        if a == "yajYa" {
+            return vec!["A".to_string()];
+        }
     }
 
     // --- 1.3.18 परिव्यवेभ्यः क्रियः ---
@@ -131,18 +139,26 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
         return vec!["A".to_string()];
     }
 
-    // --- 1.3.38 वृत्तिसर्गतायनेषु क्रमः / 1.3.43 अनुपसर्गाद्वा — treat vi/sam/pari as A ---
-    if matches!(d, "kramu" | "kram")
-        && (has_prefix(&norm, "vi") || has_sam || has_prefix(&norm, "pari"))
-    {
-        return vec!["A".to_string()];
+    // --- 1.3.38 वृत्तिसर्गतायनेषु क्रमः / 1.3.43 अनुपसर्गाद्वा ---
+    if matches!(d, "kramu" | "kram" | "krama") && kram_sense {
+        if has_prefix(&norm, "vi") || has_sam || has_prefix(&norm, "pari") {
+            return vec!["A".to_string()];
+        }
+        if norm.is_empty() {
+            return vec!["P".to_string(), "A".to_string()];
+        }
     }
 
     // --- 1.3.75 समुदाङ्भ्यो यमोऽग्रन्थे ---
     if matches!(d, "yama" | "yam" | "yamx")
         && (has_sam || has_prefix(&norm, "ud") || has_prefix(&norm, "A"))
     {
-        return vec!["A".to_string()];
+        if a == "agranthe" {
+            return vec!["A".to_string()];
+        }
+        if a == "granthe" {
+            return vec!["P".to_string()];
+        }
     }
 
     // Default: dhātupāṭha pada (1.3.12–77 exceptions are listed above).
@@ -156,6 +172,18 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
 
 pub fn pada_allowed(root_pada: &str, requested_pada: &str, dhatu: &str, prefixes: &[String]) -> bool {
     allowed_padas(root_pada, dhatu, prefixes).iter().any(|p| p == requested_pada)
+}
+
+pub fn pada_allowed_artha(
+    root_pada: &str,
+    requested_pada: &str,
+    dhatu: &str,
+    prefixes: &[String],
+    artha: &str,
+) -> bool {
+    allowed_padas_artha(root_pada, dhatu, prefixes, artha)
+        .iter()
+        .any(|p| p == requested_pada)
 }
 
 #[cfg(test)]
@@ -234,14 +262,25 @@ mod tests {
     }
 
     #[test]
-    fn kram_vi_is_a() {
+    fn kram_vi_needs_artha() {
         let vi = s(&["vi"]);
-        assert_eq!(allowed_padas("P", "kramu", &vi), vec!["A"]);
+        assert_eq!(allowed_padas("P", "kramu", &vi), vec!["P"]);
+        assert_eq!(allowed_padas_artha("P", "kramu", &vi, "vftti"), vec!["A"]);
+        assert_eq!(allowed_padas_artha("P", "kramu", &[], "sarga"), vec!["P", "A"]);
     }
 
     #[test]
-    fn yam_sam_is_a() {
+    fn yam_sam_needs_artha() {
         let sam = s(&["sam"]);
-        assert_eq!(allowed_padas("P", "yama", &sam), vec!["A"]);
+        assert_eq!(allowed_padas("P", "yama", &sam), vec!["P"]);
+        assert_eq!(allowed_padas_artha("P", "yama", &sam, "agranthe"), vec!["A"]);
+        assert_eq!(allowed_padas_artha("P", "yama", &sam, "granthe"), vec!["P"]);
+    }
+
+    #[test]
+    fn bhr_yajna_is_a() {
+        let sam = s(&["sam"]);
+        assert_eq!(allowed_padas("U", "quBfY", &sam), vec!["P", "A"]);
+        assert_eq!(allowed_padas_artha("U", "quBfY", &sam, "yajYa"), vec!["A"]);
     }
 }

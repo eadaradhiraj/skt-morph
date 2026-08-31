@@ -15,7 +15,7 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
     match (s_last, suff_first) {
         ('d', 't') => format!("{}t{}", stem_body, suffix),
         ('d', 'T') => format!("{}tT{}", stem_body, &suffix[1..]),
-        ('d', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
+        ('d', 's') | ('t', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
         ('D', 't') => format!("{}dD{}", stem_body, &suffix[1..]),
         ('D', 'T') => format!("{}dD{}", stem_body, &suffix[1..]),
         ('D', 's') => format!("{}ts{}", stem_body, &suffix[1..]),

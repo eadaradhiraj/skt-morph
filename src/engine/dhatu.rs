@@ -35,6 +35,10 @@ pub fn lookup(query: &str) -> Option<DhatuRow> {
     }
     for rec in crate::data::DHATUS {
         if rec.1 == q {
+            // यम् by name: Kaumudī यच्छति (not ghaṭādi 01.0930 mittva).
+            if q == "yama" && rec.5.contains("GawAdi") {
+                continue;
+            }
             return Some(row(rec));
         }
     }
@@ -42,6 +46,21 @@ pub fn lookup(query: &str) -> Option<DhatuRow> {
         let name = rec.1;
         if name.starts_with(q) && name.len() > q.len() && is_it_suffix(&name[q.len()..]) {
             return Some(row(rec));
+        }
+    }
+    // Devanagari क्रम → SLP1 `krama` (inherent a). Retry without final a.
+    if q.ends_with('a') && q.len() > 2 {
+        let stem = &q[..q.len() - 1];
+        for rec in crate::data::DHATUS {
+            if rec.1 == stem {
+                return Some(row(rec));
+            }
+        }
+        for rec in crate::data::DHATUS {
+            let name = rec.1;
+            if name.starts_with(stem) && name.len() > stem.len() && is_it_suffix(&name[stem.len()..]) {
+                return Some(row(rec));
+            }
         }
     }
     None
@@ -93,5 +112,18 @@ mod tests {
         let d = lookup("gam").expect("gam");
         assert_eq!(d.id, "01.1137");
         assert_eq!(d.dhatu, "gamx");
+    }
+
+    #[test]
+    fn yama_by_name_is_yacchati() {
+        let d = lookup("yama").expect("yama");
+        assert_ne!(d.id, "01.0930");
+        assert!(!d.antarganas.contains("GawAdi"));
+    }
+
+    #[test]
+    fn krama_from_deva_is_kramu() {
+        let d = lookup("krama").expect("krama");
+        assert_eq!(d.dhatu, "kramu");
     }
 }

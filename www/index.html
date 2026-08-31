@@ -65,9 +65,18 @@ details{margin-top:.6rem}
     <option value="karma">कर्मणि</option>
   </select>
   <input id="verb-prefix" placeholder="उपसर्ग प्र, सम्" style="width:180px">
+  <select id="verb-artha">
+    <option value="">अर्थ —</option>
+    <option value="vftti">वृत्ति</option>
+    <option value="sarga">सर्ग</option>
+    <option value="tAyana">तायन</option>
+    <option value="yajYa">यज्ञकर्मन्</option>
+    <option value="agranthe">अग्रन्थ</option>
+    <option value="granthe">ग्रन्थ</option>
+  </select>
   <button id="btn-verb">गण (९)</button>
   <button id="btn-verb1">एक (प्रथम एकवचन)</button>
-  <div class="hint">उपसर्ग: सम्+भू → सम्भू, प्र+इ → प्रे</div>
+  <div class="hint">उपसर्ग: सम्+भू → सम्भू, प्र+इ → प्रे. अर्थ: 1.3 वृत्ति/अग्रन्थ आदि (रिक्त = धातुरूप).</div>
   <div id="out-verb"></div>
 </section>
 
@@ -104,7 +113,7 @@ details{margin-top:.6rem}
 </section>
 
 <section id="sec-taddhita" hidden>
-  <input id="tbase" placeholder="प्रातिपदिक राम / rAma" value="राम">
+  <input id="tbase" placeholder="प्रातिपदिक राम / दिति / गर्ग" value="राम">
   <select id="tpratyaya">
     <option value="tva">त्व</option>
     <option value="tal">तल्</option>
@@ -115,6 +124,9 @@ details{margin-top:.6rem}
     <option value="tamap">तमप्</option>
     <option value="Ca">छ</option>
     <option value="ka">क</option>
+    <option value="aR">अण्</option>
+    <option value="Dak">ढक्</option>
+    <option value="yaY">यञ्</option>
   </select>
   <button id="btn-taddhita">तद्धित</button>
   <div id="out-taddhita"></div>

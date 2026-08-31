@@ -5,7 +5,7 @@ use crate::engine::lakara::{lakara_family, normalize_lakara};
 use crate::engine::stems::{derive_stem, conjugation_gana};
 use crate::engine::endings::family_endings;
 use crate::engine::join::join_variants;
-use crate::engine::upa_pada::pada_allowed;
+use crate::engine::upa_pada::pada_allowed_artha;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TinantaResult {
@@ -34,7 +34,11 @@ pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> Tin
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> TinantaResult {
-    let forms = generate_all_with_prefixes(dhatu_query, lakara, purusha, vacana, prefixes);
+    generate_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, "")
+}
+
+pub fn generate_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String], artha: &str) -> TinantaResult {
+    let forms = generate_all_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, artha);
     let (canon, _) = normalize_lakara(lakara);
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
@@ -50,7 +54,11 @@ fn attach_prefixes(prefixes: &[String], forms: Vec<String>) -> Vec<String> {
 }
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
-    generate_all_derived(dhatu_query, "", lakara, purusha, vacana, prefixes)
+    generate_all_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, "")
+}
+
+pub fn generate_all_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String], artha: &str) -> Vec<String> {
+    generate_all_derived_artha(dhatu_query, "", lakara, purusha, vacana, prefixes, artha)
 }
 
 /// `derivation`: empty = śuddha; `Ric` / `san` / `yaN` / `karma`.
@@ -62,15 +70,27 @@ pub fn generate_all_derived(
     vacana: u8,
     prefixes: &[String],
 ) -> Vec<String> {
+    generate_all_derived_artha(dhatu_query, derivation, lakara, purusha, vacana, prefixes, "")
+}
+
+pub fn generate_all_derived_artha(
+    dhatu_query: &str,
+    derivation: &str,
+    lakara: &str,
+    purusha: u8,
+    vacana: u8,
+    prefixes: &[String],
+    artha: &str,
+) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
     let deriv = derivation.trim();
     if !deriv.is_empty() && deriv != "shuddha" {
-        return live_generate_derived(dhatu_query, deriv, &canonical, &db_lakara, purusha, vacana, prefixes);
+        return live_generate_derived(dhatu_query, deriv, &canonical, &db_lakara, purusha, vacana, prefixes, artha);
     }
     if let Some(out) = crate::engine::tinanta_overrides::lookup_override(dhatu_query, &canonical, purusha, vacana, prefixes) {
         return out;
     }
-    live_generate(dhatu_query, &canonical, &db_lakara, purusha, vacana, prefixes)
+    live_generate(dhatu_query, &canonical, &db_lakara, purusha, vacana, prefixes, artha)
 }
 
 pub fn generate_derived(
@@ -81,16 +101,34 @@ pub fn generate_derived(
     vacana: u8,
     prefixes: &[String],
 ) -> TinantaResult {
-    let forms = generate_all_derived(dhatu_query, derivation, lakara, purusha, vacana, prefixes);
+    let forms = generate_all_derived_artha(dhatu_query, derivation, lakara, purusha, vacana, prefixes, "");
+    let (canon, _) = normalize_lakara(lakara);
+    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
+}
+
+pub fn generate_derived_artha(
+    dhatu_query: &str,
+    derivation: &str,
+    lakara: &str,
+    purusha: u8,
+    vacana: u8,
+    prefixes: &[String],
+    artha: &str,
+) -> TinantaResult {
+    let forms = generate_all_derived_artha(dhatu_query, derivation, lakara, purusha, vacana, prefixes, artha);
     let (canon, _) = normalize_lakara(lakara);
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
 pub fn generate_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
+    generate_paradigm_derived_artha(dhatu, derivation, lakara, prefixes, "")
+}
+
+pub fn generate_paradigm_derived_artha(dhatu: &str, derivation: &str, lakara: &str, prefixes: &[String], artha: &str) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
     for p in 1..=3 {
         for v in 1..=3 {
-            let forms = generate_all_derived(dhatu, derivation, lakara, p, v, prefixes);
+            let forms = generate_all_derived_artha(dhatu, derivation, lakara, p, v, prefixes, artha);
             out.push(ParadigmEntry { purusha: p, vacana: v, forms });
         }
     }
@@ -105,6 +143,7 @@ fn live_generate_derived(
     purusha: u8,
     vacana: u8,
     prefixes: &[String],
+    _artha: &str,
 ) -> Vec<String> {
     let Some((dhatu, _, _, _, _, _)) = load_dhatu_info(dhatu_query) else {
         return vec![];
@@ -127,13 +166,14 @@ pub fn live_generate(
     purusha: u8,
     vacana: u8,
     prefixes: &[String],
+    artha: &str,
 ) -> Vec<String> {
     let Some((dhatu, gana, root_pada, tags, antarganas, aupadeshik)) = load_dhatu_info(dhatu_query) else {
         return vec![];
     };
     let Some(family) = lakara_family(db_lakara) else { return vec![]; };
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
-    if !pada_allowed(&root_pada, &pada, &dhatu, prefixes) {
+    if !pada_allowed_artha(&root_pada, &pada, &dhatu, prefixes, artha) {
         return vec![];
     }
     if family == "lit" {
@@ -173,9 +213,13 @@ pub fn generate_paradigm(dhatu: &str, lakara: &str) -> Vec<ParadigmEntry> {
 }
 
 pub fn generate_paradigm_with_prefixes(dhatu: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
+    generate_paradigm_with_artha(dhatu, lakara, prefixes, "")
+}
+
+pub fn generate_paradigm_with_artha(dhatu: &str, lakara: &str, prefixes: &[String], artha: &str) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
     for p in 1..=3 { for v in 1..=3 {
-        let forms = generate_all_with_prefixes(dhatu, lakara, p, v, prefixes);
+        let forms = generate_all_with_artha(dhatu, lakara, p, v, prefixes, artha);
         out.push(ParadigmEntry { purusha: p, vacana: v, forms });
     }}
     out
@@ -207,7 +251,7 @@ mod tests {
     #[test]
     fn live_kakzi_vidhilin() {
         let (canon, db) = normalize_lakara("pvidhilin");
-        let f = live_generate("kAkzi", &canon, &db, 1, 1, &[]);
+        let f = live_generate("kAkzi", &canon, &db, 1, 1, &[], "");
         assert!(f.iter().any(|x| x == "kANkzet" || x == "kANkzed"), "{:?}", f);
     }
 
@@ -215,10 +259,10 @@ mod tests {
     fn live_gamx_no_override() {
         assert!(crate::engine::tinanta_overrides::lookup_override("gamx", "plat", 1, 1, &[]).is_none());
         let (canon, db) = normalize_lakara("plat");
-        let f = live_generate("gamx", &canon, &db, 1, 1, &[]);
+        let f = live_generate("gamx", &canon, &db, 1, 1, &[], "");
         assert!(f.iter().any(|x| x == "gacCati"), "{:?}", f);
         let (canon, db) = normalize_lakara("plrt");
-        let f = live_generate("gamx", &canon, &db, 1, 1, &[]);
+        let f = live_generate("gamx", &canon, &db, 1, 1, &[], "");
         assert!(f.iter().any(|x| x == "gamizyati"), "{:?}", f);
     }
 
@@ -443,5 +487,49 @@ mod tests {
         assert!(f.is_empty(), "{:?}", f);
         let f = generate_all_with_prefixes("qukrIY", "alat", 1, 1, &prefs);
         assert!(!f.is_empty(), "{:?}", f);
+    }
+
+    #[test]
+    fn folded_g1_live() {
+        let f = generate_all("RIY", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "nayati"), "{:?}", f);
+        let f = generate_all("yama", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "yacCati"), "{:?}", f);
+        let f = generate_all("yama", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "yaMsyati"), "{:?}", f);
+        let f = generate_all("dAR", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "yacCati"), "{:?}", f);
+        let f = generate_all("Sru", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "Sravati"), "{:?}", f);
+        let f = generate_all("Sru", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "Srozyati"), "{:?}", f);
+        let f = generate_all("sru", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "srozyati"), "{:?}", f);
+        let f = generate_all("rivi", "plot", 3, 1);
+        assert!(f.iter().any(|x| x == "riRvAni"), "{:?}", f);
+        let f = generate_all("vftu", "alrt", 1, 1);
+        assert!(f.iter().any(|x| x == "vartsyate"), "{:?}", f);
+        let f = generate_all("vfDu", "alrt", 1, 1);
+        assert!(f.iter().any(|x| x == "varDizyate"), "{:?}", f);
+        let f = generate_all("syandU", "alrt", 1, 1);
+        assert!(f.iter().any(|x| x == "syantsyate"), "{:?}", f);
+        let f = generate_all("kfpU", "alrt", 1, 1);
+        assert!(f.iter().any(|x| x == "kalpsyate"), "{:?}", f);
+        assert!(crate::engine::tinanta_overrides::lookup_override("vftu", "plrt", 1, 1, &[]).is_none());
+        assert!(crate::engine::tinanta_overrides::lookup_override("vfDu", "plrt", 1, 1, &[]).is_none());
+    }
+
+    #[test]
+    fn kram_yam_artha() {
+        let vi = vec!["vi".to_string()];
+        let f = generate_all_with_prefixes("kramu", "alat", 1, 1, &vi);
+        assert!(f.is_empty(), "{:?}", f);
+        let f = generate_all_with_artha("krama", "alat", 1, 1, &vi, "vftti");
+        assert!(!f.is_empty(), "{:?}", f);
+        let sam = vec!["sam".to_string()];
+        let f = generate_all_with_artha("yama", "alat", 1, 1, &sam, "agranthe");
+        assert!(!f.is_empty(), "{:?}", f);
+        let f = generate_all_with_artha("yama", "alat", 1, 1, &sam, "granthe");
+        assert!(f.is_empty(), "{:?}", f);
     }
 }

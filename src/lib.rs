@@ -28,9 +28,9 @@ pub fn generate_verb(dhatu: &str, lakara: &str, purusha: u8, vacana: u8) -> JsVa
 }
 
 #[wasm_bindgen]
-pub fn generate_verb_with_prefix(dhatu: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str) -> JsValue {
+pub fn generate_verb_with_prefix(dhatu: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
-    let result = engine::tinanta::generate_with_prefixes(dhatu, lakara, purusha, vacana, &prefs);
+    let result = engine::tinanta::generate_with_artha(dhatu, lakara, purusha, vacana, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
@@ -41,28 +41,28 @@ pub fn generate_verb_paradigm(dhatu: &str, lakara: &str) -> JsValue {
 }
 
 #[wasm_bindgen]
-pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &str) -> JsValue {
+pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
-    let result = engine::tinanta::generate_paradigm_with_prefixes(dhatu, lakara, &prefs);
+    let result = engine::tinanta::generate_paradigm_with_artha(dhatu, lakara, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
 /// `derivation`: empty / `shuddha`, or `Ric` / `san` / `yaN` / `karma`.
 #[wasm_bindgen]
-pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str) -> JsValue {
+pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
-    let result = engine::tinanta::generate_derived(dhatu, derivation, lakara, purusha, vacana, &prefs);
+    let result = engine::tinanta::generate_derived_artha(dhatu, derivation, lakara, purusha, vacana, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
-pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &str) -> JsValue {
+pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
-    let result = engine::tinanta::generate_paradigm_derived(dhatu, derivation, lakara, &prefs);
+    let result = engine::tinanta::generate_paradigm_derived_artha(dhatu, derivation, lakara, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// तद्धित (त्व / तल् / मतुप् / मयट् / इन् / तरप् / तमप् / छ / क)
+/// तद्धित (त्व / तल् / मतुप् / मयट् / इन् / तरप् / तमप् / छ / क / अण् / ढक् / यञ्)
 #[wasm_bindgen]
 pub fn generate_taddhita(pratipadika: &str, pratyaya: &str) -> JsValue {
     let result = engine::taddhita::generate(pratipadika, pratyaya);

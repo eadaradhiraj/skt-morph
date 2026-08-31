@@ -1,9 +1,7 @@
 import init, {
   analyze,
   search,
-  generate_verb,
   generate_verb_with_prefix,
-  generate_verb_paradigm,
   generate_verb_paradigm_with_prefix,
   generate_verb_derived,
   generate_verb_paradigm_derived,
@@ -179,11 +177,10 @@ document.getElementById("btn-verb").onclick = () => {
   const l = document.getElementById("lakara").value;
   const deriv = document.getElementById("derivation").value;
   const pref = prefixesToSlp1(document.getElementById("verb-prefix").value);
+  const artha = document.getElementById("verb-artha").value;
   const res = deriv
-    ? generate_verb_paradigm_derived(d, deriv, l, pref)
-    : pref
-      ? generate_verb_paradigm_with_prefix(d, l, pref)
-      : generate_verb_paradigm(d, l);
+    ? generate_verb_paradigm_derived(d, deriv, l, pref, artha)
+    : generate_verb_paradigm_with_prefix(d, l, pref, artha);
   renderVerbParadigm(res);
 };
 
@@ -192,11 +189,10 @@ document.getElementById("btn-verb1").onclick = () => {
   const l = document.getElementById("lakara").value;
   const deriv = document.getElementById("derivation").value;
   const pref = prefixesToSlp1(document.getElementById("verb-prefix").value);
+  const artha = document.getElementById("verb-artha").value;
   const res = deriv
-    ? generate_verb_derived(d, deriv, l, 1, 1, pref)
-    : pref
-      ? generate_verb_with_prefix(d, l, 1, 1, pref)
-      : generate_verb(d, l, 1, 1);
+    ? generate_verb_derived(d, deriv, l, 1, 1, pref, artha)
+    : generate_verb_with_prefix(d, l, 1, 1, pref, artha);
   renderVerbSingle(res);
 };
 
