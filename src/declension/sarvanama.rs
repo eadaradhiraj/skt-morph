@@ -37,6 +37,10 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("yad".to_string(),"pum".to_string()), vec![vec!["yaH".to_string(),"yO".to_string(),"ye".to_string(),],vec!["yam".to_string(),"yO".to_string(),"yAn".to_string(),],vec!["yena".to_string(),"yAByAm".to_string(),"yEH".to_string(),],vec!["yasmE".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasmAt".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasya".to_string(),"yayoH".to_string(),"yezAm".to_string(),],vec!["yasmin".to_string(),"yayoH".to_string(),"yezu".to_string(),],]);
   m.insert(("yad".to_string(),"stri".to_string()), vec![vec!["yA".to_string(),"ye".to_string(),"yAH".to_string(),],vec!["yAm".to_string(),"ye".to_string(),"yAH".to_string(),],vec!["yayA".to_string(),"yAByAm".to_string(),"yABiH".to_string(),],vec!["yasyE".to_string(),"yAByAm".to_string(),"yAByaH".to_string(),],vec!["yasyAH".to_string(),"yAByAm".to_string(),"yAByaH".to_string(),],vec!["yasyAH".to_string(),"yayoH".to_string(),"yAsAm".to_string(),],vec!["yasyAm".to_string(),"yayoH".to_string(),"yAsu".to_string(),],]);
   m.insert(("yad".to_string(),"nap".to_string()), vec![vec!["yat".to_string(),"ye".to_string(),"yAni".to_string(),],vec!["yat".to_string(),"ye".to_string(),"yAni".to_string(),],vec!["yena".to_string(),"yAByAm".to_string(),"yEH".to_string(),],vec!["yasmE".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasmAt".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasya".to_string(),"yayoH".to_string(),"yezAm".to_string(),],vec!["yasmin".to_string(),"yayoH".to_string(),"yezu".to_string(),],]);
+  // अदस् — 7.2.107 अदस औ सुलोपश्च (असौ); 8.2.80 अदसोऽसेर्दादु दो मः (अमू); 8.2.81 अदसोऽसेर्दादु दो मः / एत ईद्बहुवचने (अमी).
+  m.insert(("adas".to_string(),"pum".to_string()), vec![vec!["asO".to_string(),"amU".to_string(),"amI".to_string(),],vec!["amum".to_string(),"amU".to_string(),"amUn".to_string(),],vec!["amunA".to_string(),"amUByAm".to_string(),"amIBiH".to_string(),],vec!["amuzmE".to_string(),"amUByAm".to_string(),"amIByaH".to_string(),],vec!["amuzmAt".to_string(),"amUByAm".to_string(),"amIByaH".to_string(),],vec!["amuzya".to_string(),"amuyoH".to_string(),"amIzAm".to_string(),],vec!["amuzmin".to_string(),"amuyoH".to_string(),"amIzu".to_string(),],]);
+  m.insert(("adas".to_string(),"stri".to_string()), vec![vec!["asO".to_string(),"amU".to_string(),"amUH".to_string(),],vec!["amUm".to_string(),"amU".to_string(),"amUH".to_string(),],vec!["amuyA".to_string(),"amUByAm".to_string(),"amUBiH".to_string(),],vec!["amuzyE".to_string(),"amUByAm".to_string(),"amUByaH".to_string(),],vec!["amuzyAH".to_string(),"amUByAm".to_string(),"amUByaH".to_string(),],vec!["amuzyAH".to_string(),"amuyoH".to_string(),"amUzAm".to_string(),],vec!["amuzyAm".to_string(),"amuyoH".to_string(),"amUzu".to_string(),],]);
+  m.insert(("adas".to_string(),"nap".to_string()), vec![vec!["adaH".to_string(),"amU".to_string(),"amUni".to_string(),],vec!["adaH".to_string(),"amU".to_string(),"amUni".to_string(),],vec!["amunA".to_string(),"amUByAm".to_string(),"amIBiH".to_string(),],vec!["amuzmE".to_string(),"amUByAm".to_string(),"amIByaH".to_string(),],vec!["amuzmAt".to_string(),"amUByAm".to_string(),"amIByaH".to_string(),],vec!["amuzya".to_string(),"amuyoH".to_string(),"amIzAm".to_string(),],vec!["amuzmin".to_string(),"amuyoH".to_string(),"amIzu".to_string(),],]);
   m.insert(("ubha".to_string(),"any".to_string()), vec![vec!["ubhau".to_string(),"ubhau".to_string(),"ubhe".to_string(),],vec!["ubhau".to_string(),"ubhau".to_string(),"ubhe".to_string(),],vec!["ubhABhyAm".to_string(),"ubhABhyAm".to_string(),"ubhABhiH".to_string(),],vec!["ubhABhyAm".to_string(),"ubhABhyAm".to_string(),"ubhABhyaH".to_string(),],vec!["ubhABhyAm".to_string(),"ubhABhyAm".to_string(),"ubhABhyaH".to_string(),],vec!["ubhayoH".to_string(),"ubhayoH".to_string(),"ubhAm".to_string(),],vec!["ubhayoH".to_string(),"ubhayoH".to_string(),"ubhAsu".to_string(),],]);
   m.insert(("ena".to_string(),"pum".to_string()), vec![vec!["ezaH".to_string(),"etO".to_string(),"ete".to_string(),],vec!["etam".to_string(),"etO".to_string(),"etAn".to_string(),],vec!["etena".to_string(),"etAByAm".to_string(),"etEBiH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH".to_string(),"etezu".to_string(),],]);
   m.insert(("ena".to_string(),"stri".to_string()), vec![vec!["etA".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etAm".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etayA".to_string(),"etAByAm".to_string(),"etABiH".to_string(),],vec!["etasyE".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etayoH".to_string(),"etAsAm".to_string(),],vec!["etasyAm".to_string(),"etayoH".to_string(),"etAsu".to_string(),],]);
@@ -135,4 +139,35 @@ pub fn analyze(word: &str) -> Vec<HashMap<String,String>> {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn has(t: &PronounTable, vib: &str, form: &str) {
+        let row = t.table.get(vib).unwrap();
+        assert!(row.iter().any(|x| x == form || x.split('/').any(|p| p == form)), "{vib} {:?}, want {form}", row);
+    }
+
+    #[test]
+    fn adas_asau_amu_ami() {
+        let p = generate("adas", "pum").expect("adas pum");
+        has(&p, "prathamA", "asO");
+        has(&p, "prathamA", "amU");
+        has(&p, "prathamA", "amI");
+        has(&p, "dvitIyA", "amum");
+        has(&p, "tfIyA", "amunA");
+        has(&p, "saptamI", "amuzmin");
+        has(&p, "saptamI", "amIzu");
+        let s = generate("adas", "stri").expect("adas stri");
+        has(&s, "prathamA", "asO");
+        has(&s, "prathamA", "amUH");
+        has(&s, "dvitIyA", "amUm");
+        let n = generate("adas", "nap").expect("adas nap");
+        has(&n, "prathamA", "adaH");
+        has(&n, "prathamA", "amUni");
+        assert!(analyze("asO").iter().any(|m| m.get("pratipadika") == Some(&"adas".to_string())));
+        assert!(analyze("adaH").iter().any(|m| m.get("pratipadika") == Some(&"adas".to_string())));
+    }
 }
