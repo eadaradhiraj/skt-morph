@@ -64,6 +64,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **Sequential इत्:** 1.3.5 ञिटुडवः, then 6.1.64/65, then leftover vowel/a इत् — not a per-name table. ष्टन stanati, षिधु seDati, षण sanati; टुनदि nandati (7.1.58); टुओस्फूर्जा sPUrjati; ञिफला Palati. दैप् stays दायति (not 7.3.78 यच्छति).
 - **CI lint:** `cargo clippy --all-targets -- -D warnings` and tests with `RUSTFLAGS=-D warnings`. `#![deny(warnings)]` on the lib.
 - **लट् leftover sūtras:** 1.3.3 visarga/प् (छदिः छदति, दैप् दायति); 6.4.25–26 शपि only (दशति, सजति, स्वजति, रजति) not लृट् (सङ्क्ष्यति); 8.4.40 स्तोः श्चुना (षस्ज सज्जति); 7.1.58 नुम् only इदित् (not ऋति); 3.1.80 धिन्विकृण्व्योः (धिनोति, कृणोति).
+- **8.2.78 / 6.1.73–75 / 7.3.75:** ऊर्वति तूर्वति हूर्छति from उपधायां च, not a name list; म्लेच्छति लच्छति from छे च / दीर्घात् तुक् then 8.4.40; ष्ठिवु ष्ठीवति शिति (लृट् ष्ठेविष्यति). Dropped named ऊठ/नील/स्तृक्ष/णिक्ष/अति (6.1.65 + 7.1.58 + long I/U).
 
 
 
