@@ -185,7 +185,7 @@ pub fn live_generate(
         }
     }
     if family == "lun" {
-        if let Some(forms) = crate::engine::lun::kartari(&dhatu, purusha, vacana, pada) {
+        if let Some(forms) = crate::engine::lun::kartari_tagged(&dhatu, purusha, vacana, pada, &antarganas) {
             return attach_prefixes(prefixes, forms);
         }
     }
@@ -433,6 +433,10 @@ mod tests {
         assert!(f.iter().any(|x| x == "sTAsyati"), "{:?}", f);
         let f = generate_all("qupacaz", "plrt", 1, 1);
         assert!(f.iter().any(|x| x == "pakzyati"), "{:?}", f);
+        let f = generate_all("04.0081", "plun", 1, 1);
+        assert!(f.iter().any(|x| x == "atuzat"), "{:?}", f);
+        let f = generate_all("qupacaz", "alun", 1, 1);
+        assert!(f.iter().any(|x| x == "apakta"), "{:?}", f);
     }
 
     #[test]

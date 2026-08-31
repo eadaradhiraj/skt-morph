@@ -83,6 +83,16 @@ pub fn generate_krdanta_with_prefix(dhatu: &str, pratyaya: &str, prefixes: &str)
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
+/// Decline a kṛdanta where it takes सुप् (क्त, शतृ, तृच्, …). Avyaya (क्त्वा, तुमुन्, ल्यप्) → null.
+#[wasm_bindgen]
+pub fn generate_krdanta_declension(dhatu: &str, pratyaya: &str, linga: &str, prefixes: &str) -> JsValue {
+    let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    match engine::krdanta::decline(dhatu, pratyaya, linga, &prefs) {
+        Some(d) => serde_wasm_bindgen::to_value(&d).unwrap_or(JsValue::NULL),
+        None => JsValue::NULL,
+    }
+}
+
 /// Generate noun declension table
 #[wasm_bindgen]
 pub fn generate_noun(base: &str, linga: &str) -> JsValue {

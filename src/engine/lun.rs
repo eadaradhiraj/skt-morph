@@ -1,8 +1,10 @@
 //! लुङ् (3.2.110) as in the Siddhānta-Kaumudī.
 //!
 //! 6.4.71 अट्; 6.4.72 आट्; 2.4.77 सिच् लुक् (गातिस्थाघुपाभू);
-//! 3.1.55 गमॢहनविदिभ्योऽङ्; 2.4.42 हनो वधः; 3.1.45 क्सः; 3.1.48 चङ्;
-//! 7.2.1 सिचि वृद्धिः; 2.4.79 तनादिभ्यः सिच् लुक् (आत्मने अकृत).
+//! 3.1.55 पुषादिद्युताद्यॢदितः परस्मैपदेषु (अङ्); 3.1.56 सर्तिशास्त्यर्तिभ्यश्च;
+//! 2.4.42 हनो वधः; 3.1.45 शल इगुपधादनिटः क्सः; 3.1.48 णिश्रिद्रुस्रुभ्यः कर्तरि चङ्;
+//! 3.1.49 विभाषा धेट्श्व्योः; 7.2.1 सिचि वृद्धिः; 2.4.79 तनादिभ्यः सिच् लुक्;
+//! 8.2.26 झलो झलि (आत्मने अनिट् अपक्त).
 
 use crate::engine::it::{anit_sic, ruki_s, sic_p_body, surface_root};
 use crate::engine::join::internal_sandhi;
@@ -158,14 +160,24 @@ fn tanadi_luk_a(root: &str, purusha: u8, vacana: u8) -> Vec<String> {
     sic_a(root, purusha, vacana)
 }
 
-/// 3.1.48 चङ्: श्रि द्रु स्रु (णिजन्त later).
-fn cang_base(root: &str) -> Option<String> {
-    match root {
-        "Sri" => Some("SiSriy".into()),
-        "dru" => Some("dudruv".into()),
-        "sru" => Some("susruv".into()),
-        _ => None,
+/// 3.1.48 णिश्रिद्रुस्रुभ्यः कर्तरि चङ्; 3.1.49 विभाषा धेट्श्व्योः. णिजन्त is in `derived.rs`.
+fn cang_base(root: &str, dhatu: &str) -> Option<String> {
+    if matches!(root, "Sri") {
+        return Some("SiSriy".into());
     }
+    if matches!(root, "dru") {
+        return Some("dudruv".into());
+    }
+    if matches!(root, "sru") {
+        return Some("susruv".into());
+    }
+    if matches!(root, "Svi") || dhatu == "wuoSvi" {
+        return Some("SiSviy".into());
+    }
+    if matches!(root, "Dew") || dhatu == "Dew" {
+        return Some("dID".into());
+    }
+    None
 }
 
 fn is_sal(c: char) -> bool {
@@ -176,11 +188,50 @@ fn is_ik(c: char) -> bool {
     matches!(c, 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X')
 }
 
-/// 3.1.45 शल इगुपधादनिटः क्सः.
+/// 3.1.45 शल इगुपधादनिटः क्सः. दृश्/सृज् take अङ्; कृष् takes सिच् वृद्धि.
 fn takes_ksa(root: &str) -> bool {
+    if matches!(root, "dfS" | "sfj" | "kfz") {
+        return false;
+    }
+    if matches!(root, "diS" | "duh" | "lih" | "guh" | "viz" | "Sic" | "sic" | "mih") {
+        return true;
+    }
     let c: Vec<char> = root.chars().collect();
-    c.len() == 3 && is_ik(c[1]) && is_sal(c[2]) && anit_sic(root)
-        || matches!(root, "diS" | "duh" | "lih" | "guh" | "viz" | "Sic" | "sic")
+    if c.len() < 3 {
+        return false;
+    }
+    let last = *c.last().unwrap();
+    let upadha = c[c.len() - 2];
+    is_sal(last) && is_ik(upadha) && crate::engine::it::anit_sya(root)
+}
+
+fn is_cons(c: char) -> bool {
+    !is_vowel(c)
+}
+
+/// ऌित्: gamx, patx (not a root whose vowel is ऌ).
+fn is_lit_l(dhatu: &str) -> bool {
+    let s = dhatu.trim_end_matches('~');
+    let c: Vec<char> = s.chars().collect();
+    c.len() >= 2 && c.last() == Some(&'x') && is_cons(c[c.len() - 2])
+}
+
+/// 3.1.55–56 अङ् stem (thematic, parasmai).
+fn ang_stem(root: &str, dhatu: &str, antarganas: &str) -> Option<String> {
+    match root {
+        "gam" | "vid" | "sfj" => return Some(root.to_string()),
+        "dfS" => return Some("darS".into()),
+        "sf" => return Some("sar".into()),
+        "f" => return Some("f".into()),
+        _ => {}
+    }
+    if antarganas.contains("puzAdi") || antarganas.contains("dyutAdi") {
+        return Some(root.to_string());
+    }
+    if is_lit_l(dhatu) {
+        return Some(root.to_string());
+    }
+    None
 }
 
 fn ksa_stem(root: &str) -> String {
@@ -222,6 +273,16 @@ fn root_of(dhatu: &str) -> String {
 }
 
 pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<String>> {
+    kartari_tagged(dhatu, purusha, vacana, pada, "")
+}
+
+pub fn kartari_tagged(
+    dhatu: &str,
+    purusha: u8,
+    vacana: u8,
+    pada: &str,
+    antarganas: &str,
+) -> Option<Vec<String>> {
     let root = root_of(dhatu);
     if pada == "P" {
         if let Some(forms) = luk(&root, purusha, vacana) {
@@ -235,19 +296,20 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
     if root == "han" && pada == "A" {
         return Some(ang_atmane("han", purusha, vacana));
     }
-    if let Some(base) = cang_base(&root) {
+    if let Some(base) = cang_base(&root, dhatu) {
         return Some(ang_thematic(&base, purusha, vacana));
     }
     if takes_ksa(&root) && pada == "P" {
         return Some(ang_thematic(&ksa_stem(&root), purusha, vacana));
     }
+    if pada == "P" {
+        if let Some(stem) = ang_stem(&root, dhatu, antarganas) {
+            return Some(ang_thematic(&stem, purusha, vacana));
+        }
+    }
     match root.as_str() {
-        "gam" if pada == "P" => return Some(ang_thematic("gam", purusha, vacana)),
         "gam" if pada == "A" => return Some(ang_atmane("gam", purusha, vacana)),
-        "vid" if pada == "P" => return Some(ang_thematic("vid", purusha, vacana)),
         "vac" if pada == "P" => return Some(ang_thematic("voc", purusha, vacana)),
-        "sfj" if pada == "P" => return Some(ang_thematic("sfj", purusha, vacana)),
-        "dfS" if pada == "P" => return Some(ang_thematic("darS", purusha, vacana)),
         "i" if pada == "P" => return Some(sic_it_p("Ez", purusha, vacana)),
         _ => {}
     }
@@ -256,6 +318,10 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
     }
     if pada == "A" && root == "BU" {
         return Some(sic_a("Baviz", purusha, vacana));
+    }
+    // 8.2.26 झलो झलि: सिच् lopa, then चोः कुः — अपक्त, अत्यक्त.
+    if pada == "A" && matches!(root.as_str(), "pac" | "tyaj") {
+        return Some(sic_a_jhal(&root, purusha, vacana));
     }
     if pada == "P" {
         let body = match root.as_str() {
@@ -275,8 +341,6 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
         } else {
             format!("{}iz", apply_guna_to_stem(&root))
         };
-        // drop trailing z from body for sic_a which adds ta: akfz + ta → akfzta? अकृषत is kf + s + ata with luk?
-        // अनिट् आत्मने often अकृषत (kf + ṣ + ata) — use kfz as body without extra s.
         let body = match root.as_str() {
             "kf" => "kfz".into(),
             "nI" => "nez".into(),
@@ -285,6 +349,22 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
         return Some(sic_a(&body, purusha, vacana));
     }
     None
+}
+
+fn sic_a_jhal(root: &str, purusha: u8, vacana: u8) -> Vec<String> {
+    let a = with_augment(root);
+    match (purusha, vacana) {
+        (1, 1) => vec![internal_sandhi(&a, "ta")],
+        (1, 2) => vec![format!("{}AtAm", a)],
+        (1, 3) => vec![format!("{}anta", a)],
+        (2, 1) => vec![internal_sandhi(&a, "TAH")],
+        (2, 2) => vec![format!("{}ATAm", a)],
+        (2, 3) => vec![internal_sandhi(&a, "Dvam")],
+        (3, 1) => vec![format!("{}i", a)],
+        (3, 2) => vec![format!("{}vahi", a)],
+        (3, 3) => vec![format!("{}mahi", a)],
+        _ => vec![],
+    }
 }
 
 #[cfg(test)]
@@ -320,5 +400,19 @@ mod tests {
         assert!(f.iter().any(|x| x == "asfjat" || x == "asfjad"), "{:?}", f);
         let f = kartari("dfSir", 1, 1, "P").unwrap();
         assert!(f.iter().any(|x| x == "adarSat" || x == "adarSad"), "{:?}", f);
+        let f = kartari("miha", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "amikzat"), "{:?}", f);
+        let f = kartari_tagged("tuza", 1, 1, "P", "puzAdiH").unwrap();
+        assert!(f.iter().any(|x| x == "atuzat"), "{:?}", f);
+        let f = kartari("patx", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "apatat"), "{:?}", f);
+        let f = kartari("Dew", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "adIDat"), "{:?}", f);
+        let f = kartari("wuoSvi", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "aSiSviyat"), "{:?}", f);
+        let f = kartari("qupacaz", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "apakta"), "{:?}", f);
+        let f = kartari("f", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "Arat"), "{:?}", f);
     }
 }

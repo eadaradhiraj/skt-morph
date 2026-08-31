@@ -170,6 +170,82 @@ pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[Str
     KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
 }
 
+pub fn is_avyaya(pratyaya: &str) -> bool {
+    matches!(pratyaya, "ktvA" | "lyap" | "tumun" | "Ramul" | "am" | "gsnu")
+}
+
+fn is_at_participle(pratyaya: &str) -> bool {
+    matches!(pratyaya, "Satf" | "Satf~" | "ktavatu" | "ktavatu~")
+}
+
+fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
+    if is_avyaya(pratyaya) || form.is_empty() {
+        return None;
+    }
+    if pratyaya == "tfc" && linga == "stri" {
+        let base = form.trim_end_matches('f');
+        return Some(format!("{base}rI"));
+    }
+    if is_at_participle(pratyaya) && linga == "stri" {
+        if pratyaya.starts_with("ktavatu") {
+            if form.ends_with("at") {
+                return Some(format!("{form}I"));
+            }
+        } else if let Some(base) = form.strip_suffix("at") {
+            return Some(format!("{base}antI"));
+        }
+    }
+    if linga == "stri"
+        && matches!(
+            pratyaya,
+            "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "lyuw" | "lyu" | "Rvul" | "vun"
+                | "ac" | "GaY" | "anIya"
+        )
+    {
+        if let Some(base) = form.strip_suffix('a') {
+            return Some(format!("{base}A"));
+        }
+    }
+    Some(form.to_string())
+}
+
+fn satr_nap(stem: &str) -> Option<crate::declension::subanta::Declension> {
+    let mut d = crate::declension::subanta::generate(stem, "pum")?;
+    let Some(base) = stem.strip_suffix("at") else {
+        d.linga = "nap".into();
+        return Some(d);
+    };
+    let nom = vec![
+        stem.to_string(),
+        format!("{stem}I"),
+        format!("{base}anti"),
+    ];
+    d.declension.insert("prathamA".into(), nom.clone());
+    d.declension.insert("dvitIyA".into(), nom.clone());
+    d.declension.insert("samboDana".into(), nom);
+    d.linga = "nap".into();
+    Some(d)
+}
+
+/// सुबन्त of a kṛdanta pratipadika. `None` for अव्यय.
+pub fn decline(
+    dhatu_query: &str,
+    pratyaya: &str,
+    linga: &str,
+    prefixes: &[String],
+) -> Option<crate::declension::subanta::Declension> {
+    if is_avyaya(pratyaya) {
+        return None;
+    }
+    let res = generate_with_prefixes(dhatu_query, pratyaya, prefixes);
+    let form = res.forms.first()?.as_str();
+    let stem = pratipadika(form, pratyaya, linga)?;
+    if is_at_participle(pratyaya) && linga == "nap" {
+        return satr_nap(&stem);
+    }
+    crate::declension::subanta::generate(&stem, linga)
+}
+
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
     let (dhatu, gana, tags, ant, aup) = load_dhatu(dhatu_query);
     let rule = pratyaya_rule(pratyaya);
@@ -304,5 +380,35 @@ mod tests {
         assert_eq!(kta_base("labh"), "labDa");
         assert_eq!(kta_base("svap"), "supta");
         assert_eq!(kta_base("naS"), "nazwa");
+    }
+
+    #[test]
+    fn krdanta_declension() {
+        let d = decline("gam", "kta", "pum", &[]).expect("gataH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gataH"), "{:?}", pr);
+        let d = decline("gam", "kta", "stri", &[]).expect("gatA");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gatA"), "{:?}", pr);
+        let d = decline("BU", "Satf", "pum", &[]).expect("Bavan");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "BavAn"), "{:?}", pr);
+        let d = decline("BU", "Satf", "stri", &[]).expect("BavantI");
+        assert_eq!(d.stem, "BavantI");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "BavantI"), "{:?}", pr);
+        let d = decline("BU", "Satf", "nap", &[]).expect("Bavat");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "Bavat"), "{:?}", pr);
+        assert!(pr.iter().any(|x| x == "Bavanti"), "{:?}", pr);
+        let d = decline("qukfY", "tfc", "pum", &[]).expect("kartA");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "kartA"), "{:?}", pr);
+        let dv = d.declension.get("dvitIyA").unwrap();
+        assert!(dv.iter().any(|x| x == "kartAram"), "{:?}", dv);
+        assert!(decline("BU", "ktvA", "pum", &[]).is_none());
+        let d = decline("gam", "ktavatu", "pum", &[]).expect("gatavAn");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gatavAn"), "{:?}", pr);
     }
 }

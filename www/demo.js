@@ -8,6 +8,7 @@ import init, {
   generate_pronoun,
   generate_krdanta,
   generate_krdanta_with_prefix,
+  generate_krdanta_declension,
 } from "../pkg/skt_morph.js";
 import { toSlp1, toDeva, prefixesToSlp1, formsToDeva } from "./translit.js";
 import * as L from "./labels.js";
@@ -334,7 +335,18 @@ document.getElementById("btn-krdanta").onclick = () => {
     }
     const indecl = ["ktvA", "lyap", "tumun", "Ramul", "am"];
     let html = `<div>रूप: <b>${esc(formsToDeva(res.forms).join(", "))}</b> (${esc(toDeva(d))} + ${esc(L.pratyaya(p))})</div>`;
-    if (indecl.includes(p)) html += '<div class="hint">अव्यय — न सुबन्तम्</div>';
+    if (indecl.includes(p)) {
+      html += '<div class="hint">अव्यय — न सुबन्तम्</div>';
+    } else {
+      const linga = document.getElementById("krd-linga").value;
+      const declRes = generate_krdanta_declension(d, p, linga, pref);
+      const decl = asObj(declRes?.declension);
+      if (declRes && decl && Object.keys(decl).length > 0) {
+        html += renderDeclTable(toDeva(declRes.stem), declRes.linga, decl);
+      } else {
+        html += '<div class="hint">सुबन्तं न लब्धम्</div>';
+      }
+    }
     html += `<details><summary>JSON (SLP1)</summary><pre>${esc(strfy(res))}</pre></details>`;
     el.innerHTML = html;
   } catch (e) {
