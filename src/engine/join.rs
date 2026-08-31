@@ -16,7 +16,12 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         ('d', 't') => format!("{}t{}", stem_body, suffix),
         ('d', 'T') => format!("{}tT{}", stem_body, &suffix[1..]),
         ('d', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
+        ('D', 't') => format!("{}dD{}", stem_body, &suffix[1..]),
+        ('D', 'T') => format!("{}dD{}", stem_body, &suffix[1..]),
+        ('D', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
         ('c', 't') | ('j', 't') => format!("{}kt{}", stem_body, &suffix[1..]),
+        ('c', 'T') | ('j', 'T') => format!("{}kT{}", stem_body, &suffix[1..]),
+        ('c', 's') | ('j', 's') | ('S', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
         ('z', 't') => format!("{}zw{}", stem_body, &suffix[1..]),
         ('z', 'T') => format!("{}zW{}", stem_body, &suffix[1..]),
         ('h', 't') => format!("{}gD{}", stem_body, &suffix[1..]),
@@ -38,62 +43,148 @@ pub fn join_form(
     _vacana: u8,
     _antarganas: Option<&str>,
 ) -> String {
-    // AD (2,3) irregulars: vid/as/han/vac etc. (high-impact for gana02)
+    // AD (2,3) — अत्ति, अस्ति, हन्ति, एति, ब्रवीति, वक्ति
     if gana == 2 || gana == 3 {
         if let Some(d) = dhatu {
-            // han (02.??) – _join_han lat/lot/lang
-            if d == "han" {
+            let d = d.trim_end_matches('a');
+            if d == "han" || d == "han" {
                 if family == "lat" {
                     match ending {
-                        "taH" => return "hataH".to_string(),
-                        "nti" | "anti" => return "Gnanti".to_string(),
-                        "si" => return "haMsi".to_string(),
-                        "thaH" | "TaH" => return "haTaH".to_string(),
-                        "tha" | "Ta" => return "haTa".to_string(),
+                        "ti" => return "hanti".into(),
+                        "taH" => return "hataH".into(),
+                        "nti" | "anti" => return "Gnanti".into(),
+                        "si" => return "haMsi".into(),
+                        "thaH" | "TaH" => return "haTaH".into(),
+                        "tha" | "Ta" => return "haTa".into(),
+                        "mi" | "Ami" => return "hanmi".into(),
+                        "vaH" | "AvaH" => return "hanvaH".into(),
+                        "maH" | "AmaH" => return "hanmaH".into(),
                         _ => {}
                     }
                 }
                 if family == "lot" {
                     match ending {
-                        "tu" => return "hantu".to_string(),
-                        "tAm" => return "hatAm".to_string(),
-                        "antu" => return "Gnantu".to_string(),
+                        "tu" | "tAt" | "tAd" => return format!("han{}", if ending == "tu" { "tu" } else { ending }),
+                        "tAm" => return "hatAm".into(),
+                        "antu" => return "Gnantu".into(),
+                        "Di" => return "jahi".into(),
                         _ => {}
                     }
                 }
                 if family == "lang" {
-                    match ending {
-                        "an" => return "Gnan".to_string(),
-                        "atAm" => return "hatAm".to_string(),
-                        _ => {}
+                    return match ending {
+                        "at" | "ad" => "ahan".into(),
+                        "an" => "aGnan".into(),
+                        "atAm" => "ahatAm".into(),
+                        "aH" => "ahan".into(),
+                        "atam" => "ahatam".into(),
+                        "ata" => "ahata".into(),
+                        "am" => "ahanam".into(),
+                        "va" => "ahanva".into(),
+                        "ma" => "ahanma".into(),
+                        _ => format!("ahan{ending}"),
+                    };
+                }
+                if family == "vidhilin" {
+                    if ending.starts_with('y') {
+                        return format!("han{ending}");
                     }
                 }
             }
-            if d == "vid" {
-                if family == "lat" {
-                    match (ending, purusha) {
-                        ("ti", 1) => return "vetti".to_string(),
-                        ("taH", 1) => return "vittaH".to_string(),
-                        ("si", 2) => return "vetTa".to_string(),
-                        _ => {}
-                    }
+            if d == "vid" && family == "lat" {
+                match (ending, purusha) {
+                    ("ti", 1) => return "vetti".into(),
+                    ("taH", 1) => return "vittaH".into(),
+                    ("si", 2) => return "vetTa".into(),
+                    _ => {}
                 }
             }
             if d == "as" {
                 if family == "lat" {
-                    match ending {
-                        "taH" => return "staH".to_string(),
-                        "anti" | "nti" => return "santi".to_string(),
-                        "si" => return "asi".to_string(),
-                        _ => {}
-                    }
+                    return match ending {
+                        "ti" => "asti".into(),
+                        "taH" => "staH".into(),
+                        "anti" | "nti" => "santi".into(),
+                        "si" => "asi".into(),
+                        "thaH" | "TaH" => "sTaH".into(),
+                        "tha" | "Ta" => "sTa".into(),
+                        "mi" | "Ami" => "asmi".into(),
+                        "vaH" | "AvaH" => "svaH".into(),
+                        "maH" | "AmaH" => "smaH".into(),
+                        _ => format!("as{ending}"),
+                    };
                 }
+                if family == "lang" {
+                    return match ending {
+                        "at" | "ad" => "AsIt".into(),
+                        "atAm" => "AstAm".into(),
+                        "an" => "Asan".into(),
+                        "aH" => "AsIH".into(),
+                        "atam" => "Astam".into(),
+                        "ata" => "Asta".into(),
+                        "am" => "Asam".into(),
+                        "va" => "Asva".into(),
+                        "ma" => "Asma".into(),
+                        _ => format!("As{ending}"),
+                    };
+                }
+                if family == "vidhilin" {
+                    return match ending {
+                        "yAt" => "syAt".into(),
+                        "yAd" => "syAd".into(),
+                        "yAtAm" => "syAtAm".into(),
+                        "yuH" => "syuH".into(),
+                        "yAH" => "syAH".into(),
+                        "yAtam" => "syAtam".into(),
+                        "yAta" => "syAta".into(),
+                        "yAm" => "syAm".into(),
+                        "yAva" => "syAva".into(),
+                        "yAma" => "syAma".into(),
+                        _ => format!("s{ending}"),
+                    };
+                }
+            }
+            if d == "ad" {
+                let joined = internal_sandhi("ad", ending);
+                if family == "lang" {
+                    return format!("A{}", joined.trim_start_matches('a'));
+                }
+                if family == "vidhilin" && ending.starts_with('y') {
+                    return format!("ad{ending}");
+                }
+                if family == "lrt" {
+                    return format!("atsya{ending}");
+                }
+                return joined;
             }
             if d == "vac" {
                 match ending {
-                    "ti" => return "vakti".to_string(),
-                    "taH" => return "vaktaH".to_string(),
-                    "si" => return "vakzi".to_string(),
+                    "ti" => return "vakti".into(),
+                    "taH" => return "vaktaH".into(),
+                    "si" => return "vakzi".into(),
+                    "anti" | "nti" => return "vacanti".into(),
+                    _ => {}
+                }
+            }
+            if d == "brU" || d == "bravI" || stem.ends_with("bravI") {
+                match ending {
+                    "ti" => return "bravIti".into(),
+                    "taH" => return "brUtaH".into(),
+                    "anti" | "nti" => return "bruvanti".into(),
+                    "si" => return "bravIzi".into(),
+                    "mi" | "Ami" => return "bravImi".into(),
+                    _ => {}
+                }
+            }
+            if d == "i" || d == "iR" || stem == "e" {
+                match ending {
+                    "ti" => return "eti".into(),
+                    "taH" => return "itaH".into(),
+                    "anti" | "nti" => return "yanti".into(),
+                    "si" => return "ezi".into(),
+                    "mi" | "Ami" => return "emi".into(),
+                    "vaH" => return "ivaH".into(),
+                    "maH" => return "imaH".into(),
                     _ => {}
                 }
             }
@@ -186,28 +277,45 @@ pub fn join_form(
             }
         }
     }
-    // N (7) rudh → yunakti : handle Ru/Ra stems
+    // N (7) श्नम्: रुणद्धि, रुन्द्धः, रुन्धन्ति
     if gana == 7 {
         if family == "lrt" {
             return format!("{}{}", stem, ending);
         }
-        if stem.ends_with("Ra") {
-            let base_run = format!("{}n", &stem[..stem.len()-2]);
-            let base_rur = &stem[..stem.len()-1];
-            match ending {
-                "ti" => return format!("{}atti", base_rur),
-                "taH" | "TaH" => return format!("{}dDaH", base_run),
-                "nti" => return format!("{}Danti", base_run),
-                "si" => return format!("{}atsi", base_rur),
-                "thaH" | "TaH" => return format!("{}dDaH", base_run),
-                "tha" | "Ta" => return format!("{}dDa", base_run),
-                "mi" => return format!("{}Dmi", stem),
-                "vaH" => return format!("{}dDvaH", base_run),
-                "maH" => return format!("{}dDmaH", base_run),
-                "tAm" => return format!("{}dDAm", base_run),
-                "tu" => return format!("{}adDu", base_rur),
-                "antu" => return format!("{}Dantu", base_run),
-                _ => {}
+        let raw = dhatu.unwrap_or("");
+        let root = if raw.ends_with("ir") && raw.len() > 3 {
+            &raw[..raw.len() - 2]
+        } else if raw.ends_with('a') && raw.len() > 2 {
+            &raw[..raw.len() - 1]
+        } else {
+            raw
+        };
+        if !root.is_empty() {
+            let chars: Vec<char> = root.chars().collect();
+            if chars.len() >= 2 {
+                let last = chars[chars.len() - 1];
+                let body: String = chars[..chars.len() - 1].iter().collect();
+                let strong = format!("{body}Ra{last}");
+                let weak = format!("{body}n{last}");
+                let pit = matches!(ending, "ti" | "si" | "mi" | "Ami" | "tu" | "tAt" | "tAd");
+                let base = if pit { &strong } else { &weak };
+                match ending {
+                    "ti" => return internal_sandhi(&strong, "ti"),
+                    "si" => return internal_sandhi(&strong, "si"),
+                    "mi" | "Ami" => return format!("{strong}mi"),
+                    "taH" | "TaH" => return internal_sandhi(&weak, "taH"),
+                    "nti" | "anti" => return format!("{weak}anti"),
+                    "thaH" => return internal_sandhi(&weak, "TaH"),
+                    "tha" | "Ta" => return internal_sandhi(&weak, "Ta"),
+                    "vaH" | "AvaH" => return internal_sandhi(&weak, "vaH"),
+                    "maH" | "AmaH" => return internal_sandhi(&weak, "maH"),
+                    "tu" => return internal_sandhi(&strong, "tu"),
+                    "antu" => return format!("{weak}antu"),
+                    "tAm" => return internal_sandhi(&weak, "tAm"),
+                    _ => {
+                        return internal_sandhi(base, ending);
+                    }
+                }
             }
         }
     }

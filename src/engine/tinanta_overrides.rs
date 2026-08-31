@@ -10,6 +10,21 @@ pub fn lookup_override(
     vacana: u8,
     prefixes: &[String],
 ) -> Option<Vec<String>> {
+    if prefixes.is_empty()
+        && matches!(
+            dhatu_query,
+            "ada" | "02.0001" | "hana" | "02.0002" | "hu" | "03.0001" | "zuY" | "05.0001"
+                | "ruDir" | "07.0001" | "tanu" | "08.0001" | "qukrIY" | "09.0001" | "zwuY"
+                | "02.0038" | "iR" | "02.0040" | "brUY" | "02.0039" | "zWA" | "01.1077"
+                | "02.0060"
+        )
+        && matches!(
+            canonical,
+            "plat" | "plan" | "plot" | "pvidhilin" | "plrt" | "plun" | "pashirling"
+        )
+    {
+        return None;
+    }
     if dhatu_query == "rivi" || dhatu_query == "01.0679" {
         if canonical == "plot" && purusha == 3 && vacana == 1 {
             let forms = vec!["riRvAni".into()];

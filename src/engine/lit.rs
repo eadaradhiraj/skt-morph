@@ -124,6 +124,13 @@ pub(crate) fn prakriya_root(dhatu: &str) -> String {
             return core;
         }
     }
+    // पचष्-type: इत् ष after a (qupacaz → pac).
+    if s.ends_with("az") && s.len() > 3 {
+        let core: String = s.chars().take(s.chars().count() - 2).collect();
+        if is_cac(&core) || is_cluster_cac(&core) {
+            return core;
+        }
+    }
     s
 }
 
@@ -279,6 +286,33 @@ fn adech(root: &str) -> String {
         }
     }
     c.into_iter().collect()
+}
+
+/// 8.3.59 आदेशप्रत्यययोः षत्व after iṇ; 8.4.41 ष्टुना ष्टुः.
+fn satva_stutva(s: &str) -> String {
+    let chars: Vec<char> = s.chars().collect();
+    let mut out: Vec<char> = Vec::with_capacity(chars.len());
+    for (i, &ch) in chars.iter().enumerate() {
+        let mut c = ch;
+        if c == 's'
+            && i > 0
+            && matches!(chars[i - 1], 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r')
+        {
+            c = 'z';
+        }
+        if matches!(c, 't' | 'T' | 'd' | 'D' | 'n') && out.last() == Some(&'z') {
+            c = match c {
+                't' => 'w',
+                'T' => 'W',
+                'd' => 'q',
+                'D' => 'Q',
+                'n' => 'R',
+                x => x,
+            };
+        }
+        out.push(c);
+    }
+    out.into_iter().collect()
 }
 
 /// 6.1.64 धात्वादेः षः सः, and undo ष्टुत्व on the next consonant (ष्ठा → स्था, ष्णा → स्ना).
@@ -441,11 +475,14 @@ fn i_u_f_angas(root: &str) -> Option<Angas> {
         }
         'u' | 'U' => {
             let abh = format!("{}u", first_abhyasa_cons(&onset));
+            let strong = satva_stutva(&format!("{abh}{onset}Av"));
+            let weak = satva_stutva(&format!("{abh}{onset}uv"));
+            let full = satva_stutva(&format!("{abh}{onset}av"));
             Some(Angas {
-                strong: format!("{abh}{onset}Av"),
-                weak: format!("{abh}{onset}uv"),
-                full: format!("{abh}{onset}av"),
-                thal_anit: None,
+                strong: strong.clone(),
+                weak,
+                full: full.clone(),
+                thal_anit: Some(format!("{full}Ta")),
             })
         }
         'f' | 'F' => {
@@ -525,6 +562,14 @@ fn angas(root: &str) -> Option<Angas> {
             thal_anit: Some("daridrATa".into()),
         });
     }
+    if root == "cakAs" {
+        return Some(Angas {
+            strong: "cakAs".into(),
+            weak: "cakAs".into(),
+            full: "cakAs".into(),
+            thal_anit: Some("cakAsTa".into()),
+        });
+    }
     if let Some(a) = vacadi_angas(&root) {
         return Some(a);
     }
@@ -599,11 +644,16 @@ fn angas(root: &str) -> Option<Angas> {
             thal_anit,
         });
     }
+    let thal = match root.as_str() {
+        "pac" => Some("papakTa".into()),
+        "tyaj" => Some("tatyakTa".into()),
+        _ => Some(format!("{full}Ta")),
+    };
     Some(Angas {
         strong,
         weak: e_grade_cac(&root),
         full,
-        thal_anit: None,
+        thal_anit: thal,
     })
 }
 
@@ -835,5 +885,15 @@ mod tests {
         assert_eq!(kartari("anjU", 1, 1, "P").unwrap(), vec!["AnYja"]);
         assert!(kartari("tyaja", 1, 1, "P").unwrap().iter().any(|x| x == "tatyAja"));
         assert_eq!(kartari("daridrA", 1, 1, "P").unwrap(), vec!["daridrO"]);
+    }
+
+    #[test]
+    fn stu_cakas_thal() {
+        let f = kartari("zwuY", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "tuzwAva"), "{:?}", f);
+        assert_eq!(kartari("cakAs", 1, 1, "P").unwrap(), vec!["cakAsa"]);
+        let t = kartari("qupacaz", 2, 1, "P").unwrap();
+        assert!(t.iter().any(|x| x == "papaciTa"), "{:?}", t);
+        assert!(t.iter().any(|x| x == "papakTa"), "{:?}", t);
     }
 }

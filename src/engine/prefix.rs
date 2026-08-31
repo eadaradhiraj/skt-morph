@@ -79,7 +79,15 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
             result = format!("{}U{}", &prefix[..prefix.len()-1], w_rest);
         }
     } else if prefix.ends_with('m') && (voiced_cons.contains(&w_start) || unvoiced_cons.contains(&w_start)) {
-        result = format!("{}M{}", &prefix[..prefix.len()-1], word);
+        // 8.4.58 अनुस्वारस्य ययि परसवर्णः — ङ् before velar (सङ्करोति), ञ् before palatal.
+        let nasal = match w_start {
+            'k' | 'K' | 'g' | 'G' => 'N',
+            'c' | 'C' | 'j' | 'J' => 'Y',
+            'w' | 'W' | 'q' | 'Q' => 'R',
+            't' | 'T' | 'd' | 'D' => 'n',
+            _ => 'M',
+        };
+        result = format!("{}{}{}", &prefix[..prefix.len() - 1], nasal, word);
     } else if prefix == "ud" {
         if word.starts_with("sT") {
             result = format!("utT{}", &word[2..]);
@@ -100,7 +108,30 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
         }
     }
 
+    if let Some(satva) = apply_upasarga_satva(prefix, word) {
+        result = satva;
+    }
+
     crate::engine::phonology::apply_natva_to_word(&result)
+}
+
+fn apply_upasarga_satva(prefix: &str, word: &str) -> Option<String> {
+    if !matches!(prefix, "ni" | "vi" | "nI" | "su" | "anu") {
+        return None;
+    }
+    let w_chars: Vec<char> = word.chars().collect();
+    if w_chars.first() != Some(&'s') {
+        return None;
+    }
+    let rest: String = w_chars[1..].iter().collect();
+    let mutated = match w_chars.get(1).copied() {
+        Some('t') => format!("zw{}", w_chars[2..].iter().collect::<String>()),
+        Some('T') => format!("zW{}", w_chars[2..].iter().collect::<String>()),
+        Some('d') => format!("zq{}", w_chars[2..].iter().collect::<String>()),
+        Some('n') => format!("zR{}", w_chars[2..].iter().collect::<String>()),
+        _ => format!("z{rest}"),
+    };
+    Some(format!("{prefix}{mutated}"))
 }
 
 pub fn apply_prefixes(prefixes: &[String], base: &str) -> String {
@@ -188,5 +219,14 @@ mod tests {
     fn unapply_sam_bhu() {
         let rest = unapply_prefix("sam", "saMBUtvA");
         assert!(rest.iter().any(|r| r == "BUtvA"), "{:?}", rest);
+    }
+    #[test]
+    fn sam_kf_satva_a_r() {
+        assert_eq!(apply_forward_sandhi("sam", "karoti"), "saNkaroti");
+        assert_eq!(apply_forward_sandhi("A", "fcCati"), "ArcCati");
+        assert_eq!(apply_forward_sandhi("ni", "sIdati"), "nizIdati");
+        assert_eq!(apply_forward_sandhi("ni", "sTAti"), "nizWAti");
+        let rest = unapply_prefix("sam", "saNkaroti");
+        assert!(rest.iter().any(|r| r == "karoti"), "{:?}", rest);
     }
 }

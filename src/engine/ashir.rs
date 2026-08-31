@@ -1,18 +1,26 @@
-//! आशीर्लिङ् (3.3.173). यासुट् is kit: भूयात्, क्रियात्, गम्यात्, देयात्.
-//! Separate from विधिलिङ् (भवेत्).
+//! आशीर्लिङ् (3.3.173). यासुट् kit परस्मै; सीयुट् आत्मने.
+//! भूयात्, क्रियात्, गम्यात्, देयात्; कृषीष्ट, भविषीष्ट.
 
-use crate::engine::lit::prakriya_root;
+use crate::engine::it::{ruki_s, surface_root, takes_it_tavya};
+use crate::engine::phonology::apply_guna_to_stem;
 
-fn root_of(dhatu: &str) -> String {
-    match prakriya_root(dhatu).as_str() {
-        "RI" => "nI".into(),
-        "zWA" => "sTA".into(),
-        other => other.into(),
-    }
+fn is_vowel(c: char) -> bool {
+    matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
 
-/// Kit aṅga before यासुट्.
-fn stem(root: &str) -> String {
+fn root_of(dhatu: &str) -> String {
+    let mut r = surface_root(dhatu);
+    if r.ends_with('a') && r.len() >= 3 {
+        let core = &r[..r.len() - 1];
+        if core.chars().any(is_vowel) {
+            r = core.to_string();
+        }
+    }
+    r
+}
+
+/// Kit aṅga before यासुट् (परस्मै).
+fn stem_p(root: &str) -> String {
     match root {
         "kf" | "f" => "kri".into(),
         "dA" | "DA" | "sTA" | "pA" | "gA" | "mA" | "yA" => {
@@ -25,18 +33,33 @@ fn stem(root: &str) -> String {
     }
 }
 
+/// आत्मने: कृषीष्ट, भविषीष्ट.
+fn stem_a(root: &str) -> String {
+    match root {
+        "kf" => "kfz".into(),
+        "BU" => "Baviz".into(),
+        "eD" => "eDiz".into(),
+        "nI" => "nez".into(),
+        "gam" => "gamiz".into(),
+        other if takes_it_tavya(other) => format!("{}iz", apply_guna_to_stem(other)),
+        other => ruki_s(&format!("{other}s"))
+            .trim_end_matches('s')
+            .to_string(),
+    }
+}
+
 fn endings(pada: &str, purusha: u8, vacana: u8) -> Option<&'static str> {
     if pada == "A" {
         return match (purusha, vacana) {
-            (1, 1) => Some("sIzwa"),
-            (1, 2) => Some("sIyAstAm"),
-            (1, 3) => Some("sIran"),
-            (2, 1) => Some("sIzWAH"),
-            (2, 2) => Some("sIyAstAm"),
-            (2, 3) => Some("sIDvam"),
-            (3, 1) => Some("sIya"),
-            (3, 2) => Some("sIvahi"),
-            (3, 3) => Some("sImahi"),
+            (1, 1) => Some("Izwa"),
+            (1, 2) => Some("IyAstAm"),
+            (1, 3) => Some("Iran"),
+            (2, 1) => Some("IzWAH"),
+            (2, 2) => Some("IyAstAm"),
+            (2, 3) => Some("IDvam"),
+            (3, 1) => Some("Iya"),
+            (3, 2) => Some("Ivahi"),
+            (3, 3) => Some("Imahi"),
             _ => None,
         };
     }
@@ -56,10 +79,14 @@ fn endings(pada: &str, purusha: u8, vacana: u8) -> Option<&'static str> {
 
 pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<String>> {
     let root = root_of(dhatu);
-    let st = stem(&root);
     let end = endings(pada, purusha, vacana)?;
+    if pada == "A" {
+        let st = stem_a(&root);
+        return Some(vec![format!("{st}{end}")]);
+    }
+    let st = stem_p(&root);
     let form = format!("{st}{end}");
-    if pada == "P" && (purusha, vacana) == (1, 1) {
+    if (purusha, vacana) == (1, 1) {
         return Some(vec![form, format!("{st}yAd")]);
     }
     Some(vec![form])
@@ -76,5 +103,11 @@ mod tests {
         assert_eq!(kartari("qukfY", 1, 1, "P").unwrap()[0], "kriyAt");
         assert!(kartari("gamx", 1, 1, "P").unwrap().iter().any(|x| x == "gamyAt"));
         assert!(kartari("qudAY", 1, 1, "P").unwrap().iter().any(|x| x == "deyAt"));
+    }
+
+    #[test]
+    fn ashir_atmane() {
+        assert_eq!(kartari("qukfY", 1, 1, "A").unwrap()[0], "kfzIzwa");
+        assert_eq!(kartari("BU", 1, 1, "A").unwrap()[0], "BavizIzwa");
     }
 }

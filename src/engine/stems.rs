@@ -139,6 +139,21 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
     if dhatu == "gam" || dhatu == "gamx" {
         return "gamizya".to_string();
     }
+    if matches!(dhatu, "tizW" | "sTA" | "zWA") {
+        return "sTAsya".into();
+    }
+    if matches!(dhatu, "yacC") {
+        return "dAsya".into();
+    }
+    if dhatu == "pib" || dhatu == "pA" {
+        return "pAsya".into();
+    }
+    if dhatu == "Day" {
+        return "DAsya".into();
+    }
+    if dhatu == "paSy" || dhatu == "dfS" {
+        return "drakzya".into();
+    }
     if dhatu.to_ascii_lowercase().ends_with("akzi") {
         let low = dhatu.to_ascii_lowercase();
         let idx = low.find("akzi").unwrap_or(1);
@@ -216,18 +231,21 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
         return format!("{}izya", graded);
     }
     if gana==N_GANA && matches!(guna.chars().last(), Some('d'|'D')) { return format!("{}tsya", &guna[..guna.len()-1]); }
-    if guna.ends_with('v') { return format!("{}izya", guna); }
-    format!("{}izya", guna)
+    if guna.ends_with('v') {
+        return format!("{}izya", guna);
+    }
+    crate::engine::it::sya_stem(dhatu)
 }
 
 pub fn perfect_stem(dhatu: &str, guna: &str) -> String {
-    let redupl = if dhatu.len() >= 2 && "kgcjwqtp".contains(dhatu.chars().next().unwrap()) {
-        format!("{}a", dhatu.chars().next().unwrap())
+    let first = dhatu.chars().next().unwrap_or('a');
+    let redupl = if dhatu.len() >= 2 && "kgcjwqtp".contains(first) {
+        format!("{first}a")
     } else if guna.len() >= 2 {
-        let c = guna.chars().nth(1).unwrap();
-        if "aeiouAIUEO".contains(c) { guna[..2].to_string() } else { format!("{}a", guna.chars().next().unwrap()) }
+        let c = guna.chars().nth(1).unwrap_or('a');
+        if "aeiouAIUEO".contains(c) { guna[..2].to_string() } else { format!("{}a", guna.chars().next().unwrap_or('a')) }
     } else {
-        format!("{}a", guna.chars().next().unwrap_or(dhatu.chars().next().unwrap()))
+        format!("{}a", guna.chars().next().unwrap_or(first))
     };
     if guna.ends_with('v') && dhatu.ends_with('U') { return format!("ba{}", dhatu); }
     if guna.ends_with('v') { return format!("{}{}a", redupl, dhatu); }
@@ -445,14 +463,12 @@ pub fn derive_stem(
         } else if dhatu == "purv" {
             let ps = "pUrva".to_string();
             present_stem = Some(ps);
-        } else if matches!(dhatu, "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv") {
-            let ps = format!("{}Urv{}", &dhatu[..1], "a");
-            // turv->tUrva, Durv->DUrva etc. (keep first char case, u->U)
-            let mut chars: Vec<char> = dhatu.chars().collect();
-            if chars.len() >= 2 && chars[1] == 'u' { chars[1] = 'U'; }
-            let base: String = chars.into_iter().collect();
-            let ps2 = format!("{}a", base);
-            present_stem = Some(ps2);
+        } else             if matches!(dhatu, "turv" | "Turv" | "durv" | "Durv" | "gurv" | "murv") {
+                let mut chars: Vec<char> = dhatu.chars().collect();
+                if chars.len() >= 2 && chars[1] == 'u' { chars[1] = 'U'; }
+                let base: String = chars.into_iter().collect();
+                let ps2 = format!("{}a", base);
+                present_stem = Some(ps2);
         } else if matches!(dhatu, "mleC" | "laC" | "hrIC" | "hurC" | "murC" | "sPurC" | "yuC" | "uC") {
             // Ca doubling: mleC->mlecCati, laC->lacCati, hrIC->hrIcCati etc. (gold has cC, dhatu_clean stripped final a)
             // sPurC->sPUrCa, yuC->yucCa, uC->ucCa
@@ -549,17 +565,19 @@ pub fn derive_stem(
         } else if dhatu == "zRu" {
             "snO".to_string()
         } else if dhatu == "zu" {
-            "sO".to_string() // z->s, u->O long
-        } else if dhatu == "iR" {
-            "e".to_string() // iR -> e (gold eti)
+            "sO".to_string()
+        } else if dhatu == "iR" || dhatu == "i" {
+            "e".to_string()
         } else if dhatu == "wukzu" || dhatu == "kzu" {
             "kzO".to_string()
-        } else if dhatu == "UrRuY" {
+        } else if dhatu == "UrRuY" || dhatu == "UrRu" {
             "UrRo".to_string()
-        } else if dhatu == "zwuY" {
-            "stavI".to_string() // gold stavIti/stOti - take stavI
-        } else if dhatu == "brUY" {
+        } else if dhatu == "zwuY" || dhatu == "zwu" || dhatu == "stu" {
+            "stavI".to_string()
+        } else if dhatu == "brUY" || dhatu == "brU" {
             "bravI".to_string()
+        } else if dhatu == "as" {
+            "as".to_string()
         } else {
             guna.clone()
         };
@@ -703,6 +721,9 @@ pub fn derive_stem(
                         return (Some(root), Some("a".to_string()));
             }
             if dhatu == "nIla" {
+                let root = "nIl".to_string();
+                return (Some(root), Some("a".to_string()));
+            }
             if dhatu == "stfkza" {
                 return (Some("stfkz".to_string()), Some("a".to_string()));
             }
@@ -711,9 +732,6 @@ pub fn derive_stem(
             }
             if dhatu == "Divi" {
                 return (Some("Dinu".to_string()), Some("a".to_string()));
-            }
-                let root = "nIl".to_string();
-                        return (Some(root), Some("a".to_string()));
             }
             // a-final (siDa->seD) for lang: apply guNa to stem without final a (non-causative, non-YA) — keep long I/U — skip irregular pA etc.
             if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA && crate::engine::phonology::sad_present_base(dhatu).is_none() {

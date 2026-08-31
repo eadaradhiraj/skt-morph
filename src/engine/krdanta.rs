@@ -30,7 +30,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "Ramul" => Some(("am", vec!["3.3.84"], "guna")),
         "Rvul" => Some(("aka", vec!["3.2.104"], "guna")),
         "vun" => Some(("aka", vec!["3.2.104"], "guna")),
-        "anIyar" => Some(("anIya", vec!["3.2.96"], "present")),
+        "anIyar" => Some(("anIya", vec!["3.2.96"], "anIya")),
         "tavya" => Some(("tavya", vec!["3.1.96"], "guna_tavya")),
         "tfc" => Some(("tf", vec!["3.3.92"], "guna")),
         "SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
@@ -163,11 +163,29 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
             let (st, _) = crate::engine::stems::derive_stem(&dhatu, gana, "lat", "shuddha", &tags, &ant, &aup);
             let base = st.unwrap_or_else(|| present_stem(&dhatu, gana));
             if pratyaya == "Satf" {
-                if base.ends_with('a') { format!("{}at", &base[..base.len()-1]) } else { format!("{}at", base) }
+                if base.ends_with('a') {
+                    format!("{}at", &base[..base.len() - 1])
+                } else if base.ends_with('u') {
+                    format!("{}vat", &base[..base.len() - 1])
+                } else if base.ends_with('I') {
+                    format!("{}at", &base[..base.len() - 1])
+                } else {
+                    format!("{}at", base)
+                }
             } else if pratyaya == "Satf~" {
-                if base.ends_with('a') { format!("{}n", &base[..base.len()-1]) } else { format!("{}ant", base) }
+                if base.ends_with('a') {
+                    format!("{}n", &base[..base.len() - 1])
+                } else {
+                    format!("{}ant", base)
+                }
             } else if pratyaya == "SAnac" || pratyaya == "cAnaS" || pratyaya.contains("SAnac") || pratyaya.contains("cAnaS") {
-                if base.ends_with('a') { format!("{}mAna", &base[..base.len()-1]) } else { format!("{}mAna", base) }
+                if base.ends_with('a') {
+                    format!("{}mAna", &base[..base.len() - 1])
+                } else if base.ends_with('u') {
+                    format!("{}vAna", &base[..base.len() - 1])
+                } else {
+                    format!("{}mAna", base)
+                }
             } else {
                 format!("{}{}", base, suffix)
             }
@@ -176,10 +194,19 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
             let base = kta_base(&dhatu);
             if pratyaya.starts_with("ktavatu") { format!("{base}vat") } else { base }
         }
-        "guna" => format!("{}{}", guna, suffix),
+        "guna" => {
+            let r = surface_root(&dhatu);
+            match pratyaya {
+                "lyuw" | "lyu" => crate::engine::it::lyuw_form(&r),
+                "tfc" => crate::engine::it::tfc_form(&r),
+                "ktin" => format!("{}ti", r),
+                _ => format!("{}{}", guna, suffix),
+            }
+        }
         "guna_a" => format!("{}a", guna),
         "guna_tum" => tum_base(&dhatu, &guna),
-        "guna_tavya" => if guna.ends_with('a') { format!("{}itavya", &guna[..guna.len()-1]) } else { format!("{}itavya", guna) },
+        "guna_tavya" => crate::engine::it::tavya_form(&surface_root(&dhatu)),
+        "anIya" => crate::engine::it::anIya_form(&surface_root(&dhatu)),
         "root" if pratyaya == "ktvA" => ktva_base(&dhatu),
         "root" => format!("{}{}", dhatu, suffix),
         "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap_or('a'), dhatu, suffix),
@@ -244,5 +271,11 @@ mod tests {
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
         assert!(f.forms.iter().any(|x| x == "praBUya"), "{:?}", f.forms);
+        assert_eq!(derive("qukfY", "tavya"), vec!["kartavya"]);
+        assert_eq!(derive("qukfY", "tfc"), vec!["kartf"]);
+        assert_eq!(derive("qukfY", "lyuw"), vec!["karaRa"]);
+        assert_eq!(derive("qukfY", "anIyar"), vec!["karaRIya"]);
+        let sat = derive("hu", "Satf");
+        assert!(sat.iter().any(|x| x == "juhvat"), "{:?}", sat);
     }
 }

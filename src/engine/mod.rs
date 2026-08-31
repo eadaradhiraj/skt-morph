@@ -2,6 +2,7 @@ pub mod analyze;
 pub mod ashir;
 pub mod dhatu;
 pub mod endings;
+pub mod it;
 pub mod join;
 pub mod krdanta;
 pub mod lakara;

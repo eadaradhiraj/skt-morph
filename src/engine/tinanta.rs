@@ -266,4 +266,53 @@ mod tests {
         let f = generate_all("brUY", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "uvAca"), "{:?}", f);
     }
+
+    #[test]
+    fn gana_2_3_5_7_8_9_lat() {
+        let f = generate_all("ada", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "atti"), "{:?}", f);
+        let f = generate_all("hu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "juhoti"), "{:?}", f);
+        let f = generate_all("zuY", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "sunoti"), "{:?}", f);
+        let f = generate_all("ruDir", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "ruRadDi" || x == "ruRaddhi"), "{:?}", f);
+        let f = generate_all("tanu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "tanoti"), "{:?}", f);
+        let f = generate_all("qukrIY", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "krIRAti"), "{:?}", f);
+        let f = generate_all("02.0060", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "asti"), "{:?}", f);
+        let f = generate_all("iR", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "eti"), "{:?}", f);
+    }
+
+    #[test]
+    fn lun_han_ashir_a_lrt() {
+        let f = generate_all("hana", "plun", 1, 1);
+        assert!(f.iter().any(|x| x == "avaDIt"), "{:?}", f);
+        let f = generate_all("qukfY", "aashirling", 1, 1);
+        assert!(f.iter().any(|x| x == "kfzIzwa"), "{:?}", f);
+        let f = generate_all("zWA", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "sTAsyati"), "{:?}", f);
+        let f = generate_all("qupacaz", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "pakzyati"), "{:?}", f);
+    }
+
+    #[test]
+    fn pra_jagama_roundtrip() {
+        let prefs = vec!["pra".to_string()];
+        let f = generate_all_with_prefixes("gam", "plit", 1, 1, &prefs);
+        assert!(f.iter().any(|x| x == "prajagAma"), "{:?}", f);
+        let hits = crate::engine::analyze::analyze_word("prajagAma");
+        assert!(
+            hits.iter().any(|a| {
+                a.word_type == "tinanta"
+                    && a.lakara.as_deref() == Some("plit")
+                    && a.upasarga.as_deref() == Some("pra")
+            }),
+            "{:?}",
+            hits
+        );
+    }
 }

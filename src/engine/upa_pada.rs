@@ -90,6 +90,33 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
         }
     }
 
+    // --- sTA 1.3.22 समवप्रविभ्यः स्थः ---
+    if d == "sTA" || d == "zWA" {
+        if has_sam || has_prefix(&norm, "ava") || has_prefix(&norm, "pra") || has_prefix(&norm, "vi") {
+            return vec!["A".to_string()];
+        }
+    }
+
+    // --- 1.3.29 समो गम्यृच्छिप्रच्छिस्वरत्यर्तिश्रुविदिभ्यः ---
+    if has_sam && matches!(d, "f" | "fcC" | "Sru" | "vida" | "vid" | "pracC") {
+        return vec!["P".to_string(), "A".to_string()];
+    }
+
+    // --- 1.3.53 उदश्चरः ---
+    if (d == "car" || d == "cara") && has_prefix(&norm, "ud") {
+        return vec!["A".to_string()];
+    }
+
+    // --- 1.3.40 आङो दोऽनास्यविहरणे ---
+    if (d == "dA" || d == "dAR" || d == "qudAY") && has_prefix(&norm, "A") {
+        return vec!["A".to_string()];
+    }
+
+    // --- 1.3.66 भृञो यज्ञकर्मणि? sam/ni/ud + Bf → A in non-saṃskāra; treat as vA ---
+    if matches!(d, "Bf" | "BfY" | "quBfY") && (has_sam || has_prefix(&norm, "ni") || has_prefix(&norm, "ud")) {
+        return vec!["P".to_string(), "A".to_string()];
+    }
+
     // Default: dhātupāṭha pada (1.3.12–77 exceptions are listed above).
     match root_pada {
         "P" => vec!["P".to_string()],
@@ -148,5 +175,15 @@ mod tests {
     fn ji_other_prefix_stays_p() {
         let abhi = s(&["abhi"]);
         assert_eq!(allowed_padas("P","ji",&abhi), vec!["P"]);
+    }
+    #[test]
+    fn stha_sam_is_a() {
+        let sam = s(&["sam"]);
+        assert_eq!(allowed_padas("P", "zWA", &sam), vec!["A"]);
+    }
+    #[test]
+    fn ud_car_is_a() {
+        let ud = s(&["ud"]);
+        assert_eq!(allowed_padas("P", "car", &ud), vec!["A"]);
     }
 }

@@ -31,6 +31,7 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("as".to_string(),"nap".to_string()), vec![vec!["aH".to_string(),"asI".to_string(),"AMsi".to_string(),],vec!["aH".to_string(),"asI".to_string(),"AMsi".to_string(),],vec!["asA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ase".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["asaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["asaH".to_string(),"asoH".to_string(),"asAm".to_string(),],vec!["asi".to_string(),"asoH".to_string(),"aHsu".to_string(),],vec!["aH".to_string(),"asI".to_string(),"AMsi".to_string(),],]);
   m.insert(("at".to_string(),"pum".to_string()), vec![vec!["An".to_string(),"antO".to_string(),"antaH".to_string(),],vec!["antam".to_string(),"antO".to_string(),"ataH".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["an".to_string(),"antO".to_string(),"antaH".to_string(),],]);
   m.insert(("an".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"AnO".to_string(),"AnaH".to_string(),],vec!["Anam".to_string(),"AnO".to_string(),"YaH".to_string(),],vec!["YA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["Ye".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["YaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["YaH".to_string(),"YoH".to_string(),"YAm".to_string(),],vec!["Yi,Yani".to_string(),"YoH".to_string(),"asu".to_string(),],vec!["an".to_string(),"AnO".to_string(),"AnaH".to_string(),],]);
+  m.insert(("an".to_string(),"nap".to_string()), vec![vec!["a".to_string(),"nI".to_string(),"Ani".to_string(),],vec!["a".to_string(),"nI".to_string(),"Ani".to_string(),],vec!["nA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ne".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["naH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["naH".to_string(),"noH".to_string(),"nAm".to_string(),],vec!["ni".to_string(),"noH".to_string(),"asu".to_string(),],vec!["a,an".to_string(),"nI".to_string(),"Ani".to_string(),],]);
   m.insert(("c".to_string(),"stri".to_string()), vec![vec!["g".to_string(),"caH".to_string(),"caH".to_string(),],vec!["cam".to_string(),"ce".to_string(),"caH".to_string(),],vec!["cA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"coH".to_string(),"gAm".to_string(),],vec!["ci".to_string(),"coH".to_string(),"su".to_string(),],vec!["g".to_string(),"caH".to_string(),"caH".to_string(),],]);
   m.insert(("ad".to_string(),"nap".to_string()), vec![vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adam".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ade".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"adoh".to_string(),"Am".to_string(),],vec!["adi".to_string(),"adoh".to_string(),"atsu".to_string(),],vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],]);
   m.insert(("z".to_string(),"pum".to_string()), vec![vec!["H".to_string(),"qO".to_string(),"qaH".to_string(),],vec!["am".to_string(),"qO".to_string(),"qaH".to_string(),],vec!["qA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["e".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["aH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["aH".to_string(),"oH".to_string(),"Am".to_string(),],vec!["i".to_string(),"oH".to_string(),"su".to_string(),],vec!["H".to_string(),"qO".to_string(),"qaH".to_string(),],]);
@@ -165,4 +166,32 @@ pub fn analyze(word: &str) -> Vec<HashMap<String, String>> {
         }
     }
     out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rajan_pitar_naman() {
+        let d = generate("rAjan", "pum").expect("rAjan");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "rAjA"), "{:?}", pr);
+        let dv = d.declension.get("dvitIyA").unwrap();
+        assert!(dv.iter().any(|x| x == "rAjAnam"), "{:?}", dv);
+        let tr = d.declension.get("tfIyA").unwrap();
+        assert!(tr.iter().any(|x| x == "rAjYA"), "{:?}", tr);
+
+        let p = generate("pitf", "pum").expect("pitf");
+        let pr = p.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "pitA"), "{:?}", pr);
+        let dv = p.declension.get("dvitIyA").unwrap();
+        assert!(dv.iter().any(|x| x == "pitaram"), "{:?}", dv);
+
+        let n = generate("nAman", "nap").expect("nAman");
+        let pr = n.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "nAma"), "{:?}", pr);
+        let tr = n.declension.get("tfIyA").unwrap();
+        assert!(tr.iter().any(|x| x == "nAmnA"), "{:?}", tr);
+    }
 }
