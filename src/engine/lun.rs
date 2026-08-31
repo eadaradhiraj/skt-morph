@@ -246,6 +246,8 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
         "gam" if pada == "A" => return Some(ang_atmane("gam", purusha, vacana)),
         "vid" if pada == "P" => return Some(ang_thematic("vid", purusha, vacana)),
         "vac" if pada == "P" => return Some(ang_thematic("voc", purusha, vacana)),
+        "sfj" if pada == "P" => return Some(ang_thematic("sfj", purusha, vacana)),
+        "dfS" if pada == "P" => return Some(ang_thematic("darS", purusha, vacana)),
         "i" if pada == "P" => return Some(sic_it_p("Ez", purusha, vacana)),
         _ => {}
     }
@@ -314,5 +316,9 @@ mod tests {
         assert!(f.iter().any(|x| x == "agamanta"), "{:?}", f);
         let f = kartari("BU", 1, 1, "A").unwrap();
         assert!(f.iter().any(|x| x == "aBavizwa"), "{:?}", f);
+        let f = kartari("sfj", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "asfjat" || x == "asfjad"), "{:?}", f);
+        let f = kartari("dfSir", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "adarSat" || x == "adarSad"), "{:?}", f);
     }
 }

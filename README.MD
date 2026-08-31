@@ -17,7 +17,7 @@ ashtadhyayi.com data (`skt_morph.db`) is an optional **cross-check**. If live �
 
 In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लोट्, विधिलिङ्, लृट्, लिट्, लुङ्, आशीर्लिङ्; parasmai and ātmanepada), listed kṛt pratyayas, ending-class सुबन्त (including foreign stems such as ट्रम्प → ट्रम्पेण), सर्वनाम. Started: णिच् / सन् / यङ्, कर्मणि यक्. Optional अर्थ on 1.3 meaning-conditioned pada.
 
-Later: fuller लिट्/लुङ्; more णिच्/सन् defaults. Derived forms stay out of the analyze index.
+Later: fuller लिट्; remaining णिच्/सन् (पूक्/युक् extras, सन् सेट्). Derived forms stay out of the analyze index.
 
 `tinanta_overrides.rs` is a temporary patch list where the Kaumudī path is not written yet. New work goes into stems, endings, join, and sandhi — not into that table, and not into scrape rows.
 

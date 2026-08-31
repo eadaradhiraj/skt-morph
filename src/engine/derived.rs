@@ -61,50 +61,47 @@ fn root_of(dhatu: &str) -> String {
     r
 }
 
-/// मित् (6.4.92): no vṛddhi in णिच् — गमयति not गामयति.
+/// मित् (6.4.92 मितां ह्रस्वः; घटादि / अमन्त).
 fn is_mit(root: &str) -> bool {
-    matches!(root, "gam" | "yam" | "jan" | "Kan" | "van" | "tan" | "nam" | "ram")
+    matches!(
+        root,
+        "gam" | "yam" | "jan" | "Kan" | "van" | "tan" | "nam" | "ram" | "kram" | "Bram" | "Sram"
+            | "dam" | "Sam" | "tam" | "mad" | "Gaw" | "vyaT" | "praT"
+    )
 }
 
-/// णिच् present aṅga (…aya). भावय, कारय, गमय, दापय, घातय.
+fn last_is_cons(root: &str) -> bool {
+    root.chars().last().is_some_and(is_cons)
+}
+
+/// णिच् aṅga: 7.2.115/116 वृद्धि, 6.4.92 मित्, 7.3.36 पुक्, 7.3.86 लघूपध गुण.
 pub fn nic_stem(root: &str) -> String {
     match root {
-        "BU" => "BAvaya".into(),
-        "kf" => "kAraya".into(),
-        "nI" => "nAyaya".into(),
-        "dA" => "dApaya".into(),
-        "DA" => "DApaya".into(),
-        "sTA" => "sTApaya".into(),
-        "pA" => "pAyaya".into(),
-        "han" => "GAtaya".into(),
-        "i" => "gamaya".into(),
-        "dfS" => "darSaya".into(),
-        "vac" => "vAcaya".into(),
-        "pat" => "pAtaya".into(),
-        "Sru" => "SrAvaya".into(),
-        "grah" => "grAhaya".into(),
-        "BI" => "BAyaya".into(),
-        "man" => "mAnaya".into(),
-        "labh" => "laBaya".into(),
-        "kzip" => "kzepaya".into(),
-        "sic" => "secaya".into(),
-        _ if is_mit(root) => format!("{}aya", root),
-        _ => {
-            let g = apply_causative_like(root);
-            if g.ends_with("aya") {
-                g
-            } else {
-                format!("{g}aya")
+        "han" => return "GAtaya".into(),
+        "i" => return "gamaya".into(),
+        "pA" => return "pAyaya".into(),
+        _ => {}
+    }
+    if is_mit(root) {
+        return format!("{root}aya");
+    }
+    match root.chars().last() {
+        Some('A') => format!("{root}paya"),
+        Some('i') | Some('I') => format!("{}Ayaya", &root[..root.len() - 1]),
+        Some('u') | Some('U') => format!("{}Avaya", &root[..root.len() - 1]),
+        Some('f') | Some('F') => format!("{}Araya", &root[..root.len() - 1]),
+        _ if last_is_cons(root) => {
+            let v = root.chars().rev().nth(1);
+            match v {
+                Some('i') | Some('u') | Some('f') | Some('F') => {
+                    format!("{}aya", apply_guna_to_stem(root))
+                }
+                Some('a') => format!("{}aya", apply_vrddhi_to_stem(root)),
+                _ => format!("{}aya", apply_vrddhi_to_stem(root)),
             }
         }
+        _ => format!("{}aya", apply_vrddhi_to_stem(root)),
     }
-}
-
-fn apply_causative_like(root: &str) -> String {
-    if root.ends_with('f') || root.ends_with('F') {
-        return apply_guna_to_stem(root);
-    }
-    apply_vrddhi_to_stem(root)
 }
 
 /// सन् present aṅga. बुभूष, चिकीर्ष, जिगमिष, जिघांस, दित्स.
@@ -126,6 +123,17 @@ pub fn san_stem(root: &str) -> String {
         "grah" => "jiGfkza".into(),
         "BI" => "biBIza".into(),
         "labh" => "lipsa".into(),
+        "Sru" => "SuSrUza".into(),
+        _ if crate::engine::it::anit_sya(root) && last_is_cons(root) => {
+            let abh = abhyasa_i(root);
+            let joined = crate::engine::join::internal_sandhi(root, "sa");
+            let body = if joined.ends_with('a') {
+                joined
+            } else {
+                format!("{joined}a")
+            };
+            format!("{abh}{body}")
+        }
         _ => {
             let abh = abhyasa_i(root);
             format!("{abh}{root}iza")
@@ -325,6 +333,17 @@ mod tests {
         assert!(f.iter().any(|x| x == "didfkzati"), "{:?}", f);
         let f = kartari("labh", "san", "lat", 1, 1, "A").unwrap();
         assert!(f.iter().any(|x| x.contains("lips")), "{:?}", f);
+        assert_eq!(nic_stem("pac"), "pAcaya");
+        assert_eq!(nic_stem("dA"), "dApaya");
+        assert_eq!(nic_stem("kzip"), "kzepaya");
+        assert_eq!(nic_stem("dfS"), "darSaya");
+        assert_eq!(nic_stem("Gaw"), "Gawaya");
+        let f = kartari("qupacaz", "Ric", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "pAcayati"), "{:?}", f);
+        let f = kartari("qupacaz", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "pipakzati"), "{:?}", f);
+        let f = kartari("dfSir", "Ric", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "darSayati"), "{:?}", f);
     }
 
     #[test]
