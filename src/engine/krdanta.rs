@@ -176,12 +176,8 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "dah" {
         return "dagDa".into(); // दग्ध
     }
-    // Special: मुच् + क्त → मुक्त (SLP1 mukta) — 8.2.30 चोः कुः (c→k)
-    // sūtra: मुच् + क्त → मुक्त; future devs: muc→mukta, not mucta; keep k (क) via ku
-    // Extreme: muc is anit, but kta is mukta via 8.2.30, not mucta
-    if orig == "muc" {
-        return "mukta".into(); // मुक्त
-    }
+    // 8.2.30 चोः कुः is applied in the terminal match (before 7.2.35 इट्).
+    // Named मुच्/युज्/सिच्/… arms deleted — मुक्त/युक्त/सिक्त come from internal_sandhi.
     // Special: भञ्ज् + क्त → भग्न (SLP1 Bagna) — 7.1.67?/8.2.36? Actually Banj→Bagna (न-लोप + ज→ग)
     // sūtra: भञ्ज् + क्त → भग्न; future devs: Banj=भञ्ज्, Bagna=भग्न — keep g, nna
     // Extreme: keep Bagna not Banja; handles anusvāra→n and j→g via ku
@@ -289,138 +285,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     // Extreme: gam is anit, kit_anga gives g but explicit documents 6.4.40? Keep gata
     if orig == "gam" {
         return "gata".into(); // गत
-    }
-    // Special: रुच् + क्त → रुक्त (SLP1 rukta) — 8.2.30 c→k
-    // sūtra: रुच् + क्त → रुक्त; future devs: ruc=रुच्, rukta=रुक्त — keep k
-    // Extreme: keep rukta not ructa
-    if orig == "ruc" {
-        return "rukta".into(); // रुक्त
-    }
-    // Special: युज् + क्त → युक्त (SLP1 yukta) — 8.2.30 j→k, 7.1.43? Actually yuj→yukta
-    // sūtra: युज् + क्त → युक्त; future devs: yuj=युज्, yukta=युक्त — keep k
-    // Extreme: keep yukta not yujta/yukta with j
-    if orig == "yuj" {
-        return "yukta".into(); // युक्त
-    }
-    // Special: कुच् + क्त → कुक्त (SLP1 kukta) — 8.2.30 c→k (kuc→kukta)
-    // sūtra: कुच् + क्त → कुक्त; future devs: kuc=कुच्, kukta=कुक्त — keep k
-    // Extreme: keep kukta not kucta
-    if orig == "kuc" {
-        return "kukta".into(); // कुक्त
-    }
-    // Special: तुच् + क्त → तुक्त (SLP1 tukta) — 8.2.30 c→k (tuc→tukta)
-    // sūtra: तुच् + क्त → तुक्त; future devs: tuc=तुच्, tukta=तुक्त — keep k
-    // Extreme: keep tukta not tucta
-    if orig == "tuc" {
-        return "tukta".into(); // तुक्त
-    }
-    // Special: सिच् + क्त → सिक्त (SLP1 sikta) — 8.2.30 c→k (sic→sikta)
-    // sūtra: सिच् + क्त → सिक्त; future devs: sic=सिच्, sikta=सिक्त — keep k
-    // Extreme: keep sikta not sicta
-    if orig == "sic" {
-        return "sikta".into(); // सिक्त
-    }
-    // Special: भुज् + क्त → भुक्त (SLP1 Bukta) — 8.2.30 j→k (Buj→Bukta)
-    // sūtra: भुज् + क्त → भुक्त; future devs: Buj=भुज्, Bukta=भुक्त — keep k, B=भ
-    // Extreme: keep Bukta not Bujta
-    if orig == "Buj" {
-        return "Bukta".into(); // भुक्त
-    }
-    // Special: तुज् + क्त → तुक्त (SLP1 tukta) — 8.2.30 j→k (tuj→tukta)
-    // sūtra: तुज् + क्त → तुक्त; future devs: tuj=तुज्, tukta=तुक्त — keep k
-    // Extreme: keep tukta not tujta
-    if orig == "tuj" {
-        return "tukta".into(); // तुक्त
-    }
-    // Special: सुज् + क्त → सुक्त (SLP1 sukta) — 8.2.30 j→k (suj→sukta)
-    // sūtra: सुज् + क्त → सुक्त; future devs: suj=सुज्, sukta=सुक्त — keep k, s=स
-    // Extreme: keep sukta not sujta
-    if orig == "suj" {
-        return "sukta".into(); // सुक्त
-    }
-    // Special: रुज् + क्त → रुक्त (SLP1 rukta) — 8.2.30 j→k (ruj→rukta)
-    // sūtra: रुज् + क्त → रुक्त; future devs: ruj=रुज्, rukta=रुक्त — keep k, r=र
-    // Extreme: keep rukta not rujta
-    if orig == "ruj" {
-        return "rukta".into(); // रुक्त
-    }
-    // Special: विज् + क्त → विक्त (SLP1 vikta) — 8.2.30 j→k (vij→vikta)
-    // sūtra: विज् + क्त → विक्त; future devs: vij=विज्, vikta=विक्त — keep k, v=व
-    // Extreme: keep vikta not vijta
-    if orig == "vij" {
-        return "vikta".into(); // विक्त
-    }
-    // Special: सिज् + क्त → सिक्त (SLP1 sikta) — 8.2.30 j→k (sij→sikta)
-    // sūtra: सिज् + क्त → सिक्त; future devs: sij=सिज्, sikta=सिक्त — keep k, s=स
-    // Extreme: keep sikta not sijta; similar to sic but j variant
-    if orig == "sij" {
-        return "sikta".into(); // सिक्त
-    }
-    // Special: निज् + क्त → निक्त (SLP1 nikta) — 8.2.30 j→k (nij→nikta)
-    // sūtra: निज् + क्त → निक्त; future devs: nij=निज्, nikta=निक्त — keep k, n=न
-    // Extreme: keep nikta not nijta
-    if orig == "nij" {
-        return "nikta".into(); // निक्त
-    }
-    // Special: मिज् + क्त → मिक्त (SLP1 mikta) — 8.2.30 j→k (mij→mikta)
-    // sūtra: मिज् + क्त → मिक्त; future devs: mij=मिज्, mikta=मिक्त — keep k, m=म
-    // Extreme: keep mikta not mijta
-    if orig == "mij" {
-        return "mikta".into(); // मिक्त
-    }
-    // Special: पिज् + क्त → पिक्त (SLP1 pikta) — 8.2.30 j→k (pij→pikta)
-    // sūtra: पिज् + क्त → पिक्त; future devs: pij=पिज्, pikta=पिक्त — keep k, p=प
-    // Extreme: keep pikta not pijta
-    if orig == "pij" {
-        return "pikta".into(); // पिक्त
-    }
-    // Special: किज् + क्त → किक्त (SLP1 kikta) — 8.2.30 j→k (kij→kikta)
-    // sūtra: किज् + क्त → किक्त; future devs: kij=किज्, kikta=किक्त — keep k
-    // Extreme: keep kikta not kijta
-    if orig == "kij" {
-        return "kikta".into(); // किक्त
-    }
-    // Special: गिज् + क्त → गिक्त (SLP1 gikta) — 8.2.30 j→k (gij→gikta)
-    // sūtra: गिज् + क्त → गिक्त; future devs: gij=गिज्, gikta=गिक्त — keep k, g=ग
-    // Extreme: keep gikta not gijta
-    if orig == "gij" {
-        return "gikta".into(); // गिक्त
-    }
-    // Special: चिज् + क्त → चिक्त (SLP1 cikta) — 8.2.30 j→k (cij→cikta)
-    // sūtra: चिज् + क्त → चिक्त; future devs: cij=चिज्, cikta=चिक्त — keep k, c=च
-    // Extreme: keep cikta not cijta
-    if orig == "cij" {
-        return "cikta".into(); // चिक्त
-    }
-    // Special: तिज् + क्त → तिक्त (SLP1 tikta) — 8.2.30 j→k (tij→tikta)
-    // sūtra: तिज् + क्त → तिक्त; future devs: tij=तिज्, tikta=तिक्त — keep k, t=त
-    // Extreme: keep tikta not tijta
-    if orig == "tij" {
-        return "tikta".into(); // तिक्त
-    }
-    // Special: दिज् + क्त → दिक्त (SLP1 dikta) — 8.2.30 j→k (dij→dikta)
-    // sūtra: दिज् + क्त → दिक्त; future devs: dij=दिज्, dikta=दिक्त — keep k, d=द
-    // Extreme: keep dikta not dijta
-    if orig == "dij" {
-        return "dikta".into(); // दिक्त
-    }
-    // Special: बिज् + क्त → बिक्त (SLP1 bikta) — 8.2.30 j→k (bij→bikta)
-    // sūtra: बिज् + क्त → बिक्त; future devs: bij=बिज्, bikta=बिक्त — keep k, b=ब
-    // Extreme: keep bikta not bijta
-    if orig == "bij" {
-        return "bikta".into(); // बिक्त
-    }
-    // Special: लिज् + क्त → लिक्त (SLP1 likta) — 8.2.30 j→k (lij→likta)
-    // sūtra: लिज् + क्त → लिक्त; future devs: lij=लिज्, likta=लिक्त — keep k, l=ल
-    // Extreme: keep likta not lijta
-    if orig == "lij" {
-        return "likta".into(); // लिक्त
-    }
-    // Special: रिज् + क्त → रिक्त (SLP1 rikta) — 8.2.30 j→k (rij→rikta)
-    // sūtra: रिज् + क्त → रिक्त; future devs: rij=रिज्, rikta=रिक्त — keep k, r=र
-    // Extreme: keep rikta not rijta
-    if orig == "rij" {
-        return "rikta".into(); // रिक्त
     }
     // Special: दिव् + क्त → द्यूत (SLP1 dyUta) — 6.1.15 Actually div→dyU (samprasāraṇa)
     // sūtra: दिव् + क्त → द्यूत; future devs: div=दिव्, dyUta=द्यूत — keep yU, long U
@@ -975,6 +839,13 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
             format!("{s}zwa")
         }
         "ij" => "izwa".into(),
+        // 8.2.30 चोः कुः — palatal + झल् त of क्त → velar (मुक्त, युक्त, सिक्त).
+        // Must precede 7.2.35 इट्: takes_it_nistha would otherwise yield *mucita/*yujita.
+        // च/छ/ज/झ → क/ख/ग/घ; internal_sandhi maps c/j + t → kt. छ/झ rare in निष्ठा.
+        // भञ्ज् is not this arm (ञ्ज् + त → भग्न, kept named above).
+        _ if r.chars().last().is_some_and(|c| matches!(c, 'c' | 'C' | 'j' | 'J')) => {
+            internal_sandhi(&r, "ta")
+        }
         _ if r.ends_with('h')
             && r.chars().rev().nth(1).is_some_and(|c| "aAiIuUfFeEoO".contains(c)) =>
         {

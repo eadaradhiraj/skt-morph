@@ -122,7 +122,10 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         ('D', 't') => format!("{}dD{}", stem_body, &suffix[1..]),
         ('D', 'T') => format!("{}dD{}", stem_body, &suffix[1..]),
         ('D', 's') => format!("{}ts{}", stem_body, &suffix[1..]),
+        // 8.2.30 चोः कुः — चवर्ग before झल् → कवर्ग (मुक्त, युक्त; छ→ख, झ→घ).
         ('c', 't') | ('j', 't') => format!("{}kt{}", stem_body, &suffix[1..]),
+        ('C', 't') => format!("{}Kt{}", stem_body, &suffix[1..]),
+        ('J', 't') => format!("{}Gt{}", stem_body, &suffix[1..]),
         ('c', 'T') | ('j', 'T') => format!("{}kT{}", stem_body, &suffix[1..]),
         ('c', 's') | ('j', 's') | ('S', 's') | ('z', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
         ('z', 't') | ('S', 't') => format!("{}zw{}", stem_body, &suffix[1..]),
