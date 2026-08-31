@@ -131,6 +131,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **क्त दु→दुत (du→duta):** दु + क्त → दुत (SLP1 `duta`) not `duita`; added `nistha_base` special for `du` with header; `du`→`duta` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त पु→पुत (pu→puta):** पु + क्त → पुत (SLP1 `puta`) not `puita`; added `nistha_base` special for `pu` with header; `pu`→`puta` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त बु→बुत (bu→buta):** बु + क्त → बुत (SLP1 `buta`) not `buita`; added `nistha_base` special for `bu` with header; `bu`→`buta` asserts; extreme commenting kept; 97 tests — pushed.
+- **क्त मु→मुत (mu→muta):** मु + क्त → मुत (SLP1 `muta`) not `muita`; added `nistha_base` special for `mu` with header; `mu`→`muta` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त पभ्→पब्ध (paB→pabDa):** पभ् + क्त → पब्ध (SLP1 `pabDa`) not `paBta`; added `nistha_base` special for `paB` with header; `paBa`/`paB`→`pabDa` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त बभ्→बब्ध (BaB→babDa):** बभ् + क्त → बब्ध (SLP1 `babDa`) not `BaBta`; added `nistha_base` special for `BaB` with header; `BaBa`/`BaB`→`babDa` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त चभ्→चब्ध (caB→cabDa):** चभ् + क्त → चब्ध (SLP1 `cabDa`) not `caBta`; added `nistha_base` special for `caB` with header; `caBa`/`caB`→`cabDa` asserts; extreme commenting kept; 97 tests — pushed.
