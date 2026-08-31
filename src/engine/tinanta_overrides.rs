@@ -6,8 +6,8 @@
 pub fn lookup_override(
     dhatu_query: &str,
     canonical: &str,
-    purusha: u8,
-    vacana: u8,
+    _purusha: u8,
+    _vacana: u8,
     prefixes: &[String],
 ) -> Option<Vec<String>> {
     if prefixes.is_empty()
@@ -38,135 +38,15 @@ pub fn lookup_override(
                 | "SAsu" | "02.0070" | "vaSa" | "02.0075"
                 | "cakziN" | "02.0007" | "ik" | "02.0042" | "daridrA" | "02.0068"
                 | "cakAsf" | "02.0069" | "zasa" | "02.0073" | "zasti" | "02.0074"
+                | "Divi" | "01.0677" | "Rikza" | "01.0747" | "fti" | "01.1166"
         )
         && matches!(
             canonical,
             "plat" | "plan" | "plot" | "pvidhilin" | "plrt" | "plun" | "pashirling"
+                | "alat" | "alan" | "alot" | "avidhilin" | "alrt"
         )
     {
         return None;
     }
-    if dhatu_query == "Rikza" || dhatu_query == "01.0747" {
-        if let Some(forms) = rikza_forms(&canonical, purusha, vacana) {
-            if prefixes.is_empty() { return Some(forms); }
-            return Some(forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect());
-        }
-    }
-    if dhatu_query == "Divi" || dhatu_query == "01.0677" {
-        if let Some(forms) = divi_forms(&canonical, purusha, vacana) {
-            if prefixes.is_empty() { return Some(forms); }
-            return Some(forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect());
-        }
-    }
-    if dhatu_query == "fti" || dhatu_query == "01.1166" {
-        if canonical == "plrt" {
-            match (purusha, vacana) {
-                (1,1) => return Some(vec!["artizyati".into()]),
-                (1,2) => return Some(vec!["artizyataH".into()]),
-                (1,3) => return Some(vec!["artizyanti".into()]),
-                (2,1) => return Some(vec!["artizyasi".into()]),
-                (2,2) => return Some(vec!["artizyaTaH".into()]),
-                (2,3) => return Some(vec!["artizyaTa".into()]),
-                (3,1) => return Some(vec!["artizyAmi".into()]),
-                (3,2) => return Some(vec!["artizyAvaH".into()]),
-                (3,3) => return Some(vec!["artizyAmaH".into()]),
-                _ => {}
-            }
-        }
-    }
     None
-}
-
-fn rikza_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
-    match (canonical, purusha, vacana) {
-        ("plan",1,1) => Some(vec!["anikzat".into(), "anikzad".into()]),
-        ("plan",1,2) => Some(vec!["anikzatAm".into()]),
-        ("plan",1,3) => Some(vec!["anikzan".into()]),
-        ("plan",2,1) => Some(vec!["anikzaH".into()]),
-        ("plan",2,2) => Some(vec!["anikzatam".into()]),
-        ("plan",2,3) => Some(vec!["anikzata".into()]),
-        ("plan",3,1) => Some(vec!["anikzam".into()]),
-        ("plan",3,2) => Some(vec!["anikzAva".into()]),
-        ("plan",3,3) => Some(vec!["anikzAma".into()]),
-        ("pvidhilin",1,1) => Some(vec!["nikzet".into(), "nikzed".into()]),
-        ("pvidhiling",1,1) => Some(vec!["nikzet".into(), "nikzed".into()]),
-        ("pvidhilin",1,2) => Some(vec!["nikzetAm".into()]),
-        ("pvidhiling",1,2) => Some(vec!["nikzetAm".into()]),
-        ("pvidhilin",1,3) => Some(vec!["nikzeyuH".into()]),
-        ("pvidhiling",1,3) => Some(vec!["nikzeyuH".into()]),
-        ("pvidhilin",2,1) => Some(vec!["nikzeH".into()]),
-        ("pvidhiling",2,1) => Some(vec!["nikzeH".into()]),
-        ("pvidhilin",2,2) => Some(vec!["nikzetam".into()]),
-        ("pvidhiling",2,2) => Some(vec!["nikzetam".into()]),
-        ("pvidhilin",2,3) => Some(vec!["nikzeta".into()]),
-        ("pvidhiling",2,3) => Some(vec!["nikzeta".into()]),
-        ("pvidhilin",3,1) => Some(vec!["nikzeyam".into()]),
-        ("pvidhiling",3,1) => Some(vec!["nikzeyam".into()]),
-        ("pvidhilin",3,2) => Some(vec!["nikzeva".into()]),
-        ("pvidhiling",3,2) => Some(vec!["nikzeva".into()]),
-        ("pvidhilin",3,3) => Some(vec!["nikzema".into()]),
-        ("pvidhiling",3,3) => Some(vec!["nikzema".into()]),
-        _ => None,
-    }
-}
-
-
-fn divi_forms(canonical: &str, purusha: u8, vacana: u8) -> Option<Vec<String>> {
-    match (canonical, purusha, vacana) {
-        ("plat",1,1) => Some(vec!["Dinoti".into()]),
-        ("plat",1,2) => Some(vec!["DinutaH".into()]),
-        ("plat",1,3) => Some(vec!["Dinvanti".into()]),
-        ("plat",2,1) => Some(vec!["Dinozi".into()]),
-        ("plat",2,2) => Some(vec!["DinuTaH".into()]),
-        ("plat",2,3) => Some(vec!["DinuTa".into()]),
-        ("plat",3,1) => Some(vec!["Dinomi".into()]),
-        ("plat",3,2) => Some(vec!["DinuvaH".into(), "DinvaH".into()]),
-        ("plat",3,3) => Some(vec!["DinumaH".into(), "DinmaH".into()]),
-        ("plan",1,1) => Some(vec!["aDinot".into(), "aDinod".into()]),
-        ("plan",1,2) => Some(vec!["aDinutAm".into()]),
-        ("plan",1,3) => Some(vec!["aDinvan".into()]),
-        ("plan",2,1) => Some(vec!["aDinoH".into()]),
-        ("plan",2,2) => Some(vec!["aDinutam".into()]),
-        ("plan",2,3) => Some(vec!["aDinuta".into()]),
-        ("plan",3,1) => Some(vec!["aDinavam".into()]),
-        ("plan",3,2) => Some(vec!["aDinuva".into(), "aDinva".into()]),
-        ("plan",3,3) => Some(vec!["aDinuma".into(), "aDinma".into()]),
-        ("plot",1,1) => Some(vec!["DinutAt".into(), "DinutAd".into(), "Dinotu".into()]),
-        ("plot",1,2) => Some(vec!["DinutAm".into()]),
-        ("plot",1,3) => Some(vec!["Dinvantu".into()]),
-        ("plot",2,1) => Some(vec!["Dinu".into(), "DinutAt".into(), "DinutAd".into()]),
-        ("plot",2,2) => Some(vec!["Dinutam".into()]),
-        ("plot",2,3) => Some(vec!["Dinuta".into()]),
-        ("plot",3,1) => Some(vec!["DinavAni".into()]),
-        ("plot",3,2) => Some(vec!["DinavAva".into()]),
-        ("plot",3,3) => Some(vec!["DinavAma".into()]),
-        ("plrt",1,1) => Some(vec!["Dinvizyati".into()]),
-        ("plrt",1,2) => Some(vec!["DinvizyataH".into()]),
-        ("plrt",1,3) => Some(vec!["Dinvizyanti".into()]),
-        ("plrt",2,1) => Some(vec!["Dinvizyasi".into()]),
-        ("plrt",2,2) => Some(vec!["DinvizyaTaH".into()]),
-        ("plrt",2,3) => Some(vec!["DinvizyaTa".into()]),
-        ("plrt",3,1) => Some(vec!["DinvizyAmi".into()]),
-        ("plrt",3,2) => Some(vec!["DinvizyAvaH".into()]),
-        ("plrt",3,3) => Some(vec!["DinvizyAmaH".into()]),
-        ("pvidhilin",1,1) => Some(vec!["DinuyAt".into(), "DinuyAd".into()]),
-        ("pvidhiling",1,1) => Some(vec!["DinuyAt".into(), "DinuyAd".into()]),
-        ("pvidhilin",1,2) => Some(vec!["DinuyAtAm".into()]),
-        ("pvidhiling",1,2) => Some(vec!["DinuyAtAm".into()]),
-        ("pvidhilin",1,3) => Some(vec!["DinuyuH".into()]),
-        ("pvidhiling",1,3) => Some(vec!["DinuyuH".into()]),
-        ("pvidhilin",2,1) => Some(vec!["DinuyAH".into()]),
-        ("pvidhiling",2,1) => Some(vec!["DinuyAH".into()]),
-        ("pvidhilin",2,2) => Some(vec!["DinuyAtam".into()]),
-        ("pvidhiling",2,2) => Some(vec!["DinuyAtam".into()]),
-        ("pvidhilin",2,3) => Some(vec!["DinuyAta".into()]),
-        ("pvidhiling",2,3) => Some(vec!["DinuyAta".into()]),
-        ("pvidhilin",3,1) => Some(vec!["DinuyAm".into()]),
-        ("pvidhiling",3,1) => Some(vec!["DinuyAm".into()]),
-        ("pvidhilin",3,2) => Some(vec!["DinuyAva".into()]),
-        ("pvidhiling",3,2) => Some(vec!["DinuyAva".into()]),
-        ("pvidhilin",3,3) => Some(vec!["DinuyAma".into()]),
-        ("pvidhiling",3,3) => Some(vec!["DinuyAma".into()]),
-        _ => None,
-    }
 }

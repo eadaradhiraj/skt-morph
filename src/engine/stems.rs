@@ -82,6 +82,7 @@ fn g1_special_lrt(dhatu: &str) -> Option<String> {
         ("sru","srozya"),("su","sozya"),("Sru","Srozya"),("Dru","Drozya"),("du","dozya"),
         ("dru","drozya"),("tyaj","tyakzya"),("skand","skantsya"),("nam","naMsya"),
         ("vft","vartsya"),("syand","syantsya"),("kfp","kalpsya"),("kalp","kalpsya"),
+        ("Divi","Dinvizya"),("fti","artizya"),
     ];
     for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
     if ["Dinv"].contains(&dhatu) { return Some(format!("{}izya", dhatu)); }
@@ -457,6 +458,9 @@ pub fn derive_stem(
             // zasja~ (z->s) -> sajja (gold sajjati, not sasjati)
             let ps = "sajja".to_string();
                 present_stem = Some(ps);
+        } else if dhatu == "fti" {
+            // ऋति: इत् i, no नुम् (र्तते, अरतिष्यते).
+            present_stem = Some("arta".to_string());
         } else if dhatu == "Divi" {
             let ps = "Dinu".to_string();
             present_stem = Some(ps);
@@ -736,6 +740,9 @@ pub fn derive_stem(
             if dhatu.ends_with("ikza") {
                 return (Some("nikz".to_string()), Some("a".to_string()));
             }
+            if dhatu == "fti" {
+                return (Some("art".to_string()), Some("a".to_string()));
+            }
             if dhatu == "Divi" {
                 return (Some("Dinu".to_string()), Some("a".to_string()));
             }
@@ -758,7 +765,7 @@ pub fn derive_stem(
                 let prefix = &dhatu[..idx];
                 return (Some(format!("{}ANkz", prefix)), Some("a".to_string()));
             }
-            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu"|"fti"|"Divi") {
                 let base = &dhatu[..dhatu.len()-1];
                 if let Some(last) = base.chars().last() {
                     let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
@@ -915,6 +922,9 @@ pub fn derive_stem(
             if dhatu == "UWa" {
                 return (Some("UW".to_string()), None);
             }
+            if dhatu == "fti" {
+                return (Some("art".to_string()), None);
+            }
             if dhatu == "Divi" {
                 return (Some("Dinu".to_string()), None);
             }
@@ -938,7 +948,7 @@ pub fn derive_stem(
                 let root = apply_nasal_palatal(&root);
                         return (Some(root), None);
             }
-            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu"|"fti"|"Divi") {
                 let base = &dhatu[..dhatu.len()-1];
                 if let Some(last) = base.chars().last() {
                     let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };

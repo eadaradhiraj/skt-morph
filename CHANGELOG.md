@@ -40,6 +40,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **णिच्/सन् roots:** भाययति, दिदृक्षति, लिप्सते; क्षिपयति सेचयति मानयति.
 - **क्त:** दृष्ट नष्ट ऊढ गूढ दग्ध लब्ध बद्ध सुप्त सृष्ट कृष्ट ज्ञात लीढ दुग्ध.
 - **अदादि leftover live:** अधि+इ अध्येति/अधीतः; दरिद्राति/दरिद्रति; चकास्ति/चकाधि; सस्ति/सधि; संस्ति; चक्षिङ् 2.4.54 क्ष्यास्यति (परस्मै लृट्). Folded those override tables.
+- **भ्वादि leftovers live:** धिवि धिनोति/धिन्वन्ति/धिनविष्यति (श्नु-like); णिक्ष् अनिक्षत्; ऋति र्तते/अरतिष्यते (आत्मने, no नुम्). `tinanta_overrides` has no remaining form tables.
 
 
 

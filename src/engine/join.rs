@@ -4,6 +4,85 @@
 
 use crate::engine::phonology::thematic_join;
 
+/// धिवि (01.0677): श्नु-like o/u/v (धिनोति, धिन्वन्ति, धिनविष्यति).
+fn join_divi(family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    let inner = match family {
+        "lat" => match ending {
+            "ti" => "Dinoti".into(),
+            "taH" => "DinutaH".into(),
+            "nti" | "anti" => "Dinvanti".into(),
+            "si" | "zi" => "Dinozi".into(),
+            "TaH" | "thaH" => "DinuTaH".into(),
+            "Ta" | "tha" => "DinuTa".into(),
+            "mi" | "Ami" => "Dinomi".into(),
+            "vaH" | "AvaH" => "DinuvaH".into(),
+            "maH" | "AmaH" => "DinumaH".into(),
+            _ => return None,
+        },
+        "lot" => match ending {
+            "tu" | "otu" => "Dinotu".into(),
+            "tAt" | "utAt" => "DinutAt".into(),
+            "tAd" | "utAd" => "DinutAd".into(),
+            "tAm" | "utAm" => "DinutAm".into(),
+            "antu" | "vantu" => "Dinvantu".into(),
+            "" | "u" => "Dinu".into(),
+            "tam" | "utam" => "Dinutam".into(),
+            "ta" | "uta" => "Dinuta".into(),
+            "Ani" | "avAni" => "DinavAni".into(),
+            "Ava" | "avAva" => "DinavAva".into(),
+            "Ama" | "avAma" => "DinavAma".into(),
+            _ => return None,
+        },
+        "lang" => match ending {
+            "at" | "ot" => "Dinot".into(),
+            "ad" | "od" => "Dinod".into(),
+            "atAm" | "utAm" => "DinutAm".into(),
+            "an" | "van" => "Dinvan".into(),
+            "aH" | "oH" => "DinoH".into(),
+            "atam" | "utam" => "Dinutam".into(),
+            "ata" | "uta" => "Dinuta".into(),
+            "am" | "avam" => "Dinavam".into(),
+            "Ava" | "uva" | "va" => "Dinuva".into(),
+            "Ama" | "uma" | "ma" => "Dinuma".into(),
+            _ => return None,
+        },
+        "vidhilin" => match ending {
+            "et" | "At" | "yAt" => "DinuyAt".into(),
+            "ed" | "Ad" | "yAd" => "DinuyAd".into(),
+            "etAm" | "AtAm" | "yAtAm" => "DinuyAtAm".into(),
+            "eyuH" | "uH" | "yuH" => "DinuyuH".into(),
+            "eH" | "AH" | "yAH" => "DinuyAH".into(),
+            "etam" | "Atam" | "yAtam" => "DinuyAtam".into(),
+            "eta" | "Ata" | "yAta" => "DinuyAta".into(),
+            "eyam" | "Am" | "yAm" => "DinuyAm".into(),
+            "eva" | "Ava" | "yAva" => "DinuyAva".into(),
+            "ema" | "Ama" | "yAma" => "DinuyAma".into(),
+            _ => return None,
+        },
+        "lrt" => thematic_join("Dinvizya", ending),
+        _ => return None,
+    };
+    Some(apply_lang_aug(inner, family, augment))
+}
+
+fn apply_lang_aug(form: String, family: &str, augment: Option<&str>) -> String {
+    if family != "lang" {
+        return form;
+    }
+    let Some(aug) = augment else {
+        return format!("a{form}");
+    };
+    if aug != "a" {
+        return format!("{aug}{form}");
+    }
+    match form.chars().next() {
+        Some('a') | Some('A') => format!("A{}", &form[1..]),
+        Some('i') | Some('I') | Some('e') | Some('E') => format!("E{}", &form[1..]),
+        Some('u') | Some('U') | Some('o') | Some('O') => format!("O{}", &form[1..]),
+        Some('f') | Some('F') => format!("Ar{}", &form[1..]),
+        _ => format!("a{form}"),
+    }
+}
 
 pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
     if stem.is_empty() || suffix.is_empty() { return format!("{}{}", stem, suffix); }
@@ -211,19 +290,10 @@ pub fn join_form(
             }
         }
     }
-    // Divi (01.0677) — irregular Bvadi with o/u/v alternation
-    if dhatu == Some("Divi") && gana == 1 && family == "lat" {
-        match ending {
-            "ti" => return "Dinoti".to_string(),
-            "taH" => return "DinutaH".to_string(),
-            "nti" => return "Dinvanti".to_string(),
-            "si" => return "Dinozi".to_string(),
-            "TaH" => return "DinuTaH".to_string(),
-            "Ta" => return "DinuTa".to_string(),
-            "mi" | "Ami" => return "Dinomi".to_string(),
-            "vaH" | "AvaH" => return "DinuvaH".to_string(),
-            "maH" | "AmaH" => return "DinumaH".to_string(),
-            _ => {}
+    // धिवि (01.0677) — श्नु-like o/u/v for all sārvadhātuka / लृट्
+    if dhatu == Some("Divi") && gana == 1 {
+        if let Some(f) = join_divi(family, ending, augment) {
+            return crate::engine::phonology::apply_natva_to_word(&f);
         }
     }
     // G3 (3) reduplicated – juhu→juhoti, bibhI→bibheti, pF→piparti

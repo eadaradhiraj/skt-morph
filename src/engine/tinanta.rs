@@ -571,6 +571,27 @@ mod tests {
         assert!(f.iter().any(|x| x == "saMsti"), "{:?}", f);
         let f = generate_all("cakziN", "plrt", 1, 1);
         assert!(f.iter().any(|x| x == "kSAsyati"), "{:?}", f);
+        assert!(crate::engine::tinanta_overrides::lookup_override("Divi", "plat", 1, 1, &[]).is_none());
+        let f = generate_all("Divi", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "Dinoti"), "{:?}", f);
+        let f = generate_all("Divi", "plat", 1, 3);
+        assert!(f.iter().any(|x| x == "Dinvanti"), "{:?}", f);
+        let f = generate_all("Divi", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "Dinvizyati"), "{:?}", f);
+        let f = generate_all("Divi", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "aDinot" || x == "aDinod"), "{:?}", f);
+        let f = generate_all("Divi", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x == "DinuyAt" || x == "DinuyAd"), "{:?}", f);
+        let f = generate_all("Rikza", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "anikzat" || x == "anikzad"), "{:?}", f);
+        let f = generate_all("Rikza", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x == "nikzet" || x == "nikzed"), "{:?}", f);
+        let f = generate_all("fti", "alat", 1, 1);
+        assert!(f.iter().any(|x| x == "artate"), "{:?}", f);
+        let f = generate_all("fti", "alrt", 1, 1);
+        assert!(f.iter().any(|x| x == "artizyate"), "{:?}", f);
+        let f = generate_all("fti", "plrt", 1, 1);
+        assert!(f.is_empty(), "Ātmane ऋति has no parasmai लृट्: {:?}", f);
     }
 
     #[test]
