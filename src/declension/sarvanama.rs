@@ -38,6 +38,47 @@ fn an_sankhya(nom: &str) -> Vec<Vec<String>> {
     ]
 }
 
+/// अ-stem सर्वादि (1.1.27): जस्→ए, 7.1.14 स्मै/स्मात्/स्मिन्, 7.1.9 ऐस्. `natva` = 8.4.1 after र्/ष् (कतरेण, इतराणि).
+fn insert_a_sarvanama(
+    m: &mut HashMap<(String, String), Vec<Vec<String>>>,
+    stem: &str,
+    natva: bool,
+) {
+    let s = stem.trim_end_matches('a');
+    let ins = if natva { format!("{s}eRa") } else { format!("{s}ena") };
+    let ani = if natva { format!("{s}ARi") } else { format!("{s}Ani") };
+    let pum = vec![
+        vec![format!("{stem}H"), format!("{s}O"), format!("{s}e")],
+        vec![format!("{stem}m"), format!("{s}O"), format!("{s}An")],
+        vec![ins.clone(), format!("{s}AByAm"), format!("{s}EH")],
+        vec![format!("{stem}smE"), format!("{s}AByAm"), format!("{s}eByaH")],
+        vec![format!("{stem}smAt"), format!("{s}AByAm"), format!("{s}eByaH")],
+        vec![format!("{stem}sya"), format!("{s}ayoH"), format!("{s}ezAm")],
+        vec![format!("{stem}smin"), format!("{s}ayoH"), format!("{s}ezu")],
+    ];
+    let stri = vec![
+        vec![format!("{s}A"), format!("{s}e"), format!("{s}AH")],
+        vec![format!("{s}Am"), format!("{s}e"), format!("{s}AH")],
+        vec![format!("{s}ayA"), format!("{s}AByAm"), format!("{s}ABiH")],
+        vec![format!("{stem}syE"), format!("{s}AByAm"), format!("{s}AByaH")],
+        vec![format!("{stem}syAH"), format!("{s}AByAm"), format!("{s}AByaH")],
+        vec![format!("{stem}syAH"), format!("{s}ayoH"), format!("{s}AsAm")],
+        vec![format!("{stem}syAm"), format!("{s}ayoH"), format!("{s}Asu")],
+    ];
+    let nap = vec![
+        vec![format!("{stem}m"), format!("{s}e"), ani.clone()],
+        vec![format!("{stem}m"), format!("{s}e"), ani],
+        vec![ins, format!("{s}AByAm"), format!("{s}EH")],
+        vec![format!("{stem}smE"), format!("{s}AByAm"), format!("{s}eByaH")],
+        vec![format!("{stem}smAt"), format!("{s}AByAm"), format!("{s}eByaH")],
+        vec![format!("{stem}sya"), format!("{s}ayoH"), format!("{s}ezAm")],
+        vec![format!("{stem}smin"), format!("{s}ayoH"), format!("{s}ezu")],
+    ];
+    m.insert((stem.to_string(), "pum".into()), pum);
+    m.insert((stem.to_string(), "stri".into()), stri);
+    m.insert((stem.to_string(), "nap".into()), nap);
+}
+
 /// Query aliases (gold `tri`/`uBa`/`zaz`; old scrape keys `traya`/`ubha`/`zaq`/`paJcan`).
 fn canon_sarvanama(base: &str) -> &str {
     match base {
@@ -183,6 +224,17 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("viSva".to_string(),"pum".to_string()), vec![vec!["viSvaH".to_string(),"viSvO".to_string(),"viSve".to_string()],vec!["viSvam".to_string(),"viSvO".to_string(),"viSvAn".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
   m.insert(("viSva".to_string(),"stri".to_string()), vec![vec!["viSvA".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvAm".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvayA".to_string(),"viSvAByAm".to_string(),"viSvABiH".to_string()],vec!["viSvasyE".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvayoH".to_string(),"viSvAsAm".to_string()],vec!["viSvasyAm".to_string(),"viSvayoH".to_string(),"viSvAsu".to_string()]]);
   m.insert(("viSva".to_string(),"nap".to_string()), vec![vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
+  // 1.1.27 remainder: डतर/डतम, इतर, नेम, सम, सिम, त्व, अन्यतर. भवत् is at-stem सुबन्त (भवान्), not this table.
+  insert_a_sarvanama(&mut m, "katara", true);
+  insert_a_sarvanama(&mut m, "katama", false);
+  insert_a_sarvanama(&mut m, "yatara", true);
+  insert_a_sarvanama(&mut m, "yatama", false);
+  insert_a_sarvanama(&mut m, "itara", true);
+  insert_a_sarvanama(&mut m, "anyatara", true);
+  insert_a_sarvanama(&mut m, "nema", false);
+  insert_a_sarvanama(&mut m, "sama", false);
+  insert_a_sarvanama(&mut m, "sima", false);
+  insert_a_sarvanama(&mut m, "tva", false);
   m }
 
 // ---------------------------------------------------------------------------
@@ -420,5 +472,27 @@ mod tests {
         assert!(analyze("ezA").iter().any(|m| m.get("pratipadika") == Some(&"etad".to_string())));
         assert!(analyze("ezaH").iter().all(|m| m.get("pratipadika") != Some(&"ena".to_string())));
         assert!(analyze("ekAdaSa").iter().any(|m| m.get("pratipadika") == Some(&"ekAdaSan".to_string())));
+    }
+
+    #[test]
+    fn sarvadi_katara_itara_nema() {
+        let k = generate("katara", "pum").expect("katara");
+        has(&k, "prathamA", "kataraH");
+        has(&k, "prathamA", "katare");
+        has(&k, "tfIyA", "katareRa");
+        has(&k, "caturTI", "katarasmE");
+        has(&generate("katara", "nap").unwrap(), "prathamA", "katarARi");
+        has(&generate("katama", "pum").unwrap(), "tfIyA", "katamena");
+        has(&generate("katama", "pum").unwrap(), "prathamA", "katame");
+        let i = generate("itara", "nap").expect("itara");
+        has(&i, "prathamA", "itaram");
+        has(&i, "prathamA", "itarARi");
+        has(&generate("nema", "pum").unwrap(), "caturTI", "nemasmE");
+        has(&generate("nema", "pum").unwrap(), "tfIyA", "nemena");
+        has(&generate("yatara", "stri").unwrap(), "prathamA", "yatarA");
+        has(&generate("tva", "pum").unwrap(), "saptamI", "tvasmin");
+        has(&generate("sama", "pum").unwrap(), "prathamA", "same");
+        has(&generate("anyatara", "pum").unwrap(), "tfIyA", "anyatareRa");
+        assert!(analyze("katarasmE").iter().any(|m| m.get("pratipadika") == Some(&"katara".to_string())));
     }
 }
