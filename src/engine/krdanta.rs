@@ -169,108 +169,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "BaYj" {
         return "Bagna".into(); // भग्न
     }
-    // Special: जन् + क्त → जात (SLP1 jAta) — 6.4.42? Actually jan→jAta (न-लोप, a→A)
-    // sūtra: जन् + क्त → जात; future devs: jan=जन्, jAta=जात — keep long A, no n
-    // Extreme: jan is anit? but kta is jAta not janita; keep jAta
-    if orig == "jan" {
-        return "jAta".into(); // जात
-    }
-    // Special: तन् + क्त → तत (SLP1 tata) — similarly tan→tata (न-लोप)
-    // sūtra: तन् + क्त → तत; future devs: tan=तन्, tata=तत — keep short a
-    // Extreme: tan not jan, short a not long; keep tata
-    if orig == "tan" {
-        return "tata".into(); // तत
-    }
-    // Special: क्रम् + क्त → क्रान्त (SLP1 krAnta) — 6.4.?? Actually kram→krAnta (A + n)
-    // sūtra: क्रम् + क्त → क्रान्त; future devs: kram=क्रम्, krAnta=क्रान्त — keep long A, n
-    // Extreme: keep krAnta not kramta; handles A insertion
-    if orig == "kram" {
-        return "krAnta".into(); // क्रान्त
-    }
-    // Special: श्रम् + क्त → श्रान्त (SLP1 SrAnta) — similarly Sram→SrAnta
-    // sūtra: श्रम् + क्त → श्रान्त; future devs: Sram=श्रम्, SrAnta=श्रान्त — keep long A, n, S=श
-    // Extreme: keep SrAnta not Sramta
-    if orig == "Sram" {
-        return "SrAnta".into(); // श्रान्त
-    }
-    // Special: भ्रम् + क्त → भ्रान्त (SLP1 BrAnta) — similarly Bram→BrAnta
-    // sūtra: भ्रम् + क्त → भ्रान्त; future devs: Bram=भ्रम्, BrAnta=भ्रान्त — keep long A, n, B=भ
-    // Extreme: keep BrAnta not Bramta
-    if orig == "Bram" {
-        return "BrAnta".into(); // भ्रान्त
-    }
-    // Special: दम् + क्त → दान्त (SLP1 dAnta) — similarly dam→dAnta
-    // sūtra: दम् + क्त → दान्त; future devs: dam=दम्, dAnta=दान्त — keep long A, n
-    // Extreme: keep dAnta not damta
-    if orig == "dam" {
-        return "dAnta".into(); // दान्त
-    }
-    // Special: शम् + क्त → शान्त (SLP1 SAnta) — similarly Sam→SAnta
-    // sūtra: शम् + क्त → शान्त; future devs: Sam=शम्, SAnta=शान्त — keep long A, n, S=श
-    // Extreme: keep SAnta not Samta
-    if orig == "Sam" {
-        return "SAnta".into(); // शान्त
-    }
-    // Special: तम् + क्त → तान्त (SLP1 tAnta) — similarly tam→tAnta
-    // sūtra: तम् + क्त → तान्त; future devs: tam=तम्, tAnta=तान्त — keep long A, n
-    // Extreme: keep tAnta not tamta
-    if orig == "tam" {
-        return "tAnta".into(); // तान्त
-    }
-    // Special: नम् + क्त → नत (SLP1 nata) — similarly nam→nata (short a, n-lopa)
-    // sūtra: नम् + क्त → नत; future devs: nam=नम्, nata=नत — keep short a, no n
-    // Extreme: keep nata not namta/nAnta
-    if orig == "nam" {
-        return "nata".into(); // नत
-    }
-    // Special: यम् + क्त → यत (SLP1 yata) — similarly yam→yata
-    // sūtra: यम् + क्त → यत; future devs: yam=यम्, yata=यत — keep short a, no m
-    // Extreme: keep yata not yamta
-    if orig == "yam" {
-        return "yata".into(); // यत
-    }
-    // Special: रम् + क्त → रत (SLP1 rata) — similarly ram→rata
-    // sūtra: रम् + क्त → रत; future devs: ram=रम्, rata=रत — keep short a, no m
-    // Extreme: keep rata not ramta
-    if orig == "ram" {
-        return "rata".into(); // रत
-    }
-    // Special: वन् + क्त → वत (SLP1 vata) — similarly van→vata
-    // sūtra: वन् + क्त → वत; future devs: van=वन्, vata=वत — keep short a, no n
-    // Extreme: keep vata not vanta
-    if orig == "van" {
-        return "vata".into(); // वत
-    }
-    // Special: मन् + क्त → मत (SLP1 mata) — similarly man→mata
-    // sūtra: मन् + क्त → मत; future devs: man=मन्, mata=मत — keep short a, no n
-    // Extreme: keep mata not manta
-    if orig == "man" {
-        return "mata".into(); // मत
-    }
-    // Special: कन् + क्त → कत (SLP1 kata) — similarly kan→kata
-    // sūtra: कन् + क्त → कत; future devs: kan=कन्, kata=कत — keep short a, no n
-    // Extreme: keep kata not kanta
-    if orig == "kan" {
-        return "kata".into(); // कत
-    }
-    // Special: सन् + क्त → सत (SLP1 sata) — similarly san→sata
-    // sūtra: सन् + क्त → सत; future devs: san=सन्, sata=सत — keep short a, no n
-    // Extreme: keep sata not santa
-    if orig == "san" {
-        return "sata".into(); // सत
-    }
-    // Special: हन् + क्त → हत (SLP1 hata) — explicitly hata via n-lopa
-    // sūtra: हन् + क्त → हत; future devs: han=हन्, hata=हत — keep short a, no n, explicit for clarity
-    // Extreme: han is 7.4.42-like? Keep hata not hanita; kit_anga already gives ha but explicit documents sūtra
-    if orig == "han" {
-        return "hata".into(); // हत
-    }
-    // Special: गम् + क्त → गत (SLP1 gata) — explicitly gata via m-lopa
-    // sūtra: गम् + क्त → गत; future devs: gam=गम्, gata=गत — keep short a, no m, explicit for clarity
-    // Extreme: gam is anit, kit_anga gives g but explicit documents 6.4.40? Keep gata
-    if orig == "gam" {
-        return "gata".into(); // गत
-    }
     // Special: दिव् + क्त → द्यूत (SLP1 dyUta) — 6.1.15 Actually div→dyU (samprasāraṇa)
     // sūtra: दिव् + क्त → द्यूत; future devs: div=दिव्, dyUta=द्यूत — keep yU, long U
     // Extreme: keep dyUta not divta; handles v→y, u→U
@@ -553,78 +451,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "su" {
         return "suta".into(); // सुत
     }
-    // Special: खन् + क्त → खात (SLP1 KAta) — similarly Kan→KAta (jan pattern)
-    // sūtra: खन् + क्त → खात; future devs: Kan=खन्, KAta=खात — keep K=ख, A=आ, no n
-    // Extreme: keep KAta not Kanta; long A like jan→jAta
-    if orig == "Kan" {
-        return "KAta".into(); // खात
-    }
-    // Special: घन् + क्त → घात (SLP1 GAta) — similarly Gan→GAta
-    // sūtra: घन् + क्त → घात; future devs: Gan=घन्, GAta=घात — keep G=घ, A=आ, no n
-    // Extreme: keep GAta not Ganta
-    if orig == "Gan" {
-        return "GAta".into(); // घात
-    }
-    // Special: चन् + क्त → चात (SLP1 CAta) — similarly Can→CAta
-    // sūtra: चन् + क्त → चात; future devs: Can=चन्, CAta=चात — keep C=च, A=आ, no n
-    // Extreme: keep CAta not Canta
-    if orig == "Can" {
-        return "CAta".into(); // चात
-    }
-    // Special: शन् + क्त → शात (SLP1 SAta) — similarly San→SAta
-    // sūtra: शन् + क्त → शात; future devs: San=शन्, SAta=शात — keep S=श, A=आ, no n
-    // Extreme: keep SAta not Santa
-    if orig == "San" {
-        return "SAta".into(); // शात
-    }
-    // Special: फन् + क्त → फात (SLP1 PAta) — similarly Pan→PAta
-    // sūtra: फन् + क्त → फात; future devs: Pan=फन्, PAta=फात — keep P=फ, A=आ, no n
-    // Extreme: keep PAta not Panta
-    if orig == "Pan" {
-        return "PAta".into(); // फात
-    }
-    // Special: भन् + क्त → भात (SLP1 BAta) — similarly Ban→BAta
-    // sūtra: भन् + क्त → भात; future devs: Ban=भन्, BAta=भात — keep B=भ, A=आ, no n
-    // Extreme: keep BAta not Banta
-    if orig == "Ban" {
-        return "BAta".into(); // भात
-    }
-    // Special: धन् + क्त → धात (SLP1 DAta) — similarly Dan→DAta
-    // sūtra: धन् + क्त → धात; future devs: Dan=धन्, DAta=धात — keep D=ध, A=आ, no n
-    // Extreme: keep DAta not Danta
-    if orig == "Dan" {
-        return "DAta".into(); // धात
-    }
-    // Special: तन् + क्त → तात (SLP1 TAta) — similarly Tan→TAta
-    // sūtra: तन् + क्त → तात; future devs: Tan=तन्, TAta=तात — keep T=त, A=आ, no n
-    // Extreme: keep TAta not Tanta
-    if orig == "Tan" {
-        return "TAta".into(); // तात
-    }
-    // Special: रन् + क्त → रात (SLP1 RAta) — similarly Ran→RAta
-    // sūtra: रन् + क्त → रात; future devs: Ran=रन्, RAta=रात — keep R=र, A=आ, no n
-    // Extreme: keep RAta not Ranta
-    if orig == "Ran" {
-        return "RAta".into(); // रात
-    }
-    // Special: लन् + क्त → लात (SLP1 lAta) — similarly lan→lAta
-    // sūtra: लन् + क्त → लात; future devs: lan=लन्, lAta=लात — keep l=ल, A=आ, no n
-    // Extreme: keep lAta not lanta
-    if orig == "lan" {
-        return "lAta".into(); // लात
-    }
-    // Special: स्तन् + क्त → स्तात (SLP1 stAta) — similarly stan→stAta
-    // sūtra: स्तन् + क्त → स्तात; future devs: stan=स्तन्, stAta=स्तात — keep stA, no n
-    // Extreme: keep stAta not stanta
-    if orig == "stan" {
-        return "stAta".into(); // स्तात
-    }
-    // Special: स्पन् + क्त → स्पात (SLP1 spAta) — similarly span→spAta
-    // sūtra: स्पन् + क्त → स्पात; future devs: span=स्पन्, spAta=स्पात — keep spA, no n
-    // Extreme: keep spAta not spanta
-    if orig == "span" {
-        return "spAta".into(); // स्पात
-    }
     // क्षण् + क्त is सेट् → क्षणित? Actually kzaN is सेट्, not anit — keep kzaRita via it path
     // sūtra: kzaN is सेट्, so kta is kzaRita not kZAta; future devs: do not add kZAta special for kzaN
     // Extreme: keep kzaRita (via takes_it_nistha) — no special needed
@@ -650,6 +476,28 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
                 stem = s;
             }
             format!("{stem}nna")
+        }
+        // 6.4.42 जनसनखनां: न-lopa + a→A (जात, सात, खात). Before इट् (*janita).
+        _ if matches!(orig.as_str(), "jan" | "san" | "Kan") => {
+            let stem = orig.trim_end_matches('n');
+            let mut c: Vec<char> = stem.chars().collect();
+            if let Some(last) = c.last_mut() {
+                if *last == 'a' {
+                    *last = 'A';
+                }
+            }
+            format!("{}ta", c.iter().collect::<String>())
+        }
+        // शमामष्टानां (निष्ठा): शम् दम् तम् श्रम् भ्रम् क्रम् → शान्त दान्त … क्रान्त.
+        // m stays as n before त (8.3.23/8.4.58), a→A.
+        _ if matches!(orig.as_str(), "Sam" | "dam" | "tam" | "Sram" | "Bram" | "kram" | "kzam" | "klam") => {
+            let stem = orig.strip_suffix('m').and_then(|s| s.strip_suffix('a')).unwrap_or(&orig);
+            format!("{stem}Anta")
+        }
+        // 6.4.37/98 गम् हन् यम् रम् नम् तन् मन्: nasal lopa, short a (गत हत यत रत नत तत मत).
+        _ if matches!(orig.as_str(), "gam" | "han" | "yam" | "ram" | "nam" | "tan" | "man" | "van") => {
+            let stem = orig.trim_end_matches('m').trim_end_matches('n');
+            format!("{stem}ta")
         }
         // 8.2.30 चोः कुः — palatal + झल् त of क्त → velar (मुक्त, युक्त, सिक्त).
         // Must precede 7.2.35 इट्: takes_it_nistha would otherwise yield *mucita/*yujita.
@@ -715,6 +563,17 @@ fn kit_anga(root: &str) -> String {
         "mA" => "mi".into(),
         "pA" => "pI".into(),
         "gam" | "han" => root[..root.len() - 1].to_string(),
+        // 6.4.42 जनसनखनां — न-lopa, a→A (क्तिन् जाति/खाति too).
+        "jan" | "san" | "Kan" => {
+            let stem = root.trim_end_matches('n');
+            let mut c: Vec<char> = stem.chars().collect();
+            if let Some(last) = c.last_mut() {
+                if *last == 'a' {
+                    *last = 'A';
+                }
+            }
+            c.into_iter().collect()
+        }
         "banD" | "bandh" => {
             let last = root.chars().last().unwrap();
             format!("{}{last}", &root[..root.len() - 2])
@@ -1246,12 +1105,8 @@ mod tests {
         // मन् → मत (mata) — man→mata
         assert_eq!(derive("mana", "kta"), vec!["mata"]); // मन् → मत (mana is मन् with a)
         assert_eq!(derive("man", "kta"), vec!["mata"]);
-        // कन् → कत (kata) — kan→kata
-        assert_eq!(derive("kana", "kta"), vec!["kata"]); // कन् → कत (kana is कन् with a)
-        assert_eq!(derive("kan", "kta"), vec!["kata"]);
-        // सन् → सत (sata) — san→sata
-        assert_eq!(derive("sana", "kta"), vec!["sata"]); // सन् → सत (sana is सन् with a)
-        assert_eq!(derive("san", "kta"), vec!["sata"]);
+        assert_eq!(derive("sana", "kta"), vec!["sAta"]); // सन् 6.4.42 सात
+        assert_eq!(derive("san", "kta"), vec!["sAta"]);
         // हन् → हत (hata) — han→hata
         assert_eq!(derive("hana", "kta"), vec!["hata"]); // हन् → हत (hana is हन् with a)
         assert_eq!(derive("han", "kta"), vec!["hata"]);
@@ -1416,42 +1271,8 @@ mod tests {
         assert_eq!(derive("caBa", "kta"), vec!["cabDa"]); // चभ् → चब्ध (caBa is चभ् with a)
         assert_eq!(derive("caB", "kta"), vec!["cabDa"]);
         // खन् → खात (KAta) — Kan→KAta
-        assert_eq!(derive("Kana", "kta"), vec!["KAta"]); // खन् → खात (Kana is खन् with a)
+        assert_eq!(derive("Kana", "kta"), vec!["KAta"]); // खन् 6.4.42 खात
         assert_eq!(derive("Kan", "kta"), vec!["KAta"]);
-        // घन् → घात (GAta) — Gan→GAta
-        assert_eq!(derive("Gana", "kta"), vec!["GAta"]); // घन् → घात (Gana is घन् with a)
-        assert_eq!(derive("Gan", "kta"), vec!["GAta"]);
-        // चन् → चात (CAta) — Can→CAta
-        assert_eq!(derive("Cana", "kta"), vec!["CAta"]); // चन् → चात (Cana is चन् with a)
-        assert_eq!(derive("Can", "kta"), vec!["CAta"]);
-        // शन् → शात (SAta) — San→SAta
-        assert_eq!(derive("Sana", "kta"), vec!["SAta"]); // शन् → शात (Sana is शन् with a)
-        assert_eq!(derive("San", "kta"), vec!["SAta"]);
-        // फन् → फात (PAta) — Pan→PAta
-        assert_eq!(derive("Pana", "kta"), vec!["PAta"]); // फन् → फात (Pana is फन् with a)
-        assert_eq!(derive("Pan", "kta"), vec!["PAta"]);
-        // भन् → भात (BAta) — Ban→BAta
-        assert_eq!(derive("Bana", "kta"), vec!["BAta"]); // भन् → भात (Bana is भन् with a)
-        assert_eq!(derive("Ban", "kta"), vec!["BAta"]);
-        // धन् → धात (DAta) — Dan→DAta
-        assert_eq!(derive("Dana", "kta"), vec!["DAta"]); // धन् → धात (Dana is धन् with a)
-        assert_eq!(derive("Dan", "kta"), vec!["DAta"]);
-        // तन् → तात (TAta) — Tan→TAta
-        assert_eq!(derive("Tana", "kta"), vec!["TAta"]); // तन् → तात (Tana is तन् with a)
-        assert_eq!(derive("Tan", "kta"), vec!["TAta"]);
-        // रन् → रात (RAta) — Ran→RAta
-        assert_eq!(derive("Rana", "kta"), vec!["RAta"]); // रन् → रात (Rana is रन् with a)
-        assert_eq!(derive("Ran", "kta"), vec!["RAta"]);
-        // लन् → लात (lAta) — lan→lAta
-        assert_eq!(derive("lana", "kta"), vec!["lAta"]); // लन् → लात (lana is लन् with a)
-        assert_eq!(derive("lan", "kta"), vec!["lAta"]);
-        // स्तन् → स्तात (stAta) — stan→stAta
-        assert_eq!(derive("stana", "kta"), vec!["stAta"]); // स्तन् → स्तात (stana is स्तन् with a)
-        assert_eq!(derive("stan", "kta"), vec!["stAta"]);
-        // स्पन् → स्पात (spAta) — span→spAta
-        assert_eq!(derive("spana", "kta"), vec!["spAta"]); // स्पन् → स्पात (spana is स्पन् with a)
-        assert_eq!(derive("span", "kta"), vec!["spAta"]);
-        // स्कन् → स्कात (skAta) — skan→skAta
         assert_eq!(derive("skana", "kta"), vec!["skanna"]); // स्कन्दिर् ओदित् 8.2.45 स्कन्न
         assert_eq!(derive("skan", "kta"), vec!["skanna"]);
         assert_eq!(derive("Cida", "kta"), vec!["Cinna"]); // छिद् 8.2.42 छिन्न
