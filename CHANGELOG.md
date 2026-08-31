@@ -101,6 +101,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **क्त धन्→धात (Dan→DAta):** धन् + क्त → धात (SLP1 `DAta`) not `Danta`; added `nistha_base` special for `Dan` with long A header; `Dana`/`Dan`→`DAta` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त तन्→तात (Tan→TAta):** तन् + क्त → तात (SLP1 `TAta`) not `Tanta`; added `nistha_base` special for `Tan` with long A header; `Tana`/`Tan`→`TAta` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त रन्→रात (Ran→RAta):** रन् + क्त → रात (SLP1 `RAta`) not `Ranta`; added `nistha_base` special for `Ran` with long A header; `Rana`/`Ran`→`RAta` asserts; extreme commenting kept; 97 tests — pushed.
+- **क्त लन्→लात (lan→lAta):** लन् + क्त → लात (SLP1 `lAta`) not `lanta`; added `nistha_base` special for `lan` with long A header; `lana`/`lan`→`lAta` asserts; extreme commenting kept; 97 tests — pushed.
 - **यङ्लुक् extended (vac/Śru):** added `vac→vAvac→vAvakti` (8.2.30 c→k) and `Śru→SoSrū` intensive stems; enriched yaNluk sūtra comments (2.4.74, 8.2.30); 97 tests — pushed.
 
 ## 2026-08-31
