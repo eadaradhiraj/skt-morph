@@ -233,7 +233,7 @@ pub fn sad_present_base(dhatu: &str) -> Option<String> {
         "f" => return Some("fcC".to_string()),
         "sad" => return Some("sId".to_string()),
         "guh" => return Some("gUh".to_string()),
-        "saYj" => return Some("saj".to_string()),
+        "saYj" | "sanj" => return Some("saj".to_string()),
         _ => {}
     }
     if dhatu.ends_with('u') && dhatu.len()<=4 && dhatu!="gu" {
@@ -515,6 +515,55 @@ pub fn thematic_join(stem_a: &str, ending: &str) -> String {
         return format!("{}{}", &stem_a[..stem_a.len()-1], ending);
     }
     format!("{}{}", stem_a, ending)
+}
+
+/// 6.4.25 दंशसञ्जस्वञ्जां शपि; 6.4.26 रञ्जेश्च — nasal upadha drops before शप्.
+pub fn sapi_upadha_lopa(root: &str) -> String {
+    match root {
+        "danS" | "daMS" => "daS".into(),
+        "sanj" | "saYj" => "saj".into(),
+        "svanj" | "svaYj" => "svaj".into(),
+        "ranj" | "raYj" => "raj".into(),
+        other => other.to_string(),
+    }
+}
+
+/// 8.4.40 स्तोः श्चुना श्चुः (षस्ज → सज्ज्).
+pub fn stoh_scuna(root: &str) -> String {
+    root.replace("sj", "jj").replace("sc", "cc")
+}
+
+/// 7.1.58 इदितो नुम् धातोः — nasal before the last consonant after dropping i-इत्.
+pub fn idito_num(dhatu: &str) -> Option<String> {
+    if !dhatu.ends_with('i') || dhatu.len() < 3 {
+        return None;
+    }
+    let base = &dhatu[..dhatu.len() - 1];
+    let last = base.chars().last()?;
+    if is_vowel_final(last) {
+        return None;
+    }
+    let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') {
+        'N'
+    } else if matches!(last, 'q' | 'Q' | 'w' | 'W') {
+        'R'
+    } else if matches!(last, 'c' | 'C' | 'j' | 'J') {
+        'Y'
+    } else if last == 'N' {
+        'N'
+    } else {
+        'n'
+    };
+    Some(format!("{}{}{}", &base[..base.len() - last.len_utf8()], nasal, last))
+}
+
+/// 3.1.80 धिन्विकृण्व्योर च — श्नु aṅga after 7.1.58 (धिनु, कृणु).
+pub fn dhinvi_krnvi_snu_base(dhatu: &str) -> Option<&'static str> {
+    match dhatu {
+        "Divi" => Some("Din"),
+        "kfvi" => Some("kfR"),
+        _ => None,
+    }
 }
 
 pub fn apply_nasal_palatal(word: &str) -> String {

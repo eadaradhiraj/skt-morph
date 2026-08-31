@@ -76,7 +76,7 @@ pub fn g6_future_stem(dhatu: &str) -> String {
 }
 
 // --- G1 future helpers ---
-const G1_KZYA_ROOTS: &[&str] = &["Siz","viz","kruS","ruh","saYj"];
+const G1_KZYA_ROOTS: &[&str] = &["Siz","viz","kruS","ruh","saYj","sanj"];
 const G1_A_FINAL: &[&str] = &["SrA","jYA"];
 
 fn g1_special_lrt(dhatu: &str) -> Option<String> {
@@ -84,9 +84,14 @@ fn g1_special_lrt(dhatu: &str) -> Option<String> {
         ("sru","srozya"),("su","sozya"),("Sru","Srozya"),("Dru","Drozya"),("du","dozya"),
         ("dru","drozya"),("tyaj","tyakzya"),("skand","skantsya"),("nam","naMsya"),
         ("vft","vartsya"),("syand","syantsya"),("kfp","kalpsya"),("kalp","kalpsya"),
-        ("Divi","Dinvizya"),("fti","artizya"),
     ];
     for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
+    if let Some(b) = dhinvi_krnvi_snu_base(dhatu) {
+        return Some(format!("{b}vizya"));
+    }
+    if dhatu.len() == 3 && dhatu.starts_with('f') && dhatu.ends_with('i') {
+        return Some(format!("{}izya", apply_guna_to_stem(&dhatu[..2])));
+    }
     if ["Dinv"].contains(&dhatu) { return Some(format!("{}izya", dhatu)); }
     if dhatu.ends_with('A') && (2..=4).contains(&dhatu.len()) && !["SrA","jYA"].contains(&dhatu) { return Some(format!("{}sya", dhatu)); }
     if dhatu.ends_with('E') && (2..=4).contains(&dhatu.len()) { return Some(format!("{}Asya", &dhatu[..dhatu.len()-1])); }
@@ -116,7 +121,7 @@ fn g1_lrt_stems(dhatu: &str) -> Option<String> {
 fn g1_future_suffix(base: &str, dhatu: &str) -> String {
     if let Some(s)=g1_lrt_stems(dhatu) { return s; }
     if G1_KZYA_ROOTS.contains(&dhatu) {
-        if dhatu=="saYj" { return "saNkzy".to_string(); }
+        if dhatu=="saYj" || dhatu=="sanj" { return "saNkzya".to_string(); }
         let graded=apply_guna_to_stem(dhatu);
         let body = if graded.ends_with('S') || graded.ends_with('h') || graded.ends_with('z') { &graded[..graded.len()-1] } else { graded.as_str() };
         let body = if dhatu.ends_with("uS") { &graded[..graded.len()-1] } else { body };
@@ -264,31 +269,12 @@ fn is_vowel_c(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
 
-/// 6.4.24 अनिदितां हल उपधायाः — न्/ञ् drop before the final cons (दशति, रजति, सजति).
-fn anidit_upadha_lopa(root: &str) -> String {
-    let c: Vec<char> = root.chars().collect();
-    let n = c.len();
-    if n >= 3 && !is_vowel_c(c[n - 1]) && matches!(c[n - 2], 'n' | 'Y') {
-        let mut o = c;
-        o.remove(n - 2);
-        return o.into_iter().collect();
-    }
-    root.to_string()
-}
-
 /// 1.3 + 6.1.64/65, sequential (षः सः then इत्), not a one-shot name table.
 fn clean_upadesha(original: &str, gana: u8, aupadeshik: &str) -> String {
     if gana == 1 {
         if let Some(san) = nitya_san_present(original) {
             return san;
         }
-    }
-    // 1.3.3 visarga; दैप् प् इत् must not then take 6.1.45 दा (7.3.78 यच्छति is दाण्).
-    if original == "CadiH" {
-        return "Cad".to_string();
-    }
-    if original == "dEp" {
-        return "dE".to_string();
     }
     let tilde = aupadeshik == format!("{original}~");
     let tilde_any = aupadeshik.contains('~');
@@ -340,9 +326,7 @@ fn clean_upadesha(original: &str, gana: u8, aupadeshik: &str) -> String {
             s = core.to_string();
         }
     }
-    if matches!(original, "zanja" | "ranja" | "danSa") {
-        s = anidit_upadha_lopa(&s);
-    }
+    s = stoh_scuna(&s);
     if s == "RI" {
         "nI".to_string()
     } else {
@@ -355,6 +339,10 @@ fn strip_final_it(dhatu: &str, gana: u8, tilde: bool, tilde_any: bool) -> Option
     if dhatu.ends_with("ir") && tilde_any && dhatu.len() > 3 {
         return Some(dhatu[..dhatu.len() - 2].to_string());
     }
+    // 1.3.3 visarga with preceding i इत् (छदिः → छद्), not 7.1.58 इदित्.
+    if dhatu.ends_with("iH") && dhatu.len() > 3 {
+        return Some(dhatu[..dhatu.len() - 2].to_string());
+    }
     let last = dhatu.chars().last()?;
     let strip = match last {
         'I' | 'U' | 'F' | 'f' | 'x' if dhatu.len() > 2 && tilde => true,
@@ -365,6 +353,8 @@ fn strip_final_it(dhatu: &str, gana: u8, tilde: bool, tilde_any: bool) -> Option
         'u' if gana == 1 && (dhatu.ends_with("ncu") || dhatu.ends_with("ucu") || dhatu.ends_with("uju")) && dhatu.len() > 3 && tilde => true,
         'e' | 'E' | 'o' if dhatu.len() > 2 && tilde => true,
         'Y' | 'w' if dhatu.len() > 2 => true,
+        // 1.3.3 हलन्त्यम् प् (दैप् → दै; शप् is शित् so 6.1.45 does not make दा).
+        'p' if dhatu.len() > 2 && dhatu.chars().rev().nth(1).is_some_and(is_vowel_c) => true,
         'A' if dhatu.len() > 3 && tilde_any => true,
         'a' if ((gana == 2 || gana == 3) && dhatu.len() > 2 && tilde)
             || (dhatu.len() > 3 && tilde)
@@ -409,21 +399,16 @@ pub fn derive_stem(
         let ps = causative_present_stem(dhatu);
         present_stem = Some(ps);
     } else if is_thematic(cgana) {
+        let shap = sapi_upadha_lopa(dhatu);
+        let dhatu = shap.as_str();
         if cgana == 1 && (dhatu.ends_with("Ti") || dhatu.ends_with("ti")) && dhatu.len() > 3 {
             // kuTi->kunTa, ati->anta etc. (Ti/ti anubandha with nasal)
             let base = &dhatu[..dhatu.len()-2];
             let ps = if dhatu.ends_with("Ti") { format!("{}nTa", base) } else { format!("{}nta", base) };
                 present_stem = Some(ps);
-        } else if dhatu == "zasja" || dhatu == "sasja" {
-            // zasja~ (z->s) -> sajja (gold sajjati, not sasjati)
-            let ps = "sajja".to_string();
-                present_stem = Some(ps);
-        } else if dhatu == "fti" {
-            // ऋति: इत् i, no नुम् (र्तते, अरतिष्यते).
-            present_stem = Some("arta".to_string());
-        } else if dhatu == "Divi" {
-            let ps = "Dinu".to_string();
-            present_stem = Some(ps);
+        } else if let Some(snu) = dhinvi_krnvi_snu_base(dhatu) {
+            // 3.1.80 धिन्विकृण्व्योर च after 7.1.58.
+            present_stem = Some(format!("{snu}u"));
         } else if dhatu == "zWiv" {
             let ps = "zWIva".to_string();
             present_stem = Some(ps);
@@ -453,17 +438,13 @@ pub fn derive_stem(
             let prefix = &dhatu[..idx];
             let ps = format!("{}ANkza", prefix);
             present_stem = Some(ps);
-        } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 {
-            // general i anubandha with nasal: adi->anda, bidi->binda, ati->anta etc. (also len 3)
-            // Ki/Gi etc. need retroflex N: taki->taNka, uKi->uNKa (cf. asa~ gold taNkati, uNKati)
-            let base = &dhatu[..dhatu.len()-1]; // without i
-            if let Some(last) = base.chars().last() {
-                let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
-                let ps = format!("{}{}{}a", &base[..base.len()-last.len_utf8()], nasal, last);
-                        present_stem = Some(ps);
-            } else {
-                present_stem = None;
-            }
+        } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && aupadeshik.contains('~') {
+            // 7.1.58 इदितो नुम् (नन्दति, रिण्वति).
+            present_stem = idito_num(dhatu).map(|nv| format!("{nv}a"));
+        } else if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && dhatu.chars().next().is_some_and(is_vowel_c) {
+            // i इत् but not नुम् (ऋति र्तते).
+            let base = &dhatu[..dhatu.len() - 1];
+            present_stem = Some(format!("{}a", apply_guna_to_stem(base)));
         } else if let Some(yam) = yam_cc_present_stem(dhatu, antarganas) {
                 present_stem = Some(yam);
         } else if let Some(nv) = g1_nv_present_stem(dhatu) {
@@ -627,6 +608,8 @@ pub fn derive_stem(
                 return (Some(f), None);
         }
         "lang" => {
+            let shap = sapi_upadha_lopa(dhatu);
+            let dhatu = shap.as_str();
             if dhatu == "stfkza" {
                 return (Some("stfkz".to_string()), Some("a".to_string()));
             }
@@ -682,10 +665,6 @@ pub fn derive_stem(
                 let root = lang_geminate_stem(dhatu, &root);
                         return (Some(root), Some("a".to_string()));
             }
-            if dhatu == "zasja" || dhatu == "sasja" {
-                let root = fix_lang("sajj".to_string());
-                        return (Some(root), Some("a".to_string()));
-            }
             if dhatu == "UWa" {
                 let root = "UW".to_string();
                         return (Some(root), Some("a".to_string()));
@@ -700,11 +679,12 @@ pub fn derive_stem(
             if dhatu.ends_with("ikza") {
                 return (Some("nikz".to_string()), Some("a".to_string()));
             }
-            if dhatu == "fti" {
-                return (Some("art".to_string()), Some("a".to_string()));
+            if let Some(snu) = dhinvi_krnvi_snu_base(dhatu) {
+                return (Some(format!("{snu}u")), Some("a".to_string()));
             }
-            if dhatu == "Divi" {
-                return (Some("Dinu".to_string()), Some("a".to_string()));
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && dhatu.chars().next().is_some_and(is_vowel_c) && !aupadeshik.contains('~') {
+                let root = apply_guna_to_stem(&dhatu[..dhatu.len() - 1]);
+                return (Some(root), Some("a".to_string()));
             }
             // a-final (siDa->seD) for lang: apply guNa to stem without final a (non-causative, non-YA) — keep long I/U — skip irregular pA etc.
             if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA && crate::engine::phonology::sad_present_base(dhatu).is_none() {
@@ -725,13 +705,10 @@ pub fn derive_stem(
                 let prefix = &dhatu[..idx];
                 return (Some(format!("{}ANkz", prefix)), Some("a".to_string()));
             }
-            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu"|"fti"|"Divi") {
-                let base = &dhatu[..dhatu.len()-1];
-                if let Some(last) = base.chars().last() {
-                    let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
-                    let root = format!("{}{}{}", &base[..base.len()-last.len_utf8()], nasal, last);
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && aupadeshik.contains('~') {
+                if let Some(root) = idito_num(dhatu) {
                     let root = fix_lang(root);
-                                return (Some(root), Some("a".to_string()));
+                    return (Some(root), Some("a".to_string()));
                 }
             }
             if dhatu == "zWiv" {
@@ -822,6 +799,8 @@ pub fn derive_stem(
                 return (Some(root), aug);
         }
         "vidhilin" => {
+            let shap = sapi_upadha_lopa(dhatu);
+            let dhatu = shap.as_str();
             if dhatu.to_ascii_lowercase().ends_with("akzi") {
                 let idx = dhatu.find('A').unwrap_or(1);
                 let prefix = &dhatu[..idx];
@@ -875,18 +854,14 @@ pub fn derive_stem(
                                 return (Some(root), None);
                 }
             }
-            if dhatu == "zasja" || dhatu == "sasja" {
-                let root = apply_nasal_palatal("sajj");
-                        return (Some(root), None);
-            }
             if dhatu == "UWa" {
                 return (Some("UW".to_string()), None);
             }
-            if dhatu == "fti" {
-                return (Some("art".to_string()), None);
+            if let Some(snu) = dhinvi_krnvi_snu_base(dhatu) {
+                return (Some(format!("{snu}u")), None);
             }
-            if dhatu == "Divi" {
-                return (Some("Dinu".to_string()), None);
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && dhatu.chars().next().is_some_and(is_vowel_c) && !aupadeshik.contains('~') {
+                return (Some(apply_guna_to_stem(&dhatu[..dhatu.len() - 1])), None);
             }
             if dhatu == "stfkza" {
                 return (Some("stfkz".to_string()), None);
@@ -908,13 +883,10 @@ pub fn derive_stem(
                 let root = apply_nasal_palatal(&root);
                         return (Some(root), None);
             }
-            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu"|"fti"|"Divi") {
-                let base = &dhatu[..dhatu.len()-1];
-                if let Some(last) = base.chars().last() {
-                    let nasal = if matches!(last, 'K' | 'G' | 'k' | 'g') { 'N' } else if matches!(last, 'q' | 'Q' | 'w' | 'W') { 'R' } else if matches!(last, 'c' | 'C' | 'j' | 'J') { 'Y' } else if matches!(last, 'N') { 'N' } else { 'n' };
-                    let root = format!("{}{}{}", &base[..base.len()-last.len_utf8()], nasal, last);
+            if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && aupadeshik.contains('~') {
+                if let Some(root) = idito_num(dhatu) {
                     let root = apply_nasal_palatal(&root);
-                                return (Some(root), None);
+                    return (Some(root), None);
                 }
             }
             if dhatu == "zWiv" {

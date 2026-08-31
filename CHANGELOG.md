@@ -63,6 +63,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **लट् upadeśa:** 1.3 + 6.1.64/65 root, then गुण/6.1.78 (श्रयति, नयति, धयति, वयति) or 7.3.78 (सीदति). 3.1.5–6 नित्य सन् चिकित्सति. यजादि is not aya (यजति).
 - **Sequential इत्:** 1.3.5 ञिटुडवः, then 6.1.64/65, then leftover vowel/a इत् — not a per-name table. ष्टन stanati, षिधु seDati, षण sanati; टुनदि nandati (7.1.58); टुओस्फूर्जा sPUrjati; ञिफला Palati. दैप् stays दायति (not 7.3.78 यच्छति).
 - **CI lint:** `cargo clippy --all-targets -- -D warnings` and tests with `RUSTFLAGS=-D warnings`. `#![deny(warnings)]` on the lib.
+- **लट् leftover sūtras:** 1.3.3 visarga/प् (छदिः छदति, दैप् दायति); 6.4.25–26 शपि only (दशति, सजति, स्वजति, रजति) not लृट् (सङ्क्ष्यति); 8.4.40 स्तोः श्चुना (षस्ज सज्जति); 7.1.58 नुम् only इदित् (not ऋति); 3.1.80 धिन्विकृण्व्योः (धिनोति, कृणोति).
 
 
 

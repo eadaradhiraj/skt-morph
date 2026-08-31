@@ -4,62 +4,62 @@
 
 use crate::engine::phonology::thematic_join;
 
-/// धिवि (01.0677): श्नु-like o/u/v (धिनोति, धिन्वन्ति, धिनविष्यति).
-fn join_divi(family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+/// 3.1.80 धिन्विकृण्व्योर च: श्नु-like o/u/v after 7.1.58 (धिनोति, कृणोति).
+fn join_snu_anga(base: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
     let inner = match family {
         "lat" => match ending {
-            "ti" => "Dinoti".into(),
-            "taH" => "DinutaH".into(),
-            "nti" | "anti" => "Dinvanti".into(),
-            "si" | "zi" => "Dinozi".into(),
-            "TaH" | "thaH" => "DinuTaH".into(),
-            "Ta" | "tha" => "DinuTa".into(),
-            "mi" | "Ami" => "Dinomi".into(),
-            "vaH" | "AvaH" => "DinuvaH".into(),
-            "maH" | "AmaH" => "DinumaH".into(),
+            "ti" => format!("{base}oti"),
+            "taH" => format!("{base}utaH"),
+            "nti" | "anti" => format!("{base}vanti"),
+            "si" | "zi" => format!("{base}ozi"),
+            "TaH" | "thaH" => format!("{base}uTaH"),
+            "Ta" | "tha" => format!("{base}uTa"),
+            "mi" | "Ami" => format!("{base}omi"),
+            "vaH" | "AvaH" => format!("{base}uvaH"),
+            "maH" | "AmaH" => format!("{base}umaH"),
             _ => return None,
         },
         "lot" => match ending {
-            "tu" | "otu" => "Dinotu".into(),
-            "tAt" | "utAt" => "DinutAt".into(),
-            "tAd" | "utAd" => "DinutAd".into(),
-            "tAm" | "utAm" => "DinutAm".into(),
-            "antu" | "vantu" => "Dinvantu".into(),
-            "" | "u" => "Dinu".into(),
-            "tam" | "utam" => "Dinutam".into(),
-            "ta" | "uta" => "Dinuta".into(),
-            "Ani" | "avAni" => "DinavAni".into(),
-            "Ava" | "avAva" => "DinavAva".into(),
-            "Ama" | "avAma" => "DinavAma".into(),
+            "tu" | "otu" => format!("{base}otu"),
+            "tAt" | "utAt" => format!("{base}utAt"),
+            "tAd" | "utAd" => format!("{base}utAd"),
+            "tAm" | "utAm" => format!("{base}utAm"),
+            "antu" | "vantu" => format!("{base}vantu"),
+            "" | "u" => format!("{base}u"),
+            "tam" | "utam" => format!("{base}utam"),
+            "ta" | "uta" => format!("{base}uta"),
+            "Ani" | "avAni" => format!("{base}avAni"),
+            "Ava" | "avAva" => format!("{base}avAva"),
+            "Ama" | "avAma" => format!("{base}avAma"),
             _ => return None,
         },
         "lang" => match ending {
-            "at" | "ot" => "Dinot".into(),
-            "ad" | "od" => "Dinod".into(),
-            "atAm" | "utAm" => "DinutAm".into(),
-            "an" | "van" => "Dinvan".into(),
-            "aH" | "oH" => "DinoH".into(),
-            "atam" | "utam" => "Dinutam".into(),
-            "ata" | "uta" => "Dinuta".into(),
-            "am" | "avam" => "Dinavam".into(),
-            "Ava" | "uva" | "va" => "Dinuva".into(),
-            "Ama" | "uma" | "ma" => "Dinuma".into(),
+            "at" | "ot" => format!("{base}ot"),
+            "ad" | "od" => format!("{base}od"),
+            "atAm" | "utAm" => format!("{base}utAm"),
+            "an" | "van" => format!("{base}van"),
+            "aH" | "oH" => format!("{base}oH"),
+            "atam" | "utam" => format!("{base}utam"),
+            "ata" | "uta" => format!("{base}uta"),
+            "am" | "avam" => format!("{base}avam"),
+            "Ava" | "uva" | "va" => format!("{base}uva"),
+            "Ama" | "uma" | "ma" => format!("{base}uma"),
             _ => return None,
         },
         "vidhilin" => match ending {
-            "et" | "At" | "yAt" => "DinuyAt".into(),
-            "ed" | "Ad" | "yAd" => "DinuyAd".into(),
-            "etAm" | "AtAm" | "yAtAm" => "DinuyAtAm".into(),
-            "eyuH" | "uH" | "yuH" => "DinuyuH".into(),
-            "eH" | "AH" | "yAH" => "DinuyAH".into(),
-            "etam" | "Atam" | "yAtam" => "DinuyAtam".into(),
-            "eta" | "Ata" | "yAta" => "DinuyAta".into(),
-            "eyam" | "Am" | "yAm" => "DinuyAm".into(),
-            "eva" | "Ava" | "yAva" => "DinuyAva".into(),
-            "ema" | "Ama" | "yAma" => "DinuyAma".into(),
+            "et" | "At" | "yAt" => format!("{base}uyAt"),
+            "ed" | "Ad" | "yAd" => format!("{base}uyAd"),
+            "etAm" | "AtAm" | "yAtAm" => format!("{base}uyAtAm"),
+            "eyuH" | "uH" | "yuH" => format!("{base}uyuH"),
+            "eH" | "AH" | "yAH" => format!("{base}uyAH"),
+            "etam" | "Atam" | "yAtam" => format!("{base}uyAtam"),
+            "eta" | "Ata" | "yAta" => format!("{base}uyAta"),
+            "eyam" | "Am" | "yAm" => format!("{base}uyAm"),
+            "eva" | "Ava" | "yAva" => format!("{base}uyAva"),
+            "ema" | "Ama" | "yAma" => format!("{base}uyAma"),
             _ => return None,
         },
-        "lrt" => thematic_join("Dinvizya", ending),
+        "lrt" => thematic_join(&format!("{base}vizya"), ending),
         _ => return None,
     };
     Some(apply_lang_aug(inner, family, augment))
@@ -293,9 +293,9 @@ pub fn join_form(
             }
         }
     }
-    // धिवि (01.0677) — श्नु-like o/u/v for all sārvadhātuka / लृट्
-    if dhatu == Some("Divi") && gana == 1 {
-        if let Some(f) = join_divi(family, ending, augment) {
+    // 3.1.80 धिन्विकृण्व्योर च — श्नु for all sārvadhātuka / लृट्
+    if let Some(base) = dhatu.and_then(crate::engine::phonology::dhinvi_krnvi_snu_base) {
+        if let Some(f) = join_snu_anga(base, family, ending, augment) {
             return crate::engine::phonology::apply_natva_to_word(&f);
         }
     }

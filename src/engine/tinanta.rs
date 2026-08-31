@@ -583,6 +583,16 @@ mod tests {
         assert!(f.iter().all(|x| x != "yacCati"), "{:?}", f);
         let f = generate_all("zanja", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "sajati"), "{:?}", f);
+        let f = generate_all("zasja", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "sajjati"), "{:?}", f);
+        let f = generate_all("zanja", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "saNkzyati"), "{:?}", f);
+        let f = generate_all("danSa", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "daSati"), "{:?}", f);
+        let f = generate_all("ranja", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "rajati"), "{:?}", f);
+        let f = generate_all("kfvi", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "kfRoti"), "{:?}", f);
         let f = generate_all("zwana", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "stanati"), "{:?}", f);
         let f = generate_all("zaRa", "plat", 1, 1);
