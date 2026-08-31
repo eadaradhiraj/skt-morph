@@ -235,23 +235,22 @@ fn ang_stem(root: &str, dhatu: &str, antarganas: &str) -> Option<String> {
 }
 
 fn ksa_stem(root: &str) -> String {
+    // 8.2.32 दादेर् घः / 8.2.37 भष् before क्स (धुक्ष, घुक्ष).
+    let root = if root.ends_with('h') {
+        ksa_bhas(root)
+    } else {
+        root.to_string()
+    };
     if root.ends_with('S') {
-        let mut s = root.to_string();
+        let mut s = root;
         s.pop();
         format!("{s}kz")
     } else if root.ends_with('h') {
-        match root {
-            "duh" => "Dukz".into(),
-            "lih" => "likz".into(),
-            "guh" => "Gukz".into(),
-            other => {
-                let mut s = other.to_string();
-                s.pop();
-                format!("{s}kz")
-            }
-        }
+        let mut s = root;
+        s.pop();
+        format!("{s}kz")
     } else {
-        let mut s = internal_sandhi(root, "s");
+        let mut s = internal_sandhi(&root, "s");
         if s.ends_with('s') {
             s.pop();
             format!("{s}kz")
@@ -259,6 +258,21 @@ fn ksa_stem(root: &str) -> String {
             s.trim_end_matches('a').to_string()
         }
     }
+}
+
+/// 8.2.37 एकाचो बशो भष् झषन्तस्य स्ध्वोः (ह् is झष् after 8.2.31).
+fn ksa_bhas(root: &str) -> String {
+    let mut c: Vec<char> = root.chars().collect();
+    if let Some(first) = c.first_mut() {
+        *first = match *first {
+            'g' => 'G',
+            'd' => 'D',
+            'b' => 'B',
+            'j' => 'J',
+            _ => *first,
+        };
+    }
+    c.into_iter().collect()
 }
 
 fn root_of(dhatu: &str) -> String {
@@ -310,7 +324,6 @@ pub fn kartari_tagged(
     match root.as_str() {
         "gam" if pada == "A" => return Some(ang_atmane("gam", purusha, vacana)),
         "vac" if pada == "P" => return Some(ang_thematic("voc", purusha, vacana)),
-        "i" if pada == "P" => return Some(sic_it_p("Ez", purusha, vacana)),
         _ => {}
     }
     if pada == "A" && matches!(root.as_str(), "kf" | "tan" | "san" | "kzan") {
@@ -324,27 +337,18 @@ pub fn kartari_tagged(
         return Some(sic_a_jhal(&root, purusha, vacana));
     }
     if pada == "P" {
-        let body = match root.as_str() {
-            "kf" => "kArz".into(),
-            "nI" => "nEz".into(),
-            "Sru" => "SrOz".into(),
-            other => sic_p_body(other),
-        };
-        return Some(sic_it_p(&body, purusha, vacana));
+        return Some(sic_it_p(&sic_p_body(&root), purusha, vacana));
     }
     if pada == "A" {
+        // 7.2.1 वृद्धि is परस्मै only; आत्मने अनिट् takes गुण (नेष्ट).
         let body = if anit_sic(&root) {
-            ruki_s(&internal_sandhi(&root, "s"))
+            let g = apply_guna_to_stem(&root);
+            ruki_s(&internal_sandhi(&g, "s"))
                 .trim_end_matches(|c| c == 's' || c == 'z')
                 .to_string()
                 + "z"
         } else {
             format!("{}iz", apply_guna_to_stem(&root))
-        };
-        let body = match root.as_str() {
-            "kf" => "kfz".into(),
-            "nI" => "nez".into(),
-            _ => body,
         };
         return Some(sic_a(&body, purusha, vacana));
     }
@@ -380,6 +384,13 @@ mod tests {
         assert!(kartari("gamx", 1, 1, "P").unwrap().iter().any(|x| x == "agamat"));
         assert_eq!(kartari("qukfY", 1, 1, "P").unwrap()[0], "akArzIt");
         assert_eq!(kartari("RIY", 1, 1, "P").unwrap()[0], "anEzIt");
+        assert_eq!(kartari("Sru", 1, 1, "P").unwrap()[0], "aSrOzIt");
+        assert_eq!(kartari("i", 1, 1, "P").unwrap()[0], "EzIt");
+        let f = kartari("duha", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "aDukzat"), "{:?}", f);
+        let f = kartari("guhU", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "aGukzat"), "{:?}", f);
+        assert_eq!(kartari("RIY", 1, 1, "A").unwrap()[0], "anezwa");
         assert!(kartari("vaca", 1, 1, "P").unwrap().iter().any(|x| x == "avocat"));
     }
 

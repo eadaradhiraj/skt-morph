@@ -253,6 +253,14 @@ mod tests {
     use super::*;
 
     #[test]
+    fn sic_p_body_vrddhi_ruki() {
+        assert_eq!(sic_p_body("kf"), "kArz");
+        assert_eq!(sic_p_body("nI"), "nEz");
+        assert_eq!(sic_p_body("Sru"), "SrOz");
+        assert_eq!(sic_p_body("i"), "Ez");
+    }
+
+    #[test]
     fn sya_gam_kf_pac() {
         assert_eq!(sya_stem("gam"), "gamizya");
         assert_eq!(sya_stem("kf"), "karizya");
