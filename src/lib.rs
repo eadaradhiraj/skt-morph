@@ -47,6 +47,28 @@ pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
+/// `derivation`: empty / `shuddha`, or `Ric` / `san` / `yaN` / `karma`.
+#[wasm_bindgen]
+pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str) -> JsValue {
+    let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    let result = engine::tinanta::generate_derived(dhatu, derivation, lakara, purusha, vacana, &prefs);
+    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
+}
+
+#[wasm_bindgen]
+pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &str) -> JsValue {
+    let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
+    let result = engine::tinanta::generate_paradigm_derived(dhatu, derivation, lakara, &prefs);
+    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
+}
+
+/// तद्धित (त्व / तल् / मतुप् / मयट् / इन्)
+#[wasm_bindgen]
+pub fn generate_taddhita(pratipadika: &str, pratyaya: &str) -> JsValue {
+    let result = engine::taddhita::generate(pratipadika, pratyaya);
+    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
+}
+
 /// Generate participle / krdanta
 #[wasm_bindgen]
 pub fn generate_krdanta(dhatu: &str, pratyaya: &str) -> JsValue {

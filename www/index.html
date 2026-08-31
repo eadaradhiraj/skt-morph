@@ -28,12 +28,13 @@ details{margin-top:.6rem}
 </style>
 </head>
 <body>
-<h1>skt-morph <small>तिङन्त · कृदन्त · सुबन्त</small></h1>
+<h1>skt-morph <small>तिङन्त · कृदन्त · सुबन्त · तद्धित</small></h1>
 <nav>
 <button id="tab-analyze" class="active">विश्लेषण</button>
 <button id="tab-verb">तिङन्त</button>
 <button id="tab-noun">सुबन्त</button>
 <button id="tab-krdanta">कृदन्त</button>
+<button id="tab-taddhita">तद्धित</button>
 </nav>
 
 <section id="sec-analyze">
@@ -55,6 +56,13 @@ details{margin-top:.6rem}
     <option value="plun">लुङ्</option>
     <option value="pashirling">आशीर्लिङ्</option>
     <option value="alat">लट् (आत्मने)</option>
+  </select>
+  <select id="derivation">
+    <option value="">शुद्ध</option>
+    <option value="Ric">णिच्</option>
+    <option value="san">सन्</option>
+    <option value="yaN">यङ्</option>
+    <option value="karma">कर्मणि</option>
   </select>
   <input id="verb-prefix" placeholder="उपसर्ग प्र, सम्" style="width:180px">
   <button id="btn-verb">गण (९)</button>
@@ -87,11 +95,25 @@ details{margin-top:.6rem}
     <option value="lyuw">ल्युट्</option>
     <option value="tavya">तव्य</option>
     <option value="anIyar">अनीयर्</option>
+    <option value="tfc">तृच्</option>
   </select>
   <input id="krd-prefix" placeholder="उपसर्ग सम्, प्र" style="width:160px">
   <button id="btn-krdanta">कृदन्त</button>
   <div class="hint">सम्+भू+क्त्वा → सम्भूत्वा</div>
   <div id="out-krdanta"></div>
+</section>
+
+<section id="sec-taddhita" hidden>
+  <input id="tbase" placeholder="प्रातिपदिक राम / rAma" value="राम">
+  <select id="tpratyaya">
+    <option value="tva">त्व</option>
+    <option value="tal">तल्</option>
+    <option value="matup">मतुप्</option>
+    <option value="mayaT">मयट्</option>
+    <option value="ini">इन्</option>
+  </select>
+  <button id="btn-taddhita">तद्धित</button>
+  <div id="out-taddhita"></div>
 </section>
 
 <script type="module" src="./demo.js"></script>

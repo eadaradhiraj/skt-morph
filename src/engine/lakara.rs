@@ -5,14 +5,14 @@ pub fn normalize_lakara(lakara: &str) -> (String, String) {
     let map: &[(&str,&str)] = &[
         ("plat","plat"),("plrt","plrut"),("plot","plot"),("plan","plang"),("pvidhilin","pvidhiling"),("plit","plit"),
         ("plun","plun"),("pashirling","pashirling"),
-        ("alat","alat"),("alrt","alrut"),("alot","alot"),("alan","alang"),("aling","aashirling"),("alit","alit"),
+        ("alat","alat"),("alrt","alrut"),("alot","alot"),("alan","alang"),("avidhilin","avidhiling"),("aling","aashirling"),("alit","alit"),
         ("alun","alun"),
     ];
     for (c,db) in map { if *c==code { return (c.to_string(), db.to_string()); } }
     // db -> canonical
     let rev: &[(&str,&str)] = &[
         ("plat","plat"),("plrut","plrt"),("plot","plot"),("plang","plan"),("pvidhiling","pvidhilin"),
-        ("alat","alat"),("alrut","alrt"),("alot","alot"),("alang","alan"),("aashirling","aling"),("alit","alit"),
+        ("alat","alat"),("alrut","alrt"),("alot","alot"),("alang","alan"),("avidhiling","avidhilin"),("aashirling","aling"),("alit","alit"),
         ("plit","plit"),("plun","plun"),("alun","alun"),("pashirling","pashirling"),
     ];
     for (db,c) in rev { if *db==code { return (c.to_string(), db.to_string()); } }

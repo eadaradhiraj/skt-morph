@@ -83,6 +83,15 @@ export const PRATYAYA = {
   tavya: "तव्य",
   anIyar: "अनीयर्",
   ktin: "क्तिन्",
+  tva: "त्व",
+  tal: "तल्",
+  tA: "तल्",
+  matup: "मतुप्",
+  mat: "मतुप्",
+  mayaT: "मयट्",
+  maya: "मयट्",
+  ini: "इन्",
+  in: "इन्",
   tfc: "तृच्",
   yat: "यत्",
   Ryat: "ण्यत्",
@@ -127,6 +136,22 @@ export function lakara(code) {
 
 export function pratyaya(code) {
   return PRATYAYA[code] || code || "";
+}
+
+export const DERIVATION = {
+  shuddha: "शुद्ध",
+  "": "शुद्ध",
+  Ric: "णिच्",
+  nic: "णिच्",
+  san: "सन्",
+  yaN: "यङ्",
+  yan: "यङ्",
+  karma: "कर्मणि",
+  yak: "कर्मणि",
+};
+
+export function derivation(code) {
+  return DERIVATION[code] || code || "";
 }
 
 export function padaFromLakara(code) {

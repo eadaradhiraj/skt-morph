@@ -752,11 +752,6 @@ pub fn derive_stem(
                 let prefix = &dhatu[..idx];
                 return (Some(format!("{}ANkz", prefix)), Some("a".to_string()));
             }
-            if dhatu.to_ascii_lowercase().ends_with("akzi") {
-                let idx = dhatu.find('A').unwrap_or(1);
-                let prefix = &dhatu[..idx];
-                return (Some(format!("{}ANkz", prefix)), None);
-            }
             if cgana == 1 && dhatu.ends_with('i') && dhatu.len() >= 3 && !matches!(dhatu, "div"|"divu") {
                 let base = &dhatu[..dhatu.len()-1];
                 if let Some(last) = base.chars().last() {
@@ -833,8 +828,10 @@ pub fn derive_stem(
                 let root = if g9_uses_n_infix(dhatu, antarganas) {
                     let base = g9_n_lang_base(dhatu);
                     if base.ends_with('n') { base } else { format!("{}R", base) }
+                } else if let Some(ps) = &present_stem {
+                    ps.clone()
                 } else {
-                    format!("{}R", dhatu)
+                    format!("{}nA", dhatu)
                 };
                 let root = lang_geminate_stem(dhatu, &root);
                         return (Some(root), Some("a".to_string()));

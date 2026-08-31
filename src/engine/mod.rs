@@ -1,5 +1,6 @@
 pub mod analyze;
 pub mod ashir;
+pub mod derived;
 pub mod dhatu;
 pub mod endings;
 pub mod it;
@@ -11,6 +12,7 @@ pub mod lit;
 pub mod lun;
 pub mod phonology;
 pub mod prefix;
+pub mod taddhita;
 pub mod upa_pada;
 pub mod redup;
 pub mod stems;

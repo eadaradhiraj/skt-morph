@@ -15,9 +15,9 @@ ashtadhyayi.com data (`skt_morph.db`) is an optional **cross-check**. If live �
 
 ## Scope (v1)
 
-In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लोट्, विधिलिङ्, लृट्, लिट्, लुङ्, आशीर्लिङ्; parasmai and ātmanepada), listed kṛt pratyayas, ending-class सुबन्त (including foreign stems such as ट्रम्प → ट्रम्पेण), सर्वनाम.
+In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लोट्, विधिलिङ्, लृट्, लिट्, लुङ्, आशीर्लिङ्; parasmai and ātmanepada), listed kṛt pratyayas, ending-class सुबन्त (including foreign stems such as ट्रम्प → ट्रम्पेण), सर्वनाम. Started: णिच् / सन् / यङ्, कर्मणि यक्, a few तद्धित (त्व, तल्, मतुप्, मयट्, इन्).
 
-Later: ṇic, san, yaṅ; कर्मणि/भावे; तद्धित.
+Later: णिच् लुङ् (चङ् अचीकरत्) and णिच् लिट् आम्; fuller 1.3 meaning-conditioned sūtras; remaining override fold; more तद्धित.
 
 `tinanta_overrides.rs` is a temporary patch list where the Kaumudī path is not written yet. New work goes into stems, endings, join, and sandhi — not into that table, and not into scrape rows.
 
@@ -32,9 +32,10 @@ Later: ṇic, san, yaṅ; कर्मणि/भावे; तद्धित.
 
 ## Generate
 
-- **तिङन्त** — stem → ending → sandhi (`live_generate`). Optional upasargas (`prefix.rs`).
-- **कृदन्त** — kṛt such as क्त, क्तवतु, शतृ, शानच्, तुमुन्, क्त्वा, ल्यप्, … Same prefixes.
+- **तिङन्त** — stem → ending → sandhi (`live_generate`). Optional upasargas (`prefix.rs`). Optional derivation: णिच् / सन् / यङ् / कर्मणि (`derived.rs`; not indexed in analyze).
+- **कृदन्त** — kṛt such as क्त, क्तवतु, शतृ, शानच्, तुमुन्, क्त्वा, ल्यप्, तव्य, तृच्, … Same prefixes.
 - **सुबन्त / सर्वनाम** — ending-class (or pronoun) paradigms.
+- **तद्धित** — त्व, तल्, मतुप्, मयट्, इन् (`taddhita.rs`).
 
 ## Analyze
 

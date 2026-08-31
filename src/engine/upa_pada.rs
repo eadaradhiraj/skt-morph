@@ -13,6 +13,8 @@ fn normalize_one(p: &str) -> String {
         "saG" | "saM" | "saN" | "sam" | "SaM" | "SaG" | "SAM" | "sAM" => "sam".to_string(),
         "samA" | "saMA" => "samA".to_string(),
         "a" | "A" | "AG" | "AM" => "A".to_string(),
+        "ud" | "ut" | "ul" => "ud".to_string(),
+        "ni" | "nI" => "ni".to_string(),
         other => other.to_string(),
     }
 }
@@ -41,11 +43,6 @@ fn has_prefix(norm: &[String], target: &str) -> bool {
 /// Compute allowed padas for this (root_pada, dhatu, prefixes) combo.
 /// Returns Vec containing "P" and/or "A". Empty means no valid pada (shouldn't happen).
 pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<String> {
-    // U (ubhayapadī) -> both always
-    if root_pada == "U" {
-        return vec!["P".to_string(), "A".to_string()];
-    }
-
     let d = dhatu.trim();
     let norm = normalized_prefixes(prefixes);
     let has_sam = has_prefix(&norm, "sam");
@@ -117,6 +114,37 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
         return vec!["P".to_string(), "A".to_string()];
     }
 
+    // --- 1.3.18 परिव्यवेभ्यः क्रियः ---
+    if matches!(d, "qukrIY" | "krI")
+        && (has_prefix(&norm, "pari") || has_prefix(&norm, "vi") || has_prefix(&norm, "ava"))
+    {
+        return vec!["A".to_string()];
+    }
+
+    // --- 1.3.30 निसमुपविभ्यो ह्वः ---
+    if matches!(d, "hveY" | "hve")
+        && (has_prefix(&norm, "ni")
+            || has_sam
+            || has_prefix(&norm, "upa")
+            || has_prefix(&norm, "vi"))
+    {
+        return vec!["A".to_string()];
+    }
+
+    // --- 1.3.38 वृत्तिसर्गतायनेषु क्रमः / 1.3.43 अनुपसर्गाद्वा — treat vi/sam/pari as A ---
+    if matches!(d, "kramu" | "kram")
+        && (has_prefix(&norm, "vi") || has_sam || has_prefix(&norm, "pari"))
+    {
+        return vec!["A".to_string()];
+    }
+
+    // --- 1.3.75 समुदाङ्भ्यो यमोऽग्रन्थे ---
+    if matches!(d, "yama" | "yam" | "yamx")
+        && (has_sam || has_prefix(&norm, "ud") || has_prefix(&norm, "A"))
+    {
+        return vec!["A".to_string()];
+    }
+
     // Default: dhātupāṭha pada (1.3.12–77 exceptions are listed above).
     match root_pada {
         "P" => vec!["P".to_string()],
@@ -185,5 +213,35 @@ mod tests {
     fn ud_car_is_a() {
         let ud = s(&["ud"]);
         assert_eq!(allowed_padas("P", "car", &ud), vec!["A"]);
+    }
+
+    #[test]
+    fn ubhaya_bare_is_both() {
+        assert_eq!(allowed_padas("U", "qukrIY", &[]), vec!["P", "A"]);
+    }
+
+    #[test]
+    fn kri_pari_is_a() {
+        let pari = s(&["pari"]);
+        assert_eq!(allowed_padas("U", "qukrIY", &pari), vec!["A"]);
+        assert!(!pada_allowed("U", "P", "qukrIY", &pari));
+    }
+
+    #[test]
+    fn hve_ni_is_a() {
+        let ni = s(&["ni"]);
+        assert_eq!(allowed_padas("U", "hveY", &ni), vec!["A"]);
+    }
+
+    #[test]
+    fn kram_vi_is_a() {
+        let vi = s(&["vi"]);
+        assert_eq!(allowed_padas("P", "kramu", &vi), vec!["A"]);
+    }
+
+    #[test]
+    fn yam_sam_is_a() {
+        let sam = s(&["sam"]);
+        assert_eq!(allowed_padas("P", "yama", &sam), vec!["A"]);
     }
 }

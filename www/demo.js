@@ -5,10 +5,13 @@ import init, {
   generate_verb_with_prefix,
   generate_verb_paradigm,
   generate_verb_paradigm_with_prefix,
+  generate_verb_derived,
+  generate_verb_paradigm_derived,
   generate_noun,
   generate_pronoun,
   generate_krdanta,
   generate_krdanta_with_prefix,
+  generate_taddhita,
 } from "../pkg/skt_morph.js";
 import { toSlp1, toDeva, prefixesToSlp1, formsToDeva } from "./translit.js";
 import * as L from "./labels.js";
@@ -37,7 +40,7 @@ function cellForms(forms) {
   return list.length ? esc(list.join(", ")) : '<span class="empty">—</span>';
 }
 
-const tabs = ["analyze", "verb", "noun", "krdanta"];
+const tabs = ["analyze", "verb", "noun", "krdanta", "taddhita"];
 tabs.forEach((t) => {
   document.getElementById("tab-" + t).onclick = () => {
     tabs.forEach((x) => {
@@ -174,16 +177,26 @@ function renderVerbSingle(res) {
 document.getElementById("btn-verb").onclick = () => {
   const d = toSlp1(document.getElementById("dhatu").value) || "BU";
   const l = document.getElementById("lakara").value;
+  const deriv = document.getElementById("derivation").value;
   const pref = prefixesToSlp1(document.getElementById("verb-prefix").value);
-  const res = pref ? generate_verb_paradigm_with_prefix(d, l, pref) : generate_verb_paradigm(d, l);
+  const res = deriv
+    ? generate_verb_paradigm_derived(d, deriv, l, pref)
+    : pref
+      ? generate_verb_paradigm_with_prefix(d, l, pref)
+      : generate_verb_paradigm(d, l);
   renderVerbParadigm(res);
 };
 
 document.getElementById("btn-verb1").onclick = () => {
   const d = toSlp1(document.getElementById("dhatu").value) || "BU";
   const l = document.getElementById("lakara").value;
+  const deriv = document.getElementById("derivation").value;
   const pref = prefixesToSlp1(document.getElementById("verb-prefix").value);
-  const res = pref ? generate_verb_with_prefix(d, l, 1, 1, pref) : generate_verb(d, l, 1, 1);
+  const res = deriv
+    ? generate_verb_derived(d, deriv, l, 1, 1, pref)
+    : pref
+      ? generate_verb_with_prefix(d, l, 1, 1, pref)
+      : generate_verb(d, l, 1, 1);
   renderVerbSingle(res);
 };
 
@@ -259,6 +272,22 @@ document.getElementById("btn-krdanta").onclick = () => {
   } catch (e) {
     el.textContent = "Error: " + e;
   }
+};
+
+document.getElementById("btn-taddhita").onclick = () => {
+  const b = toSlp1(document.getElementById("tbase").value) || "rAma";
+  const p = document.getElementById("tpratyaya").value;
+  const el = document.getElementById("out-taddhita");
+  const res = generate_taddhita(b, p);
+  if (!res || !res.forms || res.forms.length === 0) {
+    el.innerHTML =
+      `<div class="miss">कोई तद्धित नहीं — <b>${esc(toDeva(b))}</b> + ${esc(L.pratyaya(p))}</div>` +
+      `<pre>${esc(strfy(res))}</pre>`;
+    return;
+  }
+  el.innerHTML =
+    `<div>रूप: <b>${esc(formsToDeva(res.forms).join(", "))}</b> (${esc(toDeva(b))} + ${esc(L.pratyaya(p))})</div>` +
+    `<details><summary>JSON (SLP1)</summary><pre>${esc(strfy(res))}</pre></details>`;
 };
 
 document.getElementById("out-analyze").innerHTML =

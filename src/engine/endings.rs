@@ -225,6 +225,20 @@ pub fn vidhilin_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+pub fn vidhilin_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
+    vec![
+        (vec!["eta".into()], vec!["3.4.104".into()]),
+        (vec!["eyAtAm".into()], vec!["3.4.104".into()]),
+        (vec!["eran".into()], vec!["3.4.104".into()]),
+        (vec!["eTAH".into()], vec!["3.4.104".into()]),
+        (vec!["eyATAm".into()], vec!["3.4.104".into()]),
+        (vec!["eDvam".into()], vec!["3.4.104".into()]),
+        (vec!["eya".into()], vec!["3.4.104".into()]),
+        (vec!["evahi".into()], vec!["3.4.104".into()]),
+        (vec!["emahi".into()], vec!["3.4.104".into()]),
+    ]
+}
+
 pub fn vidhilin_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["yAt".into(), "yAd".into()], vec!["3.1.3".into(), "3.4.104".into()]),
@@ -412,6 +426,7 @@ pub fn family_endings(
         ("lang","kartari","P","ad") => lang_ad_p(),
         ("lang","kartari","P","nu") => lang_nu_p(),
         ("vidhilin","kartari","P","thematic") => vidhilin_kartari_p(),
+        ("vidhilin","kartari","A","thematic") => vidhilin_kartari_a(),
         ("vidhilin","kartari","P","ad") => vidhilin_ad_p(),
         ("vidhilin","kartari","P","nu") => vidhilin_nu_p(),
         ("lit","kartari","P","thematic") => lit_kartari_p(),

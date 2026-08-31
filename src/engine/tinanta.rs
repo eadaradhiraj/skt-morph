@@ -50,12 +50,73 @@ fn attach_prefixes(prefixes: &[String], forms: Vec<String>) -> Vec<String> {
 }
 
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
+    generate_all_derived(dhatu_query, "", lakara, purusha, vacana, prefixes)
+}
+
+/// `derivation`: empty = śuddha; `Ric` / `san` / `yaN` / `karma`.
+pub fn generate_all_derived(
+    dhatu_query: &str,
+    derivation: &str,
+    lakara: &str,
+    purusha: u8,
+    vacana: u8,
+    prefixes: &[String],
+) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
-    // Temporary per-root patches until the Kaumudī prakriyā covers that sūtra. Not scrape rows.
+    let deriv = derivation.trim();
+    if !deriv.is_empty() && deriv != "shuddha" {
+        return live_generate_derived(dhatu_query, deriv, &canonical, &db_lakara, purusha, vacana, prefixes);
+    }
     if let Some(out) = crate::engine::tinanta_overrides::lookup_override(dhatu_query, &canonical, purusha, vacana, prefixes) {
         return out;
     }
     live_generate(dhatu_query, &canonical, &db_lakara, purusha, vacana, prefixes)
+}
+
+pub fn generate_derived(
+    dhatu_query: &str,
+    derivation: &str,
+    lakara: &str,
+    purusha: u8,
+    vacana: u8,
+    prefixes: &[String],
+) -> TinantaResult {
+    let forms = generate_all_derived(dhatu_query, derivation, lakara, purusha, vacana, prefixes);
+    let (canon, _) = normalize_lakara(lakara);
+    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
+}
+
+pub fn generate_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
+    let mut out = Vec::new();
+    for p in 1..=3 {
+        for v in 1..=3 {
+            let forms = generate_all_derived(dhatu, derivation, lakara, p, v, prefixes);
+            out.push(ParadigmEntry { purusha: p, vacana: v, forms });
+        }
+    }
+    out
+}
+
+fn live_generate_derived(
+    dhatu_query: &str,
+    kind: &str,
+    canonical: &str,
+    db_lakara: &str,
+    purusha: u8,
+    vacana: u8,
+    prefixes: &[String],
+) -> Vec<String> {
+    let Some((dhatu, _, _, _, _, _)) = load_dhatu_info(dhatu_query) else {
+        return vec![];
+    };
+    let Some(family) = lakara_family(db_lakara) else {
+        return vec![];
+    };
+    let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
+    if let Some(forms) = crate::engine::derived::kartari(&dhatu, kind, &family, purusha, vacana, pada) {
+        return attach_prefixes(prefixes, forms);
+    }
+    vec![]
 }
 
 /// Stem → vikaraṇa/lakāra ending → sandhi. No tables.
@@ -314,5 +375,65 @@ mod tests {
             "{:?}",
             hits
         );
+    }
+
+    #[test]
+    fn gana_athematic_lang_vidhilin() {
+        let f = generate_all("ada", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "Adat" || x == "Adad"), "{:?}", f);
+        let f = generate_all("ada", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x == "adyAt" || x == "adyAd"), "{:?}", f);
+        let f = generate_all("hu", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x == "juhuyAt" || x == "juhuyAd"), "{:?}", f);
+        let f = generate_all("hu", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "ajuhot" || x == "ajuhod"), "{:?}", f);
+        let f = generate_all("zuY", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "asunot" || x == "asunod"), "{:?}", f);
+        let f = generate_all("zuY", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x == "sunuyAt" || x == "sunuyAd"), "{:?}", f);
+        let f = generate_all("ruDir", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "aruRat"), "{:?}", f);
+        let f = generate_all("ruDir", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x.contains("runD") && x.contains("yA")), "{:?}", f);
+        let f = generate_all("qukrIY", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x.contains("krI") && x.contains("yA")), "{:?}", f);
+        let f = generate_all("qukrIY", "plan", 1, 1);
+        assert!(f.iter().any(|x| x == "akrIRAt" || x == "akrIRAd" || x == "akrINAt"), "{:?}", f);
+    }
+
+    #[test]
+    fn nic_san_yan_karma() {
+        let f = generate_all_derived("BU", "Ric", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "BAvayati"), "{:?}", f);
+        let f = generate_all_derived("BU", "san", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "buBUzati"), "{:?}", f);
+        let f = generate_all_derived("BU", "yaN", "alat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "boBUyate"), "{:?}", f);
+        let f = generate_all_derived("gam", "karma", "alat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "gamyate"), "{:?}", f);
+        let f = generate_all_derived("qukfY", "Ric", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "kArayati"), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "pvidhilin", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "BAvayet" || x == "BAvayed"), "{:?}", f);
+        let f = generate_all_derived("gam", "karma", "avidhilin", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "gamyeta"), "{:?}", f);
+    }
+
+    #[test]
+    fn akzi_live_vidhilin_lrt() {
+        assert!(crate::engine::tinanta_overrides::lookup_override("kAkzi", "pvidhilin", 1, 1, &[]).is_none());
+        let f = generate_all("kAkzi", "pvidhilin", 1, 1);
+        assert!(f.iter().any(|x| x == "kANkzet" || x == "kANkzed"), "{:?}", f);
+        let f = generate_all("kAkzi", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "kANkzizyati"), "{:?}", f);
+    }
+
+    #[test]
+    fn kri_pari_atmanepada() {
+        let prefs = vec!["pari".to_string()];
+        let f = generate_all_with_prefixes("qukrIY", "plat", 1, 1, &prefs);
+        assert!(f.is_empty(), "{:?}", f);
+        let f = generate_all_with_prefixes("qukrIY", "alat", 1, 1, &prefs);
+        assert!(!f.is_empty(), "{:?}", f);
     }
 }

@@ -219,8 +219,16 @@ pub fn join_form(
                 "si" => return format!("{}oSi", base),
                 "mi" => return format!("{}omi", base),
                 "tu" => return format!("{}otu", base),
+                "ot" | "od" => return format!("{}o{}", base, &ending[1..]),
+                "utAm" => return format!("{}utAm", base),
+                "van" => return format!("{}van", base),
+                "At" | "Ad" => return format!("{}uyA{}", base, &ending[1..]),
+                "yAt" | "yAd" => return format!("{}uyA{}", base, &ending[1..]),
                 _ => {}
             }
+        }
+        if stem.ends_with('y') && (family == "vidhilin" || ending.starts_with('A')) {
+            return format!("{}{}", stem, ending);
         }
         if stem.ends_with('I') {
             let base = &stem[..stem.len()-1];
@@ -251,6 +259,8 @@ pub fn join_form(
                 "vaH" => return format!("{}vaH", stem),
                 "maH" => return format!("{}maH", stem),
                 "tu" => return format!("{}otu", base),
+                "ot" | "od" => return format!("{}o{}", base, &ending[1..]),
+                "At" | "Ad" => return format!("{}uyA{}", base, &ending[1..]),
                 "tAm" => return format!("{}tAm", stem),
                 "antu" | "vantu" => return format!("{}vantu", base),
                 "Ani" => return format!("{}avAni", base),
@@ -312,6 +322,11 @@ pub fn join_form(
                     "tu" => return internal_sandhi(&strong, "tu"),
                     "antu" => return format!("{weak}antu"),
                     "tAm" => return internal_sandhi(&weak, "tAm"),
+                    "yAt" | "yAd" => return format!("{weak}yA{}", &ending[1..]),
+                    "at" | "ad" if family == "lang" => {
+                        let body: String = strong.chars().take(strong.chars().count().saturating_sub(1)).collect();
+                        return format!("{}{}t", augment.unwrap_or(""), body);
+                    }
                     _ => {
                         return internal_sandhi(base, ending);
                     }
@@ -335,6 +350,17 @@ pub fn join_form(
             "mi" => return format!("{}{}Ami", base, nasal),
             "vaH" => return format!("{}{}IvaH", base, nasal),
             "maH" => return format!("{}{}ImaH", base, nasal),
+            "yAt" | "yAd" => return format!("{}{}IyA{}", base, nasal, &ending[1..]),
+            "At" | "Ad" => {
+                let inner = format!("{}{}A{}", base, nasal, &ending[1..]);
+                if family == "lang" {
+                    if let Some(aug) = augment {
+                        return format!("{aug}{inner}");
+                    }
+                }
+                return inner;
+            }
+            "tu" => return format!("{}{}Atu", base, nasal),
             _ => {}
         }
     }
