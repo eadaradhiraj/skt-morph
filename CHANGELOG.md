@@ -43,6 +43,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **भ्वादि leftovers live:** धिवि धिनोति/धिन्वन्ति/धिनविष्यति (श्नु-like); णिक्ष् अनिक्षत्; ऋति र्तते/अरतिष्यते (आत्मने, no नुम्). `tinanta_overrides` has no remaining form tables.
 - **णिच्/सन् defaults:** 7.2.115/116 वृद्धि (पच् पाचयति, भू भावयति), 6.4.92 मित् (गमयति, घटयति), 7.3.36 पुक् (दापयति), 7.3.86 लघूपध (क्षेपयति, दर्शयति). सन् अनिट् अभ्यासा+स (पिपक्षति, दिदृक्षति).
 - **लुङ् अङ्:** 3.1.56 सृज्/दृश् असृजत्, अदर्शत्.
+- **CI:** `.gitignore` `bin/` was also ignoring `src/bin/`, so GitHub Actions `cargo build` failed (missing `time_analyze`). Only the repo-root `/bin/` is ignored now.
 
 
 

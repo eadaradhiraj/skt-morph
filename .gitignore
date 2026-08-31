@@ -35,7 +35,7 @@ wheels/
 venv/
 ENV/
 .miniconda/
-bin/
+/bin/
 
 # --- SQLite Temporary Files ---
 *.sqlite-journal
