@@ -59,7 +59,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // ष-anta (द्विष्) — 8.2.39 जश्त्व ष्→ड्, 8.4.56 वाऽवसाने ट्; भ्-initial ड्; सप्तमी ट्सु.
   m.insert(("z".to_string(),"pum".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
   m.insert(("z".to_string(),"stri".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
-  m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atam".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["ate".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"Am".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],]);
+  // अत् nap (जगत्) — 7.1.23 स्वमोः; नपुं जगत्/जगती/जगन्ति not *जगांसि (as-anta). भ्: 8.2.39 जगद्भ्याम्.
+  m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],]);
   m.insert(("us".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["usA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["use".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"usoH".to_string(),"usAm".to_string(),],vec!["usi".to_string(),"usoH".to_string(),"uHsu".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],]);
   m.insert(("is".to_string(),"nap".to_string()), vec![vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["isA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ise".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"isoH".to_string(),"isAm".to_string(),],vec!["isi".to_string(),"isoH".to_string(),"iHsu".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],]);
   // गो: 7.1.90 णित्, 6.1.93 औतोऽम्शसोः (गाम्/गाः), 6.1.78 अव्
@@ -191,6 +192,19 @@ fn ngeep_stri(cand: &str, linga: &str) -> String {
         format!("{cand}I")
     } else {
         cand.to_string()
+    }
+}
+
+/// 6.4.10 सान्तमहतः संयोगस्य — महत् strong न्त् → आ (महान्तम् not शतृ *महन्तम्).
+fn mahat_strong(table: &mut [Vec<String>]) {
+    for row in table.iter_mut() {
+        for cell in row.iter_mut() {
+            *cell = cell
+                .replace("antO", "AntO")
+                .replace("antaH", "AntaH")
+                .replace("antam", "Antam")
+                .replace("anti", "Anti");
+        }
     }
 }
 
@@ -331,6 +345,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             // Pāṇini exception: kinship keeps short a
             if is_kinship && best_ending == "f" && linga == "pum" && table.len() > 1 && !table[1].is_empty() {
                 table[1][0] = "aram".to_string();
+            }
+            if cand == "mahat" && best_ending == "at" {
+                mahat_strong(&mut table);
             }
             let base_no_end = &cand[..cand.len()-best_ending.len()];
             let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
@@ -688,5 +705,35 @@ mod tests {
         // हल् स्त्री same as पुं (not आ-stem fallback).
         has(&generate("lih", "stri").unwrap(), "prathamA", "lik");
         has(&generate("laB", "stri").unwrap(), "prathamA", "lap");
+    }
+
+    #[test]
+    fn at_nap_jagat_mahat_vrddhi() {
+        // शतृ पुं stays short: भवन्तम् not *भवान्तम्.
+        let b = generate("Bavat", "pum").expect("Bavat pum");
+        has(&b, "prathamA", "BavAn");
+        has(&b, "dvitIyA", "Bavantam");
+        has(&b, "prathamA", "BavantO");
+        has(&b, "tfIyA", "BavadByAm");
+        // 6.4.10 महत्: महान्तम्/महान्तौ/महान्तः.
+        let m = generate("mahat", "pum").expect("mahat pum");
+        has(&m, "prathamA", "mahAn");
+        has(&m, "prathamA", "mahAntO");
+        has(&m, "prathamA", "mahAntaH");
+        has(&m, "dvitIyA", "mahAntam");
+        has(&m, "tfIyA", "mahatA");
+        has(&m, "tfIyA", "mahadByAm");
+        has(&m, "samboDana", "mahan");
+        // अत् nap: जगत्/जगती/जगन्ति; जगद्भ्याम् (not *जगांसि / *जगत्भ्याम्).
+        let j = generate("jagat", "nap").expect("jagat nap");
+        has(&j, "prathamA", "jagat");
+        has(&j, "prathamA", "jagatI");
+        has(&j, "prathamA", "jaganti");
+        has(&j, "dvitIyA", "jagat");
+        has(&j, "tfIyA", "jagatA");
+        has(&j, "tfIyA", "jagadByAm");
+        has(&j, "zazWI", "jagatAm");
+        has(&j, "saptamI", "jagatsu");
+        has(&generate("mahat", "nap").unwrap(), "prathamA", "mahAnti");
     }
 }
