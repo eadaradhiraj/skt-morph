@@ -638,6 +638,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "dE" {
         return "dIta".into(); // दीत
     }
+    // Special: ने + क्त → नीत (SLP1 nIta) — similarly nE→nIta
+    // sūtra: ने + क्त → नीत; future devs: nE=ने, nIta=नीत — keep nI, t
+    // Extreme: keep nIta not nEta
+    if orig == "nE" {
+        return "nIta".into(); // नीत
+    }
     // Special: पभ् + क्त → पब्ध (SLP1 pabDa) — similarly paB→pabDa
     // sūtra: पभ् + क्त → पब्ध; future devs: paB=पभ्, pabDa=पब्ध — keep pa, BD=ब्ध
     // Extreme: keep pabDa not paBta
@@ -1557,6 +1563,8 @@ mod tests {
         assert_eq!(derive("kE", "kta"), vec!["kIta"]); // के → कीत
         // दे → दीत (dIta) — dE→dIta
         assert_eq!(derive("dE", "kta"), vec!["dIta"]); // दे → दीत
+        // ने → नीत (nIta) — nE→nIta
+        assert_eq!(derive("nE", "kta"), vec!["nIta"]); // ने → नीत
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
