@@ -92,13 +92,48 @@ fn ruki_stutva(s: &str) -> String {
     out.into_iter().collect()
 }
 
+/// 8.2.37 एकाचो बशो भष् झषन्तस्य स्ध्वोः (after 8.2.31 हो ढः, ढ is झष्).
+fn bhas_initial(s: &str) -> String {
+    let mut c: Vec<char> = s.chars().collect();
+    if let Some(first) = c.first_mut() {
+        *first = match *first {
+            'g' => 'G',
+            'd' => 'D',
+            'b' => 'B',
+            'j' => 'J',
+            _ => *first,
+        };
+    }
+    c.into_iter().collect()
+}
+
 fn thematic_sa(body: &str) -> String {
-    let joined = crate::engine::join::internal_sandhi(body, "sa");
+    let mut body = body.to_string();
+    if body.ends_with('h') {
+        body = bhas_initial(&body);
+    }
+    // 8.3.24 नश्चापदान्तस्य झलि — जिघांस
+    if body.ends_with('n') {
+        body = format!("{}M", &body[..body.len() - 1]);
+    }
+    let joined = crate::engine::join::internal_sandhi(&body, "sa");
     if joined.ends_with('a') {
         joined
     } else {
         format!("{joined}a")
     }
+}
+
+/// Aṅga before झलादि सन्. 6.1.16 ग्रह्; 6.4.16 + 7.3.54 हन्.
+fn san_anga(root: &str) -> String {
+    if root == "grah" {
+        return "gfh".into();
+    }
+    if root == "han" {
+        let dirgha = root.replace('a', "A");
+        return format!("G{}", &dirgha[1..]);
+    }
+    root.to_string()
 }
 
 /// 7.4.54 सनि मीमाघुर्भलभशकपतपदामच इस् (no अभ्यास). 2.4.55 दाधा घ्वदाप्; आप् ईप्स.
@@ -122,14 +157,6 @@ pub fn san_stem(root: &str) -> String {
     if let Some(s) = san_is_adesha(root) {
         return s;
     }
-    // 7.3.54/32 हन् → जिघांस
-    if root == "han" {
-        return "jiGAMsa".into();
-    }
-    // 6.1.16 ग्रह् → जिघृक्ष
-    if root == "grah" {
-        return "jiGfkza".into();
-    }
     let abh = san_abhyasa(root);
     // ऋ-final: चिकीर्ष (ṛ → ईर् before sa)
     if root.ends_with('f') || root.ends_with('F') {
@@ -138,7 +165,7 @@ pub fn san_stem(root: &str) -> String {
     }
     let last = root.chars().last();
     if last.is_some_and(|c| matches!(c, 'A' | 'i' | 'I' | 'u' | 'U' | 'e' | 'o')) {
-        // 6.4.2-like: श्रु → श्रूष्
+        // 6.4.16 अज्झनगमां सनि: श्रु → श्रूष्
         let anga = if last == Some('u') {
             let mut s = root.to_string();
             s.pop();
@@ -149,8 +176,10 @@ pub fn san_stem(root: &str) -> String {
         };
         return ruki_stutva(&format!("{abh}{}", thematic_sa(&anga)));
     }
-    if crate::engine::it::anit_sya(root) && last_is_cons(root) {
-        return format!("{abh}{}", thematic_sa(root));
+    // 7.2.10 अनिट्; 7.2.12 सनि ग्रहगुहोश्च
+    if (crate::engine::it::anit_sya(root) || matches!(root, "grah" | "guh")) && last_is_cons(root)
+    {
+        return ruki_stutva(&format!("{abh}{}", thematic_sa(&san_anga(root))));
     }
     ruki_stutva(&format!("{abh}{root}iza"))
 }
@@ -182,7 +211,6 @@ fn last_is_cons(root: &str) -> bool {
 /// णिच् aṅga: 7.2.115/116 वृद्धि, 6.4.92 मित्, 7.3.36 पुक्, 7.3.86 लघूपध गुण.
 pub fn nic_stem(root: &str) -> String {
     match root {
-        "han" => return "GAtaya".into(),
         "i" => return "gamaya".into(),
         "pA" => return "pAyaya".into(),
         // 7.3.37 शाच्छासाह्वाव्यावेपां युक्. शो/छो/षो after 6.1.45 आदेच.
@@ -203,14 +231,21 @@ pub fn nic_stem(root: &str) -> String {
         Some('u') | Some('U') => format!("{}Avaya", &root[..root.len() - 1]),
         Some('f') | Some('F') => format!("{}Araya", &root[..root.len() - 1]),
         _ if last_is_cons(root) => {
-            let v = root.chars().rev().nth(1);
-            match v {
-                Some('i') | Some('u') | Some('f') | Some('F') => {
-                    format!("{}aya", apply_guna_to_stem(root))
+            // 7.3.32 हनस्तोऽचिण्णलोः (न् → त् before अच् of णिच्)
+            let base = if root == "han" { "hat" } else { root };
+            let v = base.chars().rev().nth(1);
+            let mut anga = match v {
+                Some('i') | Some('u') | Some('f') | Some('F') => apply_guna_to_stem(base),
+                Some('a') => apply_vrddhi_to_stem(base),
+                _ => apply_vrddhi_to_stem(base),
+            };
+            // 7.3.54 हो हन्तेर्ञ्णिन्नेषु (णिच् is णित्)
+            if root == "han" {
+                if let Some(rest) = anga.strip_prefix('h') {
+                    anga = format!("G{rest}");
                 }
-                Some('a') => format!("{}aya", apply_vrddhi_to_stem(root)),
-                _ => format!("{}aya", apply_vrddhi_to_stem(root)),
             }
+            format!("{anga}aya")
         }
         _ => format!("{}aya", apply_vrddhi_to_stem(root)),
     }
@@ -499,7 +534,11 @@ mod tests {
         assert_eq!(san_stem("Sak"), "Sikza");
         assert_eq!(san_stem("Ap"), "Ipsa");
         assert_eq!(san_stem("gam"), "jigamiza");
+        assert_eq!(san_stem("han"), "jiGAMsa");
+        assert_eq!(san_stem("grah"), "jiGfkza");
+        assert_eq!(san_stem("guh"), "juGukza");
         assert_eq!(san_stem("pac"), "pipakza");
+        assert_eq!(nic_stem("han"), "GAtaya");
         assert_eq!(san_stem("jYA"), "jijYAsa");
         assert_eq!(san_stem("BI"), "biBIza");
         let f = kartari("Apx", "san", "lat", 1, 1, "P").unwrap();
@@ -529,6 +568,12 @@ mod tests {
         assert!(f.iter().any(|x| x == "dIyate"), "{:?}", f);
         let f = kartari("vaca", "karma", "lat", 1, 1, "A").unwrap();
         assert!(f.iter().any(|x| x == "ucyate"), "{:?}", f);
+        let f = kartari("hana", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "jiGAMsati"), "{:?}", f);
+        let f = kartari("graha", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "jiGfkzati"), "{:?}", f);
+        let f = kartari("hana", "Ric", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "GAtayati"), "{:?}", f);
     }
 
     #[test]
