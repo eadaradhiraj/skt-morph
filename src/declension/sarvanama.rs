@@ -120,9 +120,10 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("sarva".to_string(),"pum".to_string()), vec![vec!["sarvaH".to_string(),"sarvO".to_string(),"sarve".to_string(),],vec!["sarvam".to_string(),"sarvO".to_string(),"sarvAn".to_string(),],vec!["sarveRa".to_string(),"sarvAByAm".to_string(),"sarvEH".to_string(),],vec!["sarvasmE".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasmAt".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasya".to_string(),"sarvayoH".to_string(),"sarvezAm".to_string(),],vec!["sarvasmin".to_string(),"sarvayoH".to_string(),"sarvezu".to_string(),],vec!["sarva".to_string(),"sarvO".to_string(),"sarve".to_string(),],]);
   m.insert(("sarva".to_string(),"stri".to_string()), vec![vec!["sarvA".to_string(),"sarve".to_string(),"sarvAH".to_string(),],vec!["sarvAm".to_string(),"sarve".to_string(),"sarvAH".to_string(),],vec!["sarvayA".to_string(),"sarvAByAm".to_string(),"sarvABiH".to_string(),],vec!["sarvasyE".to_string(),"sarvAByAm".to_string(),"sarvAByaH".to_string(),],vec!["sarvasyAH".to_string(),"sarvAByAm".to_string(),"sarvAByaH".to_string(),],vec!["sarvasyAH".to_string(),"sarvayoH".to_string(),"sarvAsAm".to_string(),],vec!["sarvasyAm".to_string(),"sarvayoH".to_string(),"sarvAsu".to_string(),],vec!["sarve".to_string(),"sarve".to_string(),"sarvAH".to_string(),],]);
   m.insert(("sarva".to_string(),"nap".to_string()), vec![vec!["sarvam".to_string(),"sarve".to_string(),"sarvARi".to_string(),],vec!["sarvam".to_string(),"sarve".to_string(),"sarvARi".to_string(),],vec!["sarveRa".to_string(),"sarvAByAm".to_string(),"sarvEH".to_string(),],vec!["sarvasmE".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasmAt".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasya".to_string(),"sarvayoH".to_string(),"sarvezAm".to_string(),],vec!["sarvasmin".to_string(),"sarvayoH".to_string(),"sarvezu".to_string(),],vec!["sarva".to_string(),"sarve".to_string(),"sarvARi".to_string(),],]);
-  m.insert(("idam".to_string(),"pum".to_string()), vec![vec!["ayam".to_string(),"imO".to_string(),"ime".to_string(),],vec!["imam,enam".to_string(),"imO".to_string(),"imAn".to_string(),],vec!["anena,enena".to_string(),"AByAm".to_string(),"eBiH".to_string(),],vec!["asmE".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asmAt".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"anayoH,enayoH".to_string(),"ezAm".to_string(),],vec!["asmin".to_string(),"anayoH,enayoH".to_string(),"ezu".to_string(),],]);
-  m.insert(("idam".to_string(),"stri".to_string()), vec![vec!["iyam".to_string(),"ime".to_string(),"imAH".to_string(),],vec!["imAm".to_string(),"ime".to_string(),"imAH".to_string(),],vec!["anayA,enayA".to_string(),"AByAm".to_string(),"ABiH".to_string(),],vec!["asyE".to_string(),"AByAm".to_string(),"AByaH".to_string(),],vec!["asyAH".to_string(),"AByAm".to_string(),"AByaH".to_string(),],vec!["asyAH".to_string(),"anayoH,enayoH".to_string(),"AsAm".to_string(),],vec!["asyAm".to_string(),"anayoH,enayoH".to_string(),"Asu".to_string(),],]);
-  m.insert(("idam".to_string(),"nap".to_string()), vec![vec!["idam".to_string(),"ime".to_string(),"imAni".to_string(),],vec!["idam".to_string(),"ime".to_string(),"imAni".to_string(),],vec!["anena,enena".to_string(),"AByAm".to_string(),"eBiH".to_string(),],vec!["asmE".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asmAt".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"anayoH,enayoH".to_string(),"ezAm".to_string(),],vec!["asmin".to_string(),"anayoH,enayoH".to_string(),"ezu".to_string(),],]);
+  // इदम् — 2.4.34 एनः in द्वितीया (एनम्/एनौ/एनान्, एनाम्) plus already एनैन/एनयोः.
+  m.insert(("idam".to_string(),"pum".to_string()), vec![vec!["ayam".to_string(),"imO".to_string(),"ime".to_string(),],vec!["imam,enam".to_string(),"imO,enO".to_string(),"imAn,enAn".to_string(),],vec!["anena,enena".to_string(),"AByAm".to_string(),"eBiH".to_string(),],vec!["asmE".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asmAt".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"anayoH,enayoH".to_string(),"ezAm".to_string(),],vec!["asmin".to_string(),"anayoH,enayoH".to_string(),"ezu".to_string(),],]);
+  m.insert(("idam".to_string(),"stri".to_string()), vec![vec!["iyam".to_string(),"ime".to_string(),"imAH".to_string(),],vec!["imAm,enAm".to_string(),"ime,ene".to_string(),"imAH,enAH".to_string(),],vec!["anayA,enayA".to_string(),"AByAm".to_string(),"ABiH".to_string(),],vec!["asyE".to_string(),"AByAm".to_string(),"AByaH".to_string(),],vec!["asyAH".to_string(),"AByAm".to_string(),"AByaH".to_string(),],vec!["asyAH".to_string(),"anayoH,enayoH".to_string(),"AsAm".to_string(),],vec!["asyAm".to_string(),"anayoH,enayoH".to_string(),"Asu".to_string(),],]);
+  m.insert(("idam".to_string(),"nap".to_string()), vec![vec!["idam".to_string(),"ime".to_string(),"imAni".to_string(),],vec!["idam,enat".to_string(),"ime,ene".to_string(),"imAni,enAni".to_string(),],vec!["anena,enena".to_string(),"AByAm".to_string(),"eBiH".to_string(),],vec!["asmE".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asmAt".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"anayoH,enayoH".to_string(),"ezAm".to_string(),],vec!["asmin".to_string(),"anayoH,enayoH".to_string(),"ezu".to_string(),],]);
   // एतद् — 7.2.106 तदोः सः सावनन्त्ययोः एषः/एषा; 2.4.34 एनः on acc/ins and dual gen/loc (not a separate pratipadika).
   m.insert(("etad".to_string(),"pum".to_string()), vec![vec!["ezaH".to_string(),"etO".to_string(),"ete".to_string(),],vec!["etam,enam".to_string(),"etO".to_string(),"etAn".to_string(),],vec!["etena,enena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH,enayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH,enayoH".to_string(),"etezu".to_string(),],]);
   m.insert(("etad".to_string(),"stri".to_string()), vec![vec!["ezA".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etAm,enAm".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etayA,enayA".to_string(),"etAByAm".to_string(),"etABiH".to_string(),],vec!["etasyE".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etayoH,enayoH".to_string(),"etAsAm".to_string(),],vec!["etasyAm".to_string(),"etayoH,enayoH".to_string(),"etAsu".to_string(),],]);
@@ -199,6 +200,11 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   for linga in ["pum", "stri", "nap"] {
       m.insert(("daSan".to_string(), linga.to_string()), dasan.clone());
   }
+  // कति — संख्या, बहु only (7.1.22 लुक्); all लिङ्ग. कति, कतिभिः, कतीनाम् (6.4.3), कतिषु.
+  let kati = vec![pl("kati"), pl("kati"), pl("katiBiH"), pl("katiByaH"), pl("katiByaH"), pl("katInAm"), pl("katizu")];
+  for linga in ["pum", "stri", "nap"] {
+      m.insert(("kati".to_string(), linga.to_string()), kati.clone());
+  }
   // एकादशन्–नवदशन् — same 7.1.22 class as पञ्चन्; all लिङ्ग; बहु only. षोडशन् not *षष् sandhi.
   for (key, nom) in [
       ("ekAdaSan", "ekAdaSa"),
@@ -235,6 +241,17 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   insert_a_sarvanama(&mut m, "sama", false);
   insert_a_sarvanama(&mut m, "sima", false);
   insert_a_sarvanama(&mut m, "tva", false);
+  // 1.1.34 पूर्वपरावरदक्षिणोत्तरापराधराणि — व्यवस्था: दक्षिण/उत्तर/अवर/अधर like सर्व (already have पूर्व/पर/अपर).
+  insert_a_sarvanama(&mut m, "dakziRa", true);
+  insert_a_sarvanama(&mut m, "uttara", true);
+  insert_a_sarvanama(&mut m, "avara", true);
+  insert_a_sarvanama(&mut m, "aDara", true);
+  // 1.1.33 प्रथमचरमतयाल्पार्धकतिपयनेमाश्च (नेम already). स्मै not *प्रथमाय.
+  insert_a_sarvanama(&mut m, "praTama", false);
+  insert_a_sarvanama(&mut m, "carama", false);
+  insert_a_sarvanama(&mut m, "katipaya", false);
+  insert_a_sarvanama(&mut m, "alpa", false);
+  insert_a_sarvanama(&mut m, "arDa", false);
   m }
 
 // ---------------------------------------------------------------------------
@@ -354,6 +371,10 @@ mod tests {
         has(&i, "tfIyA", "eBiH");
         has(&is, "tfIyA", "anayA");
         has(&is, "saptamI", "Asu");
+        has(&is, "dvitIyA", "enAm");
+        has(&i, "dvitIyA", "enAn");
+        has(&i, "dvitIyA", "enO");
+        has(&generate("idam", "nap").unwrap(), "dvitIyA", "enat");
     }
 
     fn vac_slot<'a>(t: &'a PronounTable, vib: &str, vac: usize) -> &'a str {
@@ -433,6 +454,13 @@ mod tests {
         has(&generate("navan", "stri").expect("nava"), "prathamA", "nava");
         has(&generate("daSan", "nap").expect("daSa"), "prathamA", "daSa");
         has(&generate("daSan", "nap").unwrap(), "saptamI", "daSasu");
+        let kt = generate("kati", "pum").expect("kati");
+        has(&kt, "prathamA", "kati");
+        has(&kt, "tfIyA", "katiBiH");
+        has(&kt, "zazWI", "katInAm");
+        has(&kt, "saptamI", "katizu");
+        assert_eq!(vac_slot(&kt, "prathamA", 3), "kati");
+        assert!(vac_slot(&kt, "prathamA", 1).is_empty());
         assert!(analyze("paYca").iter().any(|m| m.get("pratipadika") == Some(&"paYcan".to_string())));
         assert!(analyze("zaw").iter().any(|m| m.get("pratipadika") == Some(&"zaz".to_string())));
     }
@@ -493,6 +521,12 @@ mod tests {
         has(&generate("tva", "pum").unwrap(), "saptamI", "tvasmin");
         has(&generate("sama", "pum").unwrap(), "prathamA", "same");
         has(&generate("anyatara", "pum").unwrap(), "tfIyA", "anyatareRa");
+        has(&generate("dakziRa", "pum").unwrap(), "caturTI", "dakziRasmE");
+        has(&generate("dakziRa", "pum").unwrap(), "tfIyA", "dakziReRa");
+        has(&generate("uttara", "stri").unwrap(), "prathamA", "uttarA");
+        has(&generate("praTama", "pum").unwrap(), "caturTI", "praTamasmE");
+        has(&generate("katipaya", "nap").unwrap(), "prathamA", "katipayam");
+        has(&generate("arDa", "pum").unwrap(), "tfIyA", "arDena");
         assert!(analyze("katarasmE").iter().any(|m| m.get("pratipadika") == Some(&"katara".to_string())));
     }
 }

@@ -623,5 +623,14 @@ mod tests {
         has(&s, "prathamA", "SatAni");
         let z = generate("zazwi", "stri").expect("zazwi");
         has(&z, "prathamA", "zazwiH");
+        let p = generate("paYcASat", "stri").expect("50");
+        has(&p, "prathamA", "paYcASat");
+        has(&p, "dvitIyA", "paYcASatam");
+        has(&generate("saptati", "stri").unwrap(), "prathamA", "saptatiH");
+        has(&generate("aSIti", "stri").unwrap(), "prathamA", "aSItiH");
+        has(&generate("navati", "stri").unwrap(), "prathamA", "navatiH");
+        let h = generate("sahasra", "nap").expect("sahasra");
+        has(&h, "prathamA", "sahasram");
+        has(&h, "prathamA", "sahasrARi");
     }
 }
