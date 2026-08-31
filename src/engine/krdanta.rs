@@ -170,6 +170,21 @@ fn ktin_form(root: &str) -> String {
     internal_sandhi(&kit_anga(root), "ti")
 }
 
+/// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
+fn kvasu_form(dhatu: &str) -> String {
+    if let Some(forms) = crate::engine::lit::kartari(dhatu, 1, 2, "P") {
+        if let Some(du) = forms.first() {
+            if let Some(anga) = du.strip_suffix("atuH") {
+                if anga.ends_with('v') {
+                    return format!("{anga}as");
+                }
+                return format!("{anga}vas");
+            }
+        }
+    }
+    format!("{}vas", surface_root(dhatu))
+}
+
 fn is_ac(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
@@ -365,7 +380,18 @@ pub fn decline(
     if is_at_participle(pratyaya) && linga == "nap" {
         return satr_nap(&stem);
     }
-    crate::declension::subanta::generate(&stem, linga)
+    let mut d = crate::declension::subanta::generate(&stem, linga)?;
+    // 6.4.14 अत्वसन्तस्य चाधातोः: शतृ has no दीर्घ (भवन् not भवान्). क्तवतु keeps आन्.
+    if matches!(pratyaya, "Satf" | "Satf~") && linga == "pum" {
+        if let Some(row) = d.declension.get_mut("prathamA") {
+            if let Some(nom) = row.first_mut() {
+                if let Some(base) = nom.strip_suffix("An") {
+                    *nom = format!("{base}an");
+                }
+            }
+        }
+    }
+    Some(d)
 }
 
 pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
@@ -399,12 +425,13 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
                     format!("{}ant", base)
                 }
             } else if pratyaya == "SAnac" || pratyaya == "cAnaS" || pratyaya.contains("SAnac") || pratyaya.contains("cAnaS") {
+                // 7.2.82 आने मुक्: keep शप् अ (एधमान not एध्मान).
                 if base.ends_with('a') {
-                    format!("{}mAna", &base[..base.len() - 1])
+                    format!("{}mAna", base)
                 } else if base.ends_with('u') {
                     format!("{}vAna", &base[..base.len() - 1])
                 } else {
-                    format!("{}mAna", base)
+                    format!("{}Ana", base)
                 }
             } else {
                 format!("{}{}", base, suffix)
@@ -420,6 +447,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
                 "tfc" => crate::engine::it::tfc_form(&root),
                 "ktin" => ktin_form(&root),
                 "GaY" | "Rvul" | "ukaY" | "Ryat" => nit_krt_form(&root, pratyaya),
+                "Ramul" => join_eco(&nit_krt_anga(&root, "Rvul"), "am"),
                 "yat" if root.ends_with('A') => format!("{}eya", &root[..root.len() - 1]),
                 _ => join_eco(&guna, suffix),
             }
@@ -430,7 +458,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "anIya" => crate::engine::it::anIya_form(&root),
         "root" if pratyaya == "ktvA" => ktva_base(&dhatu),
         "root" => format!("{}{}", dhatu, suffix),
-        "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap_or('a'), dhatu, suffix),
+        "lit" => kvasu_form(&dhatu),
         "lyap" => lyap_base(&dhatu),
         _ => format!("{}{}", guna, suffix),
     };
@@ -531,7 +559,10 @@ mod tests {
         assert!(pr.iter().any(|x| x == "gatA"), "{:?}", pr);
         let d = decline("BU", "Satf", "pum", &[]).expect("Bavan");
         let pr = d.declension.get("prathamA").unwrap();
-        assert!(pr.iter().any(|x| x == "BavAn"), "{:?}", pr);
+        assert!(pr.iter().any(|x| x == "Bavan"), "{:?}", pr);
+        let d = decline("gamx", "Satf", "pum", &[]).expect("gacCan");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gacCan"), "{:?}", pr);
         let d = decline("BU", "Satf", "stri", &[]).expect("BavantI");
         assert_eq!(d.stem, "BavantI");
         let pr = d.declension.get("prathamA").unwrap();
@@ -556,6 +587,7 @@ mod tests {
         assert!(lingas("lyap").is_empty());
         assert!(lingas("ktvA").is_empty());
         assert!(lingas("tumun").is_empty());
+        assert!(lingas("Ramul").is_empty());
         assert_eq!(lingas("lyuw"), &["nap"]);
         assert_eq!(lingas("ktin"), &["stri"]);
         assert_eq!(lingas("GaY"), &["pum"]);
@@ -609,5 +641,12 @@ mod tests {
         assert_eq!(derive("qukfY", "ktin"), vec!["kfti"]);
         assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
         assert_eq!(derive("zWA", "kta"), vec!["sTita"]);
+        assert_eq!(derive("eDa", "SAnac"), vec!["eDamAna"]);
+        assert_eq!(derive("BU", "SAnac"), vec!["BavamAna"]);
+        assert_eq!(derive("gamx", "Satf"), vec!["gacCat"]);
+        assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
+        assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
+        assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
+        assert!(decline("qukfY", "Ramul", "pum", &[]).is_none());
     }
 }
