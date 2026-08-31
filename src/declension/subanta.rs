@@ -38,34 +38,144 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atam".to_string(),"atI".to_string(),"AMsi".to_string(),],vec!["atA".to_string(),"ByAm".to_string(),"BiH".to_string(),],vec!["ate".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"ByAm".to_string(),"ByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"Am".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"AMsi".to_string(),],]);
   m.insert(("us".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["usA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["use".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"usoH".to_string(),"usAm".to_string(),],vec!["usi".to_string(),"usoH".to_string(),"uHsu".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],]);
   m.insert(("is".to_string(),"nap".to_string()), vec![vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["isA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ise".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"isoH".to_string(),"isAm".to_string(),],vec!["isi".to_string(),"isoH".to_string(),"iHsu".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],]);
-  // o-stem (go-type) for foreign words like apolo -> apolauH
-  m.insert(("o".to_string(),"pum".to_string()), vec![vec!["auH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["Ave".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"oSu".to_string(),],vec!["auH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
-  m.insert(("o".to_string(),"nap".to_string()), vec![vec!["Avam".to_string(),"Ave".to_string(),"AvAni".to_string(),],vec!["Avam".to_string(),"Ave".to_string(),"AvAni".to_string(),],vec!["AvA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["Ave".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"oSu".to_string(),],vec!["auH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
+  // गो: 7.1.90 णित्, 6.1.93 औतोऽम्शसोः (गाम्/गाः), 6.1.78 अव्
+  m.insert(("o".to_string(),"pum".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Am".to_string(),"AvO".to_string(),"AH".to_string(),],vec!["avA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ave".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"avoH".to_string(),"avAm".to_string(),],vec!["avi".to_string(),"avoH".to_string(),"ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
+  m.insert(("o".to_string(),"stri".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Am".to_string(),"AvO".to_string(),"AH".to_string(),],vec!["avA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ave".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"avoH".to_string(),"avAm".to_string(),],vec!["avi".to_string(),"avoH".to_string(),"ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
+  // नौ: औ-anta, 6.1.78 आव् (नावम्, not 6.1.93 गाम्)
+  m.insert(("O".to_string(),"pum".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"OByAm".to_string(),"OBiH".to_string(),],vec!["Ave".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"Ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
+  m.insert(("O".to_string(),"stri".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"OByAm".to_string(),"OBiH".to_string(),],vec!["Ave".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"Ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
   m
 }
 
 
 
-fn apply_natva(word_stem: &str, suffix: &str) -> String {
-    if !suffix.contains('n') { return suffix.to_string(); }
-    let word = format!("{}{}", word_stem, suffix);
-    let n_pos = suffix.find('n').unwrap();
-    let full_n_pos = word_stem.len() + n_pos;
-    if full_n_pos == word.len() - 1 { return suffix.to_string(); }
-    let blockers: std::collections::HashSet<char> = ['c','C','j','J','Y','S','w','W','q','Q','R','t','T','d','D','l','s','S'].iter().cloned().collect();
-    let mut trigger = false;
-    for (i,ch) in word.chars().enumerate() {
-        if i >= full_n_pos { break; }
-        if matches!(ch, 'r'|'f'|'F'|'z') { trigger = true; }
-        else if trigger && blockers.contains(&ch) { trigger = false; }
+fn is_cons(c: char) -> bool {
+    !matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
+}
+
+/// 8.4.40 स्तोः श्चुना श्चुः — न् after ज्/च्/श् → ञ् (राज्ञः).
+fn scutva_n(word: &str) -> String {
+    let c: Vec<char> = word.chars().collect();
+    let mut out = String::with_capacity(word.len());
+    for (i, &ch) in c.iter().enumerate() {
+        if ch == 'n' && i > 0 && matches!(c[i - 1], 'S' | 'c' | 'C' | 'j' | 'J') {
+            out.push('Y');
+        } else {
+            out.push(ch);
+        }
     }
-    if trigger { suffix.replacen('n', "R", 1) } else { suffix.to_string() }
+    out
+}
+
+/// 8.4.1–2 रषाभ्यां नो णः / अट्कुप्वाङ्नुम्व्यवायेऽपि. Not पदान्त न्.
+fn apply_natva_word(word: &str) -> String {
+    let chars: Vec<char> = word.chars().collect();
+    let blockers = [
+        'c', 'C', 'j', 'J', 'Y', 'S', 'w', 'W', 'q', 'Q', 'R', 't', 'T', 'd', 'D', 'l', 's',
+    ];
+    let mut out = chars.clone();
+    for i in 0..chars.len() {
+        if chars[i] != 'n' || i + 1 == chars.len() {
+            continue;
+        }
+        let mut trigger = false;
+        for &ch in &chars[..i] {
+            if matches!(ch, 'r' | 'f' | 'F' | 'z') {
+                trigger = true;
+            } else if trigger && blockers.contains(&ch) {
+                trigger = false;
+            }
+        }
+        if trigger {
+            out[i] = 'R';
+        }
+    }
+    out.into_iter().collect()
+}
+
+fn polish(word: &str) -> String {
+    scutva_n(&apply_natva_word(word))
+}
+
+fn apply_natva(word_stem: &str, suffix: &str) -> String {
+    if !suffix.contains('n') {
+        return suffix.to_string();
+    }
+    let full = apply_natva_word(&format!("{word_stem}{suffix}"));
+    full.chars().skip(word_stem.chars().count()).collect()
+}
+
+/// 6.4.134 अल्लोपोऽनः, blocked by 6.4.137 न संयोगाद्वमन्तात् (आत्मन्, ब्रह्मन्, यज्वन्).
+fn an_al_lopa(pre: &str) -> bool {
+    let c: Vec<char> = pre.chars().collect();
+    match c.as_slice() {
+        [.., a, 'v' | 'm'] if is_cons(*a) => false,
+        _ => true,
+    }
+}
+
+fn decline_an(stem: &str, linga: &str) -> Declension {
+    let pre = stem.strip_suffix("an").unwrap_or(stem);
+    let lopa = an_al_lopa(pre);
+    let weak = |v: &str| {
+        polish(&if lopa {
+            format!("{pre}n{v}")
+        } else {
+            format!("{stem}{v}")
+        })
+    };
+    let strong = |v: &str| polish(&format!("{pre}{v}"));
+    let pada = |v: &str| polish(&format!("{pre}{v}"));
+    let mut sap = vec![weak("i")];
+    if lopa {
+        sap.push(polish(&format!("{stem}i")));
+    }
+    sap.push(weak("oH"));
+    sap.push(pada("asu"));
+    let mut decl = HashMap::new();
+    if linga == "nap" {
+        let mut nom = vec![strong("a"), weak("I"), strong("Ani")];
+        if lopa {
+            nom.insert(1, polish(&format!("{stem}I")));
+        }
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert("tfIyA".into(), vec![weak("A"), pada("aByAm"), pada("aBiH")]);
+        decl.insert("caturTI".into(), vec![weak("e"), pada("aByAm"), pada("aByaH")]);
+        decl.insert("paYcamI".into(), vec![weak("aH"), pada("aByAm"), pada("aByaH")]);
+        decl.insert("zazWI".into(), vec![weak("aH"), weak("oH"), weak("Am")]);
+        decl.insert("saptamI".into(), sap);
+        decl.insert("samboDana".into(), nom);
+    } else {
+        decl.insert(
+            "prathamA".into(),
+            vec![strong("A"), strong("AnO"), strong("AnaH")],
+        );
+        decl.insert(
+            "dvitIyA".into(),
+            vec![strong("Anam"), strong("AnO"), weak("aH")],
+        );
+        decl.insert("tfIyA".into(), vec![weak("A"), pada("aByAm"), pada("aBiH")]);
+        decl.insert("caturTI".into(), vec![weak("e"), pada("aByAm"), pada("aByaH")]);
+        decl.insert("paYcamI".into(), vec![weak("aH"), pada("aByAm"), pada("aByaH")]);
+        decl.insert("zazWI".into(), vec![weak("aH"), weak("oH"), weak("Am")]);
+        decl.insert("saptamI".into(), sap);
+        decl.insert(
+            "samboDana".into(),
+            vec![stem.to_string(), strong("AnO"), strong("AnaH")],
+        );
+    }
+    Declension {
+        stem: stem.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    }
 }
 
 const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf","svasf","naptf"];
 
 pub fn generate(base: &str, linga: &str) -> Option<Declension> {
-    let mut paradigms = paradigms();
+    let paradigms = paradigms();
     // Pāṇini 7.1.9 exception: kinship f-stems keep short a in acc.sg (pitaram), agents take vṛddhi (kartAram <- netAram)
     // We store agent as default (Aram); if kinship, patch dvitīyā eka to aram
     let is_kinship = F_KINSHIP.contains(&base);
@@ -79,6 +189,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     ];
     for cand in cands {
         if cand.is_empty() { continue; }
+        if cand.ends_with("an") && (linga == "pum" || linga == "nap") {
+            return Some(decline_an(&cand, linga));
+        }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
         let mut best_len = 0;
         let mut best_ending = String::new();
@@ -104,8 +217,7 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
                 let mut row: Vec<String> = Vec::new();
                 for suffix_group in &table[i] {
                     for s in suffix_group.split(',') {
-                        let nat = apply_natva(base_no_end, s);
-                        row.push(format!("{}{}", base_no_end, nat));
+                        row.push(polish(&format!("{base_no_end}{s}")));
                     }
                 }
                 decl.insert(vib.to_string(), row);
@@ -129,8 +241,7 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
                 let mut row: Vec<String> = Vec::new();
                 for suffix_group in &table[i] {
                     for s in suffix_group.split(',') {
-                        let nat = apply_natva(base_no_end, s);
-                        row.push(format!("{}{}", base_no_end, nat));
+                        row.push(polish(&format!("{base_no_end}{s}")));
                     }
                 }
                 decl.insert(vib.to_string(), row);
@@ -193,5 +304,49 @@ mod tests {
         assert!(pr.iter().any(|x| x == "nAma"), "{:?}", pr);
         let tr = n.declension.get("tfIyA").unwrap();
         assert!(tr.iter().any(|x| x == "nAmnA"), "{:?}", tr);
+        let sap = d.declension.get("saptamI").unwrap();
+        assert!(sap.iter().any(|x| x == "rAjYi"), "{:?}", sap);
+        assert!(sap.iter().any(|x| x == "rAjani"), "{:?}", sap);
+    }
+
+    fn has(d: &Declension, vib: &str, form: &str) {
+        let row = d.declension.get(vib).unwrap();
+        assert!(row.iter().any(|x| x == form), "{vib} {:?}, want {form}", row);
+    }
+
+    #[test]
+    fn go_nau_from_ot_aut() {
+        let g = generate("go", "pum").expect("go");
+        has(&g, "prathamA", "gOH");
+        has(&g, "dvitIyA", "gAm");
+        has(&g, "dvitIyA", "gAH");
+        has(&g, "tfIyA", "gavA");
+        has(&g, "saptamI", "gavi");
+        has(&g, "saptamI", "gozu");
+        let n = generate("nO", "stri").expect("nO");
+        has(&n, "prathamA", "nOH");
+        has(&n, "dvitIyA", "nAvam");
+        has(&n, "tfIyA", "nAvA");
+        has(&n, "saptamI", "nOzu");
+    }
+
+    #[test]
+    fn atman_brahman_vs_rajan() {
+        let a = generate("Atman", "pum").expect("Atman");
+        has(&a, "prathamA", "AtmA");
+        has(&a, "tfIyA", "AtmanA");
+        has(&a, "zazWI", "AtmanaH");
+        let tr = a.declension.get("tfIyA").unwrap();
+        assert!(!tr.iter().any(|x| x.contains('Y')), "{:?}", tr);
+
+        let b = generate("brahman", "pum").expect("brahman");
+        has(&b, "prathamA", "brahmA");
+        has(&b, "dvitIyA", "brahmARam");
+        has(&b, "tfIyA", "brahmaRA");
+        has(&b, "samboDana", "brahman");
+
+        let r = generate("rAma", "pum").expect("rAma");
+        has(&r, "zazWI", "rAmARAm");
+        has(&r, "tfIyA", "rAmeRa");
     }
 }
