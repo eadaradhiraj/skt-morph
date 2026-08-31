@@ -212,6 +212,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "Sram" {
         return "SrAnta".into(); // श्रान्त
     }
+    // Special: भ्रम् + क्त → भ्रान्त (SLP1 BrAnta) — similarly Bram→BrAnta
+    // sūtra: भ्रम् + क्त → भ्रान्त; future devs: Bram=भ्रम्, BrAnta=भ्रान्त — keep long A, n, B=भ
+    // Extreme: keep BrAnta not Bramta
+    if orig == "Bram" {
+        return "BrAnta".into(); // भ्रान्त
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -779,6 +785,9 @@ mod tests {
         // श्रम् → श्रान्त (SrAnta) — Sram→SrAnta
         assert_eq!(derive("Srama", "kta"), vec!["SrAnta"]); // श्रम् → श्रान्त (Srama is श्रम् with a)
         assert_eq!(derive("Sram", "kta"), vec!["SrAnta"]);
+        // भ्रम् → भ्रान्त (BrAnta) — Bram→BrAnta
+        assert_eq!(derive("Brama", "kta"), vec!["BrAnta"]); // भ्रम् → भ्रान्त (Brama is भ्रम् with a)
+        assert_eq!(derive("Bram", "kta"), vec!["BrAnta"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
