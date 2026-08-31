@@ -73,7 +73,9 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // Future devs: j-stem g/k (वणिक्/वणिजौ), d-stem t/d (सुहृत्/सुहृदौ) — add h→k, B→p similarly
   // Extreme commenting kept for future halanta expansion — h, B next
   m.insert(("j".to_string(),"pum".to_string()), vec![vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"zu".to_string(),],vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],]);
+  m.insert(("j".to_string(),"stri".to_string()), vec![vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"zu".to_string(),],vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],]);
   m.insert(("d".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
+  m.insert(("d".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
   // त-anta (मरुत्, सरित्) — already त् at पद (8.2.39 no change). `at` शतृ stays longer-match.
   m.insert(("t".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tam".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tA".to_string(),"tByAm".to_string(),"tBiH".to_string(),],vec!["te".to_string(),"tByAm".to_string(),"tByaH".to_string(),],vec!["taH".to_string(),"tByAm".to_string(),"tByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],]);
   m.insert(("t".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tam".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tA".to_string(),"tByAm".to_string(),"tBiH".to_string(),],vec!["te".to_string(),"tByAm".to_string(),"tByaH".to_string(),],vec!["taH".to_string(),"tByAm".to_string(),"tByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],]);
@@ -565,6 +567,15 @@ mod tests {
         has(&rc, "dvitIyA", "fcam");
         has(&rc, "tfIyA", "fgByAm");
         has(&rc, "saptamI", "fkzu");
+        // ज/द स्त्री (else fallback आ-stem *परिषदा). परिषद् परिषत्; सृज्-type स्त्री सृक्.
+        let pd = generate("parizad", "stri").expect("parizad");
+        has(&pd, "prathamA", "parizat");
+        has(&pd, "dvitIyA", "parizadam");
+        has(&pd, "tfIyA", "parizadA");
+        has(&pd, "saptamI", "parizatsu");
+        let sj = generate("sfj", "stri").expect("sfj");
+        has(&sj, "prathamA", "sfk");
+        has(&sj, "dvitIyA", "sfjam");
     }
 
     #[test]
