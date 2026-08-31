@@ -765,6 +765,34 @@ mod tests {
     }
 
     #[test]
+    fn gana6_lrt_sutra() {
+        let f = generate_all("06.0001", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "totsyati"), "{:?}", f);
+        let f = generate_all("06.0150", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "srakzyati"), "{:?}", f);
+        let f = generate_all("06.0151", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "maNkzyati"), "{:?}", f);
+        let f = generate_all("06.0143", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "kzezyati"), "{:?}", f);
+        let f = generate_all("06.0134", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "guzyati"), "{:?}", f);
+        let f = generate_all("06.0135", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "Druzyati"), "{:?}", f);
+        let f = generate_all("06.0099", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "Curizyati"), "{:?}", f);
+        let f = generate_all("06.0132", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "nuvizyati"), "{:?}", f);
+        let f = generate_all("06.0130", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "huqizyati"), "{:?}", f);
+        let f = generate_all("06.0046", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "SoBizyati"), "{:?}", f);
+        let f = generate_all("06.0144", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "savizyati"), "{:?}", f);
+        let f = generate_all("06.0136", "alrt", 1, 1);
+        assert!(f.iter().any(|x| x == "kuzyate"), "{:?}", f);
+    }
+
+    #[test]
     fn kram_yam_artha() {
         let vi = vec!["vi".to_string()];
         let f = generate_all_with_prefixes("kramu", "alat", 1, 1, &vi);

@@ -53,25 +53,34 @@ fn g6_skip_future_guna(dhatu: &str) -> bool {
     false
 }
 
-pub fn g6_future_stem(dhatu: &str) -> String {
-    if dhatu == "kzi" { return apply_guna_to_stem(dhatu) + "zya"; }
-    if dhatu == "SuB" { return apply_guna_to_stem(dhatu) + "izya"; }
-    if dhatu == "majj" { return "maNkzy".to_string(); }
-    if dhatu.ends_with("ajj") { return format!("{}arkzya", &dhatu[..1]); }
-    if dhatu == "sfj" { return format!("{}rakzya", &dhatu[..1]); }
-    if dhatu.ends_with('U') { return format!("{}uvizya", &dhatu[..dhatu.len()-1]); }
-    if dhatu.len()==2 && matches!(dhatu.chars().last(), Some('u'|'i')) {
-        if dhatu == "gu" { return format!("{}zya", dhatu); }
+pub fn g6_future_stem(dhatu: &str, antarganas: &str) -> String {
+    // 1.2.1 गाङ्कुटादिभ्यो ञ्णिन्ङित् — गुण blocked for आर्धधातुक.
+    if antarganas.contains("kuwAdi") {
+        // ङ् is 1.3.3 हलन्त्यम् (कुङ् कुष्यते, कूङ् कुविष्यते).
+        let root = dhatu.strip_suffix('N').unwrap_or(dhatu);
+        if root.ends_with('U') {
+            // 6.4.77 उवङ् before इट् (नुविष्यति).
+            return format!("{}uvizya", &root[..root.len() - 1]);
+        }
+        if root.chars().last().is_some_and(|c| matches!(c, 'i' | 'u')) {
+            return format!("{root}zya");
+        }
+        return g6_future_suffix(root);
+    }
+    if crate::engine::it::anit_sya(dhatu) {
+        return crate::engine::it::sya_stem(dhatu);
+    }
+    // 7.2.10 एकाच् i/u-anta: अनिट् स्य, गुण (क्षेष्यति). ऊ is सेट् (सविष्यति).
+    if dhatu.chars().filter(|c| is_vowel_c(*c)).count() == 1
+        && dhatu.chars().last().is_some_and(|c| matches!(c, 'i' | 'u'))
+    {
         return format!("{}zya", apply_guna_to_stem(dhatu));
     }
-    if dhatu == "Dru" { return format!("{}zya", dhatu); }
-    if dhatu.ends_with("fh") { return format!("{}izya", apply_guna_to_stem(dhatu)); }
-    if dhatu == "Cur" { return g6_future_suffix(dhatu); }
-    if dhatu.len()==3 && matches!(dhatu.chars().nth(1), Some('u'|'U')) && dhatu.chars().next().is_some_and(|c| c.is_uppercase()) && dhatu.chars().nth(2).is_some_and(|c| c.is_uppercase()) {
-        let graded = apply_guna_to_stem(dhatu);
-        if graded != dhatu { return format!("{}izya", graded); }
-    }
-    let base = if g6_skip_future_guna(dhatu) { dhatu.to_string() } else { apply_guna_to_stem(dhatu) };
+    let base = if g6_skip_future_guna(dhatu) {
+        dhatu.to_string()
+    } else {
+        apply_guna_to_stem(dhatu)
+    };
     g6_future_suffix(&base)
 }
 
@@ -496,7 +505,7 @@ pub fn derive_stem(
                         return (Some(f), None);
             }
             if gana == 6 {
-                let f = g6_future_stem(dhatu);
+                let f = g6_future_stem(dhatu, antarganas);
                         return (Some(f), None);
             }
             if let Some(yam) = yam_cc_future_stem(dhatu, antarganas) {

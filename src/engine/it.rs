@@ -140,7 +140,8 @@ pub fn sya_stem(root: &str) -> String {
             format!("{g}{it}zya")
         }
     } else {
-        // 6.1.58 सृजिदृशोर्झल्यमकिति: अम्, then यण् (द्रश्, स्रज्) not गुण अर्.
+        // 7.1.60 मस्जिनशोर्झलि (मन्ज्); 6.1.58 सृजिदृशोर्झल्यमकिति: अम् then यण्.
+        let root = masji_nasoh_num(&root);
         let mut g = match root.as_str() {
             "dfS" => "draS".into(),
             "sfj" => "sraj".into(),
@@ -163,6 +164,33 @@ pub fn sya_stem(root: &str) -> String {
         // 8.3.59 आदेशप्रत्यययोः; 8.4.58 परसवर्णः (दङ्क्ष्यति, रङ्क्ष्यति).
         parasavarna_yayi(&sya_ruki(&joined))
     }
+}
+
+/// 7.1.60 मस्जिनशोर्झलि: नुम् after the last vowel (मज्ज् → मन्ज्).
+fn masji_nasoh_num(root: &str) -> String {
+    let r = if root == "masj" {
+        "majj".to_string()
+    } else {
+        root.to_string()
+    };
+    if !matches!(r.as_str(), "majj" | "naS") {
+        return r;
+    }
+    let Some(i) = last_vowel_index(&r) else {
+        return r;
+    };
+    let vlen = r[i..].chars().next().unwrap().len_utf8();
+    let after = &r[i + vlen..];
+    // 8.4.65 झरो झरि सवर्णे — मन्ज्ज् → मन्ज्.
+    let after: String = {
+        let c: Vec<char> = after.chars().collect();
+        if c.len() >= 2 && c[0] == c[1] {
+            c[1..].iter().collect()
+        } else {
+            after.to_string()
+        }
+    };
+    format!("{}n{after}", &r[..i + vlen])
 }
 
 fn sya_ruki(stem: &str) -> String {
@@ -344,6 +372,8 @@ mod tests {
         assert_eq!(sya_stem("stu"), "stozya");
         assert_eq!(sya_stem("dfS"), "drakzya");
         assert_eq!(sya_stem("sfj"), "srakzya");
+        assert_eq!(sya_stem("majj"), "maNkzya");
+        assert_eq!(sya_stem("masj"), "maNkzya");
         assert_eq!(sya_stem("grah"), "grahIzya");
         assert_eq!(sya_stem("han"), "hanizya");
     }
