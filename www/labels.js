@@ -55,6 +55,9 @@ export const LAKARA = {
   avidhilin: "विधिलिङ्",
   plit: "लिट्",
   alit: "लिट्",
+  plun: "लुङ्",
+  alun: "लुङ्",
+  pashirling: "आशीर्लिङ्",
   aling: "आशीर्लिङ्",
   aashirling: "आशीर्लिङ्",
 };

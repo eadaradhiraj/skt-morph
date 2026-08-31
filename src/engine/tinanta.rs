@@ -80,6 +80,16 @@ pub fn live_generate(
             return attach_prefixes(prefixes, forms);
         }
     }
+    if family == "lun" {
+        if let Some(forms) = crate::engine::lun::kartari(&dhatu, purusha, vacana, pada) {
+            return attach_prefixes(prefixes, forms);
+        }
+    }
+    if family == "ashir" {
+        if let Some(forms) = crate::engine::ashir::kartari(&dhatu, purusha, vacana, pada) {
+            return attach_prefixes(prefixes, forms);
+        }
+    }
     let cgana = conjugation_gana(gana, &tags);
     let (stem_opt, augment) = derive_stem(&dhatu, gana, &family, "shuddha", &tags, &antarganas, &aupadeshik);
     let Some(stem) = stem_opt else { return vec![]; };
@@ -205,5 +215,55 @@ mod tests {
         assert!(f.iter().any(|x| x == "cakrire"), "{:?}", f);
         let f = generate_all("RIY", "alit", 1, 1);
         assert!(f.iter().any(|x| x == "ninye"), "{:?}", f);
+    }
+
+    #[test]
+    fn da_dha_stha_lit() {
+        let f = generate_all("qudAY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "dadO"), "{:?}", f);
+        let f = generate_all("quDAY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "daDO"), "{:?}", f);
+        let f = generate_all("zWA", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "tasTO"), "{:?}", f);
+        let f = generate_all("qudAY", "alit", 1, 1);
+        assert!(f.iter().any(|x| x == "dade"), "{:?}", f);
+    }
+
+    #[test]
+    fn ve_vye_hve_lit() {
+        let f = generate_all("veY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "uvAya") && f.iter().any(|x| x == "vavO"), "{:?}", f);
+        let f = generate_all("vyeY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "vivyAya"), "{:?}", f);
+        let f = generate_all("hveY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "juhAva"), "{:?}", f);
+        let f = generate_all("veY", "alit", 1, 1);
+        assert!(f.iter().any(|x| x == "Uve") || f.iter().any(|x| x == "Uye"), "{:?}", f);
+    }
+
+    #[test]
+    fn i_as_lit() {
+        let f = generate_all("iR", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "iyAya"), "{:?}", f);
+        let f = generate_all("asa", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "Asa"), "{:?}", f);
+        let f = generate_all("iN", "alit", 1, 1);
+        assert!(f.iter().any(|x| x == "Iye"), "{:?}", f);
+    }
+
+    #[test]
+    fn lun_ashir_am_bru() {
+        let f = generate_all("BU", "plun", 1, 1);
+        assert!(f.iter().any(|x| x == "aBUt"), "{:?}", f);
+        let f = generate_all("gam", "plun", 1, 1);
+        assert!(f.iter().any(|x| x == "agamat"), "{:?}", f);
+        let f = generate_all("qukfY", "plun", 1, 1);
+        assert!(f.iter().any(|x| x == "akArzIt"), "{:?}", f);
+        let f = generate_all("BU", "pashirling", 1, 1);
+        assert!(f.iter().any(|x| x == "BUyAt"), "{:?}", f);
+        let f = generate_all("eDa", "alit", 1, 1);
+        assert!(f.iter().any(|x| x == "eDAYcakre"), "{:?}", f);
+        let f = generate_all("brUY", "plit", 1, 1);
+        assert!(f.iter().any(|x| x == "uvAca"), "{:?}", f);
     }
 }

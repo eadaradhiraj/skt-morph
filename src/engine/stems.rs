@@ -290,7 +290,6 @@ pub fn derive_stem(
             "zWala" => "sTal".to_string(),
             "Dew" => "Day".to_string(),
             "zE" => "sAy".to_string(),
-            "quyAcf" => "yAc".to_string(),
             _ => unreachable!(),
         }
     } else if dhatu == "zwana" {
@@ -893,21 +892,16 @@ pub fn derive_stem(
                         return (Some(root), None);
             }
             if dhatu == "UWa" {
-                let root = "UW".to_string();
-                        return (Some(root), None);
+                return (Some("UW".to_string()), None);
+            }
             if dhatu == "Divi" {
                 return (Some("Dinu".to_string()), None);
             }
-            }
-            if dhatu == "nIla" {
             if dhatu == "stfkza" {
                 return (Some("stfkz".to_string()), None);
             }
-            if dhatu.ends_with("ikza") {
-                return (Some("nikz".to_string()), None);
-            }
-                let root = "nIl".to_string();
-                        return (Some(root), None);
+            if dhatu == "nIla" {
+                return (Some("nIl".to_string()), None);
             }
             // a-final (siDa->seD) for vidhilin (non-causative, non-YA) — keep long I/U — skip irregular pA etc.
             if (dhatu.ends_with('a') || dhatu.ends_with('A')) && cgana==1 && !is_causative(gana) && gana != YA_GANA && crate::engine::phonology::sad_present_base(dhatu).is_none() {

@@ -90,11 +90,11 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
         }
     }
 
-    // --- default ---
-    // TEMP: allow both P and A. Tighten to 1.3.12–77 (Kaumudī ātmanepada section), not scrape occupancy.
+    // Default: dhātupāṭha pada (1.3.12–77 exceptions are listed above).
     match root_pada {
-        "P" => vec!["P".to_string(), "A".to_string()],
-        "A" => vec!["P".to_string(), "A".to_string()],
+        "P" => vec!["P".to_string()],
+        "A" => vec!["A".to_string()],
+        "U" => vec!["P".to_string(), "A".to_string()],
         _ => vec![root_pada.to_string()],
     }
 }

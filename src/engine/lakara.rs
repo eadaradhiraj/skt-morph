@@ -4,14 +4,16 @@ pub fn normalize_lakara(lakara: &str) -> (String, String) {
     // canonical -> db
     let map: &[(&str,&str)] = &[
         ("plat","plat"),("plrt","plrut"),("plot","plot"),("plan","plang"),("pvidhilin","pvidhiling"),("plit","plit"),
+        ("plun","plun"),("pashirling","pashirling"),
         ("alat","alat"),("alrt","alrut"),("alot","alot"),("alan","alang"),("aling","aashirling"),("alit","alit"),
+        ("alun","alun"),
     ];
     for (c,db) in map { if *c==code { return (c.to_string(), db.to_string()); } }
     // db -> canonical
     let rev: &[(&str,&str)] = &[
         ("plat","plat"),("plrut","plrt"),("plot","plot"),("plang","plan"),("pvidhiling","pvidhilin"),
         ("alat","alat"),("alrut","alrt"),("alot","alot"),("alang","alan"),("aashirling","aling"),("alit","alit"),
-        ("pashirling","pvidhilin"),("plit","plit"),
+        ("plit","plit"),("plun","plun"),("alun","alun"),("pashirling","pashirling"),
     ];
     for (db,c) in rev { if *db==code { return (c.to_string(), db.to_string()); } }
     (code.to_string(), code.to_string())
@@ -23,8 +25,10 @@ pub fn lakara_family(db_lakara: &str) -> Option<String> {
         "plot"|"alot" => Some("lot".into()),
         "plrut"|"alrut" => Some("lrt".into()),
         "plang"|"alang" => Some("lang".into()),
-        "pvidhiling"|"pashirling"|"aashirling"|"avidhiling" => Some("vidhilin".into()),
+        "pvidhiling"|"avidhiling" => Some("vidhilin".into()),
         "plit"|"alit" => Some("lit".into()),
+        "plun"|"alun" => Some("lun".into()),
+        "pashirling"|"aashirling" => Some("ashir".into()),
         _ => None,
     }
 }

@@ -1,4 +1,5 @@
 pub mod analyze;
+pub mod ashir;
 pub mod dhatu;
 pub mod endings;
 pub mod join;
@@ -6,6 +7,7 @@ pub mod krdanta;
 pub mod lakara;
 pub mod lang_ya;
 pub mod lit;
+pub mod lun;
 pub mod phonology;
 pub mod prefix;
 pub mod upa_pada;

@@ -15,9 +15,9 @@ ashtadhyayi.com data (`skt_morph.db`) is an optional **cross-check**. If live �
 
 ## Scope (v1)
 
-In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लोट्, विधिलिङ्, लृट्, लिट्; parasmai and ātmanepada), listed kṛt pratyayas, ending-class सुबन्त (including foreign stems such as ट्रम्प → ट्रम्पेण), सर्वनाम.
+In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लोट्, विधिलिङ्, लृट्, लिट्, लुङ्, आशीर्लिङ्; parasmai and ātmanepada), listed kṛt pratyayas, ending-class सुबन्त (including foreign stems such as ट्रम्प → ट्रम्पेण), सर्वनाम.
 
-Later: ṇic, san, yaṅ; fuller लिट् / लुङ् prakriyā; tighter ātmanepada (1.3.12–77).
+Later: ṇic, san, yaṅ; fuller लुङ् (चङ्/क्स) and ātmanepada 1.3 sūtras beyond the listed exceptions.
 
 `tinanta_overrides.rs` is a temporary patch list where the Kaumudī path is not written yet. New work goes into stems, endings, join, and sandhi — not into that table, and not into scrape rows.
 

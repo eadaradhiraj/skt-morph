@@ -1,7 +1,6 @@
 //! Port of sktmorph/engine/krdanta.py
 use crate::engine::phonology::apply_guna_to_stem;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use crate::engine::join::internal_sandhi;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -52,9 +51,142 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
     }
 }
 
-fn load_dhatu(dhatu_query: &str) -> Option<(String, u8)> {
-    let (dhatu, gana, _, _, _, _) = crate::engine::dhatu::load_or_fallback(dhatu_query);
-    Some((dhatu, gana))
+fn load_dhatu(dhatu_query: &str) -> (String, u8, String, String, String) {
+    let (dhatu, gana, _, tags, ant, aup) = crate::engine::dhatu::load_or_fallback(dhatu_query);
+    (dhatu, gana, tags, ant, aup)
+}
+
+fn surface_root(dhatu: &str) -> String {
+    match crate::engine::lit::prakriya_root(dhatu).as_str() {
+        "RI" => "nI".into(),
+        "brU" => "vac".into(),
+        "zWA" => "sTA".into(),
+        other => other.to_string(),
+    }
+}
+
+fn kta_base(dhatu: &str) -> String {
+    let r = surface_root(dhatu);
+    match r.as_str() {
+        "gam" => "gata".into(),
+        "han" => "hata".into(),
+        "vac" => "ukta".into(),
+        "yaj" => "izwa".into(),
+        "vap" => "upta".into(),
+        "vas" => "uzita".into(),
+        "dA" => "datta".into(),
+        "DA" => "hita".into(),
+        "sTA" => "sTita".into(),
+        "pA" => "pIta".into(),
+        "nI" | "i" => format!("{r}ta"),
+        "kf" => "kfta".into(),
+        "BU" => "BUta".into(),
+        "grah" => "gfhIta".into(),
+        "Sru" => "Sruta".into(),
+        "pat" => "patita".into(),
+        _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
+        _ => internal_sandhi(&r, "ta"),
+    }
+}
+
+fn ktva_base(dhatu: &str) -> String {
+    let ta = kta_base(dhatu);
+    if let Some(stripped) = ta.strip_suffix("ita") {
+        format!("{stripped}itvA")
+    } else if let Some(stripped) = ta.strip_suffix("ta") {
+        format!("{stripped}tvA")
+    } else {
+        format!("{ta}tvA")
+    }
+}
+
+fn lyap_base(dhatu: &str) -> String {
+    let ta = kta_base(dhatu);
+    if let Some(stripped) = ta.strip_suffix("ita") {
+        format!("{stripped}ya")
+    } else if let Some(stripped) = ta.strip_suffix("ta") {
+        format!("{stripped}ya")
+    } else {
+        format!("{ta}ya")
+    }
+}
+
+fn tum_base(dhatu: &str, guna: &str) -> String {
+    match surface_root(dhatu).as_str() {
+        "gam" => "gantum".into(),
+        "kf" => "kartum".into(),
+        "dA" => "dAtum".into(),
+        "BU" => "Bavitum".into(),
+        "nI" => "netum".into(),
+        "vac" => "vaktum".into(),
+        "han" => "hantum".into(),
+        "sTA" => "sTAtum".into(),
+        _ => {
+            let last_c = guna.chars().last().unwrap_or('a');
+            if guna.ends_with('a') || "iIuUfFeEoO".contains(last_c) {
+                let base = if guna.ends_with('a') { &guna[..guna.len() - 1] } else { guna };
+                format!("{base}itum")
+            } else {
+                internal_sandhi(guna, "tum")
+            }
+        }
+    }
+}
+
+pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
+    let forms = derive(dhatu_query, pratyaya);
+    KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
+}
+
+pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
+    let pratyaya_eff = if pratyaya == "ktvA" && !prefixes.is_empty() { "lyap" } else { pratyaya };
+    let forms = derive(dhatu_query, pratyaya_eff);
+    let forms = if prefixes.is_empty() {
+        forms
+    } else {
+        forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect()
+    };
+    KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
+}
+
+pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
+    let (dhatu, gana, tags, ant, aup) = load_dhatu(dhatu_query);
+    let rule = pratyaya_rule(pratyaya);
+    if rule.is_none() {
+        return vec![];
+    }
+    let (suffix, _sutras, mode) = rule.unwrap();
+    let guna = apply_guna_to_stem(&dhatu);
+
+    let form = match mode {
+        "present" => {
+            let (st, _) = crate::engine::stems::derive_stem(&dhatu, gana, "lat", "shuddha", &tags, &ant, &aup);
+            let base = st.unwrap_or_else(|| present_stem(&dhatu, gana));
+            if pratyaya == "Satf" {
+                if base.ends_with('a') { format!("{}at", &base[..base.len()-1]) } else { format!("{}at", base) }
+            } else if pratyaya == "Satf~" {
+                if base.ends_with('a') { format!("{}n", &base[..base.len()-1]) } else { format!("{}ant", base) }
+            } else if pratyaya == "SAnac" || pratyaya == "cAnaS" || pratyaya.contains("SAnac") || pratyaya.contains("cAnaS") {
+                if base.ends_with('a') { format!("{}mAna", &base[..base.len()-1]) } else { format!("{}mAna", base) }
+            } else {
+                format!("{}{}", base, suffix)
+            }
+        }
+        "kta" => {
+            let base = kta_base(&dhatu);
+            if pratyaya.starts_with("ktavatu") { format!("{base}vat") } else { base }
+        }
+        "guna" => format!("{}{}", guna, suffix),
+        "guna_a" => format!("{}a", guna),
+        "guna_tum" => tum_base(&dhatu, &guna),
+        "guna_tavya" => if guna.ends_with('a') { format!("{}itavya", &guna[..guna.len()-1]) } else { format!("{}itavya", guna) },
+        "root" if pratyaya == "ktvA" => ktva_base(&dhatu),
+        "root" => format!("{}{}", dhatu, suffix),
+        "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap_or('a'), dhatu, suffix),
+        "lyap" => lyap_base(&dhatu),
+        _ => format!("{}{}", guna, suffix),
+    };
+    vec![form]
 }
 
 fn present_stem(dhatu: &str, gana: u8) -> String {
@@ -81,74 +213,6 @@ fn present_stem(dhatu: &str, gana: u8) -> String {
     guna
 }
 
-fn kta_stem(dhatu: &str) -> String {
-    if dhatu.len() >= 2 && "iIuUfF".contains(dhatu.chars().last().unwrap()) {
-        return format!("{}ta", dhatu);
-    }
-    format!("{}ta", apply_guna_to_stem(dhatu))
-}
-
-pub fn generate(dhatu_query: &str, pratyaya: &str) -> KrdantaResult {
-    let forms = derive(dhatu_query, pratyaya);
-    KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
-}
-
-pub fn generate_with_prefixes(dhatu_query: &str, pratyaya: &str, prefixes: &[String]) -> KrdantaResult {
-    let forms = derive(dhatu_query, pratyaya);
-    let forms = if prefixes.is_empty() { forms } else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() };
-    KrdantaResult { forms, dhatu: dhatu_query.to_string(), pratyaya: pratyaya.to_string() }
-}
-
-pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
-    let Some((dhatu, gana)) = load_dhatu(dhatu_query) else { return vec![]; };
-    let rule = pratyaya_rule(pratyaya);
-    if rule.is_none() {
-        return vec![];
-    }
-    let (suffix, _sutras, mode) = rule.unwrap();
-    let guna = apply_guna_to_stem(&dhatu);
-
-    let form = match mode {
-        "present" => {
-            let base = present_stem(&dhatu, gana);
-            if pratyaya == "Satf" {
-                if base.ends_with('a') { format!("{}at", &base[..base.len()-1]) } else { format!("{}at", base) }
-            } else if pratyaya == "Satf~" {
-                if base.ends_with('a') { format!("{}n", &base[..base.len()-1]) } else { format!("{}ant", base) }
-            } else if pratyaya == "SAnac" || pratyaya == "cAnaS" || pratyaya.contains("SAnac") || pratyaya.contains("cAnaS") {
-                if base.ends_with('a') { format!("{}mAna", &base[..base.len()-1]) } else { format!("{}mAna", base) }
-            } else {
-                format!("{}{}", base, suffix)
-            }
-        }
-        "kta" => {
-            let base = if dhatu.len() >= 2 && "iIuUfF".contains(dhatu.chars().last().unwrap()) {
-                format!("{}ta", dhatu)
-            } else {
-                internal_sandhi(&dhatu, "ta")
-            };
-            if pratyaya.starts_with("ktavatu") { format!("{}vat", base) } else { base }
-        }
-        "guna" => format!("{}{}", guna, suffix),
-        "guna_a" => format!("{}a", guna),
-        "guna_tum" => {
-            let last_c = guna.chars().last().unwrap_or('a');
-            if guna.ends_with('a') || "iIuUfFeEoO".contains(last_c) {
-                let base = if guna.ends_with('a') { &guna[..guna.len()-1] } else { &guna };
-                format!("{}itum", base)
-            } else {
-                internal_sandhi(&guna, "tum")
-            }
-        },
-        "guna_tavya" => if guna.ends_with('a') { format!("{}itavya", &guna[..guna.len()-1]) } else { format!("{}itavya", guna) },
-        "root" => format!("{}{}", dhatu, suffix),
-        "lit" => format!("{}a{}{}", dhatu.chars().next().unwrap_or('a'), dhatu, suffix),
-        "lyap" => format!("{}{}", dhatu, suffix),
-        _ => format!("{}{}", guna, suffix),
-    };
-    vec![form]
-}
-
 // Optional scrape probe (not the spec).
 pub fn validate_against_gold(dhatu_id: &str, pratyaya: &str) -> Option<(String, String)> {
     let p = format!("/home/edhiraj/Documents/projs/skt-morph-data/data/{}/{}.json", &dhatu_id[..2], dhatu_id);
@@ -167,6 +231,18 @@ mod tests {
     #[test]
     fn bu_kta() {
         let f = derive("BU", "kta");
-        assert!(f.iter().any(|x| x == "BUta" || x.starts_with("BUta")), "{:?}", f);
+        assert!(f.iter().any(|x| x == "BUta"), "{:?}", f);
+    }
+
+    #[test]
+    fn gam_kf_vac_da_kta() {
+        assert_eq!(derive("gam", "kta"), vec!["gata"]);
+        assert_eq!(derive("qukfY", "kta"), vec!["kfta"]);
+        assert_eq!(derive("vaca", "kta"), vec!["ukta"]);
+        assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
+        assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
+        assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
+        let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
+        assert!(f.forms.iter().any(|x| x == "praBUya"), "{:?}", f.forms);
     }
 }

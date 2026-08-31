@@ -5,6 +5,11 @@
 //! 6.4.120 अत एकहलमध्येऽनादेशादेर्लिटि; 6.4.77 उवङ् (ū before a vowel);
 //! 6.1.15 वचिस्वपियजादीनां किति; 6.1.17 लिट्यभ्यासस्योभयेषाम्;
 //! 7.2.115 अचो ञ्णिति (vṛddhi of i/u/ṛ); 6.4.77/82 iyṅ uvṅ;
+//! 7.1.34 आत औ णलः; 6.4.64 आतो लोप इटि च; 6.1.45 आदेच उपदेशेऽशिति;
+//! 6.1.64 धात्वादेः षः सः; 2.4.41 वेञो वयिः; 6.1.37 लिटि वयो यः;
+//! 6.1.38 वश्चास्यान्यतरस्यां किति; 6.1.39 वेञः; 6.1.33 अभ्यस्तस्य च (ह्वे);
+//! 6.1.46 न व्यो लिटि; 7.4.69 दीर्घ इणः किति; 7.4.70 अत आदेः; 7.4.71 तस्मान्नुड् द्विहलः;
+//! 6.4.78 अभ्यासस्यासवर्णे; 6.4.81 इणो यण्; 2.4.53 ब्रुवो वचिः; 3.1.35–36 आम्;
 //! 3.4.81 लिटस्तझयोरेशिरेच्; 3.4.82 णलतुसुस्थलथुसणल्वमाः; 7.1.91 णलुत्तमो वा.
 
 /// Kartari forms for one cell. `purusha` 1 = प्रथम (3rd), 3 = उत्तम (1st).
@@ -12,13 +17,60 @@
 pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<String>> {
     let root = match prakriya_root(dhatu).as_str() {
         "RI" => "nI".to_string(),
+        "brU" => "vac".to_string(),
         other => other.to_string(),
     };
-    let a = angas(&root)?;
-    if pada == "A" {
-        Some(paradigm_atmane(&a, purusha, vacana))
-    } else {
-        Some(paradigm(&a, purusha, vacana))
+    if takes_am(&root) {
+        return Some(am_paradigm(&root, purusha, vacana, pada));
+    }
+    let list = all_angas(&root)?;
+    let mut out = Vec::new();
+    for a in &list {
+        let forms = if pada == "A" {
+            paradigm_atmane(a, purusha, vacana)
+        } else {
+            paradigm(a, purusha, vacana)
+        };
+        for f in forms {
+            if !out.contains(&f) {
+                out.push(f);
+            }
+        }
+    }
+    Some(out)
+}
+
+/// वे: 2.4.41 वयिः (उवाय, ऊयतुः / 6.1.38 ऊवतुः) and 6.1.39 आत्व (ववौ).
+/// व्ये: 6.1.46 no आत्व → विव्याय. ह्वे: 6.1.33 → हु → जुहाव.
+fn all_angas(root: &str) -> Option<Vec<Angas>> {
+    match root {
+        "ve" => Some(vec![
+            Angas {
+                strong: "uvAy".into(),
+                weak: "Uy".into(),
+                full: "uvay".into(),
+                thal_anit: None,
+            },
+            Angas {
+                strong: "uvAy".into(),
+                weak: "Uv".into(),
+                full: "uvay".into(),
+                thal_anit: None,
+            },
+            a_final_angas("vA"),
+        ]),
+        "vye" => Some(vec![Angas {
+            strong: "vivyAy".into(),
+            weak: "vivy".into(),
+            full: "vivyay".into(),
+            thal_anit: None,
+        }]),
+        "hve" => {
+            let mut a = i_u_f_angas("hu")?;
+            a.thal_anit = Some("juhoTa".into());
+            Some(vec![a])
+        }
+        _ => angas(root).map(|a| vec![a]),
     }
 }
 
@@ -32,7 +84,7 @@ struct Angas {
     thal_anit: Option<String>,
 }
 
-fn prakriya_root(dhatu: &str) -> String {
+pub(crate) fn prakriya_root(dhatu: &str) -> String {
     let mut s: String = dhatu.trim_end_matches('~').into();
     if s.starts_with("qu") && s.len() > 3 {
         s = s[2..].to_string();
@@ -40,18 +92,29 @@ fn prakriya_root(dhatu: &str) -> String {
     if s.starts_with("Yi") && s.len() > 3 {
         s = s[2..].to_string();
     }
-    for it in ["ir", "x", "Y", "R", "N", "o", "A", "I", "U", "F", "e", "E", "i", "u", "f"] {
-        if s.len() > it.len() && s.ends_with(it) {
-            let rest = &s[..s.len() - it.len()];
-            if rest.chars().any(|c| "aAiIuUfFeEoOxX".contains(c)) {
-                s = rest.to_string();
-                break;
+    // ओकार इत् (ohAk → hAk, ovE → vE).
+    if s.starts_with('o') && s.len() > 2 && s.chars().nth(1).is_some_and(is_cons) {
+        s = s[1..].to_string();
+    }
+    // जक्षादि: जागृ / दरिद्रा keep the final vowel; it is not इत्.
+    let skip_it = matches!(s.as_str(), "jAgf" | "daridrA");
+    if !skip_it {
+        for it in ["ir", "x", "Y", "R", "N", "k", "o", "A", "I", "U", "F", "e", "E", "i", "u", "f"] {
+            if s.len() > it.len() && s.ends_with(it) {
+                let rest = &s[..s.len() - it.len()];
+                if rest.chars().any(|c| "aAiIuUfFeEoOxX".contains(c)) {
+                    s = rest.to_string();
+                    break;
+                }
             }
         }
     }
-    if s.ends_with('a') && s.len() >= 4 {
+    if s.ends_with('a') && s.len() >= 3 {
         let core: String = s.chars().take(s.chars().count() - 1).collect();
         if is_cac(&core)
+            || is_a_plus_cons(&core)
+            || is_cluster_cac(&core)
+            || ic_adi(core.chars().next())
             || matches!(
                 core.as_str(),
                 "han" | "jan" | "Kan" | "Gas" | "yam" | "tap" | "vac" | "yaj" | "vap" | "vah"
@@ -71,6 +134,69 @@ fn is_cons(c: char) -> bool {
 fn is_cac(s: &str) -> bool {
     let c: Vec<char> = s.chars().collect();
     c.len() == 3 && is_cons(c[0]) && c[1] == 'a' && is_cons(c[2])
+}
+
+fn is_a_plus_cons(s: &str) -> bool {
+    let c: Vec<char> = s.chars().collect();
+    c.len() == 2 && c[0] == 'a' && is_cons(c[1])
+}
+
+fn ic_adi(c: Option<char>) -> bool {
+    matches!(c, Some('i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'o' | 'E' | 'O'))
+}
+
+fn is_guru_root(root: &str) -> bool {
+    let c: Vec<char> = root.chars().collect();
+    for (i, &ch) in c.iter().enumerate() {
+        if matches!(ch, 'A' | 'I' | 'U' | 'F' | 'e' | 'o' | 'E' | 'O') {
+            return true;
+        }
+        if !is_cons(ch) && i + 2 < c.len() && is_cons(c[i + 1]) && is_cons(c[i + 2]) {
+            return true;
+        }
+    }
+    false
+}
+
+/// 3.1.35 कास्प्रत्ययादाममन्त्रे लिटि; 3.1.36 इजादेश्च गुरुमतोऽनृच्छः.
+fn takes_am(root: &str) -> bool {
+    if matches!(root, "kAs" | "As") {
+        return true;
+    }
+    if matches!(root, "fcC" | "fC" | "f") {
+        return false;
+    }
+    ic_adi(root.chars().next()) && is_guru_root(root)
+}
+
+fn join_am(am: &str, aux: &str) -> String {
+    if aux.starts_with('c') || aux.starts_with('C') {
+        let base: String = am.chars().take(am.chars().count().saturating_sub(1)).collect();
+        return format!("{base}Y{aux}");
+    }
+    format!("{am}{aux}")
+}
+
+fn am_paradigm(root: &str, purusha: u8, vacana: u8, pada: &str) -> Vec<String> {
+    let am = format!("{root}Am");
+    let mut out = Vec::new();
+    let push_aux = |out: &mut Vec<String>, aux_dhatu: &str, p: &str| {
+        if let Some(forms) = kartari(aux_dhatu, purusha, vacana, p) {
+            for f in forms {
+                let j = join_am(&am, &f);
+                if !out.contains(&j) {
+                    out.push(j);
+                }
+            }
+        }
+    };
+    push_aux(&mut out, "qukfY", pada);
+    push_aux(&mut out, "asa", "P");
+    push_aux(&mut out, "BU", "P");
+    if pada == "A" {
+        push_aux(&mut out, "BU", "A");
+    }
+    out
 }
 
 fn is_sar(c: char) -> bool {
@@ -139,6 +265,66 @@ fn lopa_upadha(root: &str) -> String {
 fn e_grade_cac(root: &str) -> String {
     let c: Vec<char> = root.chars().collect();
     format!("{}e{}", c[0], c[2])
+}
+
+/// 6.1.45 आदेच उपदेशेऽशिति — e/o/ai/au → ā, except वे/व्ये/ह्वे (यजादि).
+fn adech(root: &str) -> String {
+    if matches!(root, "ve" | "vye" | "hve") {
+        return root.to_string();
+    }
+    let mut c: Vec<char> = root.chars().collect();
+    if let Some(last) = c.last_mut() {
+        if matches!(*last, 'e' | 'o' | 'E' | 'O') {
+            *last = 'A';
+        }
+    }
+    c.into_iter().collect()
+}
+
+/// 6.1.64 धात्वादेः षः सः, and undo ष्टुत्व on the next consonant (ष्ठा → स्था, ष्णा → स्ना).
+fn dhatvadeh_sas(root: &str) -> String {
+    let mut c: Vec<char> = root.chars().collect();
+    if c.first() != Some(&'z') {
+        return root.to_string();
+    }
+    c[0] = 's';
+    if let Some(second) = c.get_mut(1) {
+        *second = match *second {
+            'w' => 't',
+            'W' => 'T',
+            'q' => 'd',
+            'Q' => 'D',
+            'R' => 'n',
+            'z' => 's',
+            x => x,
+        };
+    }
+    c.into_iter().collect()
+}
+
+/// 7.1.34 आत औ णलः; 6.4.64 आ-lopa in kit / before iṭ.
+fn a_final_angas(root: &str) -> Angas {
+    let abh = abhyasa(root);
+    let strong = format!("{abh}{root}");
+    let weak: String = strong.chars().take(strong.chars().count() - 1).collect();
+    Angas {
+        strong: strong.clone(),
+        weak: weak.clone(),
+        full: weak,
+        thal_anit: Some(format!("{strong}Ta")),
+    }
+}
+
+/// णल् surface: CaC gets अ; आ-anta gets औ (7.1.34).
+fn nal_form(a: &Angas) -> String {
+    if a.strong.ends_with('A') {
+        let mut s = a.strong.clone();
+        s.pop();
+        s.push('O');
+        s
+    } else {
+        format!("{}a", a.strong)
+    }
 }
 
 /// 6.1.15: vaC / yaC → uC / iC (व्/य् + अ → उ/इ).
@@ -217,6 +403,23 @@ fn split_onset_vowel(root: &str) -> Option<(String, char)> {
 
 /// ī/i → āy / y; u → āv / uv; ṛ → ār / r. अभ्यास vowel is hrasva (7.4.59).
 fn i_u_f_angas(root: &str) -> Option<Angas> {
+    if root == "i" {
+        // 7.4.69 दीर्घ इणः किति; 6.4.78 इयङ्; थल् वेट् इयेथ.
+        return Some(Angas {
+            strong: "iyAy".into(),
+            weak: "Iy".into(),
+            full: "iyay".into(),
+            thal_anit: Some("iyeTa".into()),
+        });
+    }
+    if root == "f" {
+        return Some(Angas {
+            strong: "Ar".into(),
+            weak: "Ar".into(),
+            full: "Ar".into(),
+            thal_anit: None,
+        });
+    }
     if root == "ji" {
         return Some(Angas {
             strong: "jigAy".into(),
@@ -258,7 +461,46 @@ fn i_u_f_angas(root: &str) -> Option<Angas> {
     }
 }
 
+/// 7.4.70 अत आदेः; 7.4.71 तस्मान्नुड् द्विहलः.
+fn a_initial_angas(root: &str) -> Option<Angas> {
+    let c: Vec<char> = root.chars().collect();
+    if c.len() == 2 && c[0] == 'a' && is_cons(c[1]) {
+        let stem = format!("A{}", c[1]);
+        return Some(Angas {
+            strong: stem.clone(),
+            weak: stem.clone(),
+            full: stem,
+            thal_anit: None,
+        });
+    }
+    if c.len() == 3 && c[0] == 'a' && is_cons(c[1]) && is_cons(c[2]) {
+        let c1 = if c[1] == 'n' && matches!(c[2], 'c' | 'C' | 'j' | 'J') {
+            'Y'
+        } else {
+            c[1]
+        };
+        let stem = format!("An{}{}", c1, c[2]);
+        return Some(Angas {
+            strong: stem.clone(),
+            weak: stem.clone(),
+            full: stem,
+            thal_anit: None,
+        });
+    }
+    None
+}
+
+fn is_cluster_cac(s: &str) -> bool {
+    let c: Vec<char> = s.chars().collect();
+    c.len() >= 4
+        && is_cons(c[c.len() - 1])
+        && c[c.len() - 2] == 'a'
+        && c[..c.len() - 2].iter().all(|&x| is_cons(x))
+}
+
 fn angas(root: &str) -> Option<Angas> {
+    let root = adech(root);
+    let root = dhatvadeh_sas(&root);
     if root == "BU" {
         return Some(Angas {
             strong: "baBUv".into(),
@@ -267,7 +509,23 @@ fn angas(root: &str) -> Option<Angas> {
             thal_anit: None,
         });
     }
-    if let Some(a) = vacadi_angas(root) {
+    if root == "jAgf" {
+        return Some(Angas {
+            strong: "jAgAr".into(),
+            weak: "jAgar".into(),
+            full: "jAgar".into(),
+            thal_anit: None,
+        });
+    }
+    if root == "daridrA" {
+        return Some(Angas {
+            strong: "daridrA".into(),
+            weak: "daridr".into(),
+            full: "daridr".into(),
+            thal_anit: Some("daridrATa".into()),
+        });
+    }
+    if let Some(a) = vacadi_angas(&root) {
         return Some(a);
     }
     if root == "grah" {
@@ -278,10 +536,16 @@ fn angas(root: &str) -> Option<Angas> {
             thal_anit: None,
         });
     }
-    if let Some(a) = i_u_f_angas(root) {
+    if let Some(a) = i_u_f_angas(&root) {
         return Some(a);
     }
-    match root {
+    if root.ends_with('A') && root.chars().count() >= 2 {
+        return Some(a_final_angas(&root));
+    }
+    if let Some(a) = a_initial_angas(&root) {
+        return Some(a);
+    }
+    match root.as_str() {
         "han" => {
             return Some(Angas {
                 strong: "jaGAn".into(),
@@ -308,14 +572,25 @@ fn angas(root: &str) -> Option<Angas> {
         }
         _ => {}
     }
-    if !is_cac(root) {
+    if is_cluster_cac(&root) {
+        let abh = abhyasa(&root);
+        let strong = format!("{}{}", abh, vrddhi_upadha(&root));
+        let full = format!("{abh}{root}");
+        return Some(Angas {
+            strong,
+            weak: full.clone(),
+            full,
+            thal_anit: None,
+        });
+    }
+    if !is_cac(&root) {
         return None;
     }
-    let abh = abhyasa(root);
-    let strong = format!("{}{}", abh, vrddhi_upadha(root));
+    let abh = abhyasa(&root);
+    let strong = format!("{}{}", abh, vrddhi_upadha(&root));
     let full = format!("{abh}{root}");
-    if matches!(root, "gam" | "Kan") {
-        let weak = format!("{}{}", abh, lopa_upadha(root));
+    if matches!(root.as_str(), "gam" | "Kan") {
+        let weak = format!("{}{}", abh, lopa_upadha(&root));
         let thal_anit = (root == "gam").then(|| "jaganTa".into());
         return Some(Angas {
             strong,
@@ -326,14 +601,14 @@ fn angas(root: &str) -> Option<Angas> {
     }
     Some(Angas {
         strong,
-        weak: e_grade_cac(root),
+        weak: e_grade_cac(&root),
         full,
         thal_anit: None,
     })
 }
 
 fn paradigm(a: &Angas, purusha: u8, vacana: u8) -> Vec<String> {
-    let nal = format!("{}a", a.strong);
+    let nal = nal_form(a);
     match (purusha, vacana) {
         (1, 1) => vec![nal],
         (1, 2) => vec![format!("{}atuH", a.weak)],
@@ -483,5 +758,82 @@ mod tests {
         assert_eq!(kartari("graha", 1, 1, "A").unwrap(), vec!["jagfhe"]);
         assert_eq!(kartari("BU", 1, 1, "A").unwrap(), vec!["baBUve"]);
         assert_eq!(kartari("gamx", 1, 1, "A").unwrap(), vec!["jagme"]);
+    }
+
+    #[test]
+    fn da_dha_stha_lit() {
+        assert_eq!(kartari("qudAY", 1, 1, "P").unwrap(), vec!["dadO"]);
+        assert_eq!(kartari("qudAY", 1, 2, "P").unwrap(), vec!["dadatuH"]);
+        assert_eq!(kartari("qudAY", 1, 3, "P").unwrap(), vec!["daduH"]);
+        let u1 = kartari("qudAY", 3, 1, "P").unwrap();
+        assert!(u1.iter().any(|x| x == "dadO") && u1.iter().any(|x| x == "dada"), "{:?}", u1);
+        let t2 = kartari("qudAY", 2, 1, "P").unwrap();
+        assert!(t2.iter().any(|x| x == "dadiTa") && t2.iter().any(|x| x == "dadATa"), "{:?}", t2);
+        assert_eq!(kartari("qudAY", 1, 1, "A").unwrap(), vec!["dade"]);
+        assert_eq!(kartari("quDAY", 1, 1, "P").unwrap(), vec!["daDO"]);
+        assert_eq!(kartari("quDAY", 1, 2, "P").unwrap(), vec!["daDatuH"]);
+        assert_eq!(kartari("quDAY", 1, 1, "A").unwrap(), vec!["daDe"]);
+        assert_eq!(kartari("zWA", 1, 1, "P").unwrap(), vec!["tasTO"]);
+        assert_eq!(kartari("zWA", 1, 2, "P").unwrap(), vec!["tasTatuH"]);
+        assert_eq!(kartari("pA", 1, 1, "P").unwrap(), vec!["papO"]);
+        assert_eq!(kartari("gA", 1, 1, "P").unwrap(), vec!["jagO"]);
+        assert_eq!(kartari("ohAk", 1, 1, "P").unwrap(), vec!["jahO"]);
+        assert_eq!(kartari("glE", 1, 1, "P").unwrap(), vec!["jaglO"]);
+        assert_eq!(kartari("mAN", 1, 1, "A").unwrap(), vec!["mame"]);
+    }
+
+    #[test]
+    fn ve_vye_hve_lit() {
+        let f = kartari("veY", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "uvAya"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "vavO"), "{:?}", f);
+        let f = kartari("veY", 1, 2, "P").unwrap();
+        assert!(f.iter().any(|x| x == "UyatuH"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "UvatuH"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "vavatuH"), "{:?}", f);
+        let f = kartari("veY", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "Uye"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "Uve"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "vave"), "{:?}", f);
+        assert_eq!(kartari("vyeY", 1, 1, "P").unwrap(), vec!["vivyAya"]);
+        assert_eq!(kartari("vyeY", 1, 2, "P").unwrap(), vec!["vivyatuH"]);
+        assert_eq!(kartari("vyeY", 1, 1, "A").unwrap(), vec!["vivye"]);
+        assert_eq!(kartari("hveY", 1, 1, "P").unwrap(), vec!["juhAva"]);
+        assert_eq!(kartari("hveY", 1, 2, "P").unwrap(), vec!["juhuvatuH"]);
+        assert_eq!(kartari("hveY", 1, 1, "A").unwrap(), vec!["juhuve"]);
+        let t2 = kartari("hveY", 2, 1, "P").unwrap();
+        assert!(t2.iter().any(|x| x == "juhaviTa") && t2.iter().any(|x| x == "juhoTa"), "{:?}", t2);
+    }
+
+    #[test]
+    fn i_as_lit() {
+        assert_eq!(kartari("iR", 1, 1, "P").unwrap(), vec!["iyAya"]);
+        assert_eq!(kartari("iR", 1, 2, "P").unwrap(), vec!["IyatuH"]);
+        assert_eq!(kartari("iR", 1, 3, "P").unwrap(), vec!["IyuH"]);
+        let t2 = kartari("iR", 2, 1, "P").unwrap();
+        assert!(t2.iter().any(|x| x == "iyayiTa") && t2.iter().any(|x| x == "iyeTa"), "{:?}", t2);
+        let u1 = kartari("iR", 3, 1, "P").unwrap();
+        assert!(u1.iter().any(|x| x == "iyAya") && u1.iter().any(|x| x == "iyaya"), "{:?}", u1);
+        assert_eq!(kartari("iN", 1, 1, "A").unwrap(), vec!["Iye"]);
+        assert_eq!(kartari("asa", 1, 1, "P").unwrap(), vec!["Asa"]);
+        assert_eq!(kartari("asa", 1, 2, "P").unwrap(), vec!["AsatuH"]);
+        assert_eq!(kartari("asa", 1, 3, "P").unwrap(), vec!["AsuH"]);
+        assert_eq!(kartari("ada", 1, 1, "P").unwrap(), vec!["Ada"]);
+        assert_eq!(kartari("awa", 1, 1, "P").unwrap(), vec!["Awa"]);
+        assert_eq!(kartari("f", 1, 1, "P").unwrap(), vec!["Ara"]);
+    }
+
+    #[test]
+    fn am_bru_jagf_nut() {
+        let f = kartari("eDa", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "eDAYcakre"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "eDAmAsa"), "{:?}", f);
+        let f = kartari("brUY", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "uvAca"), "{:?}", f);
+        assert_eq!(kartari("jAgf", 1, 1, "P").unwrap(), vec!["jAgAra"]);
+        assert_eq!(kartari("jAgf", 1, 2, "P").unwrap(), vec!["jAgaratuH"]);
+        assert_eq!(kartari("anjU", 1, 1, "P").unwrap(), vec!["AnYja"]);
+        assert!(kartari("tyaja", 1, 1, "P").unwrap().iter().any(|x| x == "tatyAja"));
+        assert_eq!(kartari("daridrA", 1, 1, "P").unwrap(), vec!["daridrO"]);
     }
 }

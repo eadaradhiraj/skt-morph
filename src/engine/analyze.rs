@@ -34,7 +34,7 @@ static KRDANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 
 const LAKARAS: &[&str] = &[
     "plat", "alat", "plan", "alan", "plot", "alot", "plrt", "alrt",
-    "pvidhilin", "avidhilin", "plit", "alit",
+    "pvidhilin", "avidhilin", "plit", "alit", "plun", "alun", "pashirling", "aashirling",
 ];
 
 const KRTS: &[&str] = &[
