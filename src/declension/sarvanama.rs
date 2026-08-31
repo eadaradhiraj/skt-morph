@@ -20,6 +20,23 @@ fn du(s: &str) -> Vec<String> {
 fn pl(s: &str) -> Vec<String> {
     vec![String::new(), String::new(), s.to_string()]
 }
+/// उभय etc.: एक + बहु, no द्विवचन (अर्थ already dual).
+fn sg_pl(eka: &str, bahu: &str) -> Vec<String> {
+    vec![eka.to_string(), String::new(), bahu.to_string()]
+}
+/// पञ्चन्-class: 7.1.22 लुक्; `nom` is the vowel-final surface (paYca, ekAdaSa).
+fn an_sankhya(nom: &str) -> Vec<Vec<String>> {
+    let stem = nom.trim_end_matches('a');
+    vec![
+        pl(nom),
+        pl(nom),
+        vec![String::new(), String::new(), format!("{nom}BiH")],
+        vec![String::new(), String::new(), format!("{nom}ByaH")],
+        vec![String::new(), String::new(), format!("{nom}ByaH")],
+        vec![String::new(), String::new(), format!("{stem}AnAm")],
+        vec![String::new(), String::new(), format!("{nom}su")],
+    ]
+}
 
 /// Query aliases (gold `tri`/`uBa`/`zaz`; old scrape keys `traya`/`ubha`/`zaq`/`paJcan`).
 fn canon_sarvanama(base: &str) -> &str {
@@ -32,6 +49,16 @@ fn canon_sarvanama(base: &str) -> &str {
         "azwa" => "azwan",
         "nava" => "navan",
         "daSa" => "daSan",
+        "ekAdaSa" => "ekAdaSan",
+        "dvAdaSa" => "dvAdaSan",
+        "trayodaSa" => "trayodaSan",
+        "caturdaSa" => "caturdaSan",
+        "paYcadaSa" => "paYcadaSan",
+        "zoqaSa" => "zoqaSan",
+        "saptadaSa" => "saptadaSan",
+        "azwAdaSa" => "azwAdaSan",
+        "navadaSa" => "navadaSan",
+        "ubhaya" => "uBaya",
         other => other,
     }
 }
@@ -42,22 +69,23 @@ fn canon_sarvanama(base: &str) -> &str {
 // ---------------------------------------------------------------------------
 fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap::new();
   m.insert(("tad".to_string(),"pum".to_string()), vec![vec!["saH".to_string(),"tO".to_string(),"te".to_string(),],vec!["tam".to_string(),"tO".to_string(),"tAn".to_string(),],vec!["tena".to_string(),"tAByAm".to_string(),"tEH".to_string(),],vec!["tasmE".to_string(),"tAByAm".to_string(),"teByaH".to_string(),],vec!["tasmAt".to_string(),"tAByAm".to_string(),"teByaH".to_string(),],vec!["tasya".to_string(),"tayoH".to_string(),"tezAm".to_string(),],vec!["tasmin".to_string(),"tayoH".to_string(),"tezu".to_string(),],]);
-  m.insert(("tad".to_string(),"stri".to_string()), vec![vec!["sA".to_string(),"te".to_string(),"tAH".to_string(),],vec!["tAm".to_string(),"te".to_string(),"tAH".to_string(),],vec!["tayA".to_string(),"tAByAm".to_string(),"tABiH".to_string(),],vec!["tasyE".to_string(),"tAByAm".to_string(),"tAByaH".to_string(),],vec!["tasyAH".to_string(),"tAByAm".to_string(),"tAByaH".to_string(),],vec!["tasyAH".to_string(),"tayoH".to_string(),"tAsAm".to_string(),],vec!["tasyAm".to_string(),"tayoH".to_string(),"tAzu".to_string(),],]);
+  m.insert(("tad".to_string(),"stri".to_string()), vec![vec!["sA".to_string(),"te".to_string(),"tAH".to_string(),],vec!["tAm".to_string(),"te".to_string(),"tAH".to_string(),],vec!["tayA".to_string(),"tAByAm".to_string(),"tABiH".to_string(),],vec!["tasyE".to_string(),"tAByAm".to_string(),"tAByaH".to_string(),],vec!["tasyAH".to_string(),"tAByAm".to_string(),"tAByaH".to_string(),],vec!["tasyAH".to_string(),"tayoH".to_string(),"tAsAm".to_string(),],vec!["tasyAm".to_string(),"tayoH".to_string(),"tAsu".to_string(),],]);
   m.insert(("tad".to_string(),"nap".to_string()), vec![vec!["tat".to_string(),"te".to_string(),"tAni".to_string(),],vec!["tat".to_string(),"te".to_string(),"tAni".to_string(),],vec!["tena".to_string(),"tAByAm".to_string(),"tEH".to_string(),],vec!["tasmE".to_string(),"tAByAm".to_string(),"teByaH".to_string(),],vec!["tasmAt".to_string(),"tAByAm".to_string(),"teByaH".to_string(),],vec!["tasya".to_string(),"tayoH".to_string(),"tezAm".to_string(),],vec!["tasmin".to_string(),"tayoH".to_string(),"tezu".to_string(),],]);
   m.insert(("kim".to_string(),"pum".to_string()), vec![vec!["kaH".to_string(),"kO".to_string(),"ke".to_string(),],vec!["kam".to_string(),"kO".to_string(),"kAn".to_string(),],vec!["kena".to_string(),"kAByAm".to_string(),"kEH".to_string(),],vec!["kasmE".to_string(),"kAByAm".to_string(),"keByaH".to_string(),],vec!["kasmAt".to_string(),"kAByAm".to_string(),"keByaH".to_string(),],vec!["kasya".to_string(),"kayoH".to_string(),"kezAm".to_string(),],vec!["kasmin".to_string(),"kayoH".to_string(),"kezu".to_string(),],]);
-  m.insert(("kim".to_string(),"stri".to_string()), vec![vec!["kA".to_string(),"ke".to_string(),"kAH".to_string(),],vec!["kAm".to_string(),"ke".to_string(),"kAH".to_string(),],vec!["kayA".to_string(),"kAByAm".to_string(),"kABiH".to_string(),],vec!["kasyE".to_string(),"kAByAm".to_string(),"kAByaH".to_string(),],vec!["kasyAH".to_string(),"kAByAm".to_string(),"kAByaH".to_string(),],vec!["kasyAH".to_string(),"kayoH".to_string(),"kAsAm".to_string(),],vec!["kasyAm".to_string(),"kayoH".to_string(),"kAzu".to_string(),],]);
+  m.insert(("kim".to_string(),"stri".to_string()), vec![vec!["kA".to_string(),"ke".to_string(),"kAH".to_string(),],vec!["kAm".to_string(),"ke".to_string(),"kAH".to_string(),],vec!["kayA".to_string(),"kAByAm".to_string(),"kABiH".to_string(),],vec!["kasyE".to_string(),"kAByAm".to_string(),"kAByaH".to_string(),],vec!["kasyAH".to_string(),"kAByAm".to_string(),"kAByaH".to_string(),],vec!["kasyAH".to_string(),"kayoH".to_string(),"kAsAm".to_string(),],vec!["kasyAm".to_string(),"kayoH".to_string(),"kAsu".to_string(),],]);
   m.insert(("kim".to_string(),"nap".to_string()), vec![vec!["kim".to_string(),"ke".to_string(),"kAni".to_string(),],vec!["kim".to_string(),"ke".to_string(),"kAni".to_string(),],vec!["kena".to_string(),"kAByAm".to_string(),"kEH".to_string(),],vec!["kasmE".to_string(),"kAByAm".to_string(),"keByaH".to_string(),],vec!["kasmAt".to_string(),"kAByAm".to_string(),"keByaH".to_string(),],vec!["kasya".to_string(),"kayoH".to_string(),"kezAm".to_string(),],vec!["kasmin".to_string(),"kayoH".to_string(),"kezu".to_string(),],]);
   m.insert(("asmad".to_string(),"any".to_string()), vec![vec!["aham".to_string(),"AvAm".to_string(),"vayam".to_string(),],vec!["mAm,mA".to_string(),"AvAm,nO".to_string(),"asmAn,naH".to_string(),],vec!["mayA".to_string(),"AvAByAm".to_string(),"asmABiH".to_string(),],vec!["mahyam,me".to_string(),"AvAByAm,nO".to_string(),"asmaByam,naH".to_string(),],vec!["mat".to_string(),"AvAByAm".to_string(),"asmat".to_string(),],vec!["mama,me".to_string(),"AvayoH,nO".to_string(),"asmAkam,naH".to_string(),],vec!["mayi".to_string(),"AvayoH".to_string(),"asmAsu".to_string(),],]);
   m.insert(("yuzmad".to_string(),"any".to_string()), vec![vec!["tvam".to_string(),"yuvAm".to_string(),"yUyam".to_string(),],vec!["tvAm,tvA".to_string(),"yuvAm,vAm".to_string(),"yuzmAn,vaH".to_string(),],vec!["tvayA".to_string(),"yuvAByAm".to_string(),"yuzmABiH".to_string(),],vec!["tuByam,te".to_string(),"yuvAByAm,vAm".to_string(),"yuzmaByam,vaH".to_string(),],vec!["tvat".to_string(),"yuvAByAm".to_string(),"yuzmat".to_string(),],vec!["tava,te".to_string(),"yuvayoH,vAm".to_string(),"yuzmAkam,vaH".to_string(),],vec!["tvayi".to_string(),"yuvayoH".to_string(),"yuzmAsu".to_string(),],]);
   m.insert(("sarva".to_string(),"pum".to_string()), vec![vec!["sarvaH".to_string(),"sarvO".to_string(),"sarve".to_string(),],vec!["sarvam".to_string(),"sarvO".to_string(),"sarvAn".to_string(),],vec!["sarveRa".to_string(),"sarvAByAm".to_string(),"sarvEH".to_string(),],vec!["sarvasmE".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasmAt".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasya".to_string(),"sarvayoH".to_string(),"sarvezAm".to_string(),],vec!["sarvasmin".to_string(),"sarvayoH".to_string(),"sarvezu".to_string(),],vec!["sarva".to_string(),"sarvO".to_string(),"sarve".to_string(),],]);
-  m.insert(("sarva".to_string(),"stri".to_string()), vec![vec!["sarvA".to_string(),"sarve".to_string(),"sarvAH".to_string(),],vec!["sarvAm".to_string(),"sarve".to_string(),"sarvAH".to_string(),],vec!["sarvayA".to_string(),"sarvAByAm".to_string(),"sarvABiH".to_string(),],vec!["sarvasyE".to_string(),"sarvAByAm".to_string(),"sarvAByaH".to_string(),],vec!["sarvasyAH".to_string(),"sarvAByAm".to_string(),"sarvAByaH".to_string(),],vec!["sarvasyAH".to_string(),"sarvayoH".to_string(),"sarvAsAm".to_string(),],vec!["sarvasyAm".to_string(),"sarvayoH".to_string(),"sarvAzu".to_string(),],vec!["sarve".to_string(),"sarve".to_string(),"sarvAH".to_string(),],]);
+  m.insert(("sarva".to_string(),"stri".to_string()), vec![vec!["sarvA".to_string(),"sarve".to_string(),"sarvAH".to_string(),],vec!["sarvAm".to_string(),"sarve".to_string(),"sarvAH".to_string(),],vec!["sarvayA".to_string(),"sarvAByAm".to_string(),"sarvABiH".to_string(),],vec!["sarvasyE".to_string(),"sarvAByAm".to_string(),"sarvAByaH".to_string(),],vec!["sarvasyAH".to_string(),"sarvAByAm".to_string(),"sarvAByaH".to_string(),],vec!["sarvasyAH".to_string(),"sarvayoH".to_string(),"sarvAsAm".to_string(),],vec!["sarvasyAm".to_string(),"sarvayoH".to_string(),"sarvAsu".to_string(),],vec!["sarve".to_string(),"sarve".to_string(),"sarvAH".to_string(),],]);
   m.insert(("sarva".to_string(),"nap".to_string()), vec![vec!["sarvam".to_string(),"sarve".to_string(),"sarvARi".to_string(),],vec!["sarvam".to_string(),"sarve".to_string(),"sarvARi".to_string(),],vec!["sarveRa".to_string(),"sarvAByAm".to_string(),"sarvEH".to_string(),],vec!["sarvasmE".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasmAt".to_string(),"sarvAByAm".to_string(),"sarveByaH".to_string(),],vec!["sarvasya".to_string(),"sarvayoH".to_string(),"sarvezAm".to_string(),],vec!["sarvasmin".to_string(),"sarvayoH".to_string(),"sarvezu".to_string(),],vec!["sarva".to_string(),"sarve".to_string(),"sarvARi".to_string(),],]);
   m.insert(("idam".to_string(),"pum".to_string()), vec![vec!["ayam".to_string(),"imO".to_string(),"ime".to_string(),],vec!["imam,enam".to_string(),"imO".to_string(),"imAn".to_string(),],vec!["anena,enena".to_string(),"AByAm".to_string(),"eBiH".to_string(),],vec!["asmE".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asmAt".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"anayoH,enayoH".to_string(),"ezAm".to_string(),],vec!["asmin".to_string(),"anayoH,enayoH".to_string(),"ezu".to_string(),],]);
   m.insert(("idam".to_string(),"stri".to_string()), vec![vec!["iyam".to_string(),"ime".to_string(),"imAH".to_string(),],vec!["imAm".to_string(),"ime".to_string(),"imAH".to_string(),],vec!["anayA,enayA".to_string(),"AByAm".to_string(),"ABiH".to_string(),],vec!["asyE".to_string(),"AByAm".to_string(),"AByaH".to_string(),],vec!["asyAH".to_string(),"AByAm".to_string(),"AByaH".to_string(),],vec!["asyAH".to_string(),"anayoH,enayoH".to_string(),"AsAm".to_string(),],vec!["asyAm".to_string(),"anayoH,enayoH".to_string(),"Asu".to_string(),],]);
   m.insert(("idam".to_string(),"nap".to_string()), vec![vec!["idam".to_string(),"ime".to_string(),"imAni".to_string(),],vec!["idam".to_string(),"ime".to_string(),"imAni".to_string(),],vec!["anena,enena".to_string(),"AByAm".to_string(),"eBiH".to_string(),],vec!["asmE".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asmAt".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"anayoH,enayoH".to_string(),"ezAm".to_string(),],vec!["asmin".to_string(),"anayoH,enayoH".to_string(),"ezu".to_string(),],]);
-  m.insert(("etad".to_string(),"pum".to_string()), vec![vec!["ezaH".to_string(),"etO".to_string(),"ete".to_string(),],vec!["etam".to_string(),"etO".to_string(),"etAn".to_string(),],vec!["etena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH".to_string(),"etezu".to_string(),],]);
-  m.insert(("etad".to_string(),"stri".to_string()), vec![vec!["etA".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etAm".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etayA".to_string(),"etAByAm".to_string(),"etABiH".to_string(),],vec!["etasyE".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etayoH".to_string(),"etAsAm".to_string(),],vec!["etasyAm".to_string(),"etayoH".to_string(),"etAsu".to_string(),],]);
-  m.insert(("etad".to_string(),"nap".to_string()), vec![vec!["etat".to_string(),"ete".to_string(),"etAni".to_string(),],vec!["etat".to_string(),"ete".to_string(),"etAni".to_string(),],vec!["etena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH".to_string(),"etezu".to_string(),],]);
+  // एतद् — 7.2.106 तदोः सः सावनन्त्ययोः एषः/एषा; 2.4.34 एनः on acc/ins and dual gen/loc (not a separate pratipadika).
+  m.insert(("etad".to_string(),"pum".to_string()), vec![vec!["ezaH".to_string(),"etO".to_string(),"ete".to_string(),],vec!["etam,enam".to_string(),"etO".to_string(),"etAn".to_string(),],vec!["etena,enena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH,enayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH,enayoH".to_string(),"etezu".to_string(),],]);
+  m.insert(("etad".to_string(),"stri".to_string()), vec![vec!["ezA".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etAm,enAm".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etayA,enayA".to_string(),"etAByAm".to_string(),"etABiH".to_string(),],vec!["etasyE".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etayoH,enayoH".to_string(),"etAsAm".to_string(),],vec!["etasyAm".to_string(),"etayoH,enayoH".to_string(),"etAsu".to_string(),],]);
+  m.insert(("etad".to_string(),"nap".to_string()), vec![vec!["etat".to_string(),"ete".to_string(),"etAni".to_string(),],vec!["etat".to_string(),"ete".to_string(),"etAni".to_string(),],vec!["etena,enena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH,enayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH,enayoH".to_string(),"etezu".to_string(),],]);
   m.insert(("yad".to_string(),"pum".to_string()), vec![vec!["yaH".to_string(),"yO".to_string(),"ye".to_string(),],vec!["yam".to_string(),"yO".to_string(),"yAn".to_string(),],vec!["yena".to_string(),"yAByAm".to_string(),"yEH".to_string(),],vec!["yasmE".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasmAt".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasya".to_string(),"yayoH".to_string(),"yezAm".to_string(),],vec!["yasmin".to_string(),"yayoH".to_string(),"yezu".to_string(),],]);
   m.insert(("yad".to_string(),"stri".to_string()), vec![vec!["yA".to_string(),"ye".to_string(),"yAH".to_string(),],vec!["yAm".to_string(),"ye".to_string(),"yAH".to_string(),],vec!["yayA".to_string(),"yAByAm".to_string(),"yABiH".to_string(),],vec!["yasyE".to_string(),"yAByAm".to_string(),"yAByaH".to_string(),],vec!["yasyAH".to_string(),"yAByAm".to_string(),"yAByaH".to_string(),],vec!["yasyAH".to_string(),"yayoH".to_string(),"yAsAm".to_string(),],vec!["yasyAm".to_string(),"yayoH".to_string(),"yAsu".to_string(),],]);
   m.insert(("yad".to_string(),"nap".to_string()), vec![vec!["yat".to_string(),"ye".to_string(),"yAni".to_string(),],vec!["yat".to_string(),"ye".to_string(),"yAni".to_string(),],vec!["yena".to_string(),"yAByAm".to_string(),"yEH".to_string(),],vec!["yasmE".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasmAt".to_string(),"yAByAm".to_string(),"yeByaH".to_string(),],vec!["yasya".to_string(),"yayoH".to_string(),"yezAm".to_string(),],vec!["yasmin".to_string(),"yayoH".to_string(),"yezu".to_string(),],]);
@@ -73,9 +101,6 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("uBa".to_string(),"pum".to_string()), vec![du("uBO"), du("uBO"), du("uBAByAm"), du("uBAByAm"), du("uBAByAm"), du("uBayoH"), du("uBayoH")]);
   m.insert(("uBa".to_string(),"stri".to_string()), vec![du("uBe"), du("uBe"), du("uBAByAm"), du("uBAByAm"), du("uBAByAm"), du("uBayoH"), du("uBayoH")]);
   m.insert(("uBa".to_string(),"nap".to_string()), vec![du("uBe"), du("uBe"), du("uBAByAm"), du("uBAByAm"), du("uBAByAm"), du("uBayoH"), du("uBayoH")]);
-  m.insert(("ena".to_string(),"pum".to_string()), vec![vec!["ezaH".to_string(),"etO".to_string(),"ete".to_string(),],vec!["etam".to_string(),"etO".to_string(),"etAn".to_string(),],vec!["etena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH".to_string(),"etezu".to_string(),],]);
-  m.insert(("ena".to_string(),"stri".to_string()), vec![vec!["etA".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etAm".to_string(),"ete".to_string(),"etAH".to_string(),],vec!["etayA".to_string(),"etAByAm".to_string(),"etABiH".to_string(),],vec!["etasyE".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etAByAm".to_string(),"etAByaH".to_string(),],vec!["etasyAH".to_string(),"etayoH".to_string(),"etAsAm".to_string(),],vec!["etasyAm".to_string(),"etayoH".to_string(),"etAsu".to_string(),],]);
-  m.insert(("ena".to_string(),"nap".to_string()), vec![vec!["etat".to_string(),"ete".to_string(),"etAni".to_string(),],vec!["etat".to_string(),"ete".to_string(),"etAni".to_string(),],vec!["etena".to_string(),"etAByAm".to_string(),"etEH".to_string(),],vec!["etasmE".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasmAt".to_string(),"etAByAm".to_string(),"eteByaH".to_string(),],vec!["etasya".to_string(),"etayoH".to_string(),"etezAm".to_string(),],vec!["etasmin".to_string(),"etayoH".to_string(),"etezu".to_string(),],]);
   m.insert(("eka".to_string(),"pum".to_string()), vec![vec!["ekaH".to_string(),"ekO".to_string(),"eke".to_string(),],vec!["ekam".to_string(),"ekO".to_string(),"ekAn".to_string(),],vec!["ekena".to_string(),"ekAByAm".to_string(),"ekEH".to_string(),],vec!["ekasmE".to_string(),"ekAByAm".to_string(),"ekeByaH".to_string(),],vec!["ekasmAt".to_string(),"ekAByAm".to_string(),"ekeByaH".to_string(),],vec!["ekasya".to_string(),"ekayoH".to_string(),"ekezAm".to_string(),],vec!["ekasmin".to_string(),"ekayoH".to_string(),"ekezu".to_string(),],]);
   m.insert(("eka".to_string(),"stri".to_string()), vec![vec!["ekA".to_string(),"eke".to_string(),"ekAH".to_string(),],vec!["ekAm".to_string(),"eke".to_string(),"ekAH".to_string(),],vec!["ekayA".to_string(),"ekAByAm".to_string(),"ekABiH".to_string(),],vec!["ekasyE".to_string(),"ekAByAm".to_string(),"ekAByaH".to_string(),],vec!["ekasyAH".to_string(),"ekAByAm".to_string(),"ekAByaH".to_string(),],vec!["ekasyAH".to_string(),"ekayoH".to_string(),"ekAsAm".to_string(),],vec!["ekasyAm".to_string(),"ekayoH".to_string(),"ekAsu".to_string(),],]);
   m.insert(("eka".to_string(),"nap".to_string()), vec![vec!["ekam".to_string(),"eke".to_string(),"ekAni".to_string(),],vec!["ekam".to_string(),"eke".to_string(),"ekAni".to_string(),],vec!["ekena".to_string(),"ekAByAm".to_string(),"ekEH".to_string(),],vec!["ekasmE".to_string(),"ekAByAm".to_string(),"ekeByaH".to_string(),],vec!["ekasmAt".to_string(),"ekAByAm".to_string(),"ekeByaH".to_string(),],vec!["ekasya".to_string(),"ekayoH".to_string(),"ekezAm".to_string(),],vec!["ekasmin".to_string(),"ekayoH".to_string(),"ekezu".to_string(),],]);
@@ -86,7 +111,6 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("sva".to_string(),"pum".to_string()), vec![vec!["svaH".to_string(),"svO".to_string(),"sve".to_string(),],vec!["svam".to_string(),"svO".to_string(),"svAn".to_string(),],vec!["svena".to_string(),"svAByAm".to_string(),"svEH".to_string(),],vec!["svasmE".to_string(),"svAByAm".to_string(),"sveByaH".to_string(),],vec!["svasmAt".to_string(),"svAByAm".to_string(),"sveByaH".to_string(),],vec!["svasya".to_string(),"svayoH".to_string(),"svezAm".to_string(),],vec!["svasmin".to_string(),"svayoH".to_string(),"svezu".to_string(),],]);
   m.insert(("sva".to_string(),"stri".to_string()), vec![vec!["svA".to_string(),"sve".to_string(),"svAH".to_string(),],vec!["svAm".to_string(),"sve".to_string(),"svAH".to_string(),],vec!["svayA".to_string(),"svAByAm".to_string(),"svABiH".to_string(),],vec!["svasyE".to_string(),"svAByAm".to_string(),"svAByaH".to_string(),],vec!["svasyAH".to_string(),"svAByAm".to_string(),"svAByaH".to_string(),],vec!["svasyAH".to_string(),"svayoH".to_string(),"svAsAm".to_string(),],vec!["svasyAm".to_string(),"svayoH".to_string(),"svAsu".to_string(),],]);
   m.insert(("sva".to_string(),"nap".to_string()), vec![vec!["svam".to_string(),"sve".to_string(),"svAni".to_string(),],vec!["svam".to_string(),"sve".to_string(),"svAni".to_string(),],vec!["svena".to_string(),"svAByAm".to_string(),"svEH".to_string(),],vec!["svasmE".to_string(),"svAByAm".to_string(),"sveByaH".to_string(),],vec!["svasmAt".to_string(),"svAByAm".to_string(),"sveByaH".to_string(),],vec!["svasya".to_string(),"svayoH".to_string(),"svezAm".to_string(),],vec!["svasmin".to_string(),"svayoH".to_string(),"svezu".to_string(),],]);
-  m.insert(("am".to_string(),"any".to_string()), vec![vec!["am".to_string(),"am".to_string(),"am".to_string(),],vec!["am".to_string(),"am".to_string(),"am".to_string(),],vec!["am".to_string(),"am".to_string(),"am".to_string(),],vec!["am".to_string(),"am".to_string(),"am".to_string(),],vec!["am".to_string(),"am".to_string(),"am".to_string(),],vec!["am".to_string(),"am".to_string(),"am".to_string(),],vec!["am".to_string(),"am".to_string(),"am".to_string(),],]);
   // त्रि — बहु only. पुं त्रयः/त्रीन्; 7.1.53 स्त्री तिसृ → तिस्रः/तिसृभिः (not *tisrbhiH). नपुं त्रीणि (8.4.1 णत्व).
   m.insert(("tri".to_string(),"pum".to_string()), vec![pl("trayaH"), pl("trIn"), pl("triBiH"), pl("triByaH"), pl("triByaH"), pl("trayARAm"), pl("trizu")]);
   m.insert(("tri".to_string(),"stri".to_string()), vec![pl("tisraH"), pl("tisraH"), pl("tisfBiH"), pl("tisfByaH"), pl("tisfByaH"), pl("tisfRAm"), pl("tisfzu")]);
@@ -96,17 +120,17 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("catur".to_string(),"stri".to_string()), vec![pl("catasraH"), pl("catasraH"), pl("catasfBiH"), pl("catasfByaH"), pl("catasfByaH"), pl("catasfRAm"), pl("catasfzu")]);
   m.insert(("catur".to_string(),"nap".to_string()), vec![pl("catvAri"), pl("catvAri"), pl("caturBiH"), pl("caturByaH"), pl("caturByaH"), pl("caturRAm"), pl("caturzu")]);
   m.insert(("purva".to_string(),"pum".to_string()), vec![vec!["purvaH".to_string(),"purvO".to_string(),"purve".to_string(),],vec!["purvam".to_string(),"purvO".to_string(),"purvAn".to_string(),],vec!["purveRa".to_string(),"purvAByAm".to_string(),"purvEH".to_string(),],vec!["purvasmE".to_string(),"purvAByAm".to_string(),"purveByaH".to_string(),],vec!["purvasmAt".to_string(),"purvAByAm".to_string(),"purveByaH".to_string(),],vec!["purvasya".to_string(),"purvayoH".to_string(),"purvezAm".to_string(),],vec!["purvasmin".to_string(),"purvayoH".to_string(),"purvezu".to_string(),],vec!["purva".to_string(),"purvO".to_string(),"purve".to_string(),],]);
-  m.insert(("purva".to_string(),"stri".to_string()), vec![vec!["purvA".to_string(),"purve".to_string(),"purvAH".to_string(),],vec!["purvAm".to_string(),"purve".to_string(),"purvAH".to_string(),],vec!["purvayA".to_string(),"purvAByAm".to_string(),"purvABiH".to_string(),],vec!["purvasyE".to_string(),"purvAByAm".to_string(),"purvAByaH".to_string(),],vec!["purvasyAH".to_string(),"purvAByAm".to_string(),"purvAByaH".to_string(),],vec!["purvasyAH".to_string(),"purvayoH".to_string(),"purvAsAm".to_string(),],vec!["purvasyAm".to_string(),"purvayoH".to_string(),"purvAzu".to_string(),],vec!["purve".to_string(),"purve".to_string(),"purvAH".to_string(),],]);
+  m.insert(("purva".to_string(),"stri".to_string()), vec![vec!["purvA".to_string(),"purve".to_string(),"purvAH".to_string(),],vec!["purvAm".to_string(),"purve".to_string(),"purvAH".to_string(),],vec!["purvayA".to_string(),"purvAByAm".to_string(),"purvABiH".to_string(),],vec!["purvasyE".to_string(),"purvAByAm".to_string(),"purvAByaH".to_string(),],vec!["purvasyAH".to_string(),"purvAByAm".to_string(),"purvAByaH".to_string(),],vec!["purvasyAH".to_string(),"purvayoH".to_string(),"purvAsAm".to_string(),],vec!["purvasyAm".to_string(),"purvayoH".to_string(),"purvAsu".to_string(),],vec!["purve".to_string(),"purve".to_string(),"purvAH".to_string(),],]);
   m.insert(("purva".to_string(),"nap".to_string()), vec![vec!["purvam".to_string(),"purve".to_string(),"purvARi".to_string(),],vec!["purvam".to_string(),"purve".to_string(),"purvARi".to_string(),],vec!["purveRa".to_string(),"purvAByAm".to_string(),"purvEH".to_string(),],vec!["purvasmE".to_string(),"purvAByAm".to_string(),"purveByaH".to_string(),],vec!["purvasmAt".to_string(),"purvAByAm".to_string(),"purveByaH".to_string(),],vec!["purvasya".to_string(),"purvayoH".to_string(),"purvezAm".to_string(),],vec!["purvasmin".to_string(),"purvayoH".to_string(),"purvezu".to_string(),],vec!["purva".to_string(),"purve".to_string(),"purvARi".to_string(),],]);
   m.insert(("para".to_string(),"pum".to_string()), vec![vec!["paraH".to_string(),"parO".to_string(),"pare".to_string(),],vec!["param".to_string(),"parO".to_string(),"parAn".to_string(),],vec!["pareRa".to_string(),"parAByAm".to_string(),"parEH".to_string(),],vec!["parasmE".to_string(),"parAByAm".to_string(),"pareByaH".to_string(),],vec!["parasmAt".to_string(),"parAByAm".to_string(),"pareByaH".to_string(),],vec!["parasya".to_string(),"parayoH".to_string(),"parezAm".to_string(),],vec!["parasmin".to_string(),"parayoH".to_string(),"parezu".to_string(),],vec!["para".to_string(),"parO".to_string(),"pare".to_string(),],]);
-  m.insert(("para".to_string(),"stri".to_string()), vec![vec!["parA".to_string(),"pare".to_string(),"parAH".to_string(),],vec!["parAm".to_string(),"pare".to_string(),"parAH".to_string(),],vec!["parayA".to_string(),"parAByAm".to_string(),"parABiH".to_string(),],vec!["parasyE".to_string(),"parAByAm".to_string(),"parAByaH".to_string(),],vec!["parasyAH".to_string(),"parAByAm".to_string(),"parAByaH".to_string(),],vec!["parasyAH".to_string(),"parayoH".to_string(),"parAsAm".to_string(),],vec!["parasyAm".to_string(),"parayoH".to_string(),"parAzu".to_string(),],vec!["pare".to_string(),"pare".to_string(),"parAH".to_string(),],]);
+  m.insert(("para".to_string(),"stri".to_string()), vec![vec!["parA".to_string(),"pare".to_string(),"parAH".to_string(),],vec!["parAm".to_string(),"pare".to_string(),"parAH".to_string(),],vec!["parayA".to_string(),"parAByAm".to_string(),"parABiH".to_string(),],vec!["parasyE".to_string(),"parAByAm".to_string(),"parAByaH".to_string(),],vec!["parasyAH".to_string(),"parAByAm".to_string(),"parAByaH".to_string(),],vec!["parasyAH".to_string(),"parayoH".to_string(),"parAsAm".to_string(),],vec!["parasyAm".to_string(),"parayoH".to_string(),"parAsu".to_string(),],vec!["pare".to_string(),"pare".to_string(),"parAH".to_string(),],]);
   m.insert(("para".to_string(),"nap".to_string()), vec![vec!["param".to_string(),"pare".to_string(),"parARi".to_string(),],vec!["param".to_string(),"pare".to_string(),"parARi".to_string(),],vec!["pareRa".to_string(),"parAByAm".to_string(),"parEH".to_string(),],vec!["parasmE".to_string(),"parAByAm".to_string(),"pareByaH".to_string(),],vec!["parasmAt".to_string(),"parAByAm".to_string(),"pareByaH".to_string(),],vec!["parasya".to_string(),"parayoH".to_string(),"parezAm".to_string(),],vec!["parasmin".to_string(),"parayoH".to_string(),"parezu".to_string(),],vec!["para".to_string(),"pare".to_string(),"parARi".to_string(),],]);
   m.insert(("apara".to_string(),"pum".to_string()), vec![vec!["aparaH".to_string(),"aparO".to_string(),"apare".to_string(),],vec!["aparam".to_string(),"aparO".to_string(),"aparAn".to_string(),],vec!["apareRa".to_string(),"aparAByAm".to_string(),"aparEH".to_string(),],vec!["aparasmE".to_string(),"aparAByAm".to_string(),"apareByaH".to_string(),],vec!["aparasmAt".to_string(),"aparAByAm".to_string(),"apareByaH".to_string(),],vec!["aparasya".to_string(),"aparayoH".to_string(),"aparezAm".to_string(),],vec!["aparasmin".to_string(),"aparayoH".to_string(),"aparezu".to_string(),],vec!["apara".to_string(),"aparO".to_string(),"apare".to_string(),],]);
-  m.insert(("apara".to_string(),"stri".to_string()), vec![vec!["aparA".to_string(),"apare".to_string(),"aparAH".to_string(),],vec!["aparAm".to_string(),"apare".to_string(),"aparAH".to_string(),],vec!["aparayA".to_string(),"aparAByAm".to_string(),"aparABiH".to_string(),],vec!["aparasyE".to_string(),"aparAByAm".to_string(),"aparAByaH".to_string(),],vec!["aparasyAH".to_string(),"aparAByAm".to_string(),"aparAByaH".to_string(),],vec!["aparasyAH".to_string(),"aparayoH".to_string(),"aparAsAm".to_string(),],vec!["aparasyAm".to_string(),"aparayoH".to_string(),"aparAzu".to_string(),],vec!["apare".to_string(),"apare".to_string(),"aparAH".to_string(),],]);
+  m.insert(("apara".to_string(),"stri".to_string()), vec![vec!["aparA".to_string(),"apare".to_string(),"aparAH".to_string(),],vec!["aparAm".to_string(),"apare".to_string(),"aparAH".to_string(),],vec!["aparayA".to_string(),"aparAByAm".to_string(),"aparABiH".to_string(),],vec!["aparasyE".to_string(),"aparAByAm".to_string(),"aparAByaH".to_string(),],vec!["aparasyAH".to_string(),"aparAByAm".to_string(),"aparAByaH".to_string(),],vec!["aparasyAH".to_string(),"aparayoH".to_string(),"aparAsAm".to_string(),],vec!["aparasyAm".to_string(),"aparayoH".to_string(),"aparAsu".to_string(),],vec!["apare".to_string(),"apare".to_string(),"aparAH".to_string(),],]);
   m.insert(("apara".to_string(),"nap".to_string()), vec![vec!["aparam".to_string(),"apare".to_string(),"aparARi".to_string(),],vec!["aparam".to_string(),"apare".to_string(),"aparARi".to_string(),],vec!["apareRa".to_string(),"aparAByAm".to_string(),"aparEH".to_string(),],vec!["aparasmE".to_string(),"aparAByAm".to_string(),"apareByaH".to_string(),],vec!["aparasmAt".to_string(),"aparAByAm".to_string(),"apareByaH".to_string(),],vec!["aparasya".to_string(),"aparayoH".to_string(),"aparezAm".to_string(),],vec!["aparasmin".to_string(),"aparayoH".to_string(),"aparezu".to_string(),],vec!["apara".to_string(),"apare".to_string(),"aparARi".to_string(),],]);
   m.insert(("anya".to_string(),"pum".to_string()), vec![vec!["anyaH".to_string(),"anyO".to_string(),"anye".to_string(),],vec!["anyam".to_string(),"anyO".to_string(),"anyAn".to_string(),],vec!["anyena".to_string(),"anyAByAm".to_string(),"anyEH".to_string(),],vec!["anyasmE".to_string(),"anyAByAm".to_string(),"anyeByaH".to_string(),],vec!["anyasmAt".to_string(),"anyAByAm".to_string(),"anyeByaH".to_string(),],vec!["anyasya".to_string(),"anyayoH".to_string(),"anyezAm".to_string(),],vec!["anyasmin".to_string(),"anyayoH".to_string(),"anyezu".to_string(),],vec!["anya".to_string(),"anyO".to_string(),"anye".to_string(),],]);
-  m.insert(("anya".to_string(),"stri".to_string()), vec![vec!["anyA".to_string(),"anye".to_string(),"anyAH".to_string(),],vec!["anyAm".to_string(),"anye".to_string(),"anyAH".to_string(),],vec!["anyayA".to_string(),"anyAByAm".to_string(),"anyABiH".to_string(),],vec!["anyasyE".to_string(),"anyAByAm".to_string(),"anyAByaH".to_string(),],vec!["anyasyAH".to_string(),"anyAByAm".to_string(),"anyAByaH".to_string(),],vec!["anyasyAH".to_string(),"anyayoH".to_string(),"anyAsAm".to_string(),],vec!["anyasyAm".to_string(),"anyayoH".to_string(),"anyAzu".to_string(),],vec!["anye".to_string(),"anye".to_string(),"anyAH".to_string(),],]);
-  m.insert(("anya".to_string(),"nap".to_string()), vec![vec!["anyam".to_string(),"anye".to_string(),"anyARi".to_string(),],vec!["anyam".to_string(),"anye".to_string(),"anyARi".to_string(),],vec!["anyena".to_string(),"anyAByAm".to_string(),"anyEH".to_string(),],vec!["anyasmE".to_string(),"anyAByAm".to_string(),"anyeByaH".to_string(),],vec!["anyasmAt".to_string(),"anyAByAm".to_string(),"anyeByaH".to_string(),],vec!["anyasya".to_string(),"anyayoH".to_string(),"anyezAm".to_string(),],vec!["anyasmin".to_string(),"anyayoH".to_string(),"anyezu".to_string(),],vec!["anya".to_string(),"anye".to_string(),"anyARi".to_string(),],]);
+  m.insert(("anya".to_string(),"stri".to_string()), vec![vec!["anyA".to_string(),"anye".to_string(),"anyAH".to_string(),],vec!["anyAm".to_string(),"anye".to_string(),"anyAH".to_string(),],vec!["anyayA".to_string(),"anyAByAm".to_string(),"anyABiH".to_string(),],vec!["anyasyE".to_string(),"anyAByAm".to_string(),"anyAByaH".to_string(),],vec!["anyasyAH".to_string(),"anyAByAm".to_string(),"anyAByaH".to_string(),],vec!["anyasyAH".to_string(),"anyayoH".to_string(),"anyAsAm".to_string(),],vec!["anyasyAm".to_string(),"anyayoH".to_string(),"anyAsu".to_string(),],vec!["anye".to_string(),"anye".to_string(),"anyAH".to_string(),],]);
+  m.insert(("anya".to_string(),"nap".to_string()), vec![vec!["anyam".to_string(),"anye".to_string(),"anyAni".to_string(),],vec!["anyam".to_string(),"anye".to_string(),"anyAni".to_string(),],vec!["anyena".to_string(),"anyAByAm".to_string(),"anyEH".to_string(),],vec!["anyasmE".to_string(),"anyAByAm".to_string(),"anyeByaH".to_string(),],vec!["anyasmAt".to_string(),"anyAByAm".to_string(),"anyeByaH".to_string(),],vec!["anyasya".to_string(),"anyayoH".to_string(),"anyezAm".to_string(),],vec!["anyasmin".to_string(),"anyayoH".to_string(),"anyezu".to_string(),],vec!["anya".to_string(),"anye".to_string(),"anyAni".to_string(),],]);
   // पञ्चन्–दशन् — 7.1.22 षड्भ्यो लुक् (जस्/शस्); all लिङ्ग same; बहु only. SLP1 ञ् is Y (not J).
   let panca = vec![pl("paYca"), pl("paYca"), pl("paYcaBiH"), pl("paYcaByaH"), pl("paYcaByaH"), pl("paYcAnAm"), pl("paYcasu")];
   for linga in ["pum", "stri", "nap"] {
@@ -134,6 +158,31 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   for linga in ["pum", "stri", "nap"] {
       m.insert(("daSan".to_string(), linga.to_string()), dasan.clone());
   }
+  // एकादशन्–नवदशन् — same 7.1.22 class as पञ्चन्; all लिङ्ग; बहु only. षोडशन् not *षष् sandhi.
+  for (key, nom) in [
+      ("ekAdaSan", "ekAdaSa"),
+      ("dvAdaSan", "dvAdaSa"),
+      ("trayodaSan", "trayodaSa"),
+      ("caturdaSan", "caturdaSa"),
+      ("paYcadaSan", "paYcadaSa"),
+      ("zoqaSan", "zoqaSa"),
+      ("saptadaSan", "saptadaSa"),
+      ("azwAdaSan", "azwAdaSa"),
+      ("navadaSan", "navadaSa"),
+  ] {
+      let tab = an_sankhya(nom);
+      for linga in ["pum", "stri", "nap"] {
+          m.insert((key.to_string(), linga.to_string()), tab.clone());
+      }
+  }
+  // उभय — 1.1.27 सर्वनाम; no द्विवचन (अर्थ already dual). पुं उभयः/उभये; स्त्री उभया; नपुं उभयम्/उभयानि.
+  m.insert(("uBaya".to_string(),"pum".to_string()), vec![sg_pl("uBayaH","uBaye"), sg_pl("uBayam","uBayAn"), sg_pl("uBayena","uBayEH"), sg_pl("uBayasmE","uBayeByaH"), sg_pl("uBayasmAt","uBayeByaH"), sg_pl("uBayasya","uBayezAm"), sg_pl("uBayasmin","uBayezu")]);
+  m.insert(("uBaya".to_string(),"stri".to_string()), vec![sg_pl("uBayA","uBayAH"), sg_pl("uBayAm","uBayAH"), sg_pl("uBayayA","uBayABiH"), sg_pl("uBayasyE","uBayAByaH"), sg_pl("uBayasyAH","uBayAByaH"), sg_pl("uBayasyAH","uBayAsAm"), sg_pl("uBayasyAm","uBayAsu")]);
+  m.insert(("uBaya".to_string(),"nap".to_string()), vec![sg_pl("uBayam","uBayAni"), sg_pl("uBayam","uBayAni"), sg_pl("uBayena","uBayEH"), sg_pl("uBayasmE","uBayeByaH"), sg_pl("uBayasmAt","uBayeByaH"), sg_pl("uBayasya","uBayezAm"), sg_pl("uBayasmin","uBayezu")]);
+  // विश्व — 1.1.27 like सर्व (7.1.14 स्मै, 7.1.9 ऐस्, 8.4.1 णत्व विश्वेण/विश्वाणि).
+  m.insert(("viSva".to_string(),"pum".to_string()), vec![vec!["viSvaH".to_string(),"viSvO".to_string(),"viSve".to_string()],vec!["viSvam".to_string(),"viSvO".to_string(),"viSvAn".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
+  m.insert(("viSva".to_string(),"stri".to_string()), vec![vec!["viSvA".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvAm".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvayA".to_string(),"viSvAByAm".to_string(),"viSvABiH".to_string()],vec!["viSvasyE".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvayoH".to_string(),"viSvAsAm".to_string()],vec!["viSvasyAm".to_string(),"viSvayoH".to_string(),"viSvAsu".to_string()]]);
+  m.insert(("viSva".to_string(),"nap".to_string()), vec![vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
   m }
 
 // ---------------------------------------------------------------------------
@@ -142,15 +191,15 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
 // ---------------------------------------------------------------------------
 pub fn generate(base: &str, linga: &str) -> Option<PronounTable> {
     let base = canon_sarvanama(base);
-    let linga_eff = if base=="asmad" || base=="yuzmad" || base=="am" { "any" } else { linga };
+    let linga_eff = if base=="asmad" || base=="yuzmad" { "any" } else { linga };
     let table = pronouns().get(&(base.to_string(), linga_eff.to_string()))?.clone();
     let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI"];
     let mut map = HashMap::new();
     // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
-    for (i, row) in table.iter().enumerate() {
-        let v = vibhaktis[i].to_string();
+    for (i, v) in vibhaktis.iter().enumerate() {
+        let Some(row) = table.get(i) else { break };
         let forms: Vec<String> = row.iter().map(|s| s.replace(',',"/")).collect();
-        map.insert(v, forms);
+        map.insert((*v).to_string(), forms);
     }
     Some(PronounTable { base: base.to_string(), linga: linga_eff.to_string(), table: map })
 }
@@ -165,6 +214,8 @@ pub fn analyze(word: &str) -> Vec<HashMap<String,String>> {
     for ((base,linga), table) in pronouns() {
         // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for (vi,row) in table.iter().enumerate() {
+            // skip sambodhana 8th row when present (engine has seven विभक्ति keys).
+            if vi >= vibhaktis.len() { continue; }
             // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for (vac_idx, forms_str) in row.iter().enumerate() {
                 // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
@@ -332,5 +383,42 @@ mod tests {
         has(&generate("daSan", "nap").unwrap(), "saptamI", "daSasu");
         assert!(analyze("paYca").iter().any(|m| m.get("pratipadika") == Some(&"paYcan".to_string())));
         assert!(analyze("zaw").iter().any(|m| m.get("pratipadika") == Some(&"zaz".to_string())));
+    }
+
+    #[test]
+    fn etad_esa_ubhaya_visva_11_19() {
+        let s = generate("etad", "stri").expect("etad stri");
+        has(&s, "prathamA", "ezA");
+        has(&s, "dvitIyA", "enAm");
+        has(&s, "tfIyA", "enayA");
+        let p = generate("etad", "pum").expect("etad pum");
+        has(&p, "prathamA", "ezaH");
+        has(&p, "dvitIyA", "enam");
+        has(&p, "tfIyA", "enena");
+        has(&p, "zazWI", "enayoH");
+        // generate सर्व must not panic on the extra sambodhana row.
+        has(&generate("sarva", "pum").expect("sarva"), "prathamA", "sarvaH");
+        has(&generate("sarva", "stri").unwrap(), "saptamI", "sarvAsu");
+        has(&generate("tad", "stri").unwrap(), "saptamI", "tAsu");
+        let v = generate("viSva", "pum").expect("viSva");
+        has(&v, "prathamA", "viSve");
+        has(&v, "tfIyA", "viSveRa");
+        has(&v, "caturTI", "viSvasmE");
+        has(&generate("viSva", "nap").unwrap(), "prathamA", "viSvARi");
+        let u = generate("ubhaya", "pum").expect("uBaya alias");
+        has(&u, "prathamA", "uBayaH");
+        has(&u, "prathamA", "uBaye");
+        assert!(vac_slot(&u, "prathamA", 2).is_empty());
+        has(&generate("uBaya", "stri").unwrap(), "prathamA", "uBayA");
+        let e = generate("ekAdaSa", "nap").expect("11 alias");
+        has(&e, "prathamA", "ekAdaSa");
+        has(&e, "zazWI", "ekAdaSAnAm");
+        has(&e, "saptamI", "ekAdaSasu");
+        has(&generate("zoqaSan", "pum").unwrap(), "prathamA", "zoqaSa");
+        has(&generate("dvAdaSan", "stri").unwrap(), "tfIyA", "dvAdaSaBiH");
+        has(&generate("navadaSan", "pum").unwrap(), "prathamA", "navadaSa");
+        assert!(analyze("ezA").iter().any(|m| m.get("pratipadika") == Some(&"etad".to_string())));
+        assert!(analyze("ezaH").iter().all(|m| m.get("pratipadika") != Some(&"ena".to_string())));
+        assert!(analyze("ekAdaSa").iter().any(|m| m.get("pratipadika") == Some(&"ekAdaSan".to_string())));
     }
 }
