@@ -62,6 +62,12 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // नौ: औ-anta, 6.1.78 आव् (नावम्, not 6.1.93 गाम्)
   m.insert(("O".to_string(),"pum".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"OByAm".to_string(),"OBiH".to_string(),],vec!["Ave".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"Ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
   m.insert(("O".to_string(),"stri".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Avam".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["AvA".to_string(),"OByAm".to_string(),"OBiH".to_string(),],vec!["Ave".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"OByAm".to_string(),"OByaH".to_string(),],vec!["AvaH".to_string(),"AvoH".to_string(),"AvAm".to_string(),],vec!["Avi".to_string(),"AvoH".to_string(),"Ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
+  // हलन्त — j-anta (वणिज्, सुहृज्ज्-like) and d-anta (सुहृद्) — 8.2.30/8.2.39 jhal sandhi
+  // sūtra: 8.2.30 चोः कुः (j→k at pada), 8.2.39 झलां जशोऽन्ते (j→k/j etc.), 8.4.41 ष्टुत्व not here
+  // Future devs: j-stem shows g/k alternation (वणिक्/वणिजौ), d-stem shows t/d (सुहृत्/सुहृदौ)
+  // Extreme commenting kept for future halanta expansion — add h, bh etc. similarly
+  m.insert(("j".to_string(),"pum".to_string()), vec![vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"zu".to_string(),],vec!["k".to_string(),"jO".to_string(),"jaH".to_string(),],]);
+  m.insert(("d".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
   m
 }
 
@@ -417,6 +423,24 @@ mod tests {
         has(&n, "dvitIyA", "nAvam");
         has(&n, "tfIyA", "nAvA");
         has(&n, "saptamI", "nOzu");
+    }
+
+    #[test]
+    // ---------------------------------------------------------------------------
+    // fn `halanta_j_d_stems`: sūtra 8.2.30/39 — j→k (वणिक्), d→t (सुहृत्)
+    // Extreme commented for future halanta devs; validates j/d pum paradigms.
+    // ---------------------------------------------------------------------------
+    fn halanta_j_d_stems() {
+        // j-anta: vaRij (वणिज्) — nom sg वणिक् (8.2.30), instr वणिजा, loc वणिजि
+        let v = generate("vaRij", "pum").expect("vaRij");
+        has(&v, "prathamA", "vaRik");
+        has(&v, "tfIyA", "vaRijA");
+        has(&v, "saptamI", "vaRiji");
+        // d-anta: suhfd (सुहृद्) — nom sg सुहृत् (8.2.39), instr सुहृदा
+        let s = generate("suhfd", "pum").expect("suhfd");
+        has(&s, "prathamA", "suhft");
+        has(&s, "dvitIyA", "suhfdam");
+        has(&s, "tfIyA", "suhfdA");
     }
 
     #[test]
