@@ -292,168 +292,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "div" {
         return "dyUta".into(); // द्यूत
     }
-    // Special: लुभ् + क्त → लुब्ध (SLP1 lubDa) — 8.2.37 Actually luB→lubDa (भ्→ब्ध)
-    // sūtra: लुभ् + क्त → लुब्ध; future devs: luB=लुभ्, lubDa=लुब्ध — keep b, Da=ध
-    // Extreme: keep lubDa not luBta; handles Bh→bDa via jhal
-    if orig == "luB" {
-        return "lubDa".into(); // लुब्ध
-    }
-    // Special: क्षुभ् + क्त → क्षुब्ध (SLP1 kzuBDa) — similarly kzuB→kzuBDa
-    // sūtra: क्षुभ् + क्त → क्षुब्ध; future devs: kzuB=क्षुभ्, kzuBDa=क्षुब्ध — keep kzu, BD=ब्ध
-    // Extreme: keep kzuBDa not kzuBta
-    if orig == "kzuB" {
-        return "kzuBDa".into(); // क्षुब्ध
-    }
-    // Special: स्तभ् + क्त → स्तब्ध (SLP1 swaBDa) — similarly swaB→swaBDa
-    // sūtra: स्तभ् + क्त → स्तब्ध; future devs: swaB=स्तभ्, swaBDa=स्तब्ध — keep swa, BD=ब्ध
-    // Extreme: keep swaBDa not swaBta
-    if orig == "swaB" {
-        return "swaBDa".into(); // स्तब्ध
-    }
-    // Special: स्कम्भ् + क्त → स्कब्ध (SLP1 skaBDa) — similarly skaB→skaBDa (स्कम्भ्)
-    // sūtra: स्कम्भ् + क्त → स्कब्ध; future devs: skaB=स्कभ्, skaBDa=स्कब्ध — keep ska, BD=ब्ध
-    // Extreme: keep skaBDa not skaBta
-    if orig == "skaB" {
-        return "skaBDa".into(); // स्कब्ध
-    }
-    // Special: रम्भ् + क्त → रब्ध (SLP1 rabDa) — similarly ramB→rabDa (रम्भ्)
-    // sūtra: रम्भ् + क्त → रब्ध; future devs: ramB=रम्भ्, rabDa=रब्ध — keep ra, BD=ब्ध (m→b)
-    // Extreme: keep rabDa not ramBta
-    if orig == "ramB" {
-        return "rabDa".into(); // रब्ध
-    }
-    // Special: लभ् + क्त → लब्ध (SLP1 labDa) — explicitly labDa (भ्→ब्ध)
-    // sūtra: लभ् + क्त → लब्ध; future devs: laB=लभ्, labDa=लब्ध — keep la, BD=ब्ध
-    // Extreme: keep labDa not laBta; handles Bh→bDa via 8.2.37 even if generic would give labDa via jhal, explicit documents
-    if orig == "laB" {
-        return "labDa".into(); // लब्ध
-    }
-    // Special: रभ् + क्त → रब्ध (SLP1 rabDa) — similarly raB→rabDa
-    // sūtra: रभ् + क्त → रब्ध; future devs: raB=रभ्, rabDa=रब्ध — keep ra, BD=ब्ध
-    // Extreme: keep rabDa not raBta
-    if orig == "raB" {
-        return "rabDa".into(); // रब्ध
-    }
-    // Special: नभ् + क्त → नब्ध (SLP1 nabDa) — similarly naB→nabDa
-    // sūtra: नभ् + क्त → नब्ध; future devs: naB=नभ्, nabDa=नब्ध — keep na, BD=ब्ध
-    // Extreme: keep nabDa not naBta
-    if orig == "naB" {
-        return "nabDa".into(); // नब्ध
-    }
-    // Special: अभ् + क्त → अब्ध (SLP1 abDa) — similarly aB→abDa
-    // sūtra: अभ् + क्त → अब्ध; future devs: aB=अभ्, abDa=अब्ध — keep a, BD=ब्ध
-    // Extreme: keep abDa not aBta
-    if orig == "aB" {
-        return "abDa".into(); // अब्ध
-    }
-    // Special: सभ् + क्त → सब्ध (SLP1 sabDa) — similarly saB→sabDa
-    // sūtra: सभ् + क्त → सब्ध; future devs: saB=सभ्, sabDa=सब्ध — keep sa, BD=ब्ध
-    // Extreme: keep sabDa not saBta
-    if orig == "saB" {
-        return "sabDa".into(); // सब्ध
-    }
-    // Special: दभ् + क्त → दब्ध (SLP1 dabDa) — similarly daB→dabDa
-    // sūtra: दभ् + क्त → दब्ध; future devs: daB=दभ्, dabDa=दब्ध — keep da, BD=ब्ध
-    // Extreme: keep dabDa not daBta
-    if orig == "daB" {
-        return "dabDa".into(); // दब्ध
-    }
-    // Special: गभ् + क्त → गब्ध (SLP1 gabDa) — similarly gaB→gabDa
-    // sūtra: गभ् + क्त → गब्ध; future devs: gaB=गभ्, gabDa=गब्ध — keep ga, BD=ब्ध
-    // Extreme: keep gabDa not gaBta
-    if orig == "gaB" {
-        return "gabDa".into(); // गब्ध
-    }
-    // Special: द्रभ् + क्त → द्रब्ध (SLP1 drabDa) — similarly draB→drabDa
-    // sūtra: द्रभ् + क्त → द्रब्ध; future devs: draB=द्रभ्, drabDa=द्रब्ध — keep dra, BD=ब्ध
-    // Extreme: keep drabDa not draBta
-    if orig == "draB" {
-        return "drabDa".into(); // द्रब्ध
-    }
-    // Special: स्रभ् + क्त → स्रब्ध (SLP1 srabDa) — similarly sraB→srabDa
-    // sūtra: स्रभ् + क्त → स्रब्ध; future devs: sraB=स्रभ्, srabDa=स्रब्ध — keep sra, BD=ब्ध
-    // Extreme: keep srabDa not sraBta
-    if orig == "sraB" {
-        return "srabDa".into(); // स्रब्ध
-    }
-    // Special: जभ् + क्त → जब्ध (SLP1 jabDa) — similarly jaB→jabDa
-    // sūtra: जभ् + क्त → जब्ध; future devs: jaB=जभ्, jabDa=जब्ध — keep ja, BD=ब्ध
-    // Extreme: keep jabDa not jaBta
-    if orig == "jaB" {
-        return "jabDa".into(); // जब्ध
-    }
-    // Special: सुभ् + क्त → सुब्ध (SLP1 subDa) — similarly suB→subDa
-    // sūtra: सुभ् + क्त → सुब्ध; future devs: suB=सुभ्, subDa=सुब्ध — keep su, BD=ब्ध
-    // Extreme: keep subDa not suBta
-    if orig == "suB" {
-        return "subDa".into(); // सुब्ध
-    }
-    // Special: कुभ् + क्त → कुब्ध (SLP1 kubDa) — similarly kuB→kubDa
-    // sūtra: कुभ् + क्त → कुब्ध; future devs: kuB=कुभ्, kubDa=कुब्ध — keep ku, BD=ब्ध
-    // Extreme: keep kubDa not kuBta
-    if orig == "kuB" {
-        return "kubDa".into(); // कुब्ध
-    }
-    // Special: स्तुभ् + क्त → स्तुब्ध (SLP1 stuBDa) — similarly stuB→stuBDa
-    // sūtra: स्तुभ् + क्त → स्तुब्ध; future devs: stuB=स्तुभ्, stuBDa=स्तुब्ध — keep stu, BD=ब्ध
-    // Extreme: keep stuBDa not stuBta
-    if orig == "stuB" {
-        return "stuBDa".into(); // स्तुब्ध
-    }
-    // Special: स्कुभ् + क्त → स्कुब्ध (SLP1 skuBDa) — similarly skuB→skuBDa
-    // sūtra: स्कुभ् + क्त → स्कुब्ध; future devs: skuB=स्कुभ्, skuBDa=स्कुब्ध — keep sku, BD=ब्ध
-    // Extreme: keep skuBDa not skuBta
-    if orig == "skuB" {
-        return "skuBDa".into(); // स्कुब्ध
-    }
-    // Special: तभ् + क्त → तब्ध (SLP1 tabDa) — similarly taB→tabDa
-    // sūtra: तभ् + क्त → तब्ध; future devs: taB=तभ्, tabDa=तब्ध — keep ta, BD=ब्ध
-    // Extreme: keep tabDa not taBta
-    if orig == "taB" {
-        return "tabDa".into(); // तब्ध
-    }
-    // Special: बभ् + क्त → बब्ध (SLP1 babDa) — similarly baB→babDa
-    // sūtra: बभ् + क्त → बब्ध; future devs: baB=बभ्, babDa=बब्ध — keep ba, BD=ब्ध
-    // Extreme: keep babDa not baBta
-    if orig == "baB" {
-        return "babDa".into(); // बब्ध
-    }
-    // Special: मभ् + क्त → मब्ध (SLP1 mabDa) — similarly maB→mabDa
-    // sūtra: मभ् + क्त → मब्ध; future devs: maB=मभ्, mabDa=मब्ध — keep ma, BD=ब्ध
-    // Extreme: keep mabDa not maBta
-    if orig == "maB" {
-        return "mabDa".into(); // मब्ध
-    }
-    // Special: यभ् + क्त → यब्ध (SLP1 yabDa) — similarly yaB→yabDa
-    // sūtra: यभ् + क्त → यब्ध; future devs: yaB=यभ्, yabDa=यब्ध — keep ya, BD=ब्ध
-    // Extreme: keep yabDa not yaBta
-    if orig == "yaB" {
-        return "yabDa".into(); // यब्ध
-    }
-    // Special: वभ् + क्त → वब्ध (SLP1 vabDa) — similarly vaB→vabDa
-    // sūtra: वभ् + क्त → वब्ध; future devs: vaB=वभ्, vabDa=वब्ध — keep va, BD=ब्ध
-    // Extreme: keep vabDa not vaBta
-    if orig == "vaB" {
-        return "vabDa".into(); // वब्ध
-    }
-    // Special: हभ् + क्त → हब्ध (SLP1 habDa) — similarly haB→habDa
-    // sūtra: हभ् + क्त → हब्ध; future devs: haB=हभ्, habDa=हब्ध — keep ha, BD=ब्ध
-    // Extreme: keep habDa not haBta
-    if orig == "haB" {
-        return "habDa".into(); // हब्ध
-    }
-    // Special: घभ् + क्त → घब्ध (SLP1 GabDa) — similarly GaB→GabDa
-    // sūtra: घभ् + क्त → घब्ध; future devs: GaB=घभ्, GabDa=घब्ध — keep Ga, BD=ब्ध (G=घ)
-    // Extreme: keep GabDa not GaBta
-    if orig == "GaB" {
-        return "GabDa".into(); // घब्ध
-    }
-    // Special: धभ् + क्त → धब्ध (SLP1 DabDa) — similarly DaB→DabDa
-    // sūtra: धभ् + क्त → धब्ध; future devs: DaB=धभ्, DabDa=धब्ध — keep Da, BD=ब्ध (D=ध)
-    // Extreme: keep DabDa not DaBta
-    if orig == "DaB" {
-        return "DabDa".into(); // धब्ध
-    }
     // Special: गै + क्त → गीत (SLP1 gIta) — gai→gI (6.1.45 Actually gE→gI)
     // sūtra: गै + क्त → गीत; future devs: gE=गै, gIta=गीत — keep gI, t
     // Extreme: keep gIta not gEta; handles E→I via 6.1.45
@@ -730,24 +568,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "su" {
         return "suta".into(); // सुत
     }
-    // Special: पभ् + क्त → पब्ध (SLP1 pabDa) — similarly paB→pabDa
-    // sūtra: पभ् + क्त → पब्ध; future devs: paB=पभ्, pabDa=पब्ध — keep pa, BD=ब्ध
-    // Extreme: keep pabDa not paBta
-    if orig == "paB" {
-        return "pabDa".into(); // पब्ध
-    }
-    // Special: बभ् + क्त → बब्ध (SLP1 babDa) — similarly baB→babDa? Actually BaB=बभ् (Ba=ब)
-    // sūtra: बभ् + क्त → बब्ध; future devs: BaB=बभ्, babDa=बब्ध — keep ba, BD=ब्ध (Ba=ब)
-    // Extreme: keep babDa not BaBta; note Ba is ब not भ, but pattern same
-    if orig == "BaB" {
-        return "babDa".into(); // बब्ध (BaB is बभ् — Ba=ब, B=भ)
-    }
-    // Special: चभ् + क्त → चब्ध (SLP1 cabDa) — similarly caB→cabDa
-    // sūtra: चभ् + क्त → चब्ध; future devs: caB=चभ्, cabDa=चब्ध — keep ca, BD=ब्ध
-    // Extreme: keep cabDa not caBta
-    if orig == "caB" {
-        return "cabDa".into(); // चब्ध
-    }
     // Special: खन् + क्त → खात (SLP1 KAta) — similarly Kan→KAta (jan pattern)
     // sūtra: खन् + क्त → खात; future devs: Kan=खन्, KAta=खात — keep K=ख, A=आ, no n
     // Extreme: keep KAta not Kanta; long A like jan→jAta
@@ -846,6 +666,10 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         _ if r.chars().last().is_some_and(|c| matches!(c, 'c' | 'C' | 'j' | 'J')) => {
             internal_sandhi(&r, "ta")
         }
+        // 8.2.37 पदादि (भष्): भ् + त → ब्ध (लब्ध, लुब्ध). Before इट् (*luBita).
+        // 8.3.23 मोऽनुस्वारः on म्भ्: रम्भ् → रब्ध (drop m, then भष्).
+        _ if r.ends_with("mB") => format!("{}bDa", &r[..r.len() - 2]),
+        _ if r.ends_with('B') => internal_sandhi(&r, "ta"),
         _ if r.ends_with('h')
             && r.chars().rev().nth(1).is_some_and(|c| "aAiIuUfFeEoO".contains(c)) =>
         {
@@ -1515,14 +1339,13 @@ mod tests {
         assert_eq!(derive("luBa", "kta"), vec!["lubDa"]); // लुभ् → लुब्ध (luBa is लुभ् with a)
         assert_eq!(derive("luB", "kta"), vec!["lubDa"]);
         // क्षुभ् → क्षुब्ध (kzuBDa) — kzuB→kzuBDa
-        assert_eq!(derive("kzuBa", "kta"), vec!["kzuBDa"]); // क्षुभ् → क्षुब्ध (kzuBa is क्षुभ् with a)
-        assert_eq!(derive("kzuB", "kta"), vec!["kzuBDa"]);
-        // स्तभ् → स्तब्ध (swaBDa) — swaB→swaBDa
-        assert_eq!(derive("swaBa", "kta"), vec!["swaBDa"]); // स्तभ् → स्तब्ध (swaBa is स्तभ् with a)
-        assert_eq!(derive("swaB", "kta"), vec!["swaBDa"]);
-        // स्कम्भ् → स्कब्ध (skaBDa) — skaB→skaBDa
-        assert_eq!(derive("skaBa", "kta"), vec!["skaBDa"]); // स्कम्भ् → स्कब्ध (skaBa is स्कभ् with a)
-        assert_eq!(derive("skaB", "kta"), vec!["skaBDa"]);
+        assert_eq!(derive("kzuBa", "kta"), vec!["kzubDa"]); // क्षुभ् → क्षुब्ध (8.2.37 भष् B→b)
+        assert_eq!(derive("kzuB", "kta"), vec!["kzubDa"]);
+        // स्तभ् SLP1 is staB; swaB is स्टभ् (w=ट) — still भष् → swabDa
+        assert_eq!(derive("swaBa", "kta"), vec!["swabDa"]);
+        assert_eq!(derive("swaB", "kta"), vec!["swabDa"]);
+        assert_eq!(derive("skaBa", "kta"), vec!["skabDa"]);
+        assert_eq!(derive("skaB", "kta"), vec!["skabDa"]);
         // रम्भ् → रब्ध (rabDa) — ramB→rabDa
         assert_eq!(derive("ramBa", "kta"), vec!["rabDa"]); // रम्भ् → रब्ध (ramBa is रम्भ् with a)
         assert_eq!(derive("ramB", "kta"), vec!["rabDa"]);
@@ -1563,11 +1386,10 @@ mod tests {
         assert_eq!(derive("kuBa", "kta"), vec!["kubDa"]); // कुभ् → कुब्ध (kuBa is कुभ् with a)
         assert_eq!(derive("kuB", "kta"), vec!["kubDa"]);
         // स्तुभ् → स्तुब्ध (stuBDa) — stuB→stuBDa
-        assert_eq!(derive("stuBa", "kta"), vec!["stuBDa"]); // स्तुभ् → स्तुब्ध (stuBa is स्तुभ् with a)
-        assert_eq!(derive("stuB", "kta"), vec!["stuBDa"]);
-        // स्कुभ् → स्कुब्ध (skuBDa) — skuB→skuBDa
-        assert_eq!(derive("skuBa", "kta"), vec!["skuBDa"]); // स्कुभ् → स्कुब्ध (skuBa is स्कुभ् with a)
-        assert_eq!(derive("skuB", "kta"), vec!["skuBDa"]);
+        assert_eq!(derive("stuBa", "kta"), vec!["stubDa"]);
+        assert_eq!(derive("stuB", "kta"), vec!["stubDa"]);
+        assert_eq!(derive("skuBa", "kta"), vec!["skubDa"]);
+        assert_eq!(derive("skuB", "kta"), vec!["skubDa"]);
         // तभ् → तब्ध (tabDa) — taB→tabDa
         assert_eq!(derive("taBa", "kta"), vec!["tabDa"]); // तभ् → तब्ध (taBa is तभ् with a)
         assert_eq!(derive("taB", "kta"), vec!["tabDa"]);
@@ -1596,8 +1418,8 @@ mod tests {
         assert_eq!(derive("paBa", "kta"), vec!["pabDa"]); // पभ् → पब्ध (paBa is पभ् with a)
         assert_eq!(derive("paB", "kta"), vec!["pabDa"]);
         // बभ् → बब्ध (babDa) — BaB→babDa (Ba=ब, B=भ)
-        assert_eq!(derive("BaBa", "kta"), vec!["babDa"]); // बभ् → बब्ध (BaBa is बभ् with a — Ba=ब)
-        assert_eq!(derive("BaB", "kta"), vec!["babDa"]);
+        assert_eq!(derive("BaBa", "kta"), vec!["BabDa"]); // बभ् (Ba=ब, B=भ) → बब्ध BabDa
+        assert_eq!(derive("BaB", "kta"), vec!["BabDa"]);
         // चभ् → चब्ध (cabDa) — caB→cabDa
         assert_eq!(derive("caBa", "kta"), vec!["cabDa"]); // चभ् → चब्ध (caBa is चभ् with a)
         assert_eq!(derive("caB", "kta"), vec!["cabDa"]);
