@@ -143,21 +143,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "ad" {
         return "jagDa".into(); // जग्ध
     }
-    // Special: भिद् + क्त → भिन्न (SLP1 Binna) — 8.2.43?/6.4.47 d→n before t
-    // sūtra: भिद् + क्त → भिन्न (नत्व); future devs: B=bh, i, nna — keep Binna not Bitta
-    // Extreme: handles 7.2.14 kit? not needed, keep sūtra header for future halanta devs
-    if orig == "Bid" {
-        return "Binna".into(); // भिन्न
-    }
-    // Special: शद्/पद् + क्त → शन्न/पन्न (SLP1 Sanna/panna) — 8.2.45 + 6.4.?? d→n
-    // sūtra: शद्/पद् + क्त → शन्न/पन्न (n-त्व); future devs: Sad=शद् (S=श), pad=पद्
-    // Extreme: keep Sanna/panna not Satta/patta; d→n before t is sūtra-driven not sandhi atta
-    if orig == "Sad" {
-        return "Sanna".into(); // शन्न (Sad=S+ad? Actually S=श, Sad=शद्)
-    }
-    if orig == "pad" {
-        return "panna".into(); // पन्न
-    }
     // Special: सह् + क्त → सोढ (SLP1 soQa) — 8.2.31 हो ढः + 6.3.111 lengthening, guṇa a→o
     // sūtra: सह् + क्त → सोढ; future devs: sah→soQa, not sAQa (guṇa, not vṛddhi)
     // Extreme: keep soQa (सोढ) with o, Q=ढ; generic kta_ho_dha would give sAQa (साढ) — wrong
@@ -640,12 +625,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "span" {
         return "spAta".into(); // स्पात
     }
-    // Special: स्कन् + क्त → स्कात (SLP1 skAta) — similarly skan→skAta
-    // sūtra: स्कन् + क्त → स्कात; future devs: skan=स्कन्, skAta=स्कात — keep skA, no n
-    // Extreme: keep skAta not skanta
-    if orig == "skan" {
-        return "skAta".into(); // स्कात
-    }
     // क्षण् + क्त is सेट् → क्षणित? Actually kzaN is सेट्, not anit — keep kzaRita via it path
     // sūtra: kzaN is सेट्, so kta is kzaRita not kZAta; future devs: do not add kZAta special for kzaN
     // Extreme: keep kzaRita (via takes_it_nistha) — no special needed
@@ -659,6 +638,19 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
             format!("{s}zwa")
         }
         "ij" => "izwa".into(),
+        // 8.2.42 रदाभ्यां निष्ठातो नः पूर्वस्य च दः — भिद्/छिद् → भिन्न/छिन्न (not Bitta).
+        // 8.2.45 ओदितश्च — शद्/पद्/स्कन्द् → शन्न/पन्न/स्कन्न (not Satta/skAta).
+        // अद् is 2.4.36 जग्ध (above). सद् stays सत्त via internal_sandhi.
+        _ if matches!(orig.as_str(), "Bid" | "Cid" | "Sad" | "pad" | "skand" | "skan") => {
+            let mut stem = orig.as_str();
+            if let Some(s) = stem.strip_suffix('d') {
+                stem = s;
+            }
+            if let Some(s) = stem.strip_suffix('n') {
+                stem = s;
+            }
+            format!("{stem}nna")
+        }
         // 8.2.30 चोः कुः — palatal + झल् त of क्त → velar (मुक्त, युक्त, सिक्त).
         // Must precede 7.2.35 इट्: takes_it_nistha would otherwise yield *mucita/*yujita.
         // च/छ/ज/झ → क/ख/ग/घ; internal_sandhi maps c/j + t → kt. छ/झ rare in निष्ठा.
@@ -1460,8 +1452,9 @@ mod tests {
         assert_eq!(derive("spana", "kta"), vec!["spAta"]); // स्पन् → स्पात (spana is स्पन् with a)
         assert_eq!(derive("span", "kta"), vec!["spAta"]);
         // स्कन् → स्कात (skAta) — skan→skAta
-        assert_eq!(derive("skana", "kta"), vec!["skAta"]); // स्कन् → स्कात (skana is स्कन् with a)
-        assert_eq!(derive("skan", "kta"), vec!["skAta"]);
+        assert_eq!(derive("skana", "kta"), vec!["skanna"]); // स्कन्दिर् ओदित् 8.2.45 स्कन्न
+        assert_eq!(derive("skan", "kta"), vec!["skanna"]);
+        assert_eq!(derive("Cida", "kta"), vec!["Cinna"]); // छिद् 8.2.42 छिन्न
         // गै → गीत (gIta) — gE→gIta (6.1.45)
         assert_eq!(derive("gE", "kta"), vec!["gIta"]); // गै → गीत
         // पै → पीत (pIta) — pE→pIta

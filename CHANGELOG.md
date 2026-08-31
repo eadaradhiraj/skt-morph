@@ -6,6 +6,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 
 - **क्त 8.2.30 चोः कुः:** palatal + क्त त goes through `internal_sandhi` *before* 7.2.35 इट् (मुक्त, युक्त, सिक्त — not *mucita). Dropped the per-root मुच्/युज्/सिच्/रुच्/… name list. भञ्ज् → भग्न stays named (ञ्ज्).
 - **क्त 8.2.37 भष्:** भ् + त → ब्ध before इट् (लब्ध, लुब्ध, क्षुब्ध `kzubDa`). म्भ् drops म् (रम्भ् रब्ध). Dropped the per-root लुभ्/लभ्/… name list.
+- **क्त 8.2.42/45 नत्व:** भिद्/छिद् भिन्न/छिन्न; ओदित् शद्/पद्/स्कन्द् शन्न/पन्न/स्कन्न (not स्कात). अद् stays 2.4.36 जग्ध.
 - **निरावरण live:** `tinanta_overrides.rs` removed — empty patch table deleted, generate is fully sūtra-driven (stems/adadi/join/it). README updated.
 - **अतिव्याख्या extreme commenting:** every module / fn / const / impl and every inner `if`/`match`/`for`/`while` block now carries a Pāṇini/Kaumudī sūtra comment header — ~2.9k lines added, no logic change; `cargo clippy -D warnings` + 95 tests clean.
 - **क्त हित/दत्त (7.4.42 vs 7.4.46):** clarified `kit_anga` comment — SLP1 `DA`=धा → `हि` → `हित` vs `dA`=दा → `दद्` → `दत्त`; added `quDAY`/`DA` → `hita` asserts; pushed.
