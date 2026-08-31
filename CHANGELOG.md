@@ -34,6 +34,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **सुबन्त ष-anta:** द्विष् द्विट्/द्विड्, द्विषौ, द्विड्भ्याम्, द्विट्सु (replaced visarga stub).
 - **क्त प्/क् before इट्:** तप्त/आप्त/शक्त; कम्प् stays कम्पित; पत् stays पतित.
 - **सर्वनाम इदम् अनयोः/आसाम्:** dual अनयोः/एनयोः (not *इमोः); स्त्री षष्ठी बहु आसाम् (not acc *इमाम्).
+- **सर्वनाम इदम् स्मै/एभिः:** अस्मै (not *asmai); एभिः/एभ्यः (SLP1 `e` not ऐ `E`); स्त्री अनया, loc आसु.
 
 ## 2026-08-31
 
