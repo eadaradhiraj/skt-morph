@@ -108,6 +108,9 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         ('h', 's') => format!("{}kz{}", stem_body, &suffix[1..]),
         ('B', 't') => format!("{}bD{}", stem_body, &suffix[1..]),
         ('B', 'T') => format!("{}bD{}", stem_body, &suffix[1..]),
+        // 8.3.23 मोऽनुस्वारः + 8.4.58 परसवर्णः — गन्तव्य, गन्तुम्
+        ('m', 't') => format!("{}nt{}", stem_body, &suffix[1..]),
+        ('m', 'T') => format!("{}nT{}", stem_body, &suffix[1..]),
         _ => format!("{}{}", stem, suffix),
     }
 }

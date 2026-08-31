@@ -2,6 +2,7 @@
 use crate::engine::phonology::apply_guna_to_stem;
 use serde::{Deserialize, Serialize};
 use crate::engine::join::internal_sandhi;
+use crate::engine::it::join_eco;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct KrdantaResult {
@@ -66,6 +67,11 @@ fn surface_root(dhatu: &str) -> String {
 }
 
 fn kta_base(dhatu: &str) -> String {
+    nistha_base(dhatu, true)
+}
+
+/// `va` = 8.2.52 पचो वः (निष्ठा only, not क्त्वा).
+fn nistha_base(dhatu: &str, va: bool) -> String {
     let mut r = surface_root(dhatu);
     if r.ends_with('a') && r.len() >= 3 {
         let core = &r[..r.len() - 1];
@@ -75,13 +81,16 @@ fn kta_base(dhatu: &str) -> String {
             r = core.to_string();
         }
     }
-    // 6.1.15 वचिस्वपियजादीनां
+    let orig = r.clone();
+    // 6.1.15 वचिस्वपियजादीनां; 6.1.16 ग्रहिज्या…
     let r = match r.as_str() {
         "vac" => "uc".into(),
         "yaj" => "ij".into(),
         "vap" => "up".into(),
         "vah" => "uh".into(),
         "svap" | "zvap" => "sup".into(),
+        "vas" => "us".into(),
+        "grah" => "gfh".into(),
         other => other.to_string(),
     };
     // SLP1 भ is B; older "labh" = लभ्
@@ -91,11 +100,11 @@ fn kta_base(dhatu: &str) -> String {
         r
     };
     let r = kit_anga(&r);
+    if orig == "pac" && va {
+        return "pakva".into(); // 8.2.52 पचो वः
+    }
     match r.as_str() {
-        "grah" => "gfhIta".into(),
-        "vas" => "uzita".into(),
-        "pat" => "patita".into(),
-        "bandh" => "badDa".into(),
+        "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
         // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः
         "sfj" | "mfj" | "Brasj" | "vraSc" => {
             let mut s = r.clone();
@@ -107,6 +116,14 @@ fn kta_base(dhatu: &str) -> String {
             && r.chars().rev().nth(1).is_some_and(|c| "aAiIuUfFeEoO".contains(c)) =>
         {
             kta_ho_dha(&r)
+        }
+        _ if crate::engine::it::takes_it_nistha(&orig) => {
+            let anga = if r.ends_with('s') {
+                crate::engine::it::ruki_s(&r)
+            } else {
+                r.clone()
+            };
+            format!("{anga}ita")
         }
         _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
         _ => internal_sandhi(&r, "ta"),
@@ -141,6 +158,10 @@ fn kit_anga(root: &str) -> String {
         "mA" => "mi".into(),
         "pA" => "pI".into(),
         "gam" | "han" => root[..root.len() - 1].to_string(),
+        "banD" | "bandh" => {
+            let last = root.chars().last().unwrap();
+            format!("{}{last}", &root[..root.len() - 2])
+        }
         other => other.to_string(),
     }
 }
@@ -184,35 +205,6 @@ fn cajo_ku(s: &str) -> String {
     }
 }
 
-/// 6.1.78 एचोऽयवायावः; 6.1.79 वान्तो यि प्रत्यये; 6.1.101 अकः सवर्णे दीर्घः.
-fn join_eco(stem: &str, suffix: &str) -> String {
-    let Some(s0) = suffix.chars().next() else {
-        return stem.to_string();
-    };
-    let Some(last) = stem.chars().last() else {
-        return suffix.to_string();
-    };
-    let body: String = stem.chars().take(stem.chars().count() - 1).collect();
-    if s0 == 'y' {
-        return match last {
-            'o' => format!("{body}av{suffix}"),
-            'O' => format!("{body}Av{suffix}"),
-            _ => format!("{stem}{suffix}"),
-        };
-    }
-    if !is_ac(s0) {
-        return format!("{stem}{suffix}");
-    }
-    match last {
-        'e' => format!("{body}ay{suffix}"),
-        'o' => format!("{body}av{suffix}"),
-        'E' => format!("{body}Ay{suffix}"),
-        'O' => format!("{body}Av{suffix}"),
-        'a' | 'A' if s0 == 'a' || s0 == 'A' => format!("{body}A{}", &suffix[s0.len_utf8()..]),
-        _ => format!("{stem}{suffix}"),
-    }
-}
-
 /// णित्/ञित् kṛt aṅga: 7.2.115 अचो ञ्णिति, 7.2.116 अत उपधायाः, 7.3.86 इगुपध गुण,
 /// 7.3.33 आतो युक्, 7.3.32/54 हन् → घात्.
 fn nit_krt_anga(root: &str, pratyaya: &str) -> String {
@@ -250,7 +242,7 @@ fn nit_krt_form(root: &str, pratyaya: &str) -> String {
 }
 
 fn ktva_base(dhatu: &str) -> String {
-    let ta = kta_base(dhatu);
+    let ta = nistha_base(dhatu, false);
     if let Some(stripped) = ta.strip_suffix("ita") {
         format!("{stripped}itvA")
     } else if let Some(stripped) = ta.strip_suffix("ta") {
@@ -261,35 +253,13 @@ fn ktva_base(dhatu: &str) -> String {
 }
 
 fn lyap_base(dhatu: &str) -> String {
-    let ta = kta_base(dhatu);
+    let ta = nistha_base(dhatu, false);
     if let Some(stripped) = ta.strip_suffix("ita") {
         format!("{stripped}ya")
     } else if let Some(stripped) = ta.strip_suffix("ta") {
         format!("{stripped}ya")
     } else {
         format!("{ta}ya")
-    }
-}
-
-fn tum_base(dhatu: &str, guna: &str) -> String {
-    match surface_root(dhatu).as_str() {
-        "gam" => "gantum".into(),
-        "kf" => "kartum".into(),
-        "dA" => "dAtum".into(),
-        "BU" => "Bavitum".into(),
-        "nI" => "netum".into(),
-        "vac" => "vaktum".into(),
-        "han" => "hantum".into(),
-        "sTA" => "sTAtum".into(),
-        _ => {
-            let last_c = guna.chars().last().unwrap_or('a');
-            if guna.ends_with('a') || "iIuUfFeEoO".contains(last_c) {
-                let base = if guna.ends_with('a') { &guna[..guna.len() - 1] } else { guna };
-                format!("{base}itum")
-            } else {
-                internal_sandhi(guna, "tum")
-            }
-        }
     }
 }
 
@@ -455,7 +425,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
             }
         }
         "guna_a" => join_eco(&guna, "a"),
-        "guna_tum" => tum_base(&dhatu, &guna),
+        "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
         "root" if pratyaya == "ktvA" => ktva_base(&dhatu),
@@ -534,6 +504,21 @@ mod tests {
         assert_eq!(kta_base("labh"), "labDa");
         assert_eq!(kta_base("svap"), "supta");
         assert_eq!(kta_base("naS"), "nazwa");
+        assert_eq!(derive("graha", "kta"), vec!["gfhIta"]);
+        assert_eq!(derive("vasa", "kta"), vec!["uzita"]);
+        assert_eq!(derive("patx", "kta"), vec!["patita"]);
+        assert_eq!(derive("banDa", "kta"), vec!["badDa"]);
+        assert_eq!(derive("qupacaz", "kta"), vec!["pakva"]);
+        assert_eq!(derive("qupacaz", "ktvA"), vec!["paktvA"]);
+        assert_eq!(derive("gam", "tavya"), vec!["gantavya"]);
+        assert_eq!(derive("gam", "tfc"), vec!["gantf"]);
+        assert_eq!(derive("RIY", "tumun"), vec!["netum"]);
+        assert_eq!(derive("BU", "tumun"), vec!["Bavitum"]);
+        assert_eq!(derive("Sru", "lyuw"), vec!["SravaRa"]);
+        assert_eq!(derive("Sru", "anIyar"), vec!["SravaRIya"]);
+        assert_eq!(derive("hana", "anIyar"), vec!["hananIya"]);
+        assert_eq!(derive("RIY", "lyuw"), vec!["nayana"]);
+        assert_eq!(derive("qudAY", "lyuw"), vec!["dAna"]);
     }
 
     #[test]

@@ -3,7 +3,7 @@
 #![allow(non_snake_case)]
 
 use crate::engine::join::internal_sandhi;
-use crate::engine::phonology::apply_guna_to_stem;
+use crate::engine::phonology::{apply_guna_to_stem, apply_natva_to_word};
 
 fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
@@ -31,9 +31,26 @@ pub fn anit_sic(root: &str) -> bool {
     )
 }
 
-/// तव्य / अनीयर् / तृच्: कर्तव्य, गन्तव्य; सेट् is भवितव्य.
+/// तव्य / तृच् / तुमुन्: कर्तव्य, गन्तव्य; सेट् is भवितव्य. (निष्ठा is a different list.)
 pub fn anit_tavya(root: &str) -> bool {
     matches!(root, "kf" | "gam" | "han") || (anit_sya(root) && !matches!(root, "grah"))
+}
+
+/// निष्ठा (क्त) सेट्: पतित, उषित, गृहीत. 7.2.11 श्र्युकः किति blocks भूत/श्रुत/नीत.
+pub fn takes_it_nistha(root: &str) -> bool {
+    if matches!(root, "vas" | "grah" | "pat") {
+        return true;
+    }
+    if matches!(
+        root,
+        "kf" | "gam" | "han" | "labh" | "laB" | "naS" | "banD" | "svap" | "zvap"
+    ) {
+        return false;
+    }
+    if anit_sya(root) {
+        return false;
+    }
+    !root.chars().last().is_some_and(|c| "iIuUfFA".contains(c))
 }
 
 pub fn takes_it_sya(root: &str) -> bool {
@@ -136,66 +153,73 @@ pub fn sya_stem(root: &str) -> String {
     }
 }
 
-/// तव्य aṅga + suffix.
-pub fn tavya_form(root: &str) -> String {
-    match root {
-        "kf" => "kartavya".into(),
-        "gam" => "gantavya".into(),
-        "nI" => "netavya".into(),
-        "dA" => "dAtavya".into(),
-        "BU" => "Bavitavya".into(),
-        "han" => "hantavya".into(),
-        "vac" => "vaktavya".into(),
-        "sTA" => "sTAtavya".into(),
-        _ if takes_it_tavya(root) => {
-            let g = apply_guna_to_stem(root);
-            format!("{g}itavya")
-        }
-        _ => {
-            let g = apply_guna_to_stem(root);
-            internal_sandhi(&g, "tavya")
-        }
+fn is_ac(c: char) -> bool {
+    matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
+}
+
+/// 6.1.78 एचोऽयवायावः; 6.1.79 वान्तो यि प्रत्यये; 6.1.101 अकः सवर्णे दीर्घः.
+pub fn join_eco(stem: &str, suffix: &str) -> String {
+    let Some(s0) = suffix.chars().next() else {
+        return stem.to_string();
+    };
+    let Some(last) = stem.chars().last() else {
+        return suffix.to_string();
+    };
+    let body: String = stem.chars().take(stem.chars().count() - 1).collect();
+    if s0 == 'y' {
+        return match last {
+            'o' => format!("{body}av{suffix}"),
+            'O' => format!("{body}Av{suffix}"),
+            _ => format!("{stem}{suffix}"),
+        };
     }
+    if !is_ac(s0) {
+        return format!("{stem}{suffix}");
+    }
+    match last {
+        'e' => format!("{body}ay{suffix}"),
+        'o' => format!("{body}av{suffix}"),
+        'E' => format!("{body}Ay{suffix}"),
+        'O' => format!("{body}Av{suffix}"),
+        'a' | 'A' if s0 == 'a' || s0 == 'A' => format!("{body}A{}", &suffix[s0.len_utf8()..]),
+        _ => format!("{stem}{suffix}"),
+    }
+}
+
+/// गुण + सेट् इट् (7.2.35) or अनिट् sandhi, then णत्व. तव्य / तृच् / तुमुन्.
+pub fn guna_it_join(root: &str, suffix: &str) -> String {
+    let g = apply_guna_to_stem(root);
+    let raw = if takes_it_tavya(root) {
+        format!("{g}i{suffix}")
+    } else {
+        internal_sandhi(&g, suffix)
+    };
+    apply_natva_to_word(&raw)
+}
+
+/// गुण + vowel-initial kṛt (ल्युट् अन, अनीयर्), 6.1.78/101 then णत्व.
+pub fn guna_ac_suffix(root: &str, suffix: &str) -> String {
+    apply_natva_to_word(&join_eco(&apply_guna_to_stem(root), suffix))
+}
+
+pub fn tavya_form(root: &str) -> String {
+    guna_it_join(root, "tavya")
 }
 
 pub fn anIya_form(root: &str) -> String {
-    match root {
-        "kf" => "karaRIya".into(),
-        "gam" => "gamanIya".into(),
-        "nI" => "nayanIya".into(),
-        "dA" => "dAnIya".into(),
-        "BU" => "BavanIya".into(),
-        "han" => "GAtanIya".into(),
-        _ => format!("{}anIya", apply_guna_to_stem(root)),
-    }
+    guna_ac_suffix(root, "anIya")
 }
 
 pub fn lyuw_form(root: &str) -> String {
-    match root {
-        "kf" => "karaRa".into(),
-        "gam" => "gamana".into(),
-        "nI" => "nayana".into(),
-        "dA" => "dAna".into(),
-        "BU" => "Bavana".into(),
-        _ => format!("{}ana", apply_guna_to_stem(root)),
-    }
+    guna_ac_suffix(root, "ana")
 }
 
 pub fn tfc_form(root: &str) -> String {
-    match root {
-        "kf" => "kartf".into(),
-        "nI" => "netf".into(),
-        "dA" => "dAtf".into(),
-        "BU" => "Bavitf".into(),
-        "gam" => "gantf".into(),
-        "han" => "hantf".into(),
-        "vac" => "vaktf".into(),
-        _ if takes_it_tavya(root) => format!("{}itf", apply_guna_to_stem(root)),
-        _ => {
-            let g = apply_guna_to_stem(root);
-            internal_sandhi(&g, "tf")
-        }
-    }
+    guna_it_join(root, "tf")
+}
+
+pub fn tum_form(root: &str) -> String {
+    guna_it_join(root, "tum")
 }
 
 /// सिच् parasmai body (before ईत्): कार्ष, नैष्, अत्स्.
@@ -244,5 +268,16 @@ mod tests {
         assert_eq!(tavya_form("kf"), "kartavya");
         assert_eq!(tavya_form("BU"), "Bavitavya");
         assert_eq!(tfc_form("kf"), "kartf");
+        assert_eq!(tavya_form("gam"), "gantavya");
+        assert_eq!(tavya_form("nI"), "netavya");
+        assert_eq!(tavya_form("Sru"), "Srotavya");
+        assert_eq!(tum_form("gam"), "gantum");
+        assert_eq!(tum_form("BU"), "Bavitum");
+        assert_eq!(lyuw_form("kf"), "karaRa");
+        assert_eq!(lyuw_form("nI"), "nayana");
+        assert_eq!(lyuw_form("Sru"), "SravaRa");
+        assert_eq!(anIya_form("kf"), "karaRIya");
+        assert_eq!(anIya_form("han"), "hananIya");
+        assert_eq!(anIya_form("Sru"), "SravaRIya");
     }
 }
