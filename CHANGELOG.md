@@ -21,7 +21,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
   - **8.2.36 षः:** सृष्ट/इष्ट; पृच्छ् पृष्ट (not palatal *prcKta).
   - **8.2.34 नहो धः:** नह् → नद्ध (not *नाढ).
   - **6.1.16 व्यध्:** विध् → विद्ध (with 8.2.40).
-- **लृट् 7.3.77–78 / 2.4.52:** `sya_stem` undoes शित् present ādeśa (तिष्ठ/पिब/पश्य/गच्छ → स्थास्य/पास्य/द्रक्ष्य/गमिष्य) and अस्→भू भविष्यति. Dropped `g1_future_base` पा→पिब (शिति only). `anit_sya` documents 7.2.10 vs empty accent tags.
+- **अदादि आत्मने दुह्/लिह् (8.2.31/32):** `lat_ad_a` ते/आते/अते (not thematic एते/अन्ते) — दुग्धे, दुहाते, दुहते, धुक्षे, धोक्ष्यते, लीढे. `jhal` ह्+स् on द-initial is 8.2.32 (dropped the named धोक्ष्य लृट् arm). लृट् आत्मने keeps thematic स्य (`lrt_kartari_a`).
 
 ## 2026-08-31
 

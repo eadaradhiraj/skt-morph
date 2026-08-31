@@ -65,6 +65,22 @@ pub fn lat_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+/// अदादि आत्मने लट् (शप् लुक्): ते/आते/अते not thematic एते/अन्ते.
+/// दुग्धे, दुहाते, दुहते; धुक्षे; दुहे.
+pub fn lat_ad_a() -> Vec<(Vec<String>, Vec<String>)> {
+    vec![
+        (vec!["te".into()], vec!["3.4.78".into()]),
+        (vec!["Ate".into()], vec!["3.4.78".into()]),
+        (vec!["ate".into()], vec!["3.4.78".into()]),
+        (vec!["se".into()], vec!["3.4.78".into()]),
+        (vec!["ATe".into()], vec!["3.4.78".into()]),
+        (vec!["Dve".into()], vec!["3.4.78".into()]),
+        (vec!["e".into()], vec!["3.4.78".into()]),
+        (vec!["vahe".into()], vec!["3.4.78".into()]),
+        (vec!["mahe".into()], vec!["3.4.78".into()]),
+    ]
+}
+
 // ---------------------------------------------------------------------------
 // fn `lot_kartari_p`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -555,6 +571,8 @@ pub fn family_endings(
         ("lat","kartari","P","thematic") => lat_kartari_p(),
         ("lat","kartari","A","thematic") => lat_kartari_a(),
         ("lat","kartari","P","ad") => lat_ad_p(),
+        ("lat","kartari","A","ad") => lat_ad_a(),
+        ("lrt","kartari","A","ad") => lrt_kartari_a(),
         ("lot","kartari","P","thematic") => lot_kartari_p(),
         ("lot","kartari","A","thematic") => lot_kartari_a(),
         ("lot","kartari","P","ad") => lot_ad_p(),

@@ -175,6 +175,11 @@ fn jhal(stem: &str, suf: &str, lih: bool) -> String {
         ('j', 'D') => format!("{body}qQ{rest}"),
         ('h', 't') | ('h', 'T') if lih => format!("{body}Q{rest}"),
         ('h', 't') | ('h', 'T') => format!("{body}gD{rest}"),
+        // 8.2.32 दादेर्धातोर्घः + 8.2.41 षढोः कः सि — धुक्षे, धोक्ष्यति (not *dukze).
+        ('h', 's') if stem.starts_with('d') => {
+            let mid: String = body.chars().skip(1).collect();
+            format!("D{mid}kz{rest}")
+        }
         ('h', 's') => format!("{body}kz{rest}"),
         ('h', 'D') if lih => format!("{body}Q{rest}"),
         ('h', 'D') => format!("{body}gD{rest}"),
@@ -504,11 +509,9 @@ fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> O
         }
         "vidhilin" => format!("{gen}{ending}"),
         "lrt" => {
-            let sya = if root == "duh" || root == "dih" {
-                format!("D{}kzya", &strong0[1..strong0.len() - 1])
-            } else if crate::engine::it::anit_sya(root) || matches!(root, "dviz" | "vac" | "mfj") {
+            // 8.2.32 on ह्+स् is in jhal (धोक्ष्यति). Unlisted अनिट् still uses sya via jhal.
+            let sya = if crate::engine::it::anit_sya(root) || matches!(root, "dviz" | "vac" | "mfj") {
                 let j = jhal(&strong0, "sya", lih);
-                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if j.ends_with('a') {
                     j
                 } else {
@@ -1552,6 +1555,13 @@ mod tests {
         assert_eq!(join_form("dviza", "lat", "anti", 1, 3, None).as_deref(), Some("dvizanti"));
         assert_eq!(join_form("dviza", "lat", "si", 2, 1, None).as_deref(), Some("dvekzi"));
         assert_eq!(join_form("duha", "lat", "ti", 1, 1, None).as_deref(), Some("dogDi"));
+        // ātmane: 8.2.31/32 — दुग्धे, दुहते, धुक्षे (not *duhte / *dukze).
+        assert_eq!(join_form("duha", "lat", "te", 1, 1, None).as_deref(), Some("dugDe"));
+        assert_eq!(join_form("duha", "lat", "ate", 1, 3, None).as_deref(), Some("duhate"));
+        assert_eq!(join_form("duha", "lat", "Ate", 1, 2, None).as_deref(), Some("duhAte"));
+        assert_eq!(join_form("duha", "lat", "se", 2, 1, None).as_deref(), Some("Dukze"));
+        assert_eq!(join_form("liha", "lat", "te", 1, 1, None).as_deref(), Some("lIQe"));
+        assert_eq!(join_form("duha", "lrt", "te", 1, 1, None).as_deref(), Some("Dokzyate"));
         assert_eq!(join_form("liha", "lat", "ti", 1, 1, None).as_deref(), Some("leQi"));
         assert_eq!(join_form("yu", "lat", "ti", 1, 1, None).as_deref(), Some("yOti"));
         assert_eq!(join_form("yu", "lat", "anti", 1, 3, None).as_deref(), Some("yuvanti"));
