@@ -114,7 +114,9 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     let orig = r.clone();
     // 6.1.15 वचिस्वपियजादीनां किति — वच्/यज्/वप्/वह्/स्वप्/वस् → उच्/इज्/…
     // 6.1.16 ग्रहिज्यावयिव्यधिवष्टिविचतिवृश्चतिपृच्छतिभृज्जतीनां ङिति च —
-    // ग्रह् already ग्फ्; व्यध् → विध् (विद्ध after 8.2.40 ध्+त).
+    // ग्रह् already गृहीत; व्यध् → विध् (विद्ध after 8.2.40); वयि वे → उ (उत);
+    // वष्टि वश् → उश् (उष्ट after 8.2.36). विच् stays विक्त (8.2.30; संप्रसारण would collide with वच् उक्त).
+    // व्रश्च्/पृच्छ्/भ्रस्ज् are 8.2.36 below. ज्या is named जीन (class after जि would be *जित).
     let r = match r.as_str() {
         "vac" => "uc".into(),
         "yaj" => "ij".into(),
@@ -124,6 +126,8 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         "vas" => "us".into(),
         "grah" => "gfh".into(),
         "vyaD" => "viD".into(),
+        "ve" => "u".into(),
+        "vaS" => "uS".into(),
         other => other.to_string(),
     };
     // SLP1 भ is B; older "labh" = लभ्
@@ -161,6 +165,10 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "nah" {
         return "nadDa".into();
     }
+    // 6.1.16 ज्या संप्रसारण + निष्ठा न — जीन (not *jyAta; जि+त would be *jita).
+    if orig == "jyA" {
+        return "jIna".into();
+    }
     // क्षण् is सेट् (not 7.2.10): क्त is क्षणित via takes_it_nistha, not *क्षात.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -173,6 +181,7 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
             format!("{s}zwa")
         }
         "ij" => "izwa".into(),
+        "uS" => "uzwa".into(), // 6.1.16 वश् → उश्, then षः (not सेट् *vaSita / palatal *vaSwa)
         "pfcC" | "pracC" => "pfzwa".into(),
         // 8.2.42 रदाभ्यां निष्ठातो नः पूर्वस्य च दः — भिद्/छिद् → भिन्न/छिन्न (not Bitta).
         // 8.2.45 ओदितश्च — शद्/पद्/स्कन्द् → शन्न/पन्न/स्कन्न (not Satta/skAta).
@@ -237,6 +246,8 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         {
             kta_ho_dha(&r)
         }
+        // After 6.1.15/16 the aṅga may be इक् (वे → उ). 7.2.11: no इट् (*veita).
+        _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
         _ if crate::engine::it::takes_it_nistha(&orig) => {
             let anga = if r.ends_with('s') {
                 crate::engine::it::ruki_s(&r)
@@ -245,7 +256,6 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
             };
             format!("{anga}ita")
         }
-        _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
         _ => internal_sandhi(&r, "ta"),
     }
 }
@@ -823,6 +833,11 @@ mod tests {
         assert_eq!(derive("laB", "kta"), vec!["labDa"]);
         assert_eq!(derive("nah", "kta"), vec!["nadDa"]);
         assert_eq!(derive("vyaD", "kta"), vec!["vidDa"]);
+        assert_eq!(derive("jyA", "kta"), vec!["jIna"]);
+        assert_eq!(derive("ve", "kta"), vec!["uta"]);
+        assert_eq!(derive("veY", "kta"), vec!["uta"]);
+        assert_eq!(derive("vaS", "kta"), vec!["uzwa"]);
+        assert_eq!(derive("vaSa", "kta"), vec!["uzwa"]);
         assert_eq!(derive("lih", "kta"), vec!["lIQa"]);
         assert_eq!(derive("guh", "kta"), vec!["gUQa"]);
         // 6.1.45 आदेच + 6.4.66 गा/पा → गीत/पीत; other ऐ → आत (कै कात).
