@@ -188,11 +188,17 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "BaYj" {
         return "Bagna".into(); // भग्न
     }
-    // Special: जन् + क्त → जात (SLP1 jAta) — 6.4.42?/7.2.?? Actually jan→jAta (न-लोप, a→A)
+    // Special: जन् + क्त → जात (SLP1 jAta) — 6.4.42? Actually jan→jAta (न-लोप, a→A)
     // sūtra: जन् + क्त → जात; future devs: jan=जन्, jAta=जात — keep long A, no n
-    // Extreme: jan is anit? but kta is jAta not janita/jata with n; keep jAta
+    // Extreme: jan is anit? but kta is jAta not janita; keep jAta
     if orig == "jan" {
         return "jAta".into(); // जात
+    }
+    // Special: तन् + क्त → तत (SLP1 tata) — similarly tan→tata (न-लोप)
+    // sūtra: तन् + क्त → तत; future devs: tan=तन्, tata=तत — keep short a
+    // Extreme: tan not jan, short a not long; keep tata
+    if orig == "tan" {
+        return "tata".into(); // तत
     }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
@@ -752,6 +758,9 @@ mod tests {
         // जन् → जात (jAta) — jan→jAta
         assert_eq!(derive("jana", "kta"), vec!["jAta"]); // जन् → जात (jana is जन् with a)
         assert_eq!(derive("jan", "kta"), vec!["jAta"]);
+        // तन् → तत (tata) — tan→tata
+        assert_eq!(derive("tana", "kta"), vec!["tata"]); // तन् → तत (tana is तन् with a)
+        assert_eq!(derive("tan", "kta"), vec!["tata"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
