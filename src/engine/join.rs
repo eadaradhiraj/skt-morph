@@ -111,6 +111,8 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
         // 8.3.23 मोऽनुस्वारः + 8.4.58 परसवर्णः — गन्तव्य, गन्तुम्
         ('m', 't') => format!("{}nt{}", stem_body, &suffix[1..]),
         ('m', 'T') => format!("{}nT{}", stem_body, &suffix[1..]),
+        // 8.3.23 मोऽनुस्वारः — नंस्यति.
+        ('m', 's') => format!("{}Ms{}", stem_body, &suffix[1..]),
         _ => format!("{}{}", stem, suffix),
     }
 }
@@ -387,12 +389,22 @@ pub fn join_form(
             return format!("{}{}", stem, ending);
         }
         let raw = dhatu.unwrap_or("");
-        let root = if raw.ends_with("ir") && raw.len() > 3 {
+        let stripped = if raw.ends_with("ir") && raw.len() > 3 {
             &raw[..raw.len() - 2]
         } else if raw.ends_with('a') && raw.len() > 2 {
             &raw[..raw.len() - 1]
         } else {
             raw
+        };
+        // 1.3.2 initial उँ इत् (उछृदिर्, उत्तृदिर्), not undI.
+        let root = if stripped.starts_with("uC")
+            || (stripped.starts_with("ut")
+                && stripped.len() >= 4
+                && stripped.chars().nth(2).is_some_and(|c| !"aAiIuUfFeEoO".contains(c)))
+        {
+            &stripped[1..]
+        } else {
+            stripped
         };
         if !root.is_empty() {
             let chars: Vec<char> = root.chars().collect();

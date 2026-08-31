@@ -65,6 +65,9 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **CI lint:** `cargo clippy --all-targets -- -D warnings` and tests with `RUSTFLAGS=-D warnings`. `#![deny(warnings)]` on the lib.
 - **लट् leftover sūtras:** 1.3.3 visarga/प् (छदिः छदति, दैप् दायति); 6.4.25–26 शपि only (दशति, सजति, स्वजति, रजति) not लृट् (सङ्क्ष्यति); 8.4.40 स्तोः श्चुना (षस्ज सज्जति); 7.1.58 नुम् only इदित् (not ऋति); 3.1.80 धिन्विकृण्व्योः (धिनोति, कृणोति).
 - **8.2.78 / 6.1.73–75 / 7.3.75:** ऊर्वति तूर्वति हूर्छति from उपधायां च, not a name list; म्लेच्छति लच्छति from छे च / दीर्घात् तुक् then 8.4.40; ष्ठिवु ष्ठीवति शिति (लृट् ष्ठेविष्यति). Dropped named ऊठ/नील/स्तृक्ष/णिक्ष/अति (6.1.65 + 7.1.58 + long I/U).
+- **लृट् अनिट् स्य:** dropped the named भ्वादि future map. अनिट् goes through `sya_stem` (8.3.59 आदेशप्रत्यययोः स्रोष्यति; 8.3.23 नंस्यति; त्यक्ष्यति, स्कन्त्स्यति).
+- **अदादि इत् / 7.3.89 / 7.3.93:** sequential 1.3.5 then 6.1.64 (not `surface_root` / `prakriya_root`); उतो वृद्धिर्लुकि नोति क्ष्णोति सौति; ब्रुव ईट् ब्रवीति, लृट् 2.4.53 वक्ष्यति. अदादि षु is `02.0036` (भ्वादि `zu` stays सवति).
+- **गण 7 उँ इत्:** 1.3.2 initial उँ (उछृदिर् छृणत्ति), not a name list for उछृद्/उत्तृद्.
 
 
 

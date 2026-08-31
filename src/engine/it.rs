@@ -18,7 +18,8 @@ pub fn anit_sya(root: &str) -> bool {
             | "mA" | "yA" | "as" | "vid" | "pad" | "sic" | "vis" | "mfj" | "yuj" | "Baj"
             | "raYj" | "saYj" | "kfz" | "dfS" | "sfj" | "masj" | "majj" | "ruh" | "guh" | "nah"
             | "vasc" | "vraSc" | "Ced" | "Cid" | "vft" | "syand" | "kfp" | "kalp"
-            | "dviz" | "dih"
+            | "dviz" | "dih" | "sru" | "su" | "dru" | "du" | "Dru" | "nam" | "skand"
+            | "daMS" | "mih" | "tviz" | "Sap"
     )
 }
 
@@ -133,6 +134,20 @@ pub fn sya_stem(root: &str) -> String {
         "vft" => return "vartsya".into(),
         "syand" => return "syantsya".into(),
         "kfp" | "kalp" => return "kalpsya".into(),
+        "dah" => return "Dakzya".into(),
+        "daMS" => return "daNkzya".into(),
+        "kfz" => return "karkzya".into(),
+        "mih" => return "mekzya".into(),
+        "Baj" => return "Bakzya".into(),
+        "raYj" => return "raNkzya".into(),
+        "tviz" => return "tvekzya".into(),
+        "vap" => return "vapsya".into(),
+        "vah" => return "vakzya".into(),
+        "vas" => return "vatsya".into(),
+        "Sap" => return "Sapsya".into(),
+        "tyaj" => return "tyakzya".into(),
+        "skand" => return "skantsya".into(),
+        "nam" => return "naMsya".into(),
         _ => {}
     }
     if takes_it_sya(root) {
@@ -145,11 +160,26 @@ pub fn sya_stem(root: &str) -> String {
     } else {
         let g = apply_guna_to_stem(root);
         let joined = internal_sandhi(&g, "sya");
-        if joined.ends_with("sya") || joined.ends_with("zya") || joined.ends_with("kzya") {
+        let joined = if joined.ends_with("sya") || joined.ends_with("zya") || joined.ends_with("kzya") {
             joined
         } else {
             format!("{g}sya")
-        }
+        };
+        // 8.3.59 आदेशप्रत्यययोः — स्य → ष्य after इण् (स्रोष्यति).
+        sya_ruki(&joined)
+    }
+}
+
+fn sya_ruki(stem: &str) -> String {
+    let Some(body) = stem.strip_suffix("sya") else {
+        return stem.to_string();
+    };
+    if body.chars().last().is_some_and(|c| {
+        matches!(c, 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r' | 'k')
+    }) {
+        format!("{body}zya")
+    } else {
+        stem.to_string()
     }
 }
 

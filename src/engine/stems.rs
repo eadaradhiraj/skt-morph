@@ -80,12 +80,9 @@ const G1_KZYA_ROOTS: &[&str] = &["Siz","viz","kruS","ruh","saYj","sanj"];
 const G1_A_FINAL: &[&str] = &["SrA","jYA"];
 
 fn g1_special_lrt(dhatu: &str) -> Option<String> {
-    let map: &[(&str,&str)] = &[
-        ("sru","srozya"),("su","sozya"),("Sru","Srozya"),("Dru","Drozya"),("du","dozya"),
-        ("dru","drozya"),("tyaj","tyakzya"),("skand","skantsya"),("nam","naMsya"),
-        ("vft","vartsya"),("syand","syantsya"),("kfp","kalpsya"),("kalp","kalpsya"),
-    ];
-    for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
+    if crate::engine::it::anit_sya(dhatu) {
+        return Some(crate::engine::it::sya_stem(dhatu));
+    }
     if let Some(b) = dhinvi_krnvi_snu_base(dhatu) {
         return Some(format!("{b}vizya"));
     }
@@ -113,13 +110,10 @@ fn g1_future_base(dhatu: &str, present_base: &str, guna: &str) -> String {
     if present_base==dhatu && guna!=dhatu && dhatu.ends_with("Iv") && dhatu.len()>3 && !dhatu.contains('W') { return guna.to_string(); }
     present_base.to_string()
 }
-fn g1_lrt_stems(dhatu: &str) -> Option<String> {
-    let map: &[(&str,&str)] = &[("dfS","drakzya"),("daMS","daNkzya"),("kfz","karkzya"),("dah","Dakzya"),("mih","mekzya"),("pac","pakzya"),("Baj","Bakzya"),("raYj","raNkzya"),("tviz","tvekzya"),("yaj","yakzya"),("vap","vapsya"),("vah","vakzya"),("vas","vatsya"),("Sap","Sapsya")];
-    for (k,v) in map { if *k==dhatu { return Some(v.to_string()); }}
-    None
-}
 fn g1_future_suffix(base: &str, dhatu: &str) -> String {
-    if let Some(s)=g1_lrt_stems(dhatu) { return s; }
+    if crate::engine::it::anit_sya(dhatu) {
+        return crate::engine::it::sya_stem(dhatu);
+    }
     if G1_KZYA_ROOTS.contains(&dhatu) {
         if dhatu=="saYj" || dhatu=="sanj" { return "saNkzya".to_string(); }
         let graded=apply_guna_to_stem(dhatu);
@@ -351,6 +345,8 @@ fn strip_final_it(dhatu: &str, gana: u8, tilde: bool, tilde_any: bool) -> Option
         'u' if gana == 1 && (dhatu.ends_with("ncu") || dhatu.ends_with("ucu") || dhatu.ends_with("uju")) && dhatu.len() > 3 && tilde => true,
         'e' | 'E' | 'o' if dhatu.len() > 2 && tilde => true,
         'Y' | 'w' if dhatu.len() > 2 => true,
+        // 1.3.3 हलन्त्यम् ण् (इण् → इ).
+        'R' | 'N' if gana == 2 && dhatu.len() >= 2 => true,
         // 1.3.3 हलन्त्यम् प् (दैप् → दै; शप् is शित् so 6.1.45 does not make दा).
         'p' if dhatu.len() > 2 && dhatu.chars().rev().nth(1).is_some_and(is_vowel_c) => true,
         'A' if dhatu.len() > 3 && tilde_any => true,
@@ -471,25 +467,15 @@ pub fn derive_stem(
         let ps = gana3_present_stem(dhatu, Some(&guna));
         present_stem = Some(ps);
     } else if is_ad(gana) {
-        // ad (02) special: Ru->nO, zRu->snO, wukzu->kzO, zu->sO, iR->e, brUY->bravI etc.
-        let ad_ps = if dhatu == "Ru" {
-            "nO".to_string()
-        } else if dhatu == "zRu" {
-            "snO".to_string()
-        } else if dhatu == "zu" {
-            "sO".to_string()
-        } else if dhatu == "iR" || dhatu == "i" {
-            "e".to_string()
-        } else if dhatu == "wukzu" || dhatu == "kzu" {
-            "kzO".to_string()
-        } else if dhatu == "UrRuY" || dhatu == "UrRu" {
-            "UrRo".to_string()
-        } else if dhatu == "zwuY" || dhatu == "zwu" || dhatu == "stu" {
-            "stavI".to_string()
-        } else if dhatu == "brUY" || dhatu == "brU" {
-            "bravI".to_string()
-        } else if dhatu == "as" {
+        // 2.4.72 शप् लुक्. 7.3.89 उतो वृद्धिर्लुकि हलि (नोति); 7.3.93 ब्रुव ईट्.
+        let ad_ps = if dhatu == "as" {
             "as".to_string()
+        } else if dhatu == "brU" {
+            "bravI".to_string()
+        } else if matches!(dhatu, "stu" | "zwu") {
+            "stavI".to_string()
+        } else if dhatu.ends_with('u') && dhatu.len() >= 2 {
+            format!("{}O", &dhatu[..dhatu.len() - 1])
         } else {
             guna.clone()
         };
@@ -504,22 +490,18 @@ pub fn derive_stem(
         };
         present_stem = Some(ps);
     } else if gana == N_GANA {
-        // ru-dhādi 07: handle uCfd etc. (uCfdir~ -> uCfd after ir strip) via map
-        let ps = if dhatu == "uCfd" {
-            "CfRa".to_string() // uCfd -> CfR + a -> CfRatti
-        } else if dhatu == "utfd" {
-            "tfRa".to_string()
-        } else if dhatu == "uCfdir" {
-            "CfRa".to_string()
-        } else if dhatu == "utfdir" {
-            "tfRa".to_string()
-        } else if dhatu == "Sizx" {
+        // 3.1.78 रुधादिभ्यः श्नम्. उछृद्/उत्तृद्: 1.3.2 उँ in `clean_upadesha`.
+        let ps = if dhatu == "Siz" || dhatu == "Sizx" {
             "Sinaz".to_string()
-        } else if dhatu == "pizx" {
+        } else if dhatu == "piz" || dhatu == "pizx" {
             "pinaz".to_string()
         } else if dhatu == "Banjo" || dhatu == "Banj" {
-            "Banak".to_string() // Banjo -> Banak -> Banakti (gold Banakti with k)
-        } else if dhatu.ends_with('D') { format!("{}Ra", &dhatu[..dhatu.len()-1]) } else { format!("{}a", guna) };
+            "Banak".to_string()
+        } else if dhatu.ends_with('D') {
+            format!("{}Ra", &dhatu[..dhatu.len() - 1])
+        } else {
+            format!("{}a", guna)
+        };
         present_stem = Some(ps);
     } else if gana == NI_GANA {
         let ps = format!("{}nA", dhatu);

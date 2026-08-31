@@ -3,7 +3,7 @@
 //! विद्, रुदादि, शास्, वश्, जागृ, अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्.
 #![allow(non_snake_case)]
 
-use crate::engine::it::surface_root;
+use crate::engine::it::dhatu_satva;
 use crate::engine::phonology::{apply_guna_to_stem, apply_natva_to_word, apply_vrddhi_to_stem, thematic_join};
 
 fn is_vowel(c: char) -> bool {
@@ -15,67 +15,68 @@ fn is_cons(c: char) -> bool {
 }
 
 fn root_of(dhatu: &str) -> String {
-    // Before prakriya_root: wu-इत् + final u would strip to kz (wukzu → wukz).
-    match dhatu {
-        "wukzu" | "kzu" | "02.0031" => return "kzu".into(),
-        "kzRu" | "02.0032" => return "kzRu".into(),
-        "zRu" | "02.0033" => return "snu".into(),
-        "Ru" | "02.0030" => return "nu".into(),
-        "zu" | "02.0036" => return "su".into(),
-        "UrRuY" | "UrRu" | "02.0034" => return "Urnu".into(),
-        "mfjU" | "mfj" | "02.0061" => return "mfj".into(),
-        "dviza" | "02.0003" => return "dviz".into(),
-        "duha" | "02.0004" => return "duh".into(),
-        "diha" | "02.0005" => return "dih".into(),
-        "liha" | "02.0006" => return "lih".into(),
-        "vaca" | "02.0058" => return "vac".into(),
-        "ada" | "02.0001" => return "ad".into(),
-        "ik" | "02.0042" => return "ik".into(),
-        "cakziN" | "02.0007" => return "cakz".into(),
-        "daridrA" | "02.0068" => return "daridrA".into(),
-        "cakAsf" | "cakAs" | "02.0069" => return "cakAs".into(),
-        "zasa" | "02.0073" => return "sas".into(),
-        "zasti" | "02.0074" => return "saMst".into(),
-        _ => {}
+    // षस्ति is संस्त; not 6.1.64 alone.
+    if matches!(dhatu, "zasti" | "02.0074") {
+        return "saMst".into();
     }
-    let mut r = surface_root(dhatu);
-    match r.as_str() {
-        "wukzu" | "kzu" => return "kzu".into(),
-        "kzRu" => return "kzRu".into(),
-        "zRu" => return "snu".into(),
-        "Ru" => return "nu".into(),
-        "zu" => return "su".into(),
-        "UrRuY" | "UrRu" => return "Urnu".into(),
-        "mfjU" | "mfj" => return "mfj".into(),
-        "dviza" => return "dviz".into(),
-        "duha" => return "duh".into(),
-        "diha" => return "dih".into(),
-        "liha" => return "lih".into(),
-        "vaca" => return "vac".into(),
-        "ada" => return "ad".into(),
-        "cakz" | "cakzi" => return "cakz".into(),
-        "daridrA" => return "daridrA".into(),
-        "cakAs" => return "cakAs".into(),
-        "sas" | "zas" => return "sas".into(),
-        "saMst" | "sast" => return "saMst".into(),
-        _ => {}
+    // 1.3.5 ञिटुडवः then 6.1.64/65. Not prakriya_root: that strips radical u of ऊर्णु.
+    // Not surface_root: 2.4.53 ब्रुवो वचिः is लिट्/लृट्, not लट्.
+    let mut s = dhatu.trim_end_matches('~').to_string();
+    if s.starts_with("qu") && s.len() > 3 {
+        s = s[2..].to_string();
     }
-    if r.starts_with("wu") && r.len() > 3 {
-        r = r[2..].to_string();
+    if s.starts_with("wu") && s.len() > 3 {
+        s = s[2..].to_string();
     }
-    if r.starts_with('z') {
-        r = format!("s{}", &r[1..]);
+    if s.starts_with("Yi") && s.len() > 3 {
+        s = s[2..].to_string();
     }
-    if r.starts_with('R') {
-        r = format!("n{}", &r[1..]);
+    if s.ends_with("ir") && s.len() > 3 {
+        s = s[..s.len() - 2].to_string();
     }
-    if r.ends_with('a') && r.len() >= 3 {
-        let core = &r[..r.len() - 1];
-        if core.chars().last().is_some_and(is_cons) {
-            r = core.to_string();
+    if s.ends_with('Y') && s.len() > 2 {
+        s = s[..s.len() - 1].to_string();
+    }
+    if s.ends_with('R') && s.len() == 2 {
+        s = s[..s.len() - 1].to_string();
+    }
+    if s.ends_with('N') && s.len() > 3 {
+        s = s[..s.len() - 1].to_string();
+    }
+    if s.ends_with('u') && s.len() > 3 {
+        let rest = &s[..s.len() - 1];
+        if rest.chars().last().is_some_and(is_cons)
+            && rest.chars().any(|c| matches!(c, 'a' | 'A' | 'i' | 'I' | 'e' | 'o' | 'f'))
+        {
+            s = rest.to_string();
         }
     }
-    r
+    if s.ends_with('U') && s.len() > 3 {
+        let rest = &s[..s.len() - 1];
+        if rest.chars().last().is_some_and(is_cons) {
+            s = rest.to_string();
+        }
+    }
+    if s.ends_with('f') && s.len() > 4 && s != "jAgf" {
+        let rest = &s[..s.len() - 1];
+        if rest.chars().last().is_some_and(is_cons) {
+            s = rest.to_string();
+        }
+    }
+    if s.ends_with('i') && s.len() > 4 {
+        let rest = &s[..s.len() - 1];
+        if rest.chars().last().is_some_and(is_cons) && rest.chars().any(is_vowel) {
+            s = rest.to_string();
+        }
+    }
+    s = dhatu_satva(&s);
+    if s.ends_with('a') && s.len() >= 3 {
+        let core = &s[..s.len() - 1];
+        if core.chars().last().is_some_and(is_cons) {
+            s = core.to_string();
+        }
+    }
+    s
 }
 
 fn pit(family: &str, ending: &str) -> bool {
@@ -984,6 +985,73 @@ fn join_samst(root: &str, family: &str, ending: &str, augment: Option<&str>) -> 
     Some(form)
 }
 
+/// 7.3.93 ब्रुव ईट् — pit sārvadhātuka ईट् (ब्रवीति); weak ब्रू; 6.4.77 उवङ् (ब्रुवन्ति).
+/// लृट् 2.4.53 ब्रुवो वचिः → वक्ष्यति.
+fn join_bru(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "brU" {
+        return None;
+    }
+    if family == "lrt" {
+        return Some(thematic_join("vakzya", ending));
+    }
+    let form = match family {
+        "lat" => match ending {
+            "ti" => "bravIti".into(),
+            "si" => "bravIzi".into(),
+            "mi" | "Ami" => "bravImi".into(),
+            "taH" => "brUtaH".into(),
+            "thaH" | "TaH" => "brUTaH".into(),
+            "tha" | "Ta" => "brUTa".into(),
+            "anti" | "nti" => "bruvanti".into(),
+            "vaH" | "AvaH" => "brUvaH".into(),
+            "maH" | "AmaH" => "brUmaH".into(),
+            _ => format!("brU{ending}"),
+        },
+        "lot" => match ending {
+            "tu" => "bravItu".into(),
+            "tAt" | "tAd" => "brUtAt".into(),
+            "tAm" => "brUtAm".into(),
+            "antu" => "bruvantu".into(),
+            "Di" => "brUhi".into(),
+            "tam" => "brUtam".into(),
+            "ta" => "brUta".into(),
+            "Ani" => "bravARi".into(),
+            "Ava" => "bravAva".into(),
+            "Ama" => "bravAma".into(),
+            _ => format!("brU{ending}"),
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" | "ad" => "bravIt".into(),
+                "aH" => "bravIH".into(),
+                "atAm" => "brUtAm".into(),
+                "an" => "bruvan".into(),
+                "atam" => "brUtam".into(),
+                "ata" => "brUta".into(),
+                "am" => "bravam".into(),
+                "va" => "brUva".into(),
+                "ma" => "brUma".into(),
+                _ => format!("brU{}", strip_a(ending)),
+            };
+            return Some(apply_aug(inner, family, augment));
+        }
+        "vidhilin" => match ending {
+            "yAt" | "yAd" => "brUyAt".into(),
+            "yAtAm" => "brUyAtAm".into(),
+            "yuH" => "brUyuH".into(),
+            "yAH" => "brUyAH".into(),
+            "yAtam" => "brUyAtam".into(),
+            "yAta" => "brUyAta".into(),
+            "yAm" => "brUyAm".into(),
+            "yAva" => "brUyAva".into(),
+            "yAma" => "brUyAma".into(),
+            _ => format!("brU{ending}"),
+        },
+        _ => return None,
+    };
+    Some(form)
+}
+
 /// Full surface form for गण 2, or `None` to fall through (अस्, हन्, इण्, अद्).
 pub fn join_form(
     dhatu: &str,
@@ -1033,6 +1101,9 @@ pub fn join_form(
     if let Some(f) = join_jagr(&r, family, ending, augment) {
         return Some(apply_natva_to_word(&f));
     }
+    if let Some(f) = join_bru(&r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
+    }
     let form = if u_final(&r) {
         join_u(&r, family, ending, augment)
     } else if r.ends_with('A') {
@@ -1072,6 +1143,10 @@ mod tests {
         assert_eq!(join_form("dviza", "lrt", "ti", 1, 1, None).as_deref(), Some("dvekzyati"));
         assert_eq!(join_form("dviza", "lrt", "Ami", 3, 1, None).as_deref(), Some("dvekzyAmi"));
         assert_eq!(join_form("wukzu", "lat", "ti", 1, 1, None).as_deref(), Some("kzOti"));
+        assert_eq!(join_form("Ru", "lat", "ti", 1, 1, None).as_deref(), Some("nOti"));
+        assert_eq!(join_form("zRu", "lat", "ti", 1, 1, None).as_deref(), Some("snOti"));
+        assert_eq!(join_form("brUY", "lat", "ti", 1, 1, None).as_deref(), Some("bravIti"));
+        assert_eq!(join_form("brUY", "lrt", "ti", 1, 1, None).as_deref(), Some("vakzyati"));
         assert_eq!(join_form("yu", "lrt", "ti", 1, 1, None).as_deref(), Some("yavizyati"));
         assert_eq!(join_form("yu", "lot", "Ani", 3, 1, None).as_deref(), Some("yavAni"));
         assert_eq!(join_form("liha", "lat", "taH", 1, 2, None).as_deref(), Some("lIQaH"));
