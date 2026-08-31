@@ -98,6 +98,25 @@ fn kta_base(dhatu: &str) -> String {
     nistha_base(dhatu, true)
 }
 
+/// 6.4.24 अनिदितां हल उपधायाः क्ङिति — drop ञ्/ं upadhā before ज्/च्/श् on कित्
+/// (रक्त, अक्त, दष्ट). Not म् before प्: कम्प् stays सेट् कम्पित, not *कप्त.
+fn drop_anidit_upadha_nasal(root: &str) -> Option<String> {
+    let mut c: Vec<char> = root.chars().collect();
+    let n = c.len();
+    if n < 3 {
+        return None;
+    }
+    let ok = matches!(
+        (c[n - 2], c[n - 1]),
+        ('Y', 'j' | 'c') | ('n', 'j' | 'c') | ('M', 'S')
+    );
+    if !ok {
+        return None;
+    }
+    c.remove(n - 2);
+    Some(c.into_iter().collect())
+}
+
 /// `va` = 8.2.52 पचो वः (निष्ठा only, not क्त्वा).
 fn nistha_base(dhatu: &str, va: bool) -> String {
     let mut r = surface_root(dhatu);
@@ -228,6 +247,11 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
                 format!("{body}Ata")
             }
         }
+        // 6.4.24 अनिदितां — ञ्/ं-upadhā lopa then 8.2.30/36 (रक्त, अक्त, दष्ट). Before palatal *raYkta.
+        // भञ्ज् is named भग्न above. कम्प् (म्+प्) is not this arm.
+        _ if let Some(s) = drop_anidit_upadha_nasal(&orig) => internal_sandhi(&s, "ta"),
+        // 8.2.36 शां षः — श् + त → ष्ट before इट् (नष्ट, दिष्ट, स्पृष्ट). Not ष-final सेट् (भाषित).
+        _ if r.ends_with('S') => internal_sandhi(&r, "ta"),
         // 8.2.30 चोः कुः — palatal + झल् त of क्त → velar (मुक्त, युक्त, सिक्त).
         // Must precede 7.2.35 इट्: takes_it_nistha would otherwise yield *mucita/*yujita.
         // च/छ/ज/झ → क/ख/ग/घ; internal_sandhi maps c/j + t → kt. छ/झ rare in निष्ठा.
@@ -322,7 +346,9 @@ fn kit_anga(root: &str) -> String {
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
 fn ktin_form(root: &str) -> String {
-    internal_sandhi(&kit_anga(root), "ti")
+    // 6.4.24 also on क्तिन् (कित्): रक्ति not *रञ्क्ति.
+    let base = drop_anidit_upadha_nasal(root).unwrap_or_else(|| root.to_string());
+    internal_sandhi(&kit_anga(&base), "ti")
 }
 
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
@@ -802,6 +828,13 @@ mod tests {
         assert_eq!(derive("Buj", "kta"), vec!["Bukta"]);
         assert_eq!(derive("ruc", "kta"), vec!["rukta"]);
         assert_eq!(derive("BaYj", "kta"), vec!["Bagna"]);
+        assert_eq!(derive("aYj", "kta"), vec!["akta"]);
+        assert_eq!(derive("raYj", "kta"), vec!["rakta"]);
+        assert_eq!(derive("saYj", "kta"), vec!["sakta"]);
+        assert_eq!(derive("daMS", "kta"), vec!["dazwa"]);
+        assert_eq!(derive("diS", "kta"), vec!["dizwa"]);
+        assert_eq!(derive("naS", "kta"), vec!["nazwa"]);
+        assert_eq!(derive("spfS", "kta"), vec!["spfzwa"]);
         // 8.2.36 षः
         assert_eq!(derive("sfj", "kta"), vec!["sfzwa"]);
         assert_eq!(derive("yaj", "kta"), vec!["izwa"]);
@@ -987,6 +1020,8 @@ mod tests {
         assert_eq!(derive("tyaja", "ktin"), vec!["tyakti"]);
         assert_eq!(derive("dfSir", "ktin"), vec!["dfzwi"]);
         assert_eq!(derive("qukfY", "ktin"), vec!["kfti"]);
+        assert_eq!(derive("raYj", "ktin"), vec!["rakti"]);
+        assert_eq!(derive("aYj", "ktin"), vec!["akti"]);
         assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
         assert_eq!(derive("zWA", "kta"), vec!["sTita"]);
         assert_eq!(derive("eDa", "SAnac"), vec!["eDamAna"]);
