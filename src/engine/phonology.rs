@@ -139,11 +139,12 @@ pub fn g1_nv_vidhilin_stem(dhatu: &str) -> Option<String> {
     } else { None }
 }
 
+/// 7.3.77 इषुगमियमां छः — यम् only here (घटादि blocks छ); दाण् is 7.3.78 in `sad_present_base`.
 pub fn yam_cc_present_stem(dhatu: &str, antarganas: &str) -> Option<String> {
-    if (dhatu=="yam" || dhatu=="dA") && !is_gawadi(antarganas) { Some("yacCa".to_string()) } else { None }
+    if dhatu=="yam" && !is_gawadi(antarganas) { Some("yacCa".to_string()) } else { None }
 }
 pub fn yam_cc_lang_stem(dhatu: &str, antarganas: &str) -> Option<String> {
-    if (dhatu=="yam" || dhatu=="dA") && !is_gawadi(antarganas) { Some("yacC".to_string()) } else { None }
+    if dhatu=="yam" && !is_gawadi(antarganas) { Some("yacC".to_string()) } else { None }
 }
 pub fn yam_cc_future_stem(dhatu: &str, antarganas: &str) -> Option<String> {
     if dhatu=="yam" && !is_gawadi(antarganas) { Some("yaMsya".to_string()) } else { None }
@@ -218,15 +219,21 @@ pub fn ya_present_base(dhatu: &str) -> String {
 
 pub fn sad_present_base(dhatu: &str) -> Option<String> {
     match dhatu {
-        "sad" => return Some("sId".to_string()),
-        "guh" => return Some("gUh".to_string()),
+        // 7.3.77 इषुगमियमां छः (इष् is तुदादि `g6_plot_base`; यम् is `yam_cc` for घटादि).
+        "gam" => return Some("gacC".to_string()),
+        // 7.3.78 पाघ्राध्मास्थाम्नादाण्दृश्यर्तिसर्तिशदसदां पिबजिघ्रधमतिष्ठमनयच्छपश्यर्च्छधौशीयसीदाः.
+        // सर्ति→धौ only वेगितायां; शद्→शीय is आत्मने — not folded here.
         "pA" => return Some("pib".to_string()),
         "GrA" => return Some("jiGr".to_string()),
-        "saYj" => return Some("saj".to_string()),
         "DmA" => return Some("Dam".to_string()),
+        "sTA" | "zWA" => return Some("tizW".to_string()),
         "mnA" => return Some("man".to_string()),
-        "sTA" => return Some("tizW".to_string()),
-        "gam" => return Some("gacC".to_string()),
+        "dA" | "dAR" => return Some("yacC".to_string()),
+        "dfS" | "dfSir" => return Some("paSy".to_string()),
+        "f" => return Some("fcC".to_string()),
+        "sad" => return Some("sId".to_string()),
+        "guh" => return Some("gUh".to_string()),
+        "saYj" => return Some("saj".to_string()),
         _ => {}
     }
     if dhatu.ends_with('u') && dhatu.len()<=4 && dhatu!="gu" {
@@ -269,7 +276,7 @@ const G6_PLOT_LANG: &[&str] = &["Brajj","Kid","kft","lip","lup","majj","muc","pi
 pub fn g6_plot_base(dhatu: &str) -> String {
     if dhatu.starts_with('f') && dhatu.len()>=2 { return dhatu.to_string(); }
     if dhatu.ends_with('F') { return format!("{}ir", &dhatu[..dhatu.len()-1]); }
-    if dhatu=="iz" { return "icC".to_string(); }
+    if dhatu=="iz" { return "icC".to_string(); } // 7.3.77 इषु (तुदादि इच्छति)
     if dhatu=="vicC" { return "vicCAy".to_string(); }
     if dhatu=="vraSc" { return "vfSc".to_string(); }
     if dhatu=="pracC" { return "pfcC".to_string(); }
@@ -467,7 +474,6 @@ pub fn thematic_present_base(dhatu: &str, gana: u8, aupadeshik: &str) -> String 
     if let Some(sp)=sad_present_base(dhatu) { return sp; }
     if dhatu=="sUrkzy" && aupadeshik.starts_with('z') { return "sUkzy".to_string(); }
     if gana==1 {
-        if dhatu=="f" { return "fcC".to_string(); }
         if let Some(rv)=g1_rv_nv_present_base(dhatu) { return rv; }
     }
     if gana==6 { return dhatu.to_string(); }

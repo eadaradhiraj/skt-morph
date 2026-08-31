@@ -236,6 +236,7 @@ pub fn nic_stem(root: &str) -> String {
             format!("{root}yaya")
         };
     }
+    // णिच् of इण् is गमयति in the Kaumudī (not 2.4.45, which is लुङ् गाति only).
     if root == "i" {
         return "gamaya".into();
     }

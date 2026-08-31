@@ -552,6 +552,14 @@ mod tests {
         assert!(f.iter().any(|x| x == "yaMsyati"), "{:?}", f);
         let f = generate_all("dAR", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "yacCati"), "{:?}", f);
+        let f = generate_all("zWA", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "tizWati"), "{:?}", f);
+        let f = generate_all("dfSir", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "paSyati"), "{:?}", f);
+        let f = generate_all("zWala", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "sTalati"), "{:?}", f);
+        let f = generate_all("pA", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "pibati"), "{:?}", f);
         let f = generate_all("Sru", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "Sravati"), "{:?}", f);
         let f = generate_all("Sru", "plrt", 1, 1);

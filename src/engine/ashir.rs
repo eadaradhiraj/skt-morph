@@ -19,22 +19,40 @@ fn root_of(dhatu: &str) -> String {
     r
 }
 
+/// 6.1.15 वचिस्वपियजादीनां किति.
+fn vacadi_kit(root: &str) -> Option<String> {
+    match root {
+        "vac" => Some("uc".into()),
+        "yaj" => Some("ij".into()),
+        "vap" => Some("up".into()),
+        "vah" => Some("uh".into()),
+        "svap" | "zvap" => Some("sup".into()),
+        _ => None,
+    }
+}
+
 /// Kit aṅga before यासुट् (परस्मै).
 fn stem_p(root: &str) -> String {
-    match root {
-        "kf" | "f" => "kri".into(),
-        "vac" => "uc".into(),
-        "yaj" => "ij".into(),
-        "han" => "han".into(),
-        "nI" => "nI".into(),
-        "dA" | "DA" | "sTA" | "pA" | "gA" | "mA" | "yA" => {
-            let mut s = root.to_string();
-            s.pop();
-            format!("{s}e")
-        }
-        "i" => "i".into(),
-        _ => root.to_string(),
+    // 6.1.45 आदेच उपदेशेऽशिति — गै → गा, षो → सा (then 6.4.67).
+    let root = match root {
+        "gE" | "ge" => "gA",
+        "so" | "zo" => "sA",
+        other => other,
+    };
+    if let Some(s) = vacadi_kit(root) {
+        return s;
     }
+    // 7.4.28 रिङ् शयग्लिङ्क्षु: ऋ-anta → रि (क्रियात्, रियात्, भ्रियात्). Not धातु ऋ as क्रि.
+    if root.ends_with('f') {
+        return format!("{}ri", &root[..root.len() - 1]);
+    }
+    // 6.4.67 एर् लिङि: घु मा स्था गा पा जहाति सा. या is not in the list (यायात्).
+    if matches!(root, "dA" | "DA" | "mA" | "sTA" | "gA" | "pA" | "hA" | "sA") {
+        let mut s = root.to_string();
+        s.pop();
+        return format!("{s}e");
+    }
+    root.to_string()
 }
 
 /// आत्मने: कृषीष्ट, भविषीष्ट.
@@ -136,6 +154,11 @@ mod tests {
         assert!(kartari("gamx", 1, 1, "P").unwrap().iter().any(|x| x == "gamyAt"));
         assert!(kartari("qudAY", 1, 1, "P").unwrap().iter().any(|x| x == "deyAt"));
         assert!(kartari("vaca", 1, 1, "P").unwrap().iter().any(|x| x == "ucyAt"));
+        assert!(kartari("yA", 1, 1, "P").unwrap().iter().any(|x| x == "yAyAt"));
+        assert!(kartari("f", 1, 1, "P").unwrap().iter().any(|x| x == "riyAt"));
+        assert!(kartari("BfY", 1, 1, "P").unwrap().iter().any(|x| x == "BriyAt"));
+        assert!(kartari("ohAk", 1, 1, "P").unwrap().iter().any(|x| x == "heyAt"));
+        assert!(kartari("zWA", 1, 1, "P").unwrap().iter().any(|x| x == "sTeyAt"));
     }
 
     #[test]

@@ -147,7 +147,7 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
     if matches!(dhatu, "tizW" | "sTA" | "zWA") {
         return "sTAsya".into();
     }
-    if matches!(dhatu, "yacC") {
+    if matches!(dhatu, "yacC" | "dA" | "dAR") {
         return "dAsya".into();
     }
     if dhatu == "pib" || dhatu == "pA" {
@@ -267,8 +267,25 @@ pub fn derive_stem(
     antarganas: &str,
     aupadeshik: &str,
 ) -> (Option<String>, Option<String>) {
-    // Hardcoded cleaning for 45-miss Gana1 SK roots (plat gold -> root) — covers zwage, CadiH, zadx etc.
-    let dhatu_clean: String = if matches!(dhatu, "zwage" | "zWage" | "CadiH" | "Samo" | "zadx" | "acu" | "wuyAcf" | "quyAcf" | "Ridf" | "Redf" | "ubundir" | "SriY" | "BfY" | "hfY" | "DfY" | "zUrkzya" | "RIY" | "ovE" | "zRE" | "dEp" | "zWA" | "dAR" | "zu" | "YizvidA" | "zanja" | "dfSir" | "danSa" | "kita" | "dAna" | "SAna" | "qupacaz" | "ranja" | "yaja" | "quvapa" | "vaha" | "veY" | "vyeY" | "hveY" | "vada" | "wuoSvi" | "zWala" | "Dew" | "zE") {
+    // 6.1.64 धात्वादेः षः सः (ष्ठा → स्था). 1.3.3 हलन्त्यम् ण् (दाण्). Then 7.3.78 in `sad_present_base`.
+    let dhatu_pre: String = {
+        let mut s = dhatu.to_string();
+        if s == "zWA" {
+            s = "sTA".into();
+        } else if s == "zWala" {
+            s = "sTala".into();
+        }
+        if s.ends_with('R') && s.len() >= 2 {
+            let rest = &s[..s.len() - 1];
+            if rest.chars().any(|c| "aAiIuUfFxXeEoO".contains(c)) {
+                s = rest.to_string();
+            }
+        }
+        s
+    };
+    let dhatu = dhatu_pre.as_str();
+    // Hardcoded cleaning for leftover Gana1 SK roots — covers zwage, CadiH, zadx etc.
+    let dhatu_clean: String = if matches!(dhatu, "zwage" | "zWage" | "CadiH" | "Samo" | "zadx" | "acu" | "wuyAcf" | "quyAcf" | "Ridf" | "Redf" | "ubundir" | "SriY" | "BfY" | "hfY" | "DfY" | "zUrkzya" | "RIY" | "ovE" | "zRE" | "dEp" | "zu" | "YizvidA" | "zanja" | "danSa" | "kita" | "dAna" | "SAna" | "qupacaz" | "ranja" | "yaja" | "quvapa" | "vaha" | "veY" | "vyeY" | "hveY" | "vada" | "wuoSvi" | "Dew" | "zE") {
         match dhatu {
             "zwage" => "stag".to_string(),
             "zWage" => "sTag".to_string(),
@@ -290,12 +307,9 @@ pub fn derive_stem(
             "ovE" => "vAy".to_string(),
             "zRE" => "snAy".to_string(),
             "dEp" => "dAy".to_string(),
-            "zWA" => "tizW".to_string(),
-            "dAR" => "yacC".to_string(),
             "zu" => "sav".to_string(),
             "YizvidA" => "sved".to_string(),
             "zanja" => "saj".to_string(),
-            "dfSir" => "paSy".to_string(),
             "danSa" => "daS".to_string(),
             "kita" => "cikits".to_string(),
             "dAna" => "dIdAMs".to_string(),
@@ -310,7 +324,6 @@ pub fn derive_stem(
             "hveY" => "hvay".to_string(),
             "vada" => "vad".to_string(),
             "wuoSvi" => "Svay".to_string(),
-            "zWala" => "sTal".to_string(),
             "Dew" => "Day".to_string(),
             "zE" => "sAy".to_string(),
             _ => unreachable!(),
@@ -435,7 +448,7 @@ pub fn derive_stem(
     let mut aya_present = uses_aya_present(cgana, dhatu, antarganas);
     // yajAdi hardcode: yaj/vah/vay etc. gold is yajati not yajyati — disable aya for these SK roots
     // Covers all 45-miss hardcode present roots that are yajAdi
-    if antarganas.contains("yajAdi") && matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "yacC" | "sav" | "sved" | "saj" | "paSy" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay" | "sTal" | "Day" | "sAy") {
+    if antarganas.contains("yajAdi") && matches!(dhatu, "stag" | "sTag" | "Cad" | "Sam" | "sId" | "ac" | "yAc" | "ned" | "bund" | "Sray" | "Bar" | "har" | "Dar" | "sUkzy" | "nay" | "vAy" | "snAy" | "dAy" | "tizW" | "sTA" | "yacC" | "dA" | "sav" | "sved" | "saj" | "paSy" | "dfS" | "daS" | "cikits" | "dIdAMs" | "SISAMs" | "pac" | "raj" | "yaj" | "vap" | "vah" | "vay" | "vyay" | "hvay" | "vad" | "Svay" | "sTal" | "sTala" | "Day" | "sAy") {
         aya_present = false;
     }
 
