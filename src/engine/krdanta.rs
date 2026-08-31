@@ -291,6 +291,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         {
             internal_sandhi(&r, "ta")
         }
+        // प् + त → प्त before इट् (तप्त, आप्त). Not म्/ं-upadhā (कम्प् → कम्पित).
+        _ if r.ends_with('p') && !matches!(r.chars().rev().nth(1), Some('m' | 'M')) => {
+            internal_sandhi(&r, "ta")
+        }
+        // क् + त → क्त before इट् (शक्त). पतित stays सेट् (त् not this arm).
+        _ if r.ends_with('k') => internal_sandhi(&r, "ta"),
         _ if crate::engine::it::takes_it_nistha(&orig) => {
             let anga = if r.ends_with('s') {
                 crate::engine::it::ruki_s(&r)
@@ -905,6 +911,9 @@ mod tests {
         assert_eq!(derive("nud", "kta"), vec!["nutta"]);
         assert_eq!(derive("tud", "kta"), vec!["tutta"]);
         assert_eq!(derive("sad", "kta"), vec!["satta"]);
+        assert_eq!(derive("tap", "kta"), vec!["tapta"]);
+        assert_eq!(derive("Ap", "kta"), vec!["Apta"]);
+        assert_eq!(derive("Sak", "kta"), vec!["Sakta"]);
         assert_eq!(derive("lih", "kta"), vec!["lIQa"]);
         assert_eq!(derive("guh", "kta"), vec!["gUQa"]);
         // 6.1.45 आदेच + 6.4.66 गा/पा → गीत/पीत; other ऐ → आत (कै कात).
