@@ -14,6 +14,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **सुबन्त हलन्त h/B (8.2.31/39):** added `(h,pum)` लिह्→लिक्/लिहा and `(B,pum)` लभ्→लप्/लभा pum paradigms with sūtra headers; extended `halanta_j_d_stems` to cover h/B; extreme commenting kept; 97 tests — pushed.
 - **सुबन्त हलन्त r/s (8.2.66/39):** added `(r,pum)` गिर्→गिः/गिरा and `(s,pum)` तपस्→तपः/तपसम् paradigms (ru→visarga, 8.2.66); extended `halanta_j_d_stems` to cover r/s; extreme commenting kept; 97 tests — pushed.
 - **सुबन्त as/is/us pum (8.2.66):** added `(as,pum)` मनस्→मनः/मनसा, `(is,pum)` हविः/हविषा, `(us,pum)` धनुः/धनुषा pum paradigms (s→ru→ḥ); extended `halanta_j_d_stems` to cover as/is/us; extreme commenting kept; 97 tests — pushed.
+- **क्त अद्→जग्ध (2.4.36):** अद् + क्त → जग्ध (SLP1 `jagDa`) not sandhi `atta`; added `nistha_base` special for `orig=="ad"` with 2.4.36 header; `ada`/`ad` → `jagDa` asserts; extreme commenting kept; 97 tests — pushed.
 - **यङ्लुक् extended (vac/Śru):** added `vac→vAvac→vAvakti` (8.2.30 c→k) and `Śru→SoSrū` intensive stems; enriched yaNluk sūtra comments (2.4.74, 8.2.30); 97 tests — pushed.
 
 ## 2026-08-31

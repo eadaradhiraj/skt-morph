@@ -134,6 +134,15 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "pac" && va {
         return "pakva".into(); // 8.2.52 पचो वः
     }
+    // Special: अद् + क्त → जग्ध (SLP1 jagDa) — 6.1.36?/2.4.?? ad → jaG, 8.2.32 gha→dha
+    // sūtra: अदो जग्धिर्ल्यप्ति किति (2.4.36) — ad on kit → jagDh; future devs: keep SLP1 jagDa
+    // Extreme: ad is anit, not it, but kta is jagDa not atta (sandhi alone would give atta)
+    // ---------------------------------------------------------------------------
+    // ad kta special — must precede generic gfh/ij etc. arms
+    // ---------------------------------------------------------------------------
+    if orig == "ad" {
+        return "jagDa".into(); // जग्ध
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -663,6 +672,9 @@ mod tests {
         assert_eq!(derive("quDAY", "kta"), vec!["hita"]); // धेट्/धा — 7.4.42
         assert_eq!(derive("dA", "kta"), vec!["datta"]);
         assert_eq!(derive("DA", "kta"), vec!["hita"]);
+        // 2.4.36 अदो जग्धिर्ल्यप्ति किति — अद् → जग्ध (atta would be sandhi-only, wrong)
+        assert_eq!(derive("ada", "kta"), vec!["jagDa"]); // अद् → जग्ध
+        assert_eq!(derive("ad", "kta"), vec!["jagDa"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
