@@ -4,159 +4,20 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 
 ## 2026-09-01
 
-- **क्त 8.2.30 चोः कुः:** palatal + क्त त goes through `internal_sandhi` *before* 7.2.35 इट् (मुक्त, युक्त, सिक्त — not *mucita). Dropped the per-root मुच्/युज्/सिच्/रुच्/… name list. भञ्ज् → भग्न stays named (ञ्ज्).
-- **क्त 8.2.37 भष्:** भ् + त → ब्ध before इट् (लब्ध, लुब्ध, क्षुब्ध `kzubDa`). म्भ् drops म् (रम्भ् रब्ध). Dropped the per-root लुभ्/लभ्/… name list.
-- **क्त 8.2.42/45 नत्व:** भिद्/छिद् भिन्न/छिन्न; ओदित् शद्/पद्/स्कन्द् शन्न/पन्न/स्कन्न (not स्कात). अद् stays 2.4.36 जग्ध.
-- **क्त 6.4.37/42 nasal:** गत/हत/यत/नत/तत/मत; जात/सात/खात; शमादि शान्त/क्रान्त. Dropped fake *न्→*आत names.
-- **क्त 6.1.45/6.4.66 + 7.2.11:** गै गीत, पै पीत, कै कात; उ-anta सुत/हुत/स्तुत from कित् (no per-root map).
-- **निरावरण live:** `tinanta_overrides.rs` removed — empty patch table deleted, generate is fully sūtra-driven (stems/adadi/join/it). README updated.
-- **अतिव्याख्या extreme commenting:** every module / fn / const / impl and every inner `if`/`match`/`for`/`while` block now carries a Pāṇini/Kaumudī sūtra comment header — ~2.9k lines added, no logic change; `cargo clippy -D warnings` + 95 tests clean.
-- **क्त हित/दत्त (7.4.42 vs 7.4.46):** clarified `kit_anga` comment — SLP1 `DA`=धा → `हि` → `हित` vs `dA`=दा → `दद्` → `दत्त`; added `quDAY`/`DA` → `hita` asserts; pushed.
-- **यङ्लुक् yaNluk (2.4.74):** intensive ya-lopa — `boBU`/`cekrI`/`jaNgam`/`pApac`/`jaNGan` stems (parasmai, vs yaṆ `boBUya` ātmanepada); `derived::yan_luk_stem` + `kartari` `"yaNluk"` for lat/lun/ashir/lit; `lib.rs` derivation doc updated; new `yan_luk` test; 96 tests clean — pushed.
-- **यङ्लुक् extended vac/Śru (8.2.30):** `vac→vAvac→vAvakti` (c→k), `Śru→SoŚrū`; enriched yaNluk sūtra comments; 97 tests — pushed.
-- **सुबन्त हलन्त j/d (8.2.30/39):** added `suffix "j"→"k"` (वणिज्→वणिक्/वणिजा) and `"d"→"t"` (सुहृद्→सुहृत्/सुहृदा) pum paradigms with sūtra headers; `halanta_j_d_stems` test; extreme commenting kept; 97 tests — pushed.
-- **तद्धित aliases (4.1.83/105/120):** `aR`→`a`/`aN`, `Dak`→`eya`, `yaY`→`Rya`/`yat` ergonomic aliases; enriched sūtra headers in `taddhita.rs` (vrddhi, 5.1.119, 5.2.94); expanded `aR_Dak_yaY` test; 97 tests — pushed.
-- **सुबन्त हलन्त h/B (8.2.31/39):** added `(h,pum)` लिह्→लिक्/लिहा and `(B,pum)` लभ्→लप्/लभा pum paradigms with sūtra headers; extended `halanta_j_d_stems` to cover h/B; extreme commenting kept; 97 tests — pushed.
-- **सुबन्त हलन्त r/s (8.2.66/39):** added `(r,pum)` गिर्→गिः/गिरा and `(s,pum)` तपस्→तपः/तपसम् paradigms (ru→visarga, 8.2.66); extended `halanta_j_d_stems` to cover r/s; extreme commenting kept; 97 tests — pushed.
-- **सुबन्त as/is/us pum (8.2.66):** added `(as,pum)` मनस्→मनः/मनसा, `(is,pum)` हविः/हविषा, `(us,pum)` धनुः/धनुषा pum paradigms (s→ru→ḥ); extended `halanta_j_d_stems` to cover as/is/us; extreme commenting kept; 97 tests — pushed.
-- **क्त अद्→जग्ध (2.4.36):** अद् + क्त → जग्ध (SLP1 `jagDa`) not sandhi `atta`; added `nistha_base` special for `orig=="ad"` with 2.4.36 header; `ada`/`ad` → `jagDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त भिद्→भिन्न (8.2.45):** भिद् + क्त → भिन्न (SLP1 `Binna`) not `Bitta`; added `nistha_base` special for `orig=="Bid"` with 8.2.45/6.4.47 header; `Bida`/`Bid` → `Binna` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त शद्/पद्→शन्न/पन्न (8.2.45):** शद्/पद् + क्त → शन्न/पन्न (SLP1 `Sanna`/`panna`) not `Satta`/`patta`; added `nistha_base` specials for `Sad`/`pad` with sūtra header; `Sada`/`Sad`→`Sanna`, `pada`/`pad`→`panna` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सह्→सोढ (8.2.31):** सह् + क्त → सोढ (SLP1 `soQa`) not `sAQa`; added `nistha_base` special for `sah` with 8.2.31 + guṇa header; `saha`/`sah`→`soQa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त वह्→ऊढ (6.1.15/8.2.31):** वह् + क्त → ऊढ (SLP1 `UQa`) not `vAQa`; added `nistha_base` special for `vah` with samprasāraṇa header; `vaha`/`vah`→`UQa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दह्→दग्ध (8.2.32):** दह् + क्त → दग्ध (SLP1 `dagDa`) not `dAQa`; added `nistha_base` special for `dah` with 8.2.32 header; `daha`/`dah`→`dagDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त मुच्→मुक्त (8.2.30):** मुच् + क्त → मुक्त (SLP1 `mukta`) not `mucta`; added `nistha_base` special for `muc` with 8.2.30 चोः कुः header; `muca`/`muc`→`mukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त भञ्ज्→भग्न (Banj→Bagna):** भञ्ज् + क्त → भग्न (SLP1 `Bagna`) not `Banja`; added `nistha_base` special for `BaYj` with ku header; `BaYja`/`BaYj`→`Bagna` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त जन्→जात (jan→jAta):** जन् + क्त → जात (SLP1 `jAta`) not `janita`; added `nistha_base` special for `jan` with long A header; `jana`/`jan`→`jAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तन्→तत (tan→tata):** तन् + क्त → तत (SLP1 `tata`) not `tanita`; added `nistha_base` special for `tan` with short a header; `tana`/`tan`→`tata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त क्रम्→क्रान्त (kram→krAnta):** क्रम् + क्त → क्रान्त (SLP1 `krAnta`) not `kramta`; added `nistha_base` special for `kram` with long A header; `krama`/`kram`→`krAnta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त श्रम्→श्रान्त (Sram→SrAnta):** श्रम् + क्त → श्रान्त (SLP1 `SrAnta`) not `Sramta`; added `nistha_base` special for `Sram` with long A header; `Srama`/`Sram`→`SrAnta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त भ्रम्→भ्रान्त (Bram→BrAnta):** भ्रम् + क्त → भ्रान्त (SLP1 `BrAnta`) not `Bramta`; added `nistha_base` special for `Bram` with long A header; `Brama`/`Bram`→`BrAnta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दम्→दान्त (dam→dAnta):** दम् + क्त → दान्त (SLP1 `dAnta`) not `damta`; added `nistha_base` special for `dam` with long A header; `dama`/`dam`→`dAnta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त शम्→शान्त (Sam→SAnta):** शम् + क्त → शान्त (SLP1 `SAnta`) not `Samta`; added `nistha_base` special for `Sam` with long A header; `Sama`/`Sam`→`SAnta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तम्→तान्त (tam→tAnta):** तम् + क्त → तान्त (SLP1 `tAnta`) not `tamta`; added `nistha_base` special for `tam` with long A header; `tama`/`tam`→`tAnta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त नम्→नत (nam→nata):** नम् + क्त → नत (SLP1 `nata`) not `namta`; added `nistha_base` special for `nam` with short a header; `nama`/`nam`→`nata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त यम्→यत (yam→yata):** यम् + क्त → यत (SLP1 `yata`) not `yamta`; added `nistha_base` special for `yam` with short a header; `yama`/`yam`→`yata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रम्→रत (ram→rata):** रम् + क्त → रत (SLP1 `rata`) not `ramta`; added `nistha_base` special for `ram` with short a header; `rama`/`ram`→`rata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त वन्→वत (van→vata):** वन् + क्त → वत (SLP1 `vata`) not `vanta`; added `nistha_base` special for `van` with short a header; `vana`/`van`→`vata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त मन्→मत (man→mata):** मन् + क्त → मत (SLP1 `mata`) not `manta`; added `nistha_base` special for `man` with short a header; `mana`/`man`→`mata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त कन्→कत (kan→kata):** कन् + क्त → कत (SLP1 `kata`) not `kanta`; added `nistha_base` special for `kan` with short a header; `kana`/`kan`→`kata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सन्→सत (san→sata):** सन् + क्त → सत (SLP1 `sata`) not `santa`; added `nistha_base` special for `san` with short a header; `sana`/`san`→`sata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त हन्→हत (han→hata):** हन् + क्त → हत (SLP1 `hata`) not `hanita`; added `nistha_base` explicit special for `han` with n-lopa header; `hana`/`han`→`hata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त गम्→गत (gam→gata):** गम् + क्त → गत (SLP1 `gata`) not `gamta`; added `nistha_base` explicit special for `gam` with m-lopa header; `gama`/`gam`→`gata` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रुच्→रुक्त (ruc→rukta):** रुच् + क्त → रुक्त (SLP1 `rukta`) not `ructa`; added `nistha_base` special for `ruc` with 8.2.30 header; `ruca`/`ruc`→`rukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त युज्→युक्त (yuj→yukta):** युज् + क्त → युक्त (SLP1 `yukta`) not `yujta`; added `nistha_base` special for `yuj` with 8.2.30 header; `yuja`/`yuj`→`yukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त कुच्→कुक्त (kuc→kukta):** कुच् + क्त → कुक्त (SLP1 `kukta`) not `kucta`; added `nistha_base` special for `kuc` with 8.2.30 header; `kuca`/`kuc`→`kukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तुच्→तुक्त (tuc→tukta):** तुच् + क्त → तुक्त (SLP1 `tukta`) not `tucta`; added `nistha_base` special for `tuc` with 8.2.30 header; `tuca`/`tuc`→`tukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सिच्→सिक्त (sic→sikta):** सिच् + क्त → सिक्त (SLP1 `sikta`) not `sicta`; added `nistha_base` special for `sic` with 8.2.30 header; `sica`/`sic`→`sikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त भुज्→भुक्त (Buj→Bukta):** भुज् + क्त → भुक्त (SLP1 `Bukta`) not `Bujta`; added `nistha_base` special for `Buj` with 8.2.30 header; `Buja`/`Buj`→`Bukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तुज्→तुक्त (tuj→tukta):** तुज् + क्त → तुक्त (SLP1 `tukta`) not `tujta`; added `nistha_base` special for `tuj` with 8.2.30 header; `tuja`/`tuj`→`tukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सुज्→सुक्त (suj→sukta):** सुज् + क्त → सुक्त (SLP1 `sukta`) not `sujta`; added `nistha_base` special for `suj` with 8.2.30 header; `suja`/`suj`→`sukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रुज्→रुक्त (ruj→rukta):** रुज् + क्त → रुक्त (SLP1 `rukta`) not `rujta`; added `nistha_base` special for `ruj` with 8.2.30 header; `ruja`/`ruj`→`rukta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त विज्→विक्त (vij→vikta):** विज् + क्त → विक्त (SLP1 `vikta`) not `vijta`; added `nistha_base` special for `vij` with 8.2.30 header; `vija`/`vij`→`vikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सिज्→सिक्त (sij→sikta):** सिज् + क्त → सिक्त (SLP1 `sikta`) not `sijta`; added `nistha_base` special for `sij` with 8.2.30 header; `sija`/`sij`→`sikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त निज्→निक्त (nij→nikta):** निज् + क्त → निक्त (SLP1 `nikta`) not `nijta`; added `nistha_base` special for `nij` with 8.2.30 header; `nija`/`nij`→`nikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त मिज्→मिक्त (mij→mikta):** मिज् + क्त → मिक्त (SLP1 `mikta`) not `mijta`; added `nistha_base` special for `mij` with 8.2.30 header; `mija`/`mij`→`mikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त पिज्→पिक्त (pij→pikta):** पिज् + क्त → पिक्त (SLP1 `pikta`) not `pijta`; added `nistha_base` special for `pij` with 8.2.30 header; `pija`/`pij`→`pikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त किज्→किक्त (kij→kikta):** किज् + क्त → किक्त (SLP1 `kikta`) not `kijta`; added `nistha_base` special for `kij` with 8.2.30 header; `kija`/`kij`→`kikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त गिज्→गिक्त (gij→gikta):** गिज् + क्त → गिक्त (SLP1 `gikta`) not `gijta`; added `nistha_base` special for `gij` with 8.2.30 header; `gija`/`gij`→`gikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त चिज्→चिक्त (cij→cikta):** चिज् + क्त → चिक्त (SLP1 `cikta`) not `cijta`; added `nistha_base` special for `cij` with 8.2.30 header; `cija`/`cij`→`cikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तिज्→तिक्त (tij→tikta):** तिज् + क्त → तिक्त (SLP1 `tikta`) not `tijta`; added `nistha_base` special for `tij` with 8.2.30 header; `tija`/`tij`→`tikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दिज्→दिक्त (dij→dikta):** दिज् + क्त → दिक्त (SLP1 `dikta`) not `dijta`; added `nistha_base` special for `dij` with 8.2.30 header; `dija`/`dij`→`dikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त बिज्→बिक्त (bij→bikta):** बिज् + क्त → बिक्त (SLP1 `bikta`) not `bijta`; added `nistha_base` special for `bij` with 8.2.30 header; `bija`/`bij`→`bikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त लिज्→लिक्त (lij→likta):** लिज् + क्त → लिक्त (SLP1 `likta`) not `lijta`; added `nistha_base` special for `lij` with 8.2.30 header; `lija`/`lij`→`likta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रिज्→रिक्त (rij→rikta):** रिज् + क्त → रिक्त (SLP1 `rikta`) not `rijta`; added `nistha_base` special for `rij` with 8.2.30 header; `rija`/`rij`→`rikta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दिव्→द्यूत (div→dyUta):** दिव् + क्त → द्यूत (SLP1 `dyUta`) not `divta`; added `nistha_base` special for `div` with samprasāraṇa header; `diva`/`div`→`dyUta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त लुभ्→लुब्ध (luB→lubDa):** लुभ् + क्त → लुब्ध (SLP1 `lubDa`) not `luBta`; added `nistha_base` special for `luB` with 8.2.37 header; `luBa`/`luB`→`lubDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त क्षुभ्→क्षुब्ध (kzuB→kzuBDa):** क्षुभ् + क्त → क्षुब्ध (SLP1 `kzuBDa`) not `kzuBta`; added `nistha_base` special for `kzuB` with 8.2.37 header; `kzuBa`/`kzuB`→`kzuBDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्तभ्→स्तब्ध (swaB→swaBDa):** स्तभ् + क्त → स्तब्ध (SLP1 `swaBDa`) not `swaBta`; added `nistha_base` special for `swaB` with header; `swaBa`/`swaB`→`swaBDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्कभ्→स्कब्ध (skaB→skaBDa):** स्कभ् + क्त → स्कब्ध (SLP1 `skaBDa`) not `skaBta`; added `nistha_base` special for `skaB` with header; `skaBa`/`skaB`→`skaBDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रम्भ्→रब्ध (ramB→rabDa):** रम्भ् + क्त → रब्ध (SLP1 `rabDa`) not `ramBta`; added `nistha_base` special for `ramB` with header; `ramBa`/`ramB`→`rabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त लभ्→लब्ध (laB→labDa):** लभ् + क्त → लब्ध (SLP1 `labDa`) not `laBta`; added `nistha_base` explicit special for `laB` with header; `laBa`/`laB`→`labDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रभ्→रब्ध (raB→rabDa):** रभ् + क्त → रब्ध (SLP1 `rabDa`) not `raBta`; added `nistha_base` special for `raB` with header; `raBa`/`raB`→`rabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त नभ्→नब्ध (naB→nabDa):** नभ् + क्त → नब्ध (SLP1 `nabDa`) not `naBta`; added `nistha_base` special for `naB` with header; `naBa`/`naB`→`nabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त अभ्→अब्ध (aB→abDa):** अभ् + क्त → अब्ध (SLP1 `abDa`) not `aBta`; added `nistha_base` special for `aB` with header; `aBa`/`aB`→`abDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सभ्→सब्ध (saB→sabDa):** सभ् + क्त → सब्ध (SLP1 `sabDa`) not `saBta`; added `nistha_base` special for `saB` with header; `saBa`/`saB`→`sabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दभ्→दब्ध (daB→dabDa):** दभ् + क्त → दब्ध (SLP1 `dabDa`) not `daBta`; added `nistha_base` special for `daB` with header; `daBa`/`daB`→`dabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त गभ्→गब्ध (gaB→gabDa):** गभ् + क्त → गब्ध (SLP1 `gabDa`) not `gaBta`; added `nistha_base` special for `gaB` with header; `gaBa`/`gaB`→`gabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त द्रभ्→द्रब्ध (draB→drabDa):** द्रभ् + क्त → द्रब्ध (SLP1 `drabDa`) not `draBta`; added `nistha_base` special for `draB` with header; `draBa`/`draB`→`drabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्रभ्→स्रब्ध (sraB→srabDa):** स्रभ् + क्त → स्रब्ध (SLP1 `srabDa`) not `sraBta`; added `nistha_base` special for `sraB` with header; `sraBa`/`sraB`→`srabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त जभ्→जब्ध (jaB→jabDa):** जभ् + क्त → जब्ध (SLP1 `jabDa`) not `jaBta`; added `nistha_base` special for `jaB` with header; `jaBa`/`jaB`→`jabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सुभ्→सुब्ध (suB→subDa):** सुभ् + क्त → सुब्ध (SLP1 `subDa`) not `suBta`; added `nistha_base` special for `suB` with header; `suBa`/`suB`→`subDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त कुभ्→कुब्ध (kuB→kubDa):** कुभ् + क्त → कुब्ध (SLP1 `kubDa`) not `kuBta`; added `nistha_base` special for `kuB` with header; `kuBa`/`kuB`→`kubDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्तुभ्→स्तुब्ध (stuB→stuBDa):** स्तुभ् + क्त → स्तुब्ध (SLP1 `stuBDa`) not `stuBta`; added `nistha_base` special for `stuB` with header; `stuBa`/`stuB`→`stuBDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्कुभ्→स्कुब्ध (skuB→skuBDa):** स्कुभ् + क्त → स्कुब्ध (SLP1 `skuBDa`) not `skuBta`; added `nistha_base` special for `skuB` with header; `skuBa`/`skuB`→`skuBDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तभ्→तब्ध (taB→tabDa):** तभ् + क्त → तब्ध (SLP1 `tabDa`) not `taBta`; added `nistha_base` special for `taB` with header; `taBa`/`taB`→`tabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त बभ्→बब्ध (baB→babDa):** बभ् + क्त → बब्ध (SLP1 `babDa`) not `baBta`; added `nistha_base` special for `baB` with header; `baBa`/`baB`→`babDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त मभ्→मब्ध (maB→mabDa):** मभ् + क्त → मब्ध (SLP1 `mabDa`) not `maBta`; added `nistha_base` special for `maB` with header; `maBa`/`maB`→`mabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त यभ्→यब्ध (yaB→yabDa):** यभ् + क्त → यब्ध (SLP1 `yabDa`) not `yaBta`; added `nistha_base` special for `yaB` with header; `yaBa`/`yaB`→`yabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त वभ्→वब्ध (vaB→vabDa):** वभ् + क्त → वब्ध (SLP1 `vabDa`) not `vaBta`; added `nistha_base` special for `vaB` with header; `vaBa`/`vaB`→`vabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त हभ्→हब्ध (haB→habDa):** हभ् + क्त → हब्ध (SLP1 `habDa`) not `haBta`; added `nistha_base` special for `haB` with header; `haBa`/`haB`→`habDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त घभ्→घब्ध (GaB→GabDa):** घभ् + क्त → घब्ध (SLP1 `GabDa`) not `GaBta`; added `nistha_base` special for `GaB` with header; `GaBa`/`GaB`→`GabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त धभ्→धब्ध (DaB→DabDa):** धभ् + क्त → धब्ध (SLP1 `DabDa`) not `DaBta`; added `nistha_base` special for `DaB` with header; `DaBa`/`DaB`→`DabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त गै→गीत (gE→gIta, 6.1.45):** गै + क्त → गीत (SLP1 `gIta`) not `gEta`; added `nistha_base` special for `gE` with 6.1.45 header; `gE`→`gIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त पै→पीत (pE→pIta):** पै + क्त → पीत (SLP1 `pIta`) not `pEta`; added `nistha_base` special for `pE` with header; `pE`→`pIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त धे→धीत (DE→DIta):** धे + क्त → धीत (SLP1 `DIta`) not `DEta`; added `nistha_base` special for `DE` with header; `DE`→`DIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त छे→छीत (CE→CIta):** छे + क्त → छीत (SLP1 `CIta`) not `CEta`; added `nistha_base` special for `CE` with header; `CE`→`CIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त हे→हीत (hE→hIta):** हे + क्त → हीत (SLP1 `hIta`) not `hEta`; added `nistha_base` special for `hE` with header; `hE`→`hIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त शे→शीत (SE→SIta):** शे + क्त → शीत (SLP1 `SIta`) not `SEta`; added `nistha_base` special for `SE` with header; `SE`→`SIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त के→कीत (kE→kIta):** के + क्त → कीत (SLP1 `kIta`) not `kEta`; added `nistha_base` special for `kE` with header; `kE`→`kIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दे→दीत (dE→dIta):** दे + क्त → दीत (SLP1 `dIta`) not `dEta`; added `nistha_base` special for `dE` with header; `dE`→`dIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त ने→नीत (nE→nIta):** ने + क्त → नीत (SLP1 `nIta`) not `nEta`; added `nistha_base` special for `nE` with header; `nE`→`nIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त मे→मीत (mE→mIta):** मे + क्त → मीत (SLP1 `mIta`) not `mEta`; added `nistha_base` special for `mE` with header; `mE`→`mIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त ये→यीत (yE→yIta):** ये + क्त → यीत (SLP1 `yIta`) not `yEta`; added `nistha_base` special for `yE` with header; `yE`→`yIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त वे→वीत (vE→vIta):** वे + क्त → वीत (SLP1 `vIta`) not `vEta`; added `nistha_base` special for `vE` with header; `vE`→`vIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त से→सीत (sE→sIta):** से + क्त → सीत (SLP1 `sIta`) not `sEta`; added `nistha_base` special for `sE` with header; `sE`→`sIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रे→रीत (rE→rIta):** रे + क्त → रीत (SLP1 `rIta`) not `rEta`; added `nistha_base` special for `rE` with header; `rE`→`rIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त ले→लीत (lE→lIta):** ले + क्त → लीत (SLP1 `lIta`) not `lEta`; added `nistha_base` special for `lE` with header; `lE`→`lIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त बे→बीत (bE→bIta):** बे + क्त → बीत (SLP1 `bIta`) not `bEta`; added `nistha_base` special for `bE` with header; `bE`→`bIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त ते→तीत (tE→tIta):** ते + क्त → तीत (SLP1 `tIta`) not `tEta`; added `nistha_base` special for `tE` with header; `tE`→`tIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त जे→जीत (jE→jIta):** जे + क्त → जीत (SLP1 `jIta`) not `jEta`; added `nistha_base` special for `jE` with header; `jE`→`jIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त चे→चीत (cE→cIta):** चे + क्त → चीत (SLP1 `cIta`) not `cEta`; added `nistha_base` special for `cE` with header; `cE`→`cIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त भे→भीत (BE→BIta):** भे + क्त → भीत (SLP1 `BIta`) not `BEta`; added `nistha_base` special for `BE` with header; `BE`→`BIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त थे→थीत (TE→TIta):** थे + क्त → थीत (SLP1 `TIta`) not `TEta`; added `nistha_base` special for `TE` with header; `TE`→`TIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त खे→खीत (KE→KIta):** खे + क्त → खीत (SLP1 `KIta`) not `KEta`; added `nistha_base` special for `KE` with header; `KE`→`KIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त घे→घीत (GE→GIta):** घे + क्त → घीत (SLP1 `GIta`) not `GEta`; added `nistha_base` special for `GE` with header; `GE`→`GIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त जे→जीत (JE→JIta):** जे + क्त → जीत (SLP1 `JIta`) not `JEta`; added `nistha_base` special for `JE` with header; `JE`→`JIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त फे→फीत (PE→PIta):** फे + क्त → फीत (SLP1 `PIta`) not `PEta`; added `nistha_base` special for `PE` with header; `PE`→`PIta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त त्र→त्रात (tra→trAta):** त्र + क्त → त्रात (SLP1 `trAta`) not `trata`; added `nistha_base` special for `tra` with header; `tra`→`trAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त द्रु→द्रुत (dru→druta):** द्रु + क्त → द्रुत (SLP1 `druta`) not `druita`; added `nistha_base` special for `dru` with header; `dru`→`druta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्रु→स्रुत (sru→sruta):** स्रु + क्त → स्रुत (SLP1 `sruta`) not `sruita`; added `nistha_base` special for `sru` with header; `sru`→`sruta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्तु→स्तुत (stu→stuta):** स्तु + क्त → स्तुत (SLP1 `stuta`) not `stuita`; added `nistha_base` special for `stu` with header; `stu`→`stuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त क्षु→क्षुत (kzu→kzuta):** क्षु + क्त → क्षुत (SLP1 `kzuta`) not `kzuita`; added `nistha_base` special for `kzu` with header; `kzu`→`kzuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त नु→नुत (nu→nuta):** नु + क्त → नुत (SLP1 `nuta`) not `nuita`; added `nistha_base` special for `nu` with header; `nu`→`nuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त हु→हुत (hu→huta):** हु + क्त → हुत (SLP1 `huta`) not `huita`; added `nistha_base` special for `hu` with header; `hu`→`huta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त यु→युत (yu→yuta):** यु + क्त → युत (SLP1 `yuta`) not `yuita`; added `nistha_base` special for `yu` with header; `yu`→`yuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रु→रुत (ru→ruta):** रु + क्त → रुत (SLP1 `ruta`) not `ruita`; added `nistha_base` special for `ru` with header; `ru`→`ruta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त कु→कुत (ku→kuta):** कु + क्त → कुत (SLP1 `kuta`) not `kuita`; added `nistha_base` special for `ku` with header; `ku`→`kuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त गु→गुत (gu→guta):** गु + क्त → गुत (SLP1 `guta`) not `guita`; added `nistha_base` special for `gu` with header; `gu`→`guta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त चु→चुत (cu→cuta):** चु + क्त → चुत (SLP1 `cuta`) not `cuita`; added `nistha_base` special for `cu` with header; `cu`→`cuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त जु→जुत (ju→juta):** जु + क्त → जुत (SLP1 `juta`) not `juita`; added `nistha_base` special for `ju` with header; `ju`→`juta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तु→तुत (tu→tuta):** तु + क्त → तुत (SLP1 `tuta`) not `tuita`; added `nistha_base` special for `tu` with header; `tu`→`tuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त दु→दुत (du→duta):** दु + क्त → दुत (SLP1 `duta`) not `duita`; added `nistha_base` special for `du` with header; `du`→`duta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त पु→पुत (pu→puta):** पु + क्त → पुत (SLP1 `puta`) not `puita`; added `nistha_base` special for `pu` with header; `pu`→`puta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त बु→बुत (bu→buta):** बु + क्त → बुत (SLP1 `buta`) not `buita`; added `nistha_base` special for `bu` with header; `bu`→`buta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त मु→मुत (mu→muta):** मु + क्त → मुत (SLP1 `muta`) not `muita`; added `nistha_base` special for `mu` with header; `mu`→`muta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त लु→लुत (lu→luta):** लु + क्त → लुत (SLP1 `luta`) not `luita`; added `nistha_base` special for `lu` with header; `lu`→`luta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त वु→वुत (vu→vuta):** वु + क्त → वुत (SLP1 `vuta`) not `vuita`; added `nistha_base` special for `vu` with header; `vu`→`vuta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त सु→सुत (su→suta):** सु + क्त → सुत (SLP1 `suta`) not `suita`; added `nistha_base` special for `su` with header; `su`→`suta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त पभ्→पब्ध (paB→pabDa):** पभ् + क्त → पब्ध (SLP1 `pabDa`) not `paBta`; added `nistha_base` special for `paB` with header; `paBa`/`paB`→`pabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त बभ्→बब्ध (BaB→babDa):** बभ् + क्त → बब्ध (SLP1 `babDa`) not `BaBta`; added `nistha_base` special for `BaB` with header; `BaBa`/`BaB`→`babDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त चभ्→चब्ध (caB→cabDa):** चभ् + क्त → चब्ध (SLP1 `cabDa`) not `caBta`; added `nistha_base` special for `caB` with header; `caBa`/`caB`→`cabDa` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त खन्→खात (Kan→KAta):** खन् + क्त → खात (SLP1 `KAta`) not `Kanta`; added `nistha_base` special for `Kan` with long A header; `Kana`/`Kan`→`KAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त घन्→घात (Gan→GAta):** घन् + क्त → घात (SLP1 `GAta`) not `Ganta`; added `nistha_base` special for `Gan` with long A header; `Gana`/`Gan`→`GAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त चन्→चात (Can→CAta):** चन् + क्त → चात (SLP1 `CAta`) not `Canta`; added `nistha_base` special for `Can` with long A header; `Cana`/`Can`→`CAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त शन्→शात (San→SAta):** शन् + क्त → शात (SLP1 `SAta`) not `Santa`; added `nistha_base` special for `San` with long A header; `Sana`/`San`→`SAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त फन्→फात (Pan→PAta):** फन् + क्त → फात (SLP1 `PAta`) not `Panta`; added `nistha_base` special for `Pan` with long A header; `Pana`/`Pan`→`PAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त भन्→भात (Ban→BAta):** भन् + क्त → भात (SLP1 `BAta`) not `Banta`; added `nistha_base` special for `Ban` with long A header; `Bana`/`Ban`→`BAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त धन्→धात (Dan→DAta):** धन् + क्त → धात (SLP1 `DAta`) not `Danta`; added `nistha_base` special for `Dan` with long A header; `Dana`/`Dan`→`DAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त तन्→तात (Tan→TAta):** तन् + क्त → तात (SLP1 `TAta`) not `Tanta`; added `nistha_base` special for `Tan` with long A header; `Tana`/`Tan`→`TAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त रन्→रात (Ran→RAta):** रन् + क्त → रात (SLP1 `RAta`) not `Ranta`; added `nistha_base` special for `Ran` with long A header; `Rana`/`Ran`→`RAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त लन्→लात (lan→lAta):** लन् + क्त → लात (SLP1 `lAta`) not `lanta`; added `nistha_base` special for `lan` with long A header; `lana`/`lan`→`lAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्तन्→स्तात (stan→stAta):** स्तन् + क्त → स्तात (SLP1 `stAta`) not `stanta`; added `nistha_base` special for `stan` with long A header; `stana`/`stan`→`stAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्पन्→स्पात (span→spAta):** स्पन् + क्त → स्पात (SLP1 `spAta`) not `spanta`; added `nistha_base` special for `span` with long A header; `spana`/`span`→`spAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **क्त स्कन्→स्कात (skan→skAta):** स्कन् + क्त → स्कात (SLP1 `skAta`) not `skanta`; added `nistha_base` special for `skan` with long A header; `skana`/`skan`→`skAta` asserts; extreme commenting kept; 97 tests — pushed.
-- **यङ्लुक् extended (vac/Śru):** added `vac→vAvac→vAvakti` (8.2.30 c→k) and `Śru→SoSrū` intensive stems; enriched yaNluk sūtra comments (2.4.74, 8.2.30); 97 tests — pushed.
+- **निरावरण live:** `tinanta_overrides.rs` removed — generate is sūtra-driven (stems/adadi/join/it). README updated.
+- **अतिव्याख्या:** every module/fn/block carries a Pāṇini/Kaumudī header (~2.9k comment lines, no logic change).
+- **क्त हित/दत्त (7.4.42 vs 7.4.46):** `kit_anga` — SLP1 `DA`=धा → हित vs `dA`=दा → दत्त.
+- **यङ्लुक् (2.4.74):** intensive ya-lopa `boBU`/`cekrI`/`jaNgam`/`pApac`/`jaNGan` (parasmai vs yaṆ ātmanepada); vac→vAvakti (8.2.30), Śru→SoŚrū.
+- **सुबन्त हलन्त:** j/d (वणिक्, सुहृत्), h/B (लिक्, लप्), r/s (गिः, तपः), as/is/us (मनः, हविः, धनुः) — 8.2.30/31/39/66.
+- **तद्धित aliases (4.1.83/105/120):** `aR`→`a`/`aN`, `Dak`→`eya`, `yaY`→`Rya`/`yat`.
+- **क्त class sandhi before 7.2.35 इट्** (dropped per-root name lists; `takes_it_nistha` treats unknown हल् as सेट्):
+  - **8.2.30 चोः कुः:** palatal+त → मुक्त/युक्त/सिक्त (not *mucita). भञ्ज् भग्न stays named (ञ्ज् ≠ अञ्ज् अक्त).
+  - **8.2.37 भष्:** भ्+त → ब्ध (लब्ध, लुब्ध, क्षुब्ध); म्भ् drops म् (रब्ध).
+  - **8.2.42/45 नत्व:** भिद्/छिद् भिन्न/छिन्न; ओदित् शद्/पद्/स्कन्द् शन्न/पन्न/स्कन्न. अद् is 2.4.36 जग्ध.
+  - **6.4.37/42 nasal + शमादि:** गत/हत/यत/नत/तत/मत; जात/सात/खात; शान्त/क्रान्त. Dropped fake *न्→*आत.
+  - **6.1.45/6.4.66 + 7.2.11:** गै गीत, पै पीत, other ऐ → आत; उ-anta सुत/हुत/स्तुत from कित्.
+  - **6.1.15 + 8.2.31/32:** वह् ऊढ / दह् दग्ध from `kta_ho_dha` (named arms dropped).
+  - **named ādeśa left:** 2.4.36 जग्ध, 8.2.52 पक्व, सह् सोढ (गुण o not आ), भञ्ज् भग्न, 6.4.19 द्यूत.
 
 ## 2026-08-31
 

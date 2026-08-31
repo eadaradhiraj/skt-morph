@@ -131,54 +131,30 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     };
     let r = kit_anga(&r);
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
+    // Remaining named ādeśa only. वह् ऊढ / दह् दग्ध fall out of 6.1.15 + kta_ho_dha
+    // (uh → UQa via 8.2.31/6.3.111; dah starts with द so 8.2.32 दादेर् → dagDa).
+    // 8.2.30 palatal is in the terminal match (before 7.2.35 इट्).
     if orig == "pac" && va {
-        return "pakva".into(); // 8.2.52 पचो वः
+        return "pakva".into(); // 8.2.52 पचो वः (निष्ठा only; क्त्वा stays पक्त्वा)
     }
-    // Special: अद् + क्त → जग्ध (SLP1 jagDa) — 2.4.36 अदो जग्धिर्ल्यप्ति किति
-    // sūtra: ad on kit → jagDh; future devs: keep SLP1 jagDa (ध = Da)
-    // Extreme: ad is anit, not it, but kta is jagDa not atta (sandhi alone would give atta)
-    // ---------------------------------------------------------------------------
-    // ad kta special — must precede generic gfh/ij etc. arms
-    // ---------------------------------------------------------------------------
+    // 2.4.36 अदो जग्धिर्ल्यप्ति किति — अद् + क्त → जग्ध, not sandhi *atta.
     if orig == "ad" {
-        return "jagDa".into(); // जग्ध
+        return "jagDa".into();
     }
-    // Special: सह् + क्त → सोढ (SLP1 soQa) — 8.2.31 हो ढः + 6.3.111 lengthening, guṇa a→o
-    // sūtra: सह् + क्त → सोढ; future devs: sah→soQa, not sAQa (guṇa, not vṛddhi)
-    // Extreme: keep soQa (सोढ) with o, Q=ढ; generic kta_ho_dha would give sAQa (साढ) — wrong
+    // 8.2.31 हो ढः + गुण a→o (not 6.3.111 आ). Generic kta_ho_dha would yield *साढ.
     if orig == "sah" {
-        return "soQa".into(); // सोढ
+        return "soQa".into();
     }
-    // Special: वह् + क्त → ऊढ (SLP1 UQa) — 6.1.15 vah→U, 8.2.31 ho ḍha
-    // sūtra: वह् on kit → ऊढ; future devs: vah→UQa, not vaQa — samprasāraṇa U
-    // Extreme: keep UQa (ऊढ) with long U, Q=ढ; generic would give vAQa — wrong
-    if orig == "vah" {
-        return "UQa".into(); // ऊढ
-    }
-    // Special: दह् + क्त → दग्ध (SLP1 dagDa) — 8.2.32 दादेर्घः + जश्त्व? Actually दह् → दग् before ढ? But kta is घ? Check sūtra
-    // sūtra: दह् + क्त → दग्ध (dagDa); future devs: dah→dagDa, not dAQa; keep g (घ) not Q
-    // Extreme: dah is anit, but kta is dagDa via 8.2.32/8.2.37 bhaz? Keep dagDa
-    if orig == "dah" {
-        return "dagDa".into(); // दग्ध
-    }
-    // 8.2.30 चोः कुः is applied in the terminal match (before 7.2.35 इट्).
-    // Named मुच्/युज्/सिच्/… arms deleted — मुक्त/युक्त/सिक्त come from internal_sandhi.
-    // Special: भञ्ज् + क्त → भग्न (SLP1 Bagna) — 7.1.67?/8.2.36? Actually Banj→Bagna (न-लोप + ज→ग)
-    // sūtra: भञ्ज् + क्त → भग्न; future devs: Banj=भञ्ज्, Bagna=भग्न — keep g, nna
-    // Extreme: keep Bagna not Banja; handles anusvāra→n and j→g via ku
+    // भञ्ज्: ञ्-lopa + 8.2.30 ज→ग + न for त → भग्न. Palatal arm alone would give *BaYkta.
+    // अञ्ज् is अक्त (6.4.24 अनिदितां), so this is not a general ञ्ज् class.
     if orig == "BaYj" {
-        return "Bagna".into(); // भग्न
+        return "Bagna".into();
     }
-    // Special: दिव् + क्त → द्यूत (SLP1 dyUta) — 6.1.15 Actually div→dyU (samprasāraṇa)
-    // sūtra: दिव् + क्त → द्यूत; future devs: div=दिव्, dyUta=द्यूत — keep yU, long U
-    // Extreme: keep dyUta not divta; handles v→y, u→U
+    // 6.4.19 च्छ्वोः शूडनुनासिके च — दिव् व् → यू before क्त (द्यूत, not *divta / *dīta).
     if orig == "div" {
-        return "dyUta".into(); // द्यूत
+        return "dyUta".into();
     }
-    // क्षण् + क्त is सेट् → क्षणित? Actually kzaN is सेट्, not anit — keep kzaRita via it path
-    // sūtra: kzaN is सेट्, so kta is kzaRita not kZAta; future devs: do not add kZAta special for kzaN
-    // Extreme: keep kzaRita (via takes_it_nistha) — no special needed
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
+    // क्षण् is सेट् (not 7.2.10): क्त is क्षणित via takes_it_nistha, not *क्षात.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
         // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः
@@ -262,9 +238,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     }
 }
 
-/// 8.2.31 हो ढः; 8.2.32 दादेर्धातोर्घः; 6.3.111 ढ्रलोपे lengthen.
+/// 8.2.31 हो ढः (लीढ, गूढ, ऊढ from वह् after 6.1.15 uh); 8.2.32 दादेर्धातोर्घः
+/// (दह्/दुह् → दग्ध/दुग्ध via internal_sandhi h+t → gD, not ढ). 6.3.111 ढ्रलोपे
+/// पूर्वस्य दीर्घोऽणः lengthens the vowel before ढ (i→ī, u→ū, a→ā). सह् is
+/// named soQa (गुण o, not this ā).
 fn kta_ho_dha(root: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
+    // द-initial: 8.2.32 घः not ढः — दग्ध not *दाढ.
     if root.starts_with('d') {
         return internal_sandhi(root, "ta");
     }
