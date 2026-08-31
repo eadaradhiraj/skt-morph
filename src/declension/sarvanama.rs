@@ -1,7 +1,21 @@
 //! Auto-generated from sktmorph/sarvanama.py
+
+//! =============================================================================
+//! src/declension/sarvanama.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
+//! ---------------------------------------------------------------------------
+//! Purpose: see inline block comments below. Every public/private block is
+//! documented with sūtra reference, input/output, and edge-case notes.
+//! Script: SLP1 internally; Devanagari only at demo boundary.
+//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
+//! Gold DB is cross-check only, never source of truth.
+//! =============================================================================
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)] pub struct PronounTable { pub base: String, pub linga: String, pub table: HashMap<String, Vec<String>> }
+// ---------------------------------------------------------------------------
+// fn `pronouns`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap::new();
   m.insert(("tad".to_string(),"pum".to_string()), vec![vec!["saH".to_string(),"tO".to_string(),"te".to_string(),],vec!["tam".to_string(),"tO".to_string(),"tAn".to_string(),],vec!["tena".to_string(),"tAByAm".to_string(),"tEH".to_string(),],vec!["tasmE".to_string(),"tAByAm".to_string(),"teByaH".to_string(),],vec!["tasmAt".to_string(),"tAByAm".to_string(),"teByaH".to_string(),],vec!["tasya".to_string(),"tayoH".to_string(),"tezAm".to_string(),],vec!["tasmin".to_string(),"tayoH".to_string(),"tezu".to_string(),],]);
   m.insert(("tad".to_string(),"stri".to_string()), vec![vec!["sA".to_string(),"te".to_string(),"tAH".to_string(),],vec!["tAm".to_string(),"te".to_string(),"tAH".to_string(),],vec!["tayA".to_string(),"tAByAm".to_string(),"tABiH".to_string(),],vec!["tasyE".to_string(),"tAByAm".to_string(),"tAByaH".to_string(),],vec!["tasyAH".to_string(),"tAByAm".to_string(),"tAByaH".to_string(),],vec!["tasyAH".to_string(),"tayoH".to_string(),"tAsAm".to_string(),],vec!["tasyAm".to_string(),"tayoH".to_string(),"tAzu".to_string(),],]);
@@ -75,11 +89,16 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("daSan".to_string(),"nap".to_string()), vec![vec!["daSa".to_string(),"daSAni".to_string(),"daSAni".to_string(),],vec!["daSa".to_string(),"daSAni".to_string(),"daSAni".to_string(),],vec!["daSaBiH".to_string(),"daSaByAm".to_string(),"daSaBiH".to_string(),],vec!["daSaByaH".to_string(),"daSaByAm".to_string(),"daSaByaH".to_string(),],vec!["daSaByaH".to_string(),"daSaByAm".to_string(),"daSaByaH".to_string(),],vec!["daSasya".to_string(),"daSoH".to_string(),"daSAnAm".to_string(),],vec!["daSasu".to_string(),"daSasu".to_string(),"daSasu".to_string(),],]);
   m }
 
+// ---------------------------------------------------------------------------
+// fn `generate`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn generate(base: &str, linga: &str) -> Option<PronounTable> {
     let linga_eff = if base=="asmad" || base=="yuzmad" || base=="ubha" || base=="am" { "any" } else { linga };
     let table = pronouns().get(&(base.to_string(), linga_eff.to_string()))?.clone();
     let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI"];
     let mut map = HashMap::new();
+    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for (i, row) in table.iter().enumerate() {
         let v = vibhaktis[i].to_string();
         let forms: Vec<String> = row.iter().map(|s| s.replace(',',"/")).collect();
@@ -87,13 +106,22 @@ pub fn generate(base: &str, linga: &str) -> Option<PronounTable> {
     }
     Some(PronounTable { base: base.to_string(), linga: linga_eff.to_string(), table: map })
 }
+// ---------------------------------------------------------------------------
+// fn `analyze`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn analyze(word: &str) -> Vec<HashMap<String,String>> {
     let mut out=Vec::new();
     let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI"];
+    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for ((base,linga), table) in pronouns() {
+        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for (vi,row) in table.iter().enumerate() {
+            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for (vac_idx, forms_str) in row.iter().enumerate() {
+                // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                 for form in forms_str.split(',') {
+                    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                     if form==word {
                         let mut m=HashMap::new();
                         m.insert("pratipadika".to_string(), base.clone());

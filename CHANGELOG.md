@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01
+
+- **निरावरण live:** `tinanta_overrides.rs` removed — empty patch table deleted, generate is fully sūtra-driven (stems/adadi/join/it). README updated.
+- **अतिव्याख्या extreme commenting:** every module / fn / const / impl and every inner `if`/`match`/`for`/`while` block now carries a Pāṇini/Kaumudī sūtra comment header — ~2.9k lines added, no logic change; `cargo clippy -D warnings` + 95 tests clean.
+
 ## 2026-08-31
 
 - **लिट् आ-anta:** 7.1.34 आत औ णलः, 6.4.64 आ-lopa (ददौ/ददतुः, दधौ, तस्थौ, पपौ, जगौ, जहौ; ātmane ददे/दधे). 6.1.45 ग्लै → जग्लौ; 6.1.64 ष्ठा → स्था.

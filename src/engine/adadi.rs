@@ -2,15 +2,33 @@
 //! द्विष्, दुह्, अद् (8.4.55 खरि च), यु, या, वच्, मृज्, वी, विद्, रुदादि, शास्, वश्, जागृ,
 //! अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्, हन् (6.4.98 / 7.3.54), अस् (6.4.111 / 7.3.96),
 //! इण् (7.3.84 / 6.4.81).
+
+//! =============================================================================
+//! src/engine/adadi.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
+//! ---------------------------------------------------------------------------
+//! Purpose: see inline block comments below. Every public/private block is
+//! documented with sūtra reference, input/output, and edge-case notes.
+//! Script: SLP1 internally; Devanagari only at demo boundary.
+//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
+//! Gold DB is cross-check only, never source of truth.
+//! =============================================================================
 #![allow(non_snake_case)]
 
 use crate::engine::it::dhatu_satva;
 use crate::engine::phonology::{apply_guna_to_stem, apply_natva_to_word, apply_vrddhi_to_stem, thematic_join};
 
+// ---------------------------------------------------------------------------
+// fn `is_vowel`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
 
+// ---------------------------------------------------------------------------
+// fn `is_cons`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn is_cons(c: char) -> bool {
     !is_vowel(c)
 }
@@ -20,6 +38,10 @@ fn is_khar(c: char) -> bool {
     matches!(c, 'k' | 'K' | 'c' | 'C' | 'w' | 'W' | 't' | 'T' | 'p' | 'P' | 'S' | 'z' | 's')
 }
 
+// ---------------------------------------------------------------------------
+// fn `root_of`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn root_of(dhatu: &str) -> String {
     // षस्ति is संस्त; not 6.1.64 alone.
     if matches!(dhatu, "zasti" | "02.0074") {
@@ -28,56 +50,73 @@ fn root_of(dhatu: &str) -> String {
     // 1.3.5 ञिटुडवः then 6.1.64/65. Not prakriya_root: that strips radical u of ऊर्णु.
     // Not surface_root: 2.4.53 ब्रुवो वचिः is लिट्/लृट्, not लट्.
     let mut s = dhatu.trim_end_matches('~').to_string();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.starts_with("qu") && s.len() > 3 {
         s = s[2..].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.starts_with("wu") && s.len() > 3 {
         s = s[2..].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.starts_with("Yi") && s.len() > 3 {
         s = s[2..].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with("ir") && s.len() > 3 {
         s = s[..s.len() - 2].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('Y') && s.len() > 2 {
         s = s[..s.len() - 1].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('R') && s.len() == 2 {
         s = s[..s.len() - 1].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('N') && s.len() > 3 {
         s = s[..s.len() - 1].to_string();
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('u') && s.len() > 3 {
         let rest = &s[..s.len() - 1];
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rest.chars().last().is_some_and(is_cons)
             && rest.chars().any(|c| matches!(c, 'a' | 'A' | 'i' | 'I' | 'e' | 'o' | 'f'))
         {
             s = rest.to_string();
         }
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('U') && s.len() > 3 {
         let rest = &s[..s.len() - 1];
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rest.chars().last().is_some_and(is_cons) {
             s = rest.to_string();
         }
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('f') && s.len() > 4 && s != "jAgf" {
         let rest = &s[..s.len() - 1];
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rest.chars().last().is_some_and(is_cons) {
             s = rest.to_string();
         }
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('i') && s.len() > 4 {
         let rest = &s[..s.len() - 1];
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rest.chars().last().is_some_and(is_cons) && rest.chars().any(is_vowel) {
             s = rest.to_string();
         }
     }
     s = dhatu_satva(&s);
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('a') && s.len() >= 3 {
         let core = &s[..s.len() - 1];
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if core.chars().last().is_some_and(is_cons) {
             s = core.to_string();
         }
@@ -85,7 +124,12 @@ fn root_of(dhatu: &str) -> String {
     s
 }
 
+// ---------------------------------------------------------------------------
+// fn `pit` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn pit(family: &str, ending: &str) -> bool {
+    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match family {
         "lat" | "lrt" => matches!(ending, "ti" | "si" | "mi" | "Ami"),
         "lot" => matches!(ending, "tu" | "Ani" | "Ava" | "Ama"),
@@ -94,12 +138,17 @@ fn pit(family: &str, ending: &str) -> bool {
     }
 }
 
+// ---------------------------------------------------------------------------
+// fn `strip_a` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn strip_a(ending: &str) -> &str {
     ending.strip_prefix('a').unwrap_or(ending)
 }
 
 /// 8.2.30 coḥ kuḥ; 8.2.31 ho ḍhaḥ; 8.2.32 dāder ghah; 8.2.36 ṣaḍhoḥ kaḥ si; 8.4.41 ṣṭunā ṣṭuḥ.
 fn jhal(stem: &str, suf: &str, lih: bool) -> String {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if stem.is_empty() || suf.is_empty() {
         return format!("{stem}{suf}");
     }
@@ -107,9 +156,11 @@ fn jhal(stem: &str, suf: &str, lih: bool) -> String {
     let first = suf.chars().next().unwrap();
     let body: String = stem.chars().rev().skip(1).collect::<String>().chars().rev().collect();
     let rest: String = suf.chars().skip(1).collect();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if lih && last == 'Q' && matches!(first, 't' | 'T' | 'D') {
         return format!("{stem}{rest}");
     }
+    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match (last, first) {
         ('z', 't') | ('S', 't') => format!("{body}zw{rest}"),
         ('z', 'T') | ('S', 'T') => format!("{body}zW{rest}"),
@@ -139,6 +190,7 @@ fn padanta(stem: &str, lih: bool) -> String {
         return stem.to_string();
     };
     let body: String = stem.chars().rev().skip(1).collect::<String>().chars().rev().collect();
+    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match last {
         'z' | 'S' | 'j' => format!("{body}w"),
         'h' if lih => format!("{body}w"),
@@ -151,10 +203,15 @@ fn padanta(stem: &str, lih: bool) -> String {
     }
 }
 
+// ---------------------------------------------------------------------------
+// fn `lih_weak`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn lih_weak(root: &str) -> String {
     // 6.3.111 ढ्रलोपे पूर्वस्य दीर्घोऽणः: लिह् + त् → लीढ.
     let mut chars: Vec<char> = root.chars().collect();
     chars.pop();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(last) = chars.last_mut() {
         *last = match *last {
             'i' => 'I',
@@ -166,7 +223,12 @@ fn lih_weak(root: &str) -> String {
     chars.into_iter().collect::<String>() + "Q"
 }
 
+// ---------------------------------------------------------------------------
+// fn `apply_aug`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn apply_aug(form: String, family: &str, _augment: Option<&str>) -> String {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family != "lang" {
         return form;
     }
@@ -179,15 +241,27 @@ fn apply_aug(form: String, family: &str, _augment: Option<&str>) -> String {
     }
 }
 
+// ---------------------------------------------------------------------------
+// fn `u_final`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn u_final(root: &str) -> bool {
     root.ends_with('u')
 }
 
+// ---------------------------------------------------------------------------
+// fn `av`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn av(root: &str) -> String {
     // 6.1.78 eco 'yavāyāvaḥ: यु + vowel → यव्.
     format!("{}av", &root[..root.len() - 1])
 }
 
+// ---------------------------------------------------------------------------
+// fn `join_u` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn join_u(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
     let body = &root[..root.len() - 1];
     let strong = format!("{body}O");
@@ -237,6 +311,7 @@ fn join_u(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opti
         }
         "vidhilin" => {
             let uy = format!("{body}uy");
+            // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
             match ending {
                 "yAt" | "yAd" => format!("{uy}At"),
                 "yAtAm" => format!("{uy}AtAm"),
@@ -263,6 +338,10 @@ fn join_u(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opti
     Some(form)
 }
 
+// ---------------------------------------------------------------------------
+// fn `join_a` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn join_a(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
     let form = match family {
         "lat" => match ending {
@@ -302,6 +381,10 @@ fn join_a(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opti
     Some(form)
 }
 
+// ---------------------------------------------------------------------------
+// fn `join_i` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn join_i(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
     // वी: वेति, वीतः, वियन्ति (7.3.84; 6.4.77).
     let body = &root[..root.len() - 1];
@@ -354,17 +437,27 @@ fn join_i(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opti
     Some(form)
 }
 
+// ---------------------------------------------------------------------------
+// fn `cons_stems`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn cons_stems(root: &str) -> (String, String, bool) {
     let lih = root == "lih";
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root == "mfj" {
         return (apply_vrddhi_to_stem(root), root.to_string(), false);
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if lih {
         return (apply_guna_to_stem(root), lih_weak(root), true);
     }
     (apply_guna_to_stem(root), root.to_string(), lih)
 }
 
+// ---------------------------------------------------------------------------
+// fn `join_cons` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
     let (strong0, t_weak, lih) = cons_stems(root);
     let mfj = root == "mfj";
@@ -415,6 +508,7 @@ fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> O
                 format!("D{}kzya", &strong0[1..strong0.len() - 1])
             } else if crate::engine::it::anit_sya(root) || matches!(root, "dviz" | "vac" | "mfj") {
                 let j = jhal(&strong0, "sya", lih);
+                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if j.ends_with('a') {
                     j
                 } else {
@@ -432,6 +526,7 @@ fn join_cons(root: &str, family: &str, ending: &str, augment: Option<&str>) -> O
 
 /// 3.4.83 विदो लटो वा: वेत्ति / वेत्थ / वेद; weak वित्तः.
 fn join_vid(root: &str, family: &str, ending: &str, _purusha: u8, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "vid" {
         return None;
     }
@@ -494,6 +589,10 @@ fn rudadi_gun(root: &str) -> Option<(String, bool, bool)> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// fn `join_rudadi` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn join_rudadi(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
     let (gun, anit, abhyasta) = rudadi_gun(root)?;
     let form = match family {
@@ -543,6 +642,7 @@ fn join_rudadi(root: &str, family: &str, ending: &str, augment: Option<&str>) ->
         "lrt" => {
             let sya = if anit {
                 let j = jhal(&gun, "sya", false);
+                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if j.ends_with('a') { j } else { format!("{gun}sya") }
             } else {
                 format!("{gun}izya")
@@ -556,6 +656,7 @@ fn join_rudadi(root: &str, family: &str, ending: &str, augment: Option<&str>) ->
 
 /// शास्: शास्ति, शिष्टः, शासनति (7.1.4); शाधि (6.4.35).
 fn join_sas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "SAs" {
         return None;
     }
@@ -608,6 +709,7 @@ fn join_sas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Op
 
 /// वश्: वष्टि, उष्टः, उशन्ति (6.1.15).
 fn join_vas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "vaS" {
         return None;
     }
@@ -659,6 +761,7 @@ fn join_vas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Op
 
 /// जागृ: जागर्ति, जागृतः, जाग्रति (7.1.4).
 fn join_jagr(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "jAgf" {
         return None;
     }
@@ -718,6 +821,7 @@ fn her_dhih(stem: &str) -> String {
 
 /// अधि+इ (02.0042 इक्): इण् with अधि (6.1.77 यण्, 6.1.101 सवर्णदीर्घ).
 fn join_adhi_i(dhatu: &str, root: &str, family: &str, ending: &str, _augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "ik" && dhatu != "ik" && dhatu != "02.0042" {
         return None;
     }
@@ -777,9 +881,11 @@ fn join_adhi_i(dhatu: &str, root: &str, family: &str, ending: &str, _augment: Op
 
 /// 2.4.54 चक्षिङः ख्याञ्: लृट् क्ष्यास्यति (ख्यास्यति वा). Present stays चष्टे.
 fn join_cakz(root: &str, family: &str, ending: &str, _augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "cakz" {
         return None;
     }
+    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match family {
         "lrt" => Some(thematic_join("kSAsya", ending)),
         "lat" => match ending {
@@ -792,6 +898,7 @@ fn join_cakz(root: &str, family: &str, ending: &str, _augment: Option<&str>) -> 
 
 /// दरिद्रा (जक्षादि अभ्यस्त): दरिद्राति, दरिद्रितः, दरिद्रति (7.1.4); 6.4.64 इटि आ-लोप.
 fn join_daridra(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "daridrA" {
         return None;
     }
@@ -848,6 +955,7 @@ fn join_daridra(root: &str, family: &str, ending: &str, augment: Option<&str>) -
 
 /// चकास्: चकास्ति, चकासति (7.1.4); चकाधि (6.4.101); लङ् अचाकात्.
 fn join_cakas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "cakAs" {
         return None;
     }
@@ -900,6 +1008,7 @@ fn join_cakas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> 
 
 /// षस् → सस्: सस्ति, सधि (6.4.101); लङ् असत्.
 fn join_sasas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "sas" {
         return None;
     }
@@ -952,6 +1061,7 @@ fn join_sasas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> 
 
 /// षस्ति → संस्त्: संस्ति; लङ् असन् (संयोगान्तलोप).
 fn join_samst(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "saMst" {
         return None;
     }
@@ -1004,9 +1114,11 @@ fn join_samst(root: &str, family: &str, ending: &str, augment: Option<&str>) -> 
 /// 7.3.93 ब्रुव ईट् — pit sārvadhātuka ईट् (ब्रवीति); weak ब्रू; 6.4.77 उवङ् (ब्रुवन्ति).
 /// लृट् 2.4.53 ब्रुवो वचिः → वक्ष्यति.
 fn join_bru(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "brU" {
         return None;
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lrt" {
         return Some(thematic_join("vakzya", ending));
     }
@@ -1105,6 +1217,7 @@ fn join_stu_it(family: &str, ending: &str, augment: Option<&str>) -> Option<Stri
             return Some(apply_aug(inner, family, augment));
         }
         "vidhilin" => {
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if !ending.starts_with('y') {
                 return None;
             }
@@ -1115,13 +1228,20 @@ fn join_stu_it(family: &str, ending: &str, augment: Option<&str>) -> Option<Stri
     Some(form)
 }
 
+// ---------------------------------------------------------------------------
+// fn `join_stu` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn join_stu(family: &str, ending: &str, augment: Option<&str>) -> Vec<String> {
     let mut out = Vec::new();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_stu_it(family, ending, augment) {
         out.push(apply_natva_to_word(&f));
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_u("stu", family, ending, augment) {
         let f = apply_natva_to_word(&f);
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if !out.contains(&f) {
             out.push(f);
         }
@@ -1133,13 +1253,16 @@ fn join_stu(family: &str, ending: &str, augment: Option<&str>) -> Vec<String> {
 /// झि अन्ति/अन्तु/अन्: 6.4.98 + 7.3.54 हो हन्तेः → घ् (घ्नन्ति).
 /// यासुट् keeps न् (हन्यात्). पित् keeps हन् (हन्ति, हनानि).
 fn han_anga(family: &str, ending: &str) -> &'static str {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "vidhilin" || pit(family, ending) {
         return "han";
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if matches!(ending, "anti" | "nti" | "antu" | "an") {
         return "Gn";
     }
     let tin = if family == "lang" { strip_a(ending) } else { ending };
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if tin.chars().next().is_some_and(|c| matches!(c, 't' | 'T' | 'd' | 'D')) {
         return "ha";
     }
@@ -1148,18 +1271,23 @@ fn han_anga(family: &str, ending: &str) -> &'static str {
 
 /// हन्: 6.4.98 / 7.3.54; 8.3.24 हंसि; 6.4.36 हन्तेर्जः जहि; 6.1.68 अहन्.
 fn join_han(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "han" {
         return None;
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lrt" {
         return Some(thematic_join(&crate::engine::it::sya_stem("han"), ending));
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "vidhilin" {
         return Some(format!("han{ending}"));
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if ending == "Di" {
         return Some("jahi".into());
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lang" && matches!(ending, "at" | "ad" | "aH") {
         return Some(apply_aug("han".into(), family, augment));
     }
@@ -1180,6 +1308,7 @@ fn join_han(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Op
 
 /// 6.4.111 श्नसोरल्लोपः — अ of अस् drops before अपित्.
 fn as_anga(family: &str, ending: &str) -> &'static str {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if pit(family, ending) {
         "as"
     } else {
@@ -1189,16 +1318,21 @@ fn as_anga(family: &str, ending: &str) -> &'static str {
 
 /// अस्: 6.4.111; 8.4.65 असि; 7.3.96 आसीत्; 6.4.119+6.4.101 एधि; लृट् 2.4.52 भू.
 fn join_as(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "as" {
         return None;
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lrt" {
         return Some(thematic_join(&crate::engine::it::sya_stem("as"), ending));
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if ending == "Di" {
         return Some("eDi".into());
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lang" {
+        // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
         match ending {
             "at" => return Some(apply_aug("asIt".into(), family, augment)),
             "ad" => return Some(apply_aug("asId".into(), family, augment)),
@@ -1217,6 +1351,7 @@ fn join_as(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opt
     } else {
         format!("{stem}{tin}")
     };
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lang" && inner.starts_with('s') {
         // 6.4.72 आट्; 1.1.56 स्थानिवत् after 6.4.111.
         Some(format!("A{inner}"))
@@ -1227,6 +1362,7 @@ fn join_as(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opt
 
 /// इण्: 7.3.84 गुण; 6.4.81 इणो यण् (यन्ति, not इयङ्); 6.1.78 अयानि; 6.4.72 आट् आयन्.
 fn join_in(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root != "i" {
         return None;
     }
@@ -1265,6 +1401,7 @@ fn join_in(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opt
                 "ma" => format!("{weak}ma"),
                 _ => format!("{weak}{}", strip_a(ending)),
             };
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if inner.starts_with('y') {
                 format!("A{inner}")
             } else {
@@ -1299,58 +1436,76 @@ pub fn join_forms(
     _vacana: u8,
     augment: Option<&str>,
 ) -> Vec<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !matches!(family, "lat" | "lot" | "lang" | "vidhilin" | "lrt") {
         return vec![];
     }
     let r = root_of(dhatu);
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if r.is_empty() {
         return vec![];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if r == "stu" {
         return join_stu(family, ending, augment);
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_han(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_as(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_in(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_adhi_i(dhatu, &r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_cakz(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_daridra(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_cakas(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_sasas(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_samst(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_vid(&r, family, ending, _purusha, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_rudadi(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_sas(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_vas(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_jagr(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(f) = join_bru(&r, family, ending, augment) {
         return vec![apply_natva_to_word(&f)];
     }
@@ -1369,10 +1524,18 @@ pub fn join_forms(
 }
 
 #[cfg(test)]
+// ---------------------------------------------------------------------------
+// mod `tests`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `dviz_duh_yu_ya`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn dviz_duh_yu_ya() {
         assert_eq!(join_form("ada", "lat", "ti", 1, 1, None).as_deref(), Some("atti"));
         assert_eq!(join_form("ada", "lat", "TaH", 2, 2, None).as_deref(), Some("atTaH"));

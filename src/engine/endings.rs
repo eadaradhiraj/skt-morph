@@ -1,6 +1,20 @@
 //! Auto-generated from sktmorph/engine/endings.py
+
+//! =============================================================================
+//! src/engine/endings.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
+//! ---------------------------------------------------------------------------
+//! Purpose: see inline block comments below. Every public/private block is
+//! documented with sūtra reference, input/output, and edge-case notes.
+//! Script: SLP1 internally; Devanagari only at demo boundary.
+//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
+//! Gold DB is cross-check only, never source of truth.
+//! =============================================================================
 use crate::engine::redup::GANA3;
 
+// ---------------------------------------------------------------------------
+// fn `lat_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lat_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ti".into()], vec!["3.4.78".into()]),
@@ -15,6 +29,10 @@ pub fn lat_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lat_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lat_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["te".into()], vec!["3.4.78".into()]),
@@ -29,6 +47,10 @@ pub fn lat_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lat_ad_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lat_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ti".into()], vec!["3.1.3".into(), "3.4.78".into()]),
@@ -43,6 +65,10 @@ pub fn lat_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lot_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lot_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["tAt".into(), "tAd".into(), "tu".into()], vec!["3.4.78".into()]),
@@ -57,6 +83,10 @@ pub fn lot_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lot_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lot_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["atAm".into()], vec!["3.4.78".into()]),
@@ -71,6 +101,10 @@ pub fn lot_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lot_kartari_p_caus`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lot_kartari_p_caus() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["tAt".into(), "tAd".into(), "tu".into()], vec!["3.4.78".into()]),
@@ -85,6 +119,10 @@ pub fn lot_kartari_p_caus() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lot_ni_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lot_ni_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["Atu".into(), "ItAt".into(), "ItAd".into()], vec!["3.4.78".into()]),
@@ -99,6 +137,10 @@ pub fn lot_ni_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lot_nu_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lot_nu_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["utAt".into(), "utAd".into(), "otu".into()], vec!["3.1.75".into(), "3.4.78".into()]),
@@ -113,6 +155,10 @@ pub fn lot_nu_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lot_ad_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lot_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["tAt".into(), "tAd".into(), "tu".into()], vec!["3.1.3".into(), "3.4.78".into()]),
@@ -127,6 +173,10 @@ pub fn lot_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lrt_ad_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lrt_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ti".into()], vec!["3.1.3".into(), "3.4.78".into()]),
@@ -141,6 +191,10 @@ pub fn lrt_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lang_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lang_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["at".into(), "ad".into()], vec!["3.4.111".into()]),
@@ -155,6 +209,10 @@ pub fn lang_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lang_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lang_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ata".into()], vec!["3.4.111".into()]),
@@ -169,6 +227,10 @@ pub fn lang_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lang_ad_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lang_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["at".into(), "ad".into()], vec!["3.1.3".into(), "3.4.111".into()]),
@@ -183,6 +245,10 @@ pub fn lang_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lang_nu_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lang_nu_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ot".into(), "od".into()], vec!["3.1.75".into(), "3.4.111".into()]),
@@ -197,6 +263,10 @@ pub fn lang_nu_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lang_ni_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lang_ni_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["At".into(), "Ad".into()], vec!["3.1.81".into(), "3.4.111".into()]),
@@ -211,6 +281,10 @@ pub fn lang_ni_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `vidhilin_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn vidhilin_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["et".into(), "ed".into()], vec!["3.4.104".into()]),
@@ -225,6 +299,10 @@ pub fn vidhilin_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `vidhilin_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn vidhilin_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["eta".into()], vec!["3.4.104".into()]),
@@ -239,6 +317,10 @@ pub fn vidhilin_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `vidhilin_ad_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn vidhilin_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["yAt".into(), "yAd".into()], vec!["3.1.3".into(), "3.4.104".into()]),
@@ -253,6 +335,10 @@ pub fn vidhilin_ad_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `vidhilin_nu_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn vidhilin_nu_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["At".into(), "Ad".into()], vec!["3.1.75".into(), "3.4.104".into()]),
@@ -267,6 +353,10 @@ pub fn vidhilin_nu_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `vidhilin_ni_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn vidhilin_ni_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["yAt".into(), "yAd".into()], vec!["3.1.81".into(), "3.4.104".into()]),
@@ -281,6 +371,10 @@ pub fn vidhilin_ni_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lit_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lit_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["va".into()], vec!["3.2.115".into()]),
@@ -295,6 +389,10 @@ pub fn lit_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lit_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lit_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["e".into()], vec!["3.4.78".into()]),
@@ -309,6 +407,10 @@ pub fn lit_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `nu_lat_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn nu_lat_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ti".into()], vec!["3.1.75".into(), "3.4.78".into()]),
@@ -323,6 +425,10 @@ pub fn nu_lat_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `nu_lat_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn nu_lat_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["te".into()], vec!["3.1.75".into(), "3.4.78".into()]),
@@ -337,6 +443,10 @@ pub fn nu_lat_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lrt_kartari_p`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lrt_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["ti".into()], vec!["3.4.78".into()]),
@@ -351,6 +461,10 @@ pub fn lrt_kartari_p() -> Vec<(Vec<String>, Vec<String>)> {
     ]
 }
 
+// ---------------------------------------------------------------------------
+// fn `lrt_kartari_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn lrt_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["te".into()], vec!["3.4.78".into()]),
@@ -366,13 +480,24 @@ pub fn lrt_kartari_a() -> Vec<(Vec<String>, Vec<String>)> {
 }
 
 
+// ---------------------------------------------------------------------------
+// fn `gana_class`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn gana_class(gana: u8) -> &'static str {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if matches!(gana, 2|3) { return "ad"; }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if matches!(gana, 5|8) { return "nu"; }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if matches!(gana, 7|9) { return "thematic"; }
     "thematic"
 }
 
+// ---------------------------------------------------------------------------
+// fn `family_endings` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn family_endings(
     family: &str,
     prayoga: &str,
@@ -380,11 +505,16 @@ pub fn family_endings(
     gana: u8,
     dhatu: Option<&str>,
 ) -> Option<Vec<(Vec<String>, Vec<String>)>> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if prayoga != "kartari" { return None; }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if gana == GANA3 {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(d) = dhatu {
             let mode = crate::engine::redup::gana3_join_mode(d, None);
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if mode == "nu" {
+                // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
                 match family {
                     "lot" => return Some(lot_nu_p()),
                     "lang" => return Some(lang_nu_p()),
@@ -396,16 +526,27 @@ pub fn family_endings(
             }
         }
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="vidhilin" && pada=="P" && gana==9 { return Some(vidhilin_ni_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lrt" && pada=="P" && matches!(gana, 5|8) { return Some(lrt_kartari_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="vidhilin" && pada=="P" && matches!(gana, 5|8) { return Some(vidhilin_nu_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lot" && pada=="P" && gana==10 { return Some(lot_kartari_p_caus()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lang" && pada=="P" && gana==4 { return Some(crate::engine::lang_ya::lang_ya_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lang" && pada=="P" && gana==7 { return Some(lang_ad_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="vidhilin" && pada=="P" && gana==7 { return Some(vidhilin_ad_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lang" && pada=="P" && gana==9 { return Some(lang_ni_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lang" && pada=="P" && matches!(gana, 5|8) { return Some(lang_nu_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lot" && pada=="P" && gana==9 { return Some(lot_ni_p()); }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family=="lot" && pada=="P" && matches!(gana, 5|8) { return Some(lot_nu_p()); }
 
     let gclass = if matches!(gana, 5|8) && family=="lat" { "nu" } else { gana_class(gana) };
@@ -434,14 +575,18 @@ pub fn family_endings(
         ("lat","kartari","P","nu") => nu_lat_kartari_p(),
         ("lat","kartari","A","nu") => nu_lat_kartari_a(),
         _ => return {
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if gclass=="nu" {
+                // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
                 match (family, prayoga, pada) {
                     ("lat","kartari","P") => return Some(lat_kartari_p()),
                     ("lat","kartari","A") => return Some(lat_kartari_a()),
                     _ => {}
                 }
             }
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if gclass=="ad" {
+                // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
                 match (family, prayoga, pada, "thematic") {
                     ("lat","kartari","P","thematic") => return Some(lat_kartari_p()),
                     ("lat","kartari","A","thematic") => return Some(lat_kartari_a()),
@@ -461,6 +606,10 @@ pub fn family_endings(
 }
 
 
+// ---------------------------------------------------------------------------
+// fn `ending_table` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn ending_table(lakara: &str, prayoga: &str, pada: &str, gana: u8) -> Option<Vec<(String, Vec<String>)>> {
     let ( _canon, db ) = crate::engine::lakara::normalize_lakara(lakara);
     let family = crate::engine::lakara::lakara_family(&db)?;

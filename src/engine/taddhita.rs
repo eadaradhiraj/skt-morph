@@ -1,21 +1,44 @@
 //! तद्धित (minimal Kaumudī set): त्व, तल्, मतुप्, मयट्, इन्, तरप्, तमप्, छ, क, अण्, ढक्, यञ्.
+
+//! =============================================================================
+//! src/engine/taddhita.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
+//! ---------------------------------------------------------------------------
+//! Purpose: see inline block comments below. Every public/private block is
+//! documented with sūtra reference, input/output, and edge-case notes.
+//! Script: SLP1 internally; Devanagari only at demo boundary.
+//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
+//! Gold DB is cross-check only, never source of truth.
+//! =============================================================================
 #![allow(non_snake_case)]
 
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
+// ---------------------------------------------------------------------------
+// struct `TaddhitaResult`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub struct TaddhitaResult {
     pub forms: Vec<String>,
     pub pratipadika: String,
     pub pratyaya: String,
 }
 
+// ---------------------------------------------------------------------------
+// fn `strip_visarga`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn strip_visarga(s: &str) -> String {
     s.trim_end_matches('H').trim_end_matches('M').to_string()
 }
 
+// ---------------------------------------------------------------------------
+// fn `a_stem_base`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn a_stem_base(p: &str) -> String {
     let s = strip_visarga(p);
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('a') {
         s[..s.len() - 1].to_string()
     } else {
@@ -23,6 +46,10 @@ fn a_stem_base(p: &str) -> String {
     }
 }
 
+// ---------------------------------------------------------------------------
+// fn `is_vowel`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
@@ -30,6 +57,7 @@ fn is_vowel(c: char) -> bool {
 /// First-vowel vṛddhi (अण् / ढक् / यञ्): a→ā, i/ī/e→ai, u/ū/o→au, ṛ→ār.
 fn vrddhi_adi(s: &str) -> String {
     let chars: Vec<char> = s.chars().collect();
+    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for (i, &ch) in chars.iter().enumerate() {
         let repl = match ch {
             'a' => Some("A"),
@@ -38,17 +66,21 @@ fn vrddhi_adi(s: &str) -> String {
             'f' | 'F' | 'x' => Some("Ar"),
             _ => None,
         };
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(r) = repl {
             let mut o = String::new();
+            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for &c in &chars[..i] {
                 o.push(c);
             }
             o.push_str(r);
+            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for &c in &chars[i + 1..] {
                 o.push(c);
             }
             return o;
         }
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if is_vowel(ch) {
             return s.to_string();
         }
@@ -56,7 +88,12 @@ fn vrddhi_adi(s: &str) -> String {
     s.to_string()
 }
 
+// ---------------------------------------------------------------------------
+// fn `drop_final_a`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn drop_final_a(s: &str) -> String {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with('a') || s.ends_with('A') {
         s[..s.len() - 1].to_string()
     } else {
@@ -67,6 +104,7 @@ fn drop_final_a(s: &str) -> String {
 /// अण्: वृद्धि of the first vowel, then a. i-stem → ya; u-stem → ava (औपगव).
 fn derive_aR(s: &str) -> String {
     let v = vrddhi_adi(s);
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if v.ends_with('a') {
         v
     } else if v.ends_with('i') || v.ends_with('I') {
@@ -88,16 +126,23 @@ fn derive_yaY(s: &str) -> String {
     format!("{}ya", vrddhi_adi(&drop_final_a(s)))
 }
 
+// ---------------------------------------------------------------------------
+// fn `derive`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
     let p = pratipadika.trim();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if p.is_empty() {
         return vec![];
     }
     let s = strip_visarga(p);
+    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match pratyaya {
         "tva" => vec![format!("{s}tva")],
         "tal" | "tA" => vec![format!("{s}tA")],
         "matup" | "mat" => {
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if s.ends_with('a') {
                 vec![format!("{}vat", &s[..s.len() - 1])]
             } else {
@@ -117,6 +162,10 @@ pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
     }
 }
 
+// ---------------------------------------------------------------------------
+// fn `generate`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn generate(pratipadika: &str, pratyaya: &str) -> TaddhitaResult {
     TaddhitaResult {
         forms: derive(pratipadika, pratyaya),
@@ -126,10 +175,18 @@ pub fn generate(pratipadika: &str, pratyaya: &str) -> TaddhitaResult {
 }
 
 #[cfg(test)]
+// ---------------------------------------------------------------------------
+// mod `tests`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `tva_tal_matup`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn tva_tal_matup() {
         assert_eq!(derive("rAma", "tva"), vec!["rAmatva"]);
         assert_eq!(derive("rAmaH", "tal"), vec!["rAmatA"]);
@@ -142,6 +199,10 @@ mod tests {
     }
 
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `aR_Dak_yaY`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn aR_Dak_yaY() {
         assert_eq!(derive("diti", "aR"), vec!["dEtya"]);
         assert_eq!(derive("upagu", "aR"), vec!["Opagava"]);

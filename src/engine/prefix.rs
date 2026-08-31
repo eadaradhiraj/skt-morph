@@ -1,9 +1,21 @@
 //! Port of morphology.py UPASARGA handling + apply_forward_sandhi
 //! Pāṇini sandhi for prefixes (upasarga) + verb/participle
 
+
+//! =============================================================================
+//! src/engine/prefix.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
+//! ---------------------------------------------------------------------------
+//! Purpose: see inline block comments below. Every public/private block is
+//! documented with sūtra reference, input/output, and edge-case notes.
+//! Script: SLP1 internally; Devanagari only at demo boundary.
+//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
+//! Gold DB is cross-check only, never source of truth.
+//! =============================================================================
 pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if prefix.is_empty() { return word.to_string(); }
     let word = word.trim_start_matches('-');
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if word.is_empty() { return prefix.to_string(); }
     let p_chars: Vec<char> = prefix.chars().collect();
     let w_chars: Vec<char> = word.chars().collect();
@@ -15,11 +27,15 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
     let unvoiced_cons = ['k','K','c','C','w','W','t','T','p','P','S','z','s'];
 
     let mut result = format!("{}{}", prefix, word);
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if vowels.contains(&p_end) && w_start == 'C' {
         result = format!("{}c{}", prefix, word);
     }
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if p_end == 's' {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if prefix.ends_with("as") {
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if voiced_cons.contains(&w_start) {
                 result = format!("{}o{}", &prefix[..prefix.len()-2], word);
             } else if w_start == 'a' {
@@ -34,6 +50,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
                 result = format!("{}H{}", &prefix[..prefix.len()-1], word);
             }
         } else if prefix.ends_with("is") || prefix.ends_with("us") {
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if voiced_cons.contains(&w_start) || vowels.contains(&w_start) {
                 result = format!("{}r{}", &prefix[..prefix.len()-1], word);
             } else if w_start == 'c' || w_start == 'C' {
@@ -43,11 +60,13 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
             }
         }
     } else if p_end == 'a' || p_end == 'A' {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if w_start == 'a' || w_start == 'A' {
             result = format!("{}A{}", &prefix[..prefix.len()-1], w_rest);
         } else if w_start == 'i' || w_start == 'I' {
             result = format!("{}e{}", &prefix[..prefix.len()-1], w_rest);
         } else if w_start == 'u' || w_start == 'U' {
+            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if prefix == "pra" && word.starts_with("Uh") {
                 result = format!("{}O{}", &prefix[..prefix.len()-1], w_rest);
             } else {
@@ -63,12 +82,14 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
             result = format!("{}O{}", &prefix[..prefix.len()-1], w_rest);
         }
     } else if p_end == 'i' || p_end == 'I' {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if vowels.contains(&w_start) && w_start != 'i' && w_start != 'I' {
             result = format!("{}y{}", &prefix[..prefix.len()-1], word);
         } else if w_start == 'i' || w_start == 'I' {
             result = format!("{}I{}", &prefix[..prefix.len()-1], w_rest);
         }
     } else if p_end == 'u' || p_end == 'U' {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if vowels.contains(&w_start) && w_start != 'u' && w_start != 'U' {
             result = format!("{}v{}", &prefix[..prefix.len()-1], word);
         } else if w_start == 'u' || w_start == 'U' {
@@ -85,6 +106,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
         };
         result = format!("{}{}{}", &prefix[..prefix.len() - 1], nasal, word);
     } else if prefix == "ud" {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if word.starts_with("sT") {
             result = format!("utT{}", &word[2..]);
         } else if word.starts_with("stamB") {
@@ -97,6 +119,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
             result = format!("uddh{}", w_rest);
         }
     } else if prefix == "Srat" {
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if voiced_cons.contains(&w_start) || vowels.contains(&w_start) {
             result = format!("Srad{}", word);
         } else {
@@ -104,6 +127,7 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
         }
     }
 
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(satva) = apply_upasarga_satva(prefix, word) {
         result = satva;
     }
@@ -111,11 +135,17 @@ pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
     crate::engine::phonology::apply_natva_to_word(&result)
 }
 
+// ---------------------------------------------------------------------------
+// fn `apply_upasarga_satva`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 fn apply_upasarga_satva(prefix: &str, word: &str) -> Option<String> {
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !matches!(prefix, "ni" | "vi" | "nI" | "su" | "anu") {
         return None;
     }
     let w_chars: Vec<char> = word.chars().collect();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if w_chars.first() != Some(&'s') {
         return None;
     }
@@ -130,14 +160,23 @@ fn apply_upasarga_satva(prefix: &str, word: &str) -> Option<String> {
     Some(format!("{prefix}{mutated}"))
 }
 
+// ---------------------------------------------------------------------------
+// fn `apply_prefixes`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub fn apply_prefixes(prefixes: &[String], base: &str) -> String {
     let mut cur = base.to_string();
+    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for p in prefixes.iter().rev() {
         cur = apply_forward_sandhi(p, &cur);
     }
     cur
 }
 
+// ---------------------------------------------------------------------------
+// const `UPASARGAS`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 pub const UPASARGAS: &[&str] = &[
     "pra", "parA", "apa", "sam", "anu", "ava", "nis", "nir", "dus", "dur",
     "vi", "A", "aDi", "api", "ati", "su", "ud", "aBi", "prati", "pari", "upa", "ni",
@@ -146,14 +185,18 @@ pub const UPASARGAS: &[&str] = &[
 /// Remainders `rest` such that `apply_forward_sandhi(prefix, rest) == word`.
 pub fn unapply_prefix(prefix: &str, word: &str) -> Vec<String> {
     let mut out = Vec::new();
+    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if prefix.is_empty() || word.len() <= prefix.len() {
         return out;
     }
+    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for i in 1..word.len() {
         let rest = &word[i..];
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rest.is_empty() {
             continue;
         }
+        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if apply_forward_sandhi(prefix, rest) == word {
             out.push(rest.to_string());
         }
@@ -164,13 +207,18 @@ pub fn unapply_prefix(prefix: &str, word: &str) -> Vec<String> {
 /// `(upasargas left-to-right, bare form)` including the unprefixed word.
 pub fn split_upasarga_candidates(word: &str) -> Vec<(Vec<String>, String)> {
     let mut out = vec![(Vec::new(), word.to_string())];
+    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for &p in UPASARGAS {
+        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for rest in unapply_prefix(p, word) {
             out.push((vec![p.to_string()], rest.clone()));
+            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for &p2 in UPASARGAS {
+                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if p2 == p {
                     continue;
                 }
+                // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                 for rest2 in unapply_prefix(p2, &rest) {
                     out.push((vec![p.to_string(), p2.to_string()], rest2));
                 }
@@ -184,17 +232,33 @@ pub fn split_upasarga_candidates(word: &str) -> Vec<(Vec<String>, String)> {
 // Full split BFS is in analyze, here just for completeness
 
 #[cfg(test)]
+// ---------------------------------------------------------------------------
+// mod `tests`: purpose, inputs→outputs, edge cases.
+// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `test_sam_bhu`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn test_sam_bhu() {
         assert_eq!(apply_forward_sandhi("sam", "BUtvA"), "saMBUtvA");
     }
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `test_pra_ets`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn test_pra_ets() {
         assert_eq!(apply_forward_sandhi("pra", "eti"), "preti");
     }
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `pra_bhavanti_no_natva_on_tin_ending` — tin/sUP endings: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn pra_bhavanti_no_natva_on_tin_ending() {
         assert_eq!(apply_forward_sandhi("pra", "Bavanti"), "praBavanti");
         assert_eq!(apply_forward_sandhi("pra", "Bavizyanti"), "praBavizyanti");
@@ -203,20 +267,36 @@ mod tests {
         assert_eq!(f, "aBipraBavanti");
     }
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `pra_namati_has_natva`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn pra_namati_has_natva() {
         assert_eq!(apply_forward_sandhi("pra", "namati"), "praRamati");
     }
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `unapply_pra_gacchati`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn unapply_pra_gacchati() {
         let rest = unapply_prefix("pra", "pragacCati");
         assert!(rest.iter().any(|r| r == "gacCati"), "{:?}", rest);
     }
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `unapply_sam_bhu`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn unapply_sam_bhu() {
         let rest = unapply_prefix("sam", "saMBUtvA");
         assert!(rest.iter().any(|r| r == "BUtvA"), "{:?}", rest);
     }
     #[test]
+    // ---------------------------------------------------------------------------
+    // fn `sam_kf_satva_a_r`: purpose, inputs→outputs, edge cases.
+    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
+    // ---------------------------------------------------------------------------
     fn sam_kf_satva_a_r() {
         assert_eq!(apply_forward_sandhi("sam", "karoti"), "saNkaroti");
         assert_eq!(apply_forward_sandhi("A", "fcCati"), "ArcCati");

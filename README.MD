@@ -19,7 +19,7 @@ In: śuddha kartari तिङन्त (10 gaṇas; लट्, लङ्, लो
 
 Later: fuller यङ्, remaining क्त specials (दत्त/हित), fuller सुबन्त. Derived tinanta stays out of the analyze index.
 
-`tinanta_overrides.rs` is a temporary patch list where the Kaumudī path is not written yet. New work goes into stems, endings, join, and sandhi — not into that table, and not into scrape rows.
+All तिङन्त is now live (`stems`/`adadi`/`join`/sutras) — no override table and no scrape rows in the generate path.
 
 ## I/O
 
