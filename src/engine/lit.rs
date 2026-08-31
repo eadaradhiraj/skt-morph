@@ -540,6 +540,16 @@ fn is_cluster_cac(s: &str) -> bool {
 fn angas(root: &str) -> Option<Angas> {
     let root = adech(root);
     let root = dhatvadeh_sas(&root);
+    let root = if root.ends_with('a') && root.len() >= 3 {
+        let core = &root[..root.len() - 1];
+        if core.chars().last().is_some_and(is_cons) && core.chars().any(|c| !is_cons(c)) {
+            core.to_string()
+        } else {
+            root
+        }
+    } else {
+        root
+    };
     if root == "BU" {
         return Some(Angas {
             strong: "baBUv".into(),
@@ -630,33 +640,56 @@ fn angas(root: &str) -> Option<Angas> {
             thal_anit: None,
         });
     }
-    if !is_cac(&root) {
-        return None;
-    }
-    let abh = abhyasa(&root);
-    let strong = format!("{}{}", abh, vrddhi_upadha(&root));
-    let full = format!("{abh}{root}");
-    if matches!(root.as_str(), "gam" | "Kan") {
-        let weak = format!("{}{}", abh, lopa_upadha(&root));
-        let thal_anit = (root == "gam").then(|| "jaganTa".into());
+    // गाध् / नाथ्: CāC (7.4.59 ह्रस्वः in abhyāsa, 7.4.62 कुहोश्चुः).
+    let c: Vec<char> = root.chars().collect();
+    if c.len() == 3 && is_cons(c[0]) && c[1] == 'A' && is_cons(c[2]) {
+        let abh = abhyasa(&root);
+        let full = format!("{abh}{root}");
         return Some(Angas {
-            strong,
-            weak,
+            strong: full.clone(),
+            weak: full.clone(),
             full,
-            thal_anit,
+            thal_anit: Some(format!("{abh}{root}Ta")),
         });
     }
-    let thal = match root.as_str() {
-        "pac" => Some("papakTa".into()),
-        "tyaj" => Some("tatyakTa".into()),
-        _ => Some(format!("{full}Ta")),
-    };
-    Some(Angas {
-        strong,
-        weak: e_grade_cac(&root),
-        full,
-        thal_anit: thal,
-    })
+    if is_cac(&root) {
+        let abh = abhyasa(&root);
+        let strong = format!("{}{}", abh, vrddhi_upadha(&root));
+        let full = format!("{abh}{root}");
+        if matches!(root.as_str(), "gam" | "Kan") {
+            let weak = format!("{}{}", abh, lopa_upadha(&root));
+            let thal_anit = (root == "gam").then(|| "jaganTa".into());
+            return Some(Angas {
+                strong,
+                weak,
+                full,
+                thal_anit,
+            });
+        }
+        let thal = match root.as_str() {
+            "pac" => Some("papakTa".into()),
+            "tyaj" => Some("tatyakTa".into()),
+            _ => Some(format!("{full}Ta")),
+        };
+        return Some(Angas {
+            strong,
+            weak: e_grade_cac(&root),
+            full,
+            thal_anit: thal,
+        });
+    }
+    // स्पर्ध् etc.: अभ्यास + root when no other aṅga rule fired.
+    if root.chars().any(is_cons) {
+        let abh = abhyasa(&root);
+        let full = format!("{abh}{root}");
+        return Some(Angas {
+            strong: full.clone(),
+            weak: full.clone(),
+            full,
+            thal_anit: None,
+        });
+    }
+    None
 }
 
 fn paradigm(a: &Angas, purusha: u8, vacana: u8) -> Vec<String> {
@@ -758,6 +791,18 @@ mod tests {
         assert_eq!(abhyasa("Kan"), "ca");
         assert_eq!(abhyasa("pat"), "pa");
         assert_eq!(abhyasa("kram"), "ca");
+        assert_eq!(abhyasa("gAD"), "ja");
+        assert_eq!(abhyasa("sparD"), "pa");
+    }
+
+    #[test]
+    fn gadh_nath_spardh_atmane() {
+        let f = kartari("gADf", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "jagADe"), "{:?}", f);
+        let f = kartari("nATf", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "nanATe"), "{:?}", f);
+        let f = kartari("sparDa", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x == "pasparDe"), "{:?}", f);
     }
 
     #[test]

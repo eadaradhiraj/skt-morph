@@ -83,6 +83,11 @@ pub fn nic_stem(root: &str) -> String {
         "pat" => "pAtaya".into(),
         "Sru" => "SrAvaya".into(),
         "grah" => "grAhaya".into(),
+        "BI" => "BAyaya".into(),
+        "man" => "mAnaya".into(),
+        "labh" => "laBaya".into(),
+        "kzip" => "kzepaya".into(),
+        "sic" => "secaya".into(),
         _ if is_mit(root) => format!("{}aya", root),
         _ => {
             let g = apply_causative_like(root);
@@ -117,6 +122,10 @@ pub fn san_stem(root: &str) -> String {
         "pac" => "pipakza".into(),
         "pat" => "pitsa".into(),
         "jYA" => "jijYAsa".into(),
+        "dfS" => "didfkza".into(),
+        "grah" => "jiGfkza".into(),
+        "BI" => "biBIza".into(),
+        "labh" => "lipsa".into(),
         _ => {
             let abh = abhyasa_i(root);
             format!("{abh}{root}iza")
@@ -310,6 +319,12 @@ mod tests {
         assert!(f.iter().any(|x| x == "kArayati"), "{:?}", f);
         let f = kartari("gamx", "Ric", "lat", 1, 1, "P").unwrap();
         assert!(f.iter().any(|x| x == "gamayati"), "{:?}", f);
+        let f = kartari("BI", "Ric", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "BAyayati"), "{:?}", f);
+        let f = kartari("dfSir", "san", "lat", 1, 1, "P").unwrap();
+        assert!(f.iter().any(|x| x == "didfkzati"), "{:?}", f);
+        let f = kartari("labh", "san", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x.contains("lips")), "{:?}", f);
     }
 
     #[test]

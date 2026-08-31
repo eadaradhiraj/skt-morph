@@ -66,7 +66,15 @@ fn surface_root(dhatu: &str) -> String {
 }
 
 fn kta_base(dhatu: &str) -> String {
-    let r = surface_root(dhatu);
+    let mut r = surface_root(dhatu);
+    if r.ends_with('a') && r.len() >= 3 {
+        let core = &r[..r.len() - 1];
+        if core.chars().last().is_some_and(|c| !"aAiIuUfFeEoOxX".contains(c))
+            && core.chars().any(|c| "aAiIuUfFeEoOxX".contains(c))
+        {
+            r = core.to_string();
+        }
+    }
     match r.as_str() {
         "gam" => "gata".into(),
         "han" => "hata".into(),
@@ -84,6 +92,19 @@ fn kta_base(dhatu: &str) -> String {
         "grah" => "gfhIta".into(),
         "Sru" => "Sruta".into(),
         "pat" => "patita".into(),
+        "dfS" => "dfzwa".into(),
+        "naS" => "nazwa".into(),
+        "vah" => "UQa".into(),
+        "guh" => "gUQa".into(),
+        "dah" => "dagDa".into(),
+        "labh" => "labDa".into(),
+        "bandh" => "badDa".into(),
+        "svap" => "supta".into(),
+        "sfj" => "sfzwa".into(),
+        "kfz" => "kfzwa".into(),
+        "jYA" => "jYAta".into(),
+        "lih" => "lIQa".into(),
+        "duh" => "dugDa".into(),
         _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
         _ => internal_sandhi(&r, "ta"),
     }
@@ -277,5 +298,11 @@ mod tests {
         assert_eq!(derive("qukfY", "anIyar"), vec!["karaRIya"]);
         let sat = derive("hu", "Satf");
         assert!(sat.iter().any(|x| x == "juhvat"), "{:?}", sat);
+        assert_eq!(derive("dfSir", "kta"), vec!["dfzwa"]);
+        assert_eq!(derive("vaha", "kta"), vec!["UQa"]);
+        assert_eq!(derive("duha", "kta"), vec!["dugDa"]);
+        assert_eq!(kta_base("labh"), "labDa");
+        assert_eq!(kta_base("svap"), "supta");
+        assert_eq!(kta_base("naS"), "nazwa");
     }
 }

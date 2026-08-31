@@ -23,6 +23,10 @@ fn root_of(dhatu: &str) -> String {
 fn stem_p(root: &str) -> String {
     match root {
         "kf" | "f" => "kri".into(),
+        "vac" => "uc".into(),
+        "yaj" => "ij".into(),
+        "han" => "han".into(),
+        "nI" => "nI".into(),
         "dA" | "DA" | "sTA" | "pA" | "gA" | "mA" | "yA" => {
             let mut s = root.to_string();
             s.pop();
@@ -82,7 +86,11 @@ pub fn kartari(dhatu: &str, purusha: u8, vacana: u8, pada: &str) -> Option<Vec<S
     let end = endings(pada, purusha, vacana)?;
     if pada == "A" {
         let st = stem_a(&root);
-        return Some(vec![format!("{st}{end}")]);
+        let form = format!("{st}{end}");
+        if (purusha, vacana) == (1, 2) {
+            return Some(vec![form.clone(), format!("{st}IyAsTAm")]);
+        }
+        return Some(vec![form]);
     }
     let st = stem_p(&root);
     let form = format!("{st}{end}");
@@ -127,11 +135,15 @@ mod tests {
         assert_eq!(kartari("qukfY", 1, 1, "P").unwrap()[0], "kriyAt");
         assert!(kartari("gamx", 1, 1, "P").unwrap().iter().any(|x| x == "gamyAt"));
         assert!(kartari("qudAY", 1, 1, "P").unwrap().iter().any(|x| x == "deyAt"));
+        assert!(kartari("vaca", 1, 1, "P").unwrap().iter().any(|x| x == "ucyAt"));
     }
 
     #[test]
     fn ashir_atmane() {
         assert_eq!(kartari("qukfY", 1, 1, "A").unwrap()[0], "kfzIzwa");
         assert_eq!(kartari("BU", 1, 1, "A").unwrap()[0], "BavizIzwa");
+        let f = kartari("eDa", 1, 2, "A").unwrap();
+        assert!(f.iter().any(|x| x == "eDizIyAstAm"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "eDizIyAsTAm"), "{:?}", f);
     }
 }
