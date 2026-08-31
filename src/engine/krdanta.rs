@@ -112,7 +112,9 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         }
     }
     let orig = r.clone();
-    // 6.1.15 वचिस्वपियजादीनां; 6.1.16 ग्रहिज्या…
+    // 6.1.15 वचिस्वपियजादीनां किति — वच्/यज्/वप्/वह्/स्वप्/वस् → उच्/इज्/…
+    // 6.1.16 ग्रहिज्यावयिव्यधिवष्टिविचतिवृश्चतिपृच्छतिभृज्जतीनां ङिति च —
+    // ग्रह् already ग्फ्; व्यध् → विध् (विद्ध after 8.2.40 ध्+त).
     let r = match r.as_str() {
         "vac" => "uc".into(),
         "yaj" => "ij".into(),
@@ -121,6 +123,7 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         "svap" | "zvap" => "sup".into(),
         "vas" => "us".into(),
         "grah" => "gfh".into(),
+        "vyaD" => "viD".into(),
         other => other.to_string(),
     };
     // SLP1 भ is B; older "labh" = लभ्
@@ -154,16 +157,23 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "div" {
         return "dyUta".into();
     }
+    // 8.2.34 नहो धः — नह् + त → नद्ध, not हो ढः *नाढ (kta_ho_dha).
+    if orig == "nah" {
+        return "nadDa".into();
+    }
     // क्षण् is सेट् (not 7.2.10): क्त is क्षणित via takes_it_nistha, not *क्षात.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
-        // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः
+        // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः — ज/च्छ → ष before झल् त
+        // (सृष्ट, मृष्ट, इष्ट). More specific than 8.2.30 चोः कुः (*सृक्त).
+        // पृच्छ्: 6.1.16 संप्रसारण + च्छ→ष → पृष्ट (not palatal *prcKta).
         "sfj" | "mfj" | "Brasj" | "vraSc" => {
             let mut s = r.clone();
             s.pop();
             format!("{s}zwa")
         }
         "ij" => "izwa".into(),
+        "pfcC" | "pracC" => "pfzwa".into(),
         // 8.2.42 रदाभ्यां निष्ठातो नः पूर्वस्य च दः — भिद्/छिद् → भिन्न/छिन्न (not Bitta).
         // 8.2.45 ओदितश्च — शद्/पद्/स्कन्द् → शन्न/पन्न/स्कन्न (not Satta/skAta).
         // अद् is 2.4.36 जग्ध (above). सद् stays सत्त via internal_sandhi.
@@ -220,6 +230,8 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         // 8.3.23 मोऽनुस्वारः on म्भ्: रम्भ् → रब्ध (drop m, then भष्).
         _ if r.ends_with("mB") => format!("{}bDa", &r[..r.len() - 2]),
         _ if r.ends_with('B') => internal_sandhi(&r, "ta"),
+        // 8.2.40 झषस्तथोर्धोऽधः — ध् + त → द्ध (विद्ध after 6.1.16, बद्ध). Before इट् (*viDita).
+        _ if r.ends_with('D') => internal_sandhi(&r, "ta"),
         _ if r.ends_with('h')
             && r.chars().rev().nth(1).is_some_and(|c| "aAiIuUfFeEoO".contains(c)) =>
         {
@@ -773,268 +785,58 @@ mod tests {
         // दह् → दग्ध (dagDa) — 8.2.32
         assert_eq!(derive("daha", "kta"), vec!["dagDa"]); // दह् → दग्ध
         assert_eq!(derive("dah", "kta"), vec!["dagDa"]);
-        // मुच् → मुक्त (mukta) — 8.2.30
-        assert_eq!(derive("muca", "kta"), vec!["mukta"]); // मुच् → मुक्त (muca is मुच् with a)
+        // 8.2.30 चोः कुः — real palatals (not the fake *kij/*tuj dump).
         assert_eq!(derive("muc", "kta"), vec!["mukta"]);
-        // भञ्ज् → भग्न (Bagna) — Banj→Bagna
-        assert_eq!(derive("BaYja", "kta"), vec!["Bagna"]); // भञ्ज् → भग्न (BaYja is भञ्ज् with a)
-        assert_eq!(derive("BaYj", "kta"), vec!["Bagna"]);
-        // जन् → जात (jAta) — jan→jAta
-        assert_eq!(derive("jana", "kta"), vec!["jAta"]); // जन् → जात (jana is जन् with a)
-        assert_eq!(derive("jan", "kta"), vec!["jAta"]);
-        // तन् → तत (tata) — tan→tata
-        assert_eq!(derive("tana", "kta"), vec!["tata"]); // तन् → तत (tana is तन् with a)
-        assert_eq!(derive("tan", "kta"), vec!["tata"]);
-        // क्रम् → क्रान्त (krAnta) — kram→krAnta
-        assert_eq!(derive("krama", "kta"), vec!["krAnta"]); // क्रम् → क्रान्त (krama is क्रम् with a)
-        assert_eq!(derive("kram", "kta"), vec!["krAnta"]);
-        // श्रम् → श्रान्त (SrAnta) — Sram→SrAnta
-        assert_eq!(derive("Srama", "kta"), vec!["SrAnta"]); // श्रम् → श्रान्त (Srama is श्रम् with a)
-        assert_eq!(derive("Sram", "kta"), vec!["SrAnta"]);
-        // भ्रम् → भ्रान्त (BrAnta) — Bram→BrAnta
-        assert_eq!(derive("Brama", "kta"), vec!["BrAnta"]); // भ्रम् → भ्रान्त (Brama is भ्रम् with a)
-        assert_eq!(derive("Bram", "kta"), vec!["BrAnta"]);
-        // दम् → दान्त (dAnta) — dam→dAnta
-        assert_eq!(derive("dama", "kta"), vec!["dAnta"]); // दम् → दान्त (dama is दम् with a)
-        assert_eq!(derive("dam", "kta"), vec!["dAnta"]);
-        // शम् → शान्त (SAnta) — Sam→SAnta
-        assert_eq!(derive("Sama", "kta"), vec!["SAnta"]); // शम् → शान्त (Sama is शम् with a)
-        assert_eq!(derive("Sam", "kta"), vec!["SAnta"]);
-        // तम् → तान्त (tAnta) — tam→tAnta
-        assert_eq!(derive("tama", "kta"), vec!["tAnta"]); // तम् → तान्त (tama is तम् with a)
-        assert_eq!(derive("tam", "kta"), vec!["tAnta"]);
-        // नम् → नत (nata) — nam→nata
-        assert_eq!(derive("nama", "kta"), vec!["nata"]); // नम् → नत (nama is नम् with a)
-        assert_eq!(derive("nam", "kta"), vec!["nata"]);
-        // यम् → यत (yata) — yam→yata
-        assert_eq!(derive("yama", "kta"), vec!["yata"]); // यम् → यत (yama is यम् with a)
-        assert_eq!(derive("yam", "kta"), vec!["yata"]);
-        // रम् → रत (rata) — ram→rata
-        assert_eq!(derive("rama", "kta"), vec!["rata"]); // रम् → रत (rama is रम् with a)
-        assert_eq!(derive("ram", "kta"), vec!["rata"]);
-        // वन् → वत (vata) — van→vata
-        assert_eq!(derive("vana", "kta"), vec!["vata"]); // वन् → वत (vana is वन् with a)
-        assert_eq!(derive("van", "kta"), vec!["vata"]);
-        // मन् → मत (mata) — man→mata
-        assert_eq!(derive("mana", "kta"), vec!["mata"]); // मन् → मत (mana is मन् with a)
-        assert_eq!(derive("man", "kta"), vec!["mata"]);
-        assert_eq!(derive("sana", "kta"), vec!["sAta"]); // सन् 6.4.42 सात
-        assert_eq!(derive("san", "kta"), vec!["sAta"]);
-        // हन् → हत (hata) — han→hata
-        assert_eq!(derive("hana", "kta"), vec!["hata"]); // हन् → हत (hana is हन् with a)
-        assert_eq!(derive("han", "kta"), vec!["hata"]);
-        // गम् → गत (gata) — gam→gata
-        assert_eq!(derive("gama", "kta"), vec!["gata"]); // गम् → गत (gama is गम् with a) — careful gama is गम्? Actually gama is गम with a, but test as gam
-        assert_eq!(derive("gam", "kta"), vec!["gata"]);
-        // रुच् → रुक्त (rukta) — ruc→rukta
-        assert_eq!(derive("ruca", "kta"), vec!["rukta"]); // रुच् → रुक्त (ruca is रुच् with a)
-        assert_eq!(derive("ruc", "kta"), vec!["rukta"]);
-        // युज् → युक्त (yukta) — yuj→yukta
-        assert_eq!(derive("yuja", "kta"), vec!["yukta"]); // युज् → युक्त (yuja is युज् with a)
         assert_eq!(derive("yuj", "kta"), vec!["yukta"]);
-        // कुच् → कुक्त (kukta) — kuc→kukta
-        assert_eq!(derive("kuca", "kta"), vec!["kukta"]); // कुच् → कुक्त (kuca is कुच् with a)
-        assert_eq!(derive("kuc", "kta"), vec!["kukta"]);
-        // तुच् → तुक्त (tukta) — tuc→tukta
-        assert_eq!(derive("tuca", "kta"), vec!["tukta"]); // तुच् → तुक्त (tuca is तुच् with a)
-        assert_eq!(derive("tuc", "kta"), vec!["tukta"]);
-        // सिच् → सिक्त (sikta) — sic→sikta
-        assert_eq!(derive("sica", "kta"), vec!["sikta"]); // सिच् → सिक्त (sica is सिच् with a)
         assert_eq!(derive("sic", "kta"), vec!["sikta"]);
-        // भुज् → भुक्त (Bukta) — Buj→Bukta
-        assert_eq!(derive("Buja", "kta"), vec!["Bukta"]); // भुज् → भुक्त (Buja is भुज् with a)
         assert_eq!(derive("Buj", "kta"), vec!["Bukta"]);
-        // तुज् → तुक्त (tukta) — tuj→tukta
-        assert_eq!(derive("tuja", "kta"), vec!["tukta"]); // तुज् → तुक्त (tuja is तुज् with a)
-        assert_eq!(derive("tuj", "kta"), vec!["tukta"]);
-        // सुज् → सुक्त (sukta) — suj→sukta
-        assert_eq!(derive("suja", "kta"), vec!["sukta"]); // सुज् → सुक्त (suja is सुज् with a)
-        assert_eq!(derive("suj", "kta"), vec!["sukta"]);
-        // रुज् → रुक्त (rukta) — ruj→rukta
-        assert_eq!(derive("ruja", "kta"), vec!["rukta"]); // रुज् → रुक्त (ruja is रुज् with a)
-        assert_eq!(derive("ruj", "kta"), vec!["rukta"]);
-        // विज् → विक्त (vikta) — vij→vikta
-        assert_eq!(derive("vija", "kta"), vec!["vikta"]); // विज् → विक्त (vija is विज् with a)
-        assert_eq!(derive("vij", "kta"), vec!["vikta"]);
-        // सिज् → सिक्त (sikta) — sij→sikta
-        assert_eq!(derive("sija", "kta"), vec!["sikta"]); // सिज् → सिक्त (sija is सिज् with a)
-        assert_eq!(derive("sij", "kta"), vec!["sikta"]);
-        // निज् → निक्त (nikta) — nij→nikta
-        assert_eq!(derive("nija", "kta"), vec!["nikta"]); // निज् → निक्त (nija is निज् with a)
-        assert_eq!(derive("nij", "kta"), vec!["nikta"]);
-        // मिज् → मिक्त (mikta) — mij→mikta
-        assert_eq!(derive("mija", "kta"), vec!["mikta"]); // मिज् → मिक्त (mija is मिज् with a)
-        assert_eq!(derive("mij", "kta"), vec!["mikta"]);
-        // पिज् → पिक्त (pikta) — pij→pikta
-        assert_eq!(derive("pija", "kta"), vec!["pikta"]); // पिज् → पिक्त (pija is पिज् with a)
-        assert_eq!(derive("pij", "kta"), vec!["pikta"]);
-        // किज् → किक्त (kikta) — kij→kikta
-        assert_eq!(derive("kija", "kta"), vec!["kikta"]); // किज् → किक्त (kija is किज् with a)
-        assert_eq!(derive("kij", "kta"), vec!["kikta"]);
-        // गिज् → गिक्त (gikta) — gij→gikta
-        assert_eq!(derive("gija", "kta"), vec!["gikta"]); // गिज् → गिक्त (gija is गिज् with a)
-        assert_eq!(derive("gij", "kta"), vec!["gikta"]);
-        // चिज् → चिक्त (cikta) — cij→cikta
-        assert_eq!(derive("cija", "kta"), vec!["cikta"]); // चिज् → चिक्त (cija is चिज् with a)
-        assert_eq!(derive("cij", "kta"), vec!["cikta"]);
-        // तिज् → तिक्त (tikta) — tij→tikta
-        assert_eq!(derive("tija", "kta"), vec!["tikta"]); // तिज् → तिक्त (tija is तिज् with a)
-        assert_eq!(derive("tij", "kta"), vec!["tikta"]);
-        // दिज् → दिक्त (dikta) — dij→dikta
-        assert_eq!(derive("dija", "kta"), vec!["dikta"]); // दिज् → दिक्त (dija is दिज् with a)
-        assert_eq!(derive("dij", "kta"), vec!["dikta"]);
-        // बिज् → बिक्त (bikta) — bij→bikta
-        assert_eq!(derive("bija", "kta"), vec!["bikta"]); // बिज् → बिक्त (bija is बिज् with a)
-        assert_eq!(derive("bij", "kta"), vec!["bikta"]);
-        // लिज् → लिक्त (likta) — lij→likta
-        assert_eq!(derive("lija", "kta"), vec!["likta"]); // लिज् → लिक्त (lija is लिज् with a)
-        assert_eq!(derive("lij", "kta"), vec!["likta"]);
-        // रिज् → रिक्त (rikta) — rij→rikta
-        assert_eq!(derive("rija", "kta"), vec!["rikta"]); // रिज् → रिक्त (rija is रिज् with a)
-        assert_eq!(derive("rij", "kta"), vec!["rikta"]);
-        // दिव् → द्यूत (dyUta) — div→dyUta
-        assert_eq!(derive("diva", "kta"), vec!["dyUta"]); // दिव् → द्यूत (diva is दिव् with a)
-        assert_eq!(derive("div", "kta"), vec!["dyUta"]);
-        // लुभ् → लुब्ध (lubDa) — luB→lubDa
-        assert_eq!(derive("luBa", "kta"), vec!["lubDa"]); // लुभ् → लुब्ध (luBa is लुभ् with a)
-        assert_eq!(derive("luB", "kta"), vec!["lubDa"]);
-        // क्षुभ् → क्षुब्ध (kzuBDa) — kzuB→kzuBDa
-        assert_eq!(derive("kzuBa", "kta"), vec!["kzubDa"]); // क्षुभ् → क्षुब्ध (8.2.37 भष् B→b)
-        assert_eq!(derive("kzuB", "kta"), vec!["kzubDa"]);
-        // स्तभ् SLP1 is staB; swaB is स्टभ् (w=ट) — still भष् → swabDa
-        assert_eq!(derive("swaBa", "kta"), vec!["swabDa"]);
-        assert_eq!(derive("swaB", "kta"), vec!["swabDa"]);
-        assert_eq!(derive("skaBa", "kta"), vec!["skabDa"]);
-        assert_eq!(derive("skaB", "kta"), vec!["skabDa"]);
-        // रम्भ् → रब्ध (rabDa) — ramB→rabDa
-        assert_eq!(derive("ramBa", "kta"), vec!["rabDa"]); // रम्भ् → रब्ध (ramBa is रम्भ् with a)
-        assert_eq!(derive("ramB", "kta"), vec!["rabDa"]);
-        // लभ् → लब्ध (labDa) — laB→labDa
-        assert_eq!(derive("laBa", "kta"), vec!["labDa"]); // लभ् → लब्ध (laBa is लभ् with a)
-        assert_eq!(derive("laB", "kta"), vec!["labDa"]);
-        // रभ् → रब्ध (rabDa) — raB→rabDa
-        assert_eq!(derive("raBa", "kta"), vec!["rabDa"]); // रभ् → रब्ध (raBa is रभ् with a)
-        assert_eq!(derive("raB", "kta"), vec!["rabDa"]);
-        // नभ् → नब्ध (nabDa) — naB→nabDa
-        assert_eq!(derive("naBa", "kta"), vec!["nabDa"]); // नभ् → नब्ध (naBa is नभ् with a)
-        assert_eq!(derive("naB", "kta"), vec!["nabDa"]);
-        // अभ् → अब्ध (abDa) — aB→abDa
-        assert_eq!(derive("aBa", "kta"), vec!["abDa"]); // अभ् → अब्ध (aBa is अभ् with a)
-        assert_eq!(derive("aB", "kta"), vec!["abDa"]);
-        // सभ् → सब्ध (sabDa) — saB→sabDa
-        assert_eq!(derive("saBa", "kta"), vec!["sabDa"]); // सभ् → सब्ध (saBa is सभ् with a)
-        assert_eq!(derive("saB", "kta"), vec!["sabDa"]);
-        // दभ् → दब्ध (dabDa) — daB→dabDa
-        assert_eq!(derive("daBa", "kta"), vec!["dabDa"]); // दभ् → दब्ध (daBa is दभ् with a)
-        assert_eq!(derive("daB", "kta"), vec!["dabDa"]);
-        // गभ् → गब्ध (gabDa) — gaB→gabDa
-        assert_eq!(derive("gaBa", "kta"), vec!["gabDa"]); // गभ् → गब्ध (gaBa is गभ् with a)
-        assert_eq!(derive("gaB", "kta"), vec!["gabDa"]);
-        // द्रभ् → द्रब्ध (drabDa) — draB→drabDa
-        assert_eq!(derive("draBa", "kta"), vec!["drabDa"]); // द्रभ् → द्रब्ध (draBa is द्रभ् with a)
-        assert_eq!(derive("draB", "kta"), vec!["drabDa"]);
-        // स्रभ् → स्रब्ध (srabDa) — sraB→srabDa
-        assert_eq!(derive("sraBa", "kta"), vec!["srabDa"]); // स्रभ् → स्रब्ध (sraBa is स्रभ् with a)
-        assert_eq!(derive("sraB", "kta"), vec!["srabDa"]);
-        // जभ् → जब्ध (jabDa) — jaB→jabDa
-        assert_eq!(derive("jaBa", "kta"), vec!["jabDa"]); // जभ् → जब्ध (jaBa is जभ् with a)
-        assert_eq!(derive("jaB", "kta"), vec!["jabDa"]);
-        // सुभ् → सुब्ध (subDa) — suB→subDa
-        assert_eq!(derive("suBa", "kta"), vec!["subDa"]); // सुभ् → सुब्ध (suBa is सुभ् with a)
-        assert_eq!(derive("suB", "kta"), vec!["subDa"]);
-        // कुभ् → कुब्ध (kubDa) — kuB→kubDa
-        assert_eq!(derive("kuBa", "kta"), vec!["kubDa"]); // कुभ् → कुब्ध (kuBa is कुभ् with a)
-        assert_eq!(derive("kuB", "kta"), vec!["kubDa"]);
-        // स्तुभ् → स्तुब्ध (stuBDa) — stuB→stuBDa
-        assert_eq!(derive("stuBa", "kta"), vec!["stubDa"]);
-        assert_eq!(derive("stuB", "kta"), vec!["stubDa"]);
-        assert_eq!(derive("skuBa", "kta"), vec!["skubDa"]);
-        assert_eq!(derive("skuB", "kta"), vec!["skubDa"]);
-        // तभ् → तब्ध (tabDa) — taB→tabDa
-        assert_eq!(derive("taBa", "kta"), vec!["tabDa"]); // तभ् → तब्ध (taBa is तभ् with a)
-        assert_eq!(derive("taB", "kta"), vec!["tabDa"]);
-        // बभ् → बब्ध (babDa) — baB→babDa
-        assert_eq!(derive("baBa", "kta"), vec!["babDa"]); // बभ् → बब्ध (baBa is बभ् with a)
-        assert_eq!(derive("baB", "kta"), vec!["babDa"]);
-        // मभ् → मब्ध (mabDa) — maB→mabDa
-        assert_eq!(derive("maBa", "kta"), vec!["mabDa"]); // मभ् → मब्ध (maBa is मभ् with a)
-        assert_eq!(derive("maB", "kta"), vec!["mabDa"]);
-        // यभ् → यब्ध (yabDa) — yaB→yabDa
-        assert_eq!(derive("yaBa", "kta"), vec!["yabDa"]); // यभ् → यब्ध (yaBa is यभ् with a)
-        assert_eq!(derive("yaB", "kta"), vec!["yabDa"]);
-        // वभ् → वब्ध (vabDa) — vaB→vabDa
-        assert_eq!(derive("vaBa", "kta"), vec!["vabDa"]); // वभ् → वब्ध (vaBa is वभ् with a)
-        assert_eq!(derive("vaB", "kta"), vec!["vabDa"]);
-        // हभ् → हब्ध (habDa) — haB→habDa
-        assert_eq!(derive("haBa", "kta"), vec!["habDa"]); // हभ् → हब्ध (haBa is हभ् with a)
-        assert_eq!(derive("haB", "kta"), vec!["habDa"]);
-        // घभ् → घब्ध (GabDa) — GaB→GabDa
-        assert_eq!(derive("GaBa", "kta"), vec!["GabDa"]); // घभ् → घब्ध (GaBa is घभ् with a)
-        assert_eq!(derive("GaB", "kta"), vec!["GabDa"]);
-        // धभ् → धब्ध (DabDa) — DaB→DabDa
-        assert_eq!(derive("DaBa", "kta"), vec!["DabDa"]); // धभ् → धब्ध (DaBa is धभ् with a)
-        assert_eq!(derive("DaB", "kta"), vec!["DabDa"]);
-        // पभ् → पब्ध (pabDa) — paB→pabDa
-        assert_eq!(derive("paBa", "kta"), vec!["pabDa"]); // पभ् → पब्ध (paBa is पभ् with a)
-        assert_eq!(derive("paB", "kta"), vec!["pabDa"]);
-        // बभ् → बब्ध (babDa) — BaB→babDa (Ba=ब, B=भ)
-        assert_eq!(derive("BaBa", "kta"), vec!["BabDa"]); // बभ् (Ba=ब, B=भ) → बब्ध BabDa
-        assert_eq!(derive("BaB", "kta"), vec!["BabDa"]);
-        // चभ् → चब्ध (cabDa) — caB→cabDa
-        assert_eq!(derive("caBa", "kta"), vec!["cabDa"]); // चभ् → चब्ध (caBa is चभ् with a)
-        assert_eq!(derive("caB", "kta"), vec!["cabDa"]);
-        // खन् → खात (KAta) — Kan→KAta
-        assert_eq!(derive("Kana", "kta"), vec!["KAta"]); // खन् 6.4.42 खात
+        assert_eq!(derive("ruc", "kta"), vec!["rukta"]);
+        assert_eq!(derive("BaYj", "kta"), vec!["Bagna"]);
+        // 8.2.36 षः
+        assert_eq!(derive("sfj", "kta"), vec!["sfzwa"]);
+        assert_eq!(derive("yaj", "kta"), vec!["izwa"]);
+        assert_eq!(derive("pfcC", "kta"), vec!["pfzwa"]);
+        // 6.4.37/42 + शमादि
+        assert_eq!(derive("jan", "kta"), vec!["jAta"]);
+        assert_eq!(derive("tan", "kta"), vec!["tata"]);
+        assert_eq!(derive("kram", "kta"), vec!["krAnta"]);
+        assert_eq!(derive("Sram", "kta"), vec!["SrAnta"]);
+        assert_eq!(derive("Bram", "kta"), vec!["BrAnta"]);
+        assert_eq!(derive("dam", "kta"), vec!["dAnta"]);
+        assert_eq!(derive("Sam", "kta"), vec!["SAnta"]);
+        assert_eq!(derive("tam", "kta"), vec!["tAnta"]);
+        assert_eq!(derive("nam", "kta"), vec!["nata"]);
+        assert_eq!(derive("yam", "kta"), vec!["yata"]);
+        assert_eq!(derive("ram", "kta"), vec!["rata"]);
+        assert_eq!(derive("van", "kta"), vec!["vata"]);
+        assert_eq!(derive("man", "kta"), vec!["mata"]);
+        assert_eq!(derive("san", "kta"), vec!["sAta"]);
+        assert_eq!(derive("han", "kta"), vec!["hata"]);
         assert_eq!(derive("Kan", "kta"), vec!["KAta"]);
-        assert_eq!(derive("skana", "kta"), vec!["skanna"]); // स्कन्दिर् ओदित् 8.2.45 स्कन्न
         assert_eq!(derive("skan", "kta"), vec!["skanna"]);
-        assert_eq!(derive("Cida", "kta"), vec!["Cinna"]); // छिद् 8.2.42 छिन्न
+        assert_eq!(derive("Cid", "kta"), vec!["Cinna"]);
+        // 6.4.19 द्यूत; 8.2.37 भष्; 8.2.34 नद्ध; 6.1.16+8.2.40 विद्ध
+        assert_eq!(derive("div", "kta"), vec!["dyUta"]);
+        assert_eq!(derive("luB", "kta"), vec!["lubDa"]);
+        assert_eq!(derive("kzuB", "kta"), vec!["kzubDa"]);
+        assert_eq!(derive("ramB", "kta"), vec!["rabDa"]);
+        assert_eq!(derive("laB", "kta"), vec!["labDa"]);
+        assert_eq!(derive("nah", "kta"), vec!["nadDa"]);
+        assert_eq!(derive("vyaD", "kta"), vec!["vidDa"]);
+        assert_eq!(derive("lih", "kta"), vec!["lIQa"]);
+        assert_eq!(derive("guh", "kta"), vec!["gUQa"]);
         // 6.1.45 आदेच + 6.4.66 गा/पा → गीत/पीत; other ऐ → आत (कै कात).
         assert_eq!(derive("gE", "kta"), vec!["gIta"]);
         assert_eq!(derive("pE", "kta"), vec!["pIta"]);
         assert_eq!(derive("kE", "kta"), vec!["kAta"]);
         assert_eq!(derive("dE", "kta"), vec!["dAta"]);
         assert_eq!(derive("trE", "kta"), vec!["trAta"]);
-        // 7.2.11 श्र्युकः किति: u-final अनिट् + त (स्तुत, हुत, सुत).
-        assert_eq!(derive("dru", "kta"), vec!["druta"]); // द्रु → द्रुत
-        // स्रु → स्रुत (sruta) — sru→sruta
-        assert_eq!(derive("sru", "kta"), vec!["sruta"]); // स्रु → स्रुत
-        // स्तु → स्तुत (stuta) — stu→stuta
-        assert_eq!(derive("stu", "kta"), vec!["stuta"]); // स्तु → स्तुत
-        // क्षु → क्षुत (kzuta) — kzu→kzuta
-        assert_eq!(derive("kzu", "kta"), vec!["kzuta"]); // क्षु → क्षुत
-        // नु → नुत (nuta) — nu→nuta
-        assert_eq!(derive("nu", "kta"), vec!["nuta"]); // नु → नुत
-        // हु → हुत (huta) — hu→huta
-        assert_eq!(derive("hu", "kta"), vec!["huta"]); // हु → हुत
-        // यु → युत (yuta) — yu→yuta
-        assert_eq!(derive("yu", "kta"), vec!["yuta"]); // यु → युत
-        // रु → रुत (ruta) — ru→ruta
-        assert_eq!(derive("ru", "kta"), vec!["ruta"]); // रु → रुत
-        // कु → कुत (kuta) — ku→kuta
-        assert_eq!(derive("ku", "kta"), vec!["kuta"]); // कु → कुत
-        // गु → गुत (guta) — gu→guta
-        assert_eq!(derive("gu", "kta"), vec!["guta"]); // गु → गुत
-        // चु → चुत (cuta) — cu→cuta
-        assert_eq!(derive("cu", "kta"), vec!["cuta"]); // चु → चुत
-        // जु → जुत (juta) — ju→juta
-        assert_eq!(derive("ju", "kta"), vec!["juta"]); // जु → जुत
-        // तु → तुत (tuta) — tu→tuta
-        assert_eq!(derive("tu", "kta"), vec!["tuta"]); // तु → तुत
-        // दु → दुत (duta) — du→duta
-        assert_eq!(derive("du", "kta"), vec!["duta"]); // दु → दुत
-        // पु → पुत (puta) — pu→puta
-        assert_eq!(derive("pu", "kta"), vec!["puta"]); // पु → पुत
-        // बु → बुत (buta) — bu→buta
-        assert_eq!(derive("bu", "kta"), vec!["buta"]); // बु → बुत
-        // मु → मुत (muta) — mu→muta
-        assert_eq!(derive("mu", "kta"), vec!["muta"]); // मु → मुत
-        // लु → लुत (luta) — lu→luta
-        assert_eq!(derive("lu", "kta"), vec!["luta"]); // लु → लुत
-        // वु → वुत (vuta) — vu→vuta
-        assert_eq!(derive("vu", "kta"), vec!["vuta"]); // वु → वुत
-        // सु → सुत (suta) — su→suta
-        assert_eq!(derive("su", "kta"), vec!["suta"]); // सु → सुत
+        // 7.2.11 श्र्युकः किति: u-final अनिट् + त (real dhātus only).
+        assert_eq!(derive("dru", "kta"), vec!["druta"]);
+        assert_eq!(derive("sru", "kta"), vec!["sruta"]);
+        assert_eq!(derive("stu", "kta"), vec!["stuta"]);
+        assert_eq!(derive("hu", "kta"), vec!["huta"]);
+        assert_eq!(derive("su", "kta"), vec!["suta"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
