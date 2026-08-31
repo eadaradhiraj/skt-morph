@@ -366,6 +366,7 @@ pub fn apply_vrddhi_to_stem(stem: &str) -> String {
             'a' => { let mut o=String::new(); for &c in &chars[0..idx]{o.push(c);} o.push('A'); for &c in &chars[idx+1..]{o.push(c);} return o; }
             'i' => { let mut o=String::new(); for &c in &chars[0..idx]{o.push(c);} o.push('I'); for &c in &chars[idx+1..]{o.push(c);} return o; }
             'u' => { let mut o=String::new(); for &c in &chars[0..idx]{o.push(c);} o.push('U'); for &c in &chars[idx+1..]{o.push(c);} return o; }
+            'f' | 'F' => { let mut o=String::new(); for &c in &chars[0..idx]{o.push(c);} o.push_str("Ar"); for &c in &chars[idx+1..]{o.push(c);} return o; }
             'A'|'I'|'U'|'E'|'O' => return stem.to_string(),
             _ => {}
         }
@@ -531,16 +532,18 @@ pub fn apply_natva_to_word(word: &str) -> String {
     let mut chars: Vec<char> = word.chars().collect();
     let blockers: std::collections::HashSet<char> = ['c','C','j','J','Y','S','w','W','q','Q','R','t','T','d','D','l','s','S'].iter().cloned().collect();
     let mut trigger = false;
+    let mut trigger_z = false;
     for i in 0..chars.len() {
         let ch = chars[i];
         if matches!(ch, 'r'|'f'|'F'|'z') {
             trigger = true;
+            trigger_z = ch == 'z';
         } else if trigger && ch == 'n' {
             if i != chars.len() - 1 {
                 let next_ch = chars[i + 1];
                 let next_is_last = i + 1 == chars.len() - 1;
-                // तिङ् आनि (प्रभवानि): न्+इ at padānta is not णत्व. Root न्+इ in the middle still is (प्रणीतः).
-                if next_is_last && matches!(next_ch, 'i' | 'I') {
+                // तिङ् आनि after र (प्रभवानि) is not णत्व; after ष it is (द्वेषाणि, क्षवाणि).
+                if next_is_last && matches!(next_ch, 'i' | 'I') && !trigger_z {
                     // leave n
                 } else if "aAiIuUfFeEoOyvm".contains(next_ch) {
                     chars[i] = 'R';
@@ -548,6 +551,7 @@ pub fn apply_natva_to_word(word: &str) -> String {
             }
         } else if trigger && blockers.contains(&ch) {
             trigger = false;
+            trigger_z = false;
         }
     }
     chars.into_iter().collect()

@@ -31,6 +31,11 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **Demo:** तद्धित tab removed (तिङन्त · कृदन्त · सुबन्त).
 - **Demo धातु page:** अर्थ dropdown removed; 1.4.59 upasarga chips + extra field; कृदन्त sits on the same dhātu page as तिङन्त. Unlisted prefixes still sandhi; scrape gold only covers the 22.
 - **अस्:** name `as`/`asa` → 02.0060 अस्ति (not भ्वादि 01.1029); लङ् द्विवचन आस्ताम्.
+- **अदादि live join:** शप् लुक् + pit वृद्धि (यौति, द्वेष्टि, मार्ष्टि), jhal 8.2/8.4 (दोग्धि, लीढ, वक्ति), 8.2.32 धोक्/धोक्ष्यति, 6.1.78 यविष्यति/यवानि, लृट् a-elision द्वेक्ष्यामि. Folded those override tables (keep चक्षिङ्, अधि+इ, विद्, रुद्, श्वस्, जक्ष, जागृ, शास्, वश्, …).
+- **णत्व after ष:** द्वेषाणि (तिङ् आनि after र still प्रभवानि).
+- **णिच्/सन् fuller:** भावयते, अभावयत्, भावयिष्यति; नी नाययति, दा दापयति, हन् घातयति; सन् बुभूषिष्यति. Still not in the analyze index.
+
+
 
 
 ## 2026-08-28

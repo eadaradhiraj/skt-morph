@@ -1,3 +1,4 @@
+pub mod adadi;
 pub mod analyze;
 pub mod ashir;
 pub mod derived;

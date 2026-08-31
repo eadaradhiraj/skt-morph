@@ -44,6 +44,13 @@ pub fn join_form(
     _antarganas: Option<&str>,
 ) -> String {
     // AD (2,3) — अत्ति, अस्ति, हन्ति, एति, ब्रवीति, वक्ति
+    if gana == 2 {
+        if let Some(d) = dhatu {
+            if let Some(f) = crate::engine::adadi::join_form(d, family, ending, purusha, _vacana, augment) {
+                return crate::engine::phonology::apply_natva_to_word(&f);
+            }
+        }
+    }
     if gana == 2 || gana == 3 {
         if let Some(d) = dhatu {
             let d = d.trim_end_matches('a');
@@ -64,8 +71,12 @@ pub fn join_form(
                 }
                 if family == "lot" {
                     match ending {
-                        "tu" | "tAt" | "tAd" => return format!("han{}", if ending == "tu" { "tu" } else { ending }),
+                        "tu" => return "hantu".into(),
+                        "tAt" => return "hatAt".into(),
+                        "tAd" => return "hatAd".into(),
                         "tAm" => return "hatAm".into(),
+                        "tam" => return "hatam".into(),
+                        "ta" => return "hata".into(),
                         "antu" => return "Gnantu".into(),
                         "Di" => return "jahi".into(),
                         _ => {}
@@ -145,17 +156,27 @@ pub fn join_form(
                 }
             }
             if d == "ad" {
-                let joined = internal_sandhi("ad", ending);
                 if family == "lang" {
-                    return format!("A{}", joined.trim_start_matches('a'));
+                    return match ending {
+                        "at" | "ad" => "Adat".into(),
+                        "aH" => "AdaH".into(),
+                        "atAm" => "AttAm".into(),
+                        "atam" => "Attam".into(),
+                        "ata" => "Atta".into(),
+                        "an" => "Adan".into(),
+                        "am" => "Adam".into(),
+                        "va" => "Adva".into(),
+                        "ma" => "Adma".into(),
+                        _ => format!("Ad{}", ending.trim_start_matches('a')),
+                    };
                 }
                 if family == "vidhilin" && ending.starts_with('y') {
                     return format!("ad{ending}");
                 }
                 if family == "lrt" {
-                    return format!("atsya{ending}");
+                    return crate::engine::phonology::thematic_join("atsya", ending);
                 }
-                return joined;
+                return internal_sandhi("ad", ending);
             }
             if d == "vac" {
                 match ending {

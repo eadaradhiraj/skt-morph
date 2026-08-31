@@ -394,6 +394,16 @@ mod tests {
         assert!(f.iter().any(|x| x == "AstAm"), "{:?}", f);
         let f = generate_all("iR", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "eti"), "{:?}", f);
+        let f = generate_all("dviza", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "dvezwi"), "{:?}", f);
+        let f = generate_all("duha", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "dogDi"), "{:?}", f);
+        let f = generate_all("yu", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "yOti"), "{:?}", f);
+        let f = generate_all("yA", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "yAti"), "{:?}", f);
+        let f = generate_all("vaca", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "vakti"), "{:?}", f);
     }
 
     #[test]
@@ -473,6 +483,22 @@ mod tests {
         assert!(f.iter().any(|x| x == "BAvayAt" || x == "BAvayAd"), "{:?}", f);
         let f = generate_all_derived("BU", "san", "plun", 1, 1, &[]);
         assert!(f.iter().any(|x| x == "abuBUzIt" || x == "abuBUzId"), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "alat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "BAvayate"), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "plot", 1, 1, &[]);
+        assert!(f.iter().any(|x| x.contains("BAvaya")), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "plan", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "aBAvayat" || x == "aBAvayad"), "{:?}", f);
+        let f = generate_all_derived("BU", "Ric", "plrt", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "BAvayizyati"), "{:?}", f);
+        let f = generate_all_derived("BU", "san", "plrt", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "buBUzizyati"), "{:?}", f);
+        let f = generate_all_derived("nI", "Ric", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "nAyayati"), "{:?}", f);
+        let f = generate_all_derived("dA", "Ric", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "dApayati"), "{:?}", f);
+        let f = generate_all_derived("hana", "Ric", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x == "GAtayati"), "{:?}", f);
     }
 
     #[test]

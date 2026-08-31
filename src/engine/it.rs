@@ -18,6 +18,7 @@ pub fn anit_sya(root: &str) -> bool {
             | "mA" | "yA" | "as" | "vid" | "pad" | "sic" | "vis" | "mfj" | "yuj" | "Baj"
             | "raYj" | "saYj" | "kfz" | "dfS" | "sfj" | "masj" | "majj" | "ruh" | "guh" | "nah"
             | "vasc" | "vraSc" | "Ced" | "Cid" | "vft" | "syand" | "kfp" | "kalp"
+            | "dviz" | "dih"
     )
 }
 
