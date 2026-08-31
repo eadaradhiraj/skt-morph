@@ -143,11 +143,20 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "ad" {
         return "jagDa".into(); // जग्ध
     }
-    // Special: भिद् + क्त → भिन्न (SLP1 Binna) — 8.2.45?/6.4.47? d→n before t, with vowel? Actually Bid→Binna
-    // sūtra: भिद् + क्त → भिन्न (नत्व + चर्त्व); future devs: B=bh, i, nna
-    // Extreme: keep Binna not Bitta; handles 7.2.14? not needed
+    // Special: भिद् + क्त → भिन्न (SLP1 Binna) — 8.2.43?/6.4.47 d→n before t
+    // sūtra: भिद् + क्त → भिन्न (नत्व); future devs: B=bh, i, nna — keep Binna not Bitta
+    // Extreme: handles 7.2.14 kit? not needed, keep sūtra header for future halanta devs
     if orig == "Bid" {
         return "Binna".into(); // भिन्न
+    }
+    // Special: शद्/पद् + क्त → शन्न/पन्न (SLP1 Sanna/panna) — 8.2.45 + 6.4.?? d→n
+    // sūtra: शद्/पद् + क्त → शन्न/पन्न (n-त्व); future devs: Sad=शद् (S=श), pad=पद्
+    // Extreme: keep Sanna/panna not Satta/patta; d→n before t is sūtra-driven not sandhi atta
+    if orig == "Sad" {
+        return "Sanna".into(); // शन्न (Sad=S+ad? Actually S=श, Sad=शद्)
+    }
+    if orig == "pad" {
+        return "panna".into(); // पन्न
     }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
@@ -681,9 +690,14 @@ mod tests {
         // 2.4.36 अदो जग्धिर्ल्यप्ति किति — अद् → जग्ध (atta would be sandhi-only, wrong)
         assert_eq!(derive("ada", "kta"), vec!["jagDa"]); // अद् → जग्ध
         assert_eq!(derive("ad", "kta"), vec!["jagDa"]);
-        // भिद् → भिन्न (Binna) — 8.2.45/6.4.47 special, not Bitta
+        // भिद् → भिन्न (Binna) — 8.2.43/6.4.47 special, not Bitta
         assert_eq!(derive("Bida", "kta"), vec!["Binna"]); // भिद् → भिन्न (Bida is भिद् with a)
         assert_eq!(derive("Bid", "kta"), vec!["Binna"]);
+        // शद्/पद् → शन्न/पन्न (Sanna/panna) — 8.2.45
+        assert_eq!(derive("Sada", "kta"), vec!["Sanna"]); // शद् → शन्न
+        assert_eq!(derive("pada", "kta"), vec!["panna"]); // पद् → पन्न (pada is पद्)
+        assert_eq!(derive("Sad", "kta"), vec!["Sanna"]);
+        assert_eq!(derive("pad", "kta"), vec!["panna"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
