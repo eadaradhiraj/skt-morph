@@ -272,6 +272,17 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         }
         // After 6.1.15/16 the aṅga may be इक् (वे → उ). 7.2.11: no इट् (*veita).
         _ if r.chars().last().is_some_and(|c| "iIuUfF".contains(c)) => format!("{r}ta"),
+        // इगुपध + प्/त्/क् + निष्ठा त before 7.2.35 (*kzipita/*gupita). क्षिप्त, लिप्त, गुप्त, चित्त.
+        // takes_it_nistha treats unknown हल् as सेट्. Not anusvāra-upadhā प् (कम्प् → कम्पित).
+        // Not ष्: generic ष्टुत्व would yield *शुष्ट; शुष्क is later.
+        _ if {
+            let mut cs = r.chars().rev();
+            matches!(cs.next(), Some('p' | 't' | 'k'))
+                && matches!(cs.next(), Some('i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X'))
+        } =>
+        {
+            internal_sandhi(&r, "ta")
+        }
         _ if crate::engine::it::takes_it_nistha(&orig) => {
             let anga = if r.ends_with('s') {
                 crate::engine::it::ruki_s(&r)
@@ -871,6 +882,12 @@ mod tests {
         assert_eq!(derive("veY", "kta"), vec!["uta"]);
         assert_eq!(derive("vaS", "kta"), vec!["uzwa"]);
         assert_eq!(derive("vaSa", "kta"), vec!["uzwa"]);
+        // इगुपध प्/त्/क् before इट् (not *kzipita; कम्प् stays कम्पित).
+        assert_eq!(derive("kzip", "kta"), vec!["kzipta"]);
+        assert_eq!(derive("lip", "kta"), vec!["lipta"]);
+        assert_eq!(derive("gup", "kta"), vec!["gupta"]);
+        assert_eq!(derive("cit", "kta"), vec!["citta"]);
+        assert_eq!(derive("kamp", "kta"), vec!["kampita"]);
         assert_eq!(derive("lih", "kta"), vec!["lIQa"]);
         assert_eq!(derive("guh", "kta"), vec!["gUQa"]);
         // 6.1.45 आदेच + 6.4.66 गा/पा → गीत/पीत; other ऐ → आत (कै कात).
