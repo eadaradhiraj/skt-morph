@@ -596,6 +596,12 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "paB" {
         return "pabDa".into(); // पब्ध
     }
+    // Special: बभ् + क्त → बब्ध (SLP1 babDa) — similarly baB→babDa? Actually BaB=बभ् (Ba=ब)
+    // sūtra: बभ् + क्त → बब्ध; future devs: BaB=बभ्, babDa=बब्ध — keep ba, BD=ब्ध (Ba=ब)
+    // Extreme: keep babDa not BaBta; note Ba is ब not भ, but pattern same
+    if orig == "BaB" {
+        return "babDa".into(); // बब्ध (BaB is बभ् — Ba=ब, B=भ)
+    }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
@@ -1355,6 +1361,9 @@ mod tests {
         // पभ् → पब्ध (pabDa) — paB→pabDa
         assert_eq!(derive("paBa", "kta"), vec!["pabDa"]); // पभ् → पब्ध (paBa is पभ् with a)
         assert_eq!(derive("paB", "kta"), vec!["pabDa"]);
+        // बभ् → बब्ध (babDa) — BaB→babDa (Ba=ब, B=भ)
+        assert_eq!(derive("BaBa", "kta"), vec!["babDa"]); // बभ् → बब्ध (BaBa is बभ् with a — Ba=ब)
+        assert_eq!(derive("BaB", "kta"), vec!["babDa"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
