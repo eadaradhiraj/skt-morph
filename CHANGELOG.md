@@ -26,6 +26,11 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **1.3 अर्थ:** empty = dhātupāṭha pada; `vftti`/`sarga`/`tAyana` क्रम 1.3.38/43; `yajYa` भृ 1.3.66; `agranthe`/`granthe` यम् 1.3.75. Devanagari क्रम → `kramu`.
 - **Override fold:** यम्/दा/नी/स्था/श्रु/स्रु etc. live; वृत् अनिट् वर्त्स्यते; वृध् सेट् वर्धिष्यते; स्यन्द्/कॢप् अनिट्; कॢप् 8.2.18 कल्प्स्यते. Scrape वर्त्स्यति on वृध् dropped.
 - **तद्धित अण्/ढक्/यञ्:** दैत्य, औपगव, गार्ग; वैनतेय, दाक्षेय; गार्ग्य.
+- **तिङन्तान्वेषण:** demo looks up the surface form as तिङन्त (not dhātu-name prefix). अस् by name is 02.0060 अस्ति; लङ् द्विवचन आस्ताम्.
+- **सुबन्तविश्लेषण:** same lookup, keeping only सुबन्त / सर्वनाम.
+- **Demo:** तद्धित tab removed (तिङन्त · कृदन्त · सुबन्त).
+- **Demo धातु page:** अर्थ dropdown removed; 1.4.59 upasarga chips + extra field; कृदन्त sits on the same dhātu page as तिङन्त. Unlisted prefixes still sandhi; scrape gold only covers the 22.
+- **अस्:** name `as`/`asa` → 02.0060 अस्ति (not भ्वादि 01.1029); लङ् द्विवचन आस्ताम्.
 
 
 ## 2026-08-28

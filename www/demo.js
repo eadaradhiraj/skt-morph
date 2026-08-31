@@ -1,6 +1,5 @@
 import init, {
   analyze,
-  search,
   generate_verb_with_prefix,
   generate_verb_paradigm_with_prefix,
   generate_verb_derived,
@@ -9,7 +8,6 @@ import init, {
   generate_pronoun,
   generate_krdanta,
   generate_krdanta_with_prefix,
-  generate_taddhita,
 } from "../pkg/skt_morph.js";
 import { toSlp1, toDeva, prefixesToSlp1, formsToDeva } from "./translit.js";
 import * as L from "./labels.js";
@@ -38,7 +36,7 @@ function cellForms(forms) {
   return list.length ? esc(list.join(", ")) : '<span class="empty">—</span>';
 }
 
-const tabs = ["analyze", "verb", "noun", "krdanta", "taddhita"];
+const tabs = ["analyze", "verb", "noun"];
 tabs.forEach((t) => {
   document.getElementById("tab-" + t).onclick = () => {
     tabs.forEach((x) => {
@@ -47,6 +45,66 @@ tabs.forEach((t) => {
     });
   };
 });
+
+/** 1.4.59 — same list as `prefix.rs` / ashtadhyayi upasarga pages. */
+const UPASARGAS = [
+  ["pra", "प्र"],
+  ["parA", "परा"],
+  ["apa", "अप"],
+  ["sam", "सम्"],
+  ["anu", "अनु"],
+  ["ava", "अव"],
+  ["nis", "निस्"],
+  ["nir", "निर्"],
+  ["dus", "दुस्"],
+  ["dur", "दुर्"],
+  ["vi", "वि"],
+  ["A", "आ"],
+  ["ni", "नि"],
+  ["aDi", "अधि"],
+  ["api", "अपि"],
+  ["ati", "अति"],
+  ["su", "सु"],
+  ["ud", "उद्"],
+  ["aBi", "अभि"],
+  ["prati", "प्रति"],
+  ["pari", "परि"],
+  ["upa", "उप"],
+];
+
+const selectedUpa = [];
+
+function renderUpaChips() {
+  const box = document.getElementById("upasargas");
+  box.innerHTML = UPASARGAS.map(([slp, deva]) => {
+    const on = selectedUpa.includes(slp) ? " on" : "";
+    return `<button type="button" class="upa${on}" data-slp="${slp}">${deva}</button>`;
+  }).join("");
+}
+
+document.getElementById("upasargas").onclick = (e) => {
+  const b = e.target.closest("button.upa");
+  if (!b) return;
+  const slp = b.dataset.slp;
+  const i = selectedUpa.indexOf(slp);
+  if (i >= 0) selectedUpa.splice(i, 1);
+  else selectedUpa.push(slp);
+  b.classList.toggle("on", i < 0);
+};
+
+document.getElementById("btn-upa-clear").onclick = () => {
+  selectedUpa.length = 0;
+  document.getElementById("verb-prefix-extra").value = "";
+  renderUpaChips();
+};
+
+function prefixArg() {
+  const extra = prefixesToSlp1(document.getElementById("verb-prefix-extra").value);
+  const extras = extra ? extra.split(",") : [];
+  return [...selectedUpa, ...extras].join(",");
+}
+
+renderUpaChips();
 
 function analysisRows(a) {
   const rows = [];
@@ -90,7 +148,7 @@ function renderAnalyses(raw, queryDeva) {
 
   if (list.length === 0) {
     el.innerHTML =
-      `<div class="miss">कोई विश्लेषण नहीं — <b>${esc(queryDeva)}</b></div>` +
+      `<div class="miss">न किञ्चन विश्लेषणम् — <b>${esc(queryDeva)}</b></div>` +
       `<details><summary>JSON</summary><pre>${esc(strfy(raw))}</pre></details>`;
     return;
   }
@@ -107,29 +165,41 @@ function renderAnalyses(raw, queryDeva) {
   el.innerHTML = html;
 }
 
-document.getElementById("btn-analyze").onclick = () => {
+function asList(raw) {
+  let list = raw;
+  if (raw && typeof raw === "object" && !Array.isArray(raw) && raw[0] !== undefined) {
+    list = Array.from(raw);
+  }
+  if (!Array.isArray(list)) list = list ? [list] : [];
+  return list.map(asObj);
+}
+
+function runAnalyze(types, miss) {
   const typed = document.getElementById("q").value.trim();
   if (!typed) return;
   const slp = toSlp1(typed);
   const res = analyze(slp);
-  renderAnalyses(res, toDeva(slp) || typed);
-};
-
-document.getElementById("btn-search").onclick = () => {
-  const typed = document.getElementById("q").value.trim();
-  const slp = toSlp1(typed);
-  const res = search(slp, 10);
-  const items = Array.isArray(res) ? res : res ? Array.from(res) : [];
-  const el = document.getElementById("out-analyze");
-  if (!items.length) {
-    el.innerHTML = `<div class="miss">कोई धातु नहीं</div><pre>${esc(strfy(res))}</pre>`;
+  const queryDeva = toDeva(slp) || typed;
+  if (!types) {
+    renderAnalyses(res, queryDeva);
     return;
   }
-  let html = "<ul class='hits'>";
-  for (const d of items) html += `<li><b>${esc(toDeva(d))}</b> <code>${esc(d)}</code></li>`;
-  html += `</ul><details><summary>JSON</summary><pre>${esc(strfy(res))}</pre></details>`;
-  el.innerHTML = html;
-};
+  const list = asList(res).filter((a) => types.includes(a.word_type || a.wordType));
+  if (list.length === 0) {
+    const el = document.getElementById("out-analyze");
+    el.innerHTML =
+      `<div class="miss">${miss} — <b>${esc(queryDeva)}</b></div>` +
+      `<details><summary>JSON</summary><pre>${esc(strfy(res))}</pre></details>`;
+    return;
+  }
+  renderAnalyses(list, queryDeva);
+}
+
+document.getElementById("btn-analyze").onclick = () => runAnalyze(null);
+document.getElementById("btn-search").onclick = () =>
+  runAnalyze(["tinanta"], "न किञ्चन तिङन्तम्");
+document.getElementById("btn-subanta").onclick = () =>
+  runAnalyze(["subanta", "sarvanama"], "न किञ्चन सुबन्तम्");
 
 function renderVerbParadigm(res) {
   const el = document.getElementById("out-verb");
@@ -172,27 +242,29 @@ function renderVerbSingle(res) {
     `<details><summary>JSON (SLP1)</summary><pre>${esc(strfy(res))}</pre></details>`;
 }
 
+function dhatuQuery() {
+  return toSlp1(document.getElementById("dhatu").value) || "BU";
+}
+
 document.getElementById("btn-verb").onclick = () => {
-  const d = toSlp1(document.getElementById("dhatu").value) || "BU";
+  const d = dhatuQuery();
   const l = document.getElementById("lakara").value;
   const deriv = document.getElementById("derivation").value;
-  const pref = prefixesToSlp1(document.getElementById("verb-prefix").value);
-  const artha = document.getElementById("verb-artha").value;
+  const pref = prefixArg();
   const res = deriv
-    ? generate_verb_paradigm_derived(d, deriv, l, pref, artha)
-    : generate_verb_paradigm_with_prefix(d, l, pref, artha);
+    ? generate_verb_paradigm_derived(d, deriv, l, pref, "")
+    : generate_verb_paradigm_with_prefix(d, l, pref, "");
   renderVerbParadigm(res);
 };
 
 document.getElementById("btn-verb1").onclick = () => {
-  const d = toSlp1(document.getElementById("dhatu").value) || "BU";
+  const d = dhatuQuery();
   const l = document.getElementById("lakara").value;
   const deriv = document.getElementById("derivation").value;
-  const pref = prefixesToSlp1(document.getElementById("verb-prefix").value);
-  const artha = document.getElementById("verb-artha").value;
+  const pref = prefixArg();
   const res = deriv
-    ? generate_verb_derived(d, deriv, l, 1, 1, pref, artha)
-    : generate_verb_with_prefix(d, l, 1, 1, pref, artha);
+    ? generate_verb_derived(d, deriv, l, 1, 1, pref, "")
+    : generate_verb_with_prefix(d, l, 1, 1, pref, "");
   renderVerbSingle(res);
 };
 
@@ -219,7 +291,7 @@ function renderDeclension(res) {
   const decl = asObj(res?.declension);
   if (!res || !decl || Object.keys(decl).length === 0) {
     el.innerHTML =
-      `<div class="miss">कोई सुबन्त नहीं — <b>${esc(toDeva(toSlp1(document.getElementById("nbase").value)))}</b></div>` +
+      `<div class="miss">न किञ्चन सुबन्तम् — <b>${esc(toDeva(toSlp1(document.getElementById("nbase").value)))}</b></div>` +
       `<div class="hint">उदाहरण: राम / rAma, सीता / sItA, हरि / hari, नदी / nadI</div>` +
       `<pre>${esc(res ? strfy(res) : "null")}</pre>`;
     return;
@@ -248,42 +320,26 @@ document.getElementById("btn-noun").onclick = () => {
 };
 
 document.getElementById("btn-krdanta").onclick = () => {
-  const d = toSlp1(document.getElementById("kdhatu").value) || "BU";
+  const d = dhatuQuery();
   const p = document.getElementById("pratyaya").value;
-  const pref = prefixesToSlp1(document.getElementById("krd-prefix").value);
+  const pref = prefixArg();
   const el = document.getElementById("out-krdanta");
   try {
     const res = pref ? generate_krdanta_with_prefix(d, p, pref) : generate_krdanta(d, p);
     if (!res || !res.forms || res.forms.length === 0 || res.forms[0] === "") {
       el.innerHTML =
-        `<div class="miss">कोई कृदन्त नहीं — <b>${esc(toDeva(d))}</b> + ${esc(L.pratyaya(p))}</div>` +
+        `<div class="miss">न किञ्चन कृदन्तम् — <b>${esc(toDeva(d))}</b> + ${esc(L.pratyaya(p))}</div>` +
         `<pre>${esc(strfy(res))}</pre>`;
       return;
     }
     const indecl = ["ktvA", "lyap", "tumun", "Ramul", "am"];
     let html = `<div>रूप: <b>${esc(formsToDeva(res.forms).join(", "))}</b> (${esc(toDeva(d))} + ${esc(L.pratyaya(p))})</div>`;
-    if (indecl.includes(p)) html += '<div class="hint">अव्यय — सुबन्त नहीं</div>';
+    if (indecl.includes(p)) html += '<div class="hint">अव्यय — न सुबन्तम्</div>';
     html += `<details><summary>JSON (SLP1)</summary><pre>${esc(strfy(res))}</pre></details>`;
     el.innerHTML = html;
   } catch (e) {
     el.textContent = "Error: " + e;
   }
-};
-
-document.getElementById("btn-taddhita").onclick = () => {
-  const b = toSlp1(document.getElementById("tbase").value) || "rAma";
-  const p = document.getElementById("tpratyaya").value;
-  const el = document.getElementById("out-taddhita");
-  const res = generate_taddhita(b, p);
-  if (!res || !res.forms || res.forms.length === 0) {
-    el.innerHTML =
-      `<div class="miss">कोई तद्धित नहीं — <b>${esc(toDeva(b))}</b> + ${esc(L.pratyaya(p))}</div>` +
-      `<pre>${esc(strfy(res))}</pre>`;
-    return;
-  }
-  el.innerHTML =
-    `<div>रूप: <b>${esc(formsToDeva(res.forms).join(", "))}</b> (${esc(toDeva(b))} + ${esc(L.pratyaya(p))})</div>` +
-    `<details><summary>JSON (SLP1)</summary><pre>${esc(strfy(res))}</pre></details>`;
 };
 
 document.getElementById("out-analyze").innerHTML =

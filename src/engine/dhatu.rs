@@ -33,6 +33,14 @@ pub fn lookup(query: &str) -> Option<DhatuRow> {
             return Some(row(rec));
         }
     }
+    // अस् by name: Kaumudī अस्ति (02.0060), not भ्वादि 01.1029.
+    if q == "as" || q == "asa" {
+        for rec in crate::data::DHATUS {
+            if rec.0 == "02.0060" {
+                return Some(row(rec));
+            }
+        }
+    }
     for rec in crate::data::DHATUS {
         if rec.1 == q {
             // यम् by name: Kaumudī यच्छति (not ghaṭādi 01.0930 mittva).
@@ -125,5 +133,14 @@ mod tests {
     fn krama_from_deva_is_kramu() {
         let d = lookup("krama").expect("krama");
         assert_eq!(d.dhatu, "kramu");
+    }
+
+    #[test]
+    fn as_by_name_is_adadi() {
+        let d = lookup("asa").expect("asa");
+        assert_eq!(d.id, "02.0060");
+        assert_eq!(d.gana, 2);
+        let d = lookup("as").expect("as");
+        assert_eq!(d.id, "02.0060");
     }
 }

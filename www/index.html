@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="hi">
+<html lang="sa">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -22,30 +22,39 @@ th{background:#f3f3f3}
 .parse dl{margin:0;display:grid;grid-template-columns:9rem 1fr;gap:.15rem .75rem}
 .parse dt{color:#666}
 .parse dd{margin:0;font-weight:600}
-.hits{padding-left:1.2rem}
 code{font-size:.85em;color:#666}
 details{margin-top:.6rem}
+h2.block{font-size:1.05rem;margin:1.1rem 0 .4rem;border-top:1px solid #eee;padding-top:.75rem}
+.upasargas{display:flex;flex-wrap:wrap;gap:.3rem;margin:.45rem 0}
+.upasargas button{padding:.2rem .55rem;border:1px solid #ccc;background:#f5f5f5;cursor:pointer;font:inherit}
+.upasargas button.on{background:#222;color:#fff}
+#verb-prefix-extra{width:14rem}
 </style>
 </head>
 <body>
-<h1>skt-morph <small>तिङन्त · कृदन्त · सुबन्त · तद्धित</small></h1>
+<h1>skt-morph <small>तिङन्त · कृदन्त · सुबन्त</small></h1>
 <nav>
 <button id="tab-analyze" class="active">विश्लेषण</button>
-<button id="tab-verb">तिङन्त</button>
+<button id="tab-verb">धातु</button>
 <button id="tab-noun">सुबन्त</button>
-<button id="tab-krdanta">कृदन्त</button>
-<button id="tab-taddhita">तद्धित</button>
 </nav>
 
 <section id="sec-analyze">
-  <input id="q" placeholder="रामेण / rAmeNa / ट्रम्पेण" style="width:360px" lang="hi">
+  <input id="q" placeholder="रामेण / rAmeNa / ट्रम्पेण" style="width:360px">
   <button id="btn-analyze">विश्लेषण</button>
-  <button id="btn-search">धातु खोज</button>
+  <button id="btn-search">तिङन्तान्वेषण</button>
+  <button id="btn-subanta">सुबन्तविश्लेषण</button>
   <div id="out-analyze"></div>
 </section>
 
 <section id="sec-verb" hidden>
   <input id="dhatu" placeholder="धातु भू / bhU / 01.0001" value="भू">
+  <div id="upasargas" class="upasargas"></div>
+  <input id="verb-prefix-extra" placeholder="अन्य — आविस्, तिरस्, पुरस्">
+  <button type="button" id="btn-upa-clear">निरुपसर्ग</button>
+  <div class="hint">उपसर्गाः १.४.५९ — scrape gold is these. Any other prefix still joins by sandhi; <code>skt_morph.db</code> has no row for it.</div>
+
+  <h2 class="block">तिङन्त</h2>
   <select id="lakara">
     <option value="plat">लट् (परस्मै)</option>
     <option value="plan">लङ्</option>
@@ -64,35 +73,11 @@ details{margin-top:.6rem}
     <option value="yaN">यङ्</option>
     <option value="karma">कर्मणि</option>
   </select>
-  <input id="verb-prefix" placeholder="उपसर्ग प्र, सम्" style="width:180px">
-  <select id="verb-artha">
-    <option value="">अर्थ —</option>
-    <option value="vftti">वृत्ति</option>
-    <option value="sarga">सर्ग</option>
-    <option value="tAyana">तायन</option>
-    <option value="yajYa">यज्ञकर्मन्</option>
-    <option value="agranthe">अग्रन्थ</option>
-    <option value="granthe">ग्रन्थ</option>
-  </select>
-  <button id="btn-verb">गण (९)</button>
+  <button id="btn-verb">गण</button>
   <button id="btn-verb1">एक (प्रथम एकवचन)</button>
-  <div class="hint">उपसर्ग: सम्+भू → सम्भू, प्र+इ → प्रे. अर्थ: 1.3 वृत्ति/अग्रन्थ आदि (रिक्त = धातुरूप).</div>
   <div id="out-verb"></div>
-</section>
 
-<section id="sec-noun" hidden>
-  <input id="nbase" placeholder="प्रातिपदिक राम / rAma / ट्रम्प" value="राम">
-  <select id="linga">
-    <option value="pum">पुंलिङ्ग</option>
-    <option value="stri">स्त्रीलिङ्ग</option>
-    <option value="nap">नपुंसकलिङ्ग</option>
-  </select>
-  <button id="btn-noun">सुबन्त</button>
-  <div id="out-noun"></div>
-</section>
-
-<section id="sec-krdanta" hidden>
-  <input id="kdhatu" placeholder="धातु भू / bhU" value="भू">
+  <h2 class="block">कृदन्त</h2>
   <select id="pratyaya">
     <option value="kta">क्त</option>
     <option value="ktavatu">क्तवतु</option>
@@ -106,30 +91,19 @@ details{margin-top:.6rem}
     <option value="anIyar">अनीयर्</option>
     <option value="tfc">तृच्</option>
   </select>
-  <input id="krd-prefix" placeholder="उपसर्ग सम्, प्र" style="width:160px">
   <button id="btn-krdanta">कृदन्त</button>
-  <div class="hint">सम्+भू+क्त्वा → सम्भूत्वा</div>
   <div id="out-krdanta"></div>
 </section>
 
-<section id="sec-taddhita" hidden>
-  <input id="tbase" placeholder="प्रातिपदिक राम / दिति / गर्ग" value="राम">
-  <select id="tpratyaya">
-    <option value="tva">त्व</option>
-    <option value="tal">तल्</option>
-    <option value="matup">मतुप्</option>
-    <option value="mayaT">मयट्</option>
-    <option value="ini">इन्</option>
-    <option value="tarap">तरप्</option>
-    <option value="tamap">तमप्</option>
-    <option value="Ca">छ</option>
-    <option value="ka">क</option>
-    <option value="aR">अण्</option>
-    <option value="Dak">ढक्</option>
-    <option value="yaY">यञ्</option>
+<section id="sec-noun" hidden>
+  <input id="nbase" placeholder="प्रातिपदिक राम / rAma / ट्रम्प" value="राम">
+  <select id="linga">
+    <option value="pum">पुंलिङ्ग</option>
+    <option value="stri">स्त्रीलिङ्ग</option>
+    <option value="nap">नपुंसकलिङ्ग</option>
   </select>
-  <button id="btn-taddhita">तद्धित</button>
-  <div id="out-taddhita"></div>
+  <button id="btn-noun">सुबन्त</button>
+  <div id="out-noun"></div>
 </section>
 
 <script type="module" src="./demo.js"></script>

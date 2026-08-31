@@ -388,6 +388,10 @@ mod tests {
         assert!(f.iter().any(|x| x == "krIRAti"), "{:?}", f);
         let f = generate_all("02.0060", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "asti"), "{:?}", f);
+        let f = generate_all("02.0060", "plan", 1, 2);
+        assert!(f.iter().any(|x| x == "AstAm"), "{:?}", f);
+        let f = generate_all("asa", "plan", 1, 2);
+        assert!(f.iter().any(|x| x == "AstAm"), "{:?}", f);
         let f = generate_all("iR", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "eti"), "{:?}", f);
     }
