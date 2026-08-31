@@ -89,6 +89,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **क्त हभ्→हब्ध (haB→habDa):** हभ् + क्त → हब्ध (SLP1 `habDa`) not `haBta`; added `nistha_base` special for `haB` with header; `haBa`/`haB`→`habDa` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त घभ्→घब्ध (GaB→GabDa):** घभ् + क्त → घब्ध (SLP1 `GabDa`) not `GaBta`; added `nistha_base` special for `GaB` with header; `GaBa`/`GaB`→`GabDa` asserts; extreme commenting kept; 97 tests — pushed.
 - **क्त धभ्→धब्ध (DaB→DabDa):** धभ् + क्त → धब्ध (SLP1 `DabDa`) not `DaBta`; added `nistha_base` special for `DaB` with header; `DaBa`/`DaB`→`DabDa` asserts; extreme commenting kept; 97 tests — pushed.
+- **क्त पभ्→पब्ध (paB→pabDa):** पभ् + क्त → पब्ध (SLP1 `pabDa`) not `paBta`; added `nistha_base` special for `paB` with header; `paBa`/`paB`→`pabDa` asserts; extreme commenting kept; 97 tests — pushed.
 - **यङ्लुक् extended (vac/Śru):** added `vac→vAvac→vAvakti` (8.2.30 c→k) and `Śru→SoSrū` intensive stems; enriched yaNluk sūtra comments (2.4.74, 8.2.30); 97 tests — pushed.
 
 ## 2026-08-31
