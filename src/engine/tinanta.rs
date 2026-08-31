@@ -174,7 +174,10 @@ pub fn live_generate(
     let Some(family) = lakara_family(db_lakara) else { return vec![]; };
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
     if !pada_allowed_artha(&root_pada, &pada, &dhatu, prefixes, artha) {
-        return vec![];
+        // 2.4.54 चक्षिङः ख्याञ् — लृट् of ख्या/क्ष्या is parasmai.
+        if !(pada == "P" && family == "lrt" && matches!(dhatu.as_str(), "cakziN")) {
+            return vec![];
+        }
     }
     if family == "lit" {
         if let Some(forms) = crate::engine::lit::kartari(&dhatu, purusha, vacana, pada) {
@@ -555,6 +558,19 @@ mod tests {
         assert!(f.iter().any(|x| x == "kalpsyate"), "{:?}", f);
         assert!(crate::engine::tinanta_overrides::lookup_override("vftu", "plrt", 1, 1, &[]).is_none());
         assert!(crate::engine::tinanta_overrides::lookup_override("vfDu", "plrt", 1, 1, &[]).is_none());
+        assert!(crate::engine::tinanta_overrides::lookup_override("ik", "plat", 1, 1, &[]).is_none());
+        let f = generate_all("ik", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "aDyeti"), "{:?}", f);
+        let f = generate_all("daridrA", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "daridrAti"), "{:?}", f);
+        let f = generate_all("cakAsf", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "cakAsti"), "{:?}", f);
+        let f = generate_all("zasa", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "sasti"), "{:?}", f);
+        let f = generate_all("zasti", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "saMsti"), "{:?}", f);
+        let f = generate_all("cakziN", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "kSAsyati"), "{:?}", f);
     }
 
     #[test]

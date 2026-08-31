@@ -1,5 +1,6 @@
 //! अदादि (गण 2): शप् लुक् (2.4.72), pit गुण (7.3.86), jhal sandhi (8.2 / 8.4).
-//! as / han / iṇ stay in `join.rs`; this covers द्विष्, दुह्, यु, या, वच्, मृज्, वी.
+//! as / han / iṇ stay in `join.rs`; this covers द्विष्, दुह्, यु, या, वच्, मृज्, वी,
+//! विद्, रुदादि, शास्, वश्, जागृ, अधि+इ, दरिद्रा, चकास्, षस्, षस्ति, चक्षिङ् लृट्.
 #![allow(non_snake_case)]
 
 use crate::engine::it::surface_root;
@@ -29,6 +30,12 @@ fn root_of(dhatu: &str) -> String {
         "liha" | "02.0006" => return "lih".into(),
         "vaca" | "02.0058" => return "vac".into(),
         "ada" | "02.0001" => return "ad".into(),
+        "ik" | "02.0042" => return "ik".into(),
+        "cakziN" | "02.0007" => return "cakz".into(),
+        "daridrA" | "02.0068" => return "daridrA".into(),
+        "cakAsf" | "cakAs" | "02.0069" => return "cakAs".into(),
+        "zasa" | "02.0073" => return "sas".into(),
+        "zasti" | "02.0074" => return "saMst".into(),
         _ => {}
     }
     let mut r = surface_root(dhatu);
@@ -46,6 +53,11 @@ fn root_of(dhatu: &str) -> String {
         "liha" => return "lih".into(),
         "vaca" => return "vac".into(),
         "ada" => return "ad".into(),
+        "cakz" | "cakzi" => return "cakz".into(),
+        "daridrA" => return "daridrA".into(),
+        "cakAs" => return "cakAs".into(),
+        "sas" | "zas" => return "sas".into(),
+        "saMst" | "sast" => return "saMst".into(),
         _ => {}
     }
     if r.starts_with("wu") && r.len() > 3 {
@@ -681,7 +693,298 @@ fn join_jagr(root: &str, family: &str, ending: &str, augment: Option<&str>) -> O
     })
 }
 
-/// Full surface form for गण 2, or `None` to fall through (अस्, हन्, इण्, अधी+इ).
+/// 6.4.101 हुझल्भ्यो हेर्धिः: झल् + हि → धि.
+fn her_dhih(stem: &str) -> String {
+    let body: String = stem.chars().rev().skip(1).collect::<String>().chars().rev().collect();
+    format!("{body}Di")
+}
+
+/// अधि+इ (02.0042 इक्): इण् with अधि (6.1.77 यण्, 6.1.101 सवर्णदीर्घ).
+fn join_adhi_i(dhatu: &str, root: &str, family: &str, ending: &str, _augment: Option<&str>) -> Option<String> {
+    if root != "ik" && dhatu != "ik" && dhatu != "02.0042" {
+        return None;
+    }
+    Some(match family {
+        "lat" => match ending {
+            "ti" => "aDyeti".into(),
+            "si" => "aDyezi".into(),
+            "mi" | "Ami" => "aDyemi".into(),
+            "taH" => "aDItaH".into(),
+            "TaH" | "thaH" => "aDITaH".into(),
+            "Ta" | "tha" => "aDITa".into(),
+            "anti" | "nti" => "aDiyanti".into(),
+            "vaH" | "AvaH" => "aDIvaH".into(),
+            "maH" | "AmaH" => "aDImaH".into(),
+            _ => return None,
+        },
+        "lot" => match ending {
+            "tu" => "aDyetu".into(),
+            "tAt" | "tAd" | "Di" => "aDItAt".into(),
+            "tAm" => "aDItAm".into(),
+            "antu" => "aDiyantu".into(),
+            "tam" => "aDItam".into(),
+            "ta" => "aDIta".into(),
+            "Ani" => "aDyayAni".into(),
+            "Ava" => "aDyayAva".into(),
+            "Ama" => "aDyayAma".into(),
+            _ => return None,
+        },
+        "lang" => match ending {
+            "at" | "ad" => "aDyEt".into(),
+            "aH" => "aDyEH".into(),
+            "atAm" => "aDyEtAm".into(),
+            "an" => "aDyAyan".into(),
+            "atam" => "aDyEtam".into(),
+            "ata" => "aDyEta".into(),
+            "am" => "aDyAyam".into(),
+            "va" => "aDyEva".into(),
+            "ma" => "aDyEma".into(),
+            _ => return None,
+        },
+        "vidhilin" => match ending {
+            "yAt" | "yAd" => "aDIyAt".into(),
+            "yAtAm" => "aDIyAtAm".into(),
+            "yuH" => "aDIyuH".into(),
+            "yAH" => "aDIyAH".into(),
+            "yAtam" => "aDIyAtam".into(),
+            "yAta" => "aDIyAta".into(),
+            "yAm" => "aDIyAm".into(),
+            "yAva" => "aDIyAva".into(),
+            "yAma" => "aDIyAma".into(),
+            _ => format!("aDIy{}", ending.strip_prefix('y').unwrap_or(ending)),
+        },
+        "lrt" => thematic_join("aDyezya", ending),
+        _ => return None,
+    })
+}
+
+/// 2.4.54 चक्षिङः ख्याञ्: लृट् क्ष्यास्यति (ख्यास्यति वा). Present stays चष्टे.
+fn join_cakz(root: &str, family: &str, ending: &str, _augment: Option<&str>) -> Option<String> {
+    if root != "cakz" {
+        return None;
+    }
+    match family {
+        "lrt" => Some(thematic_join("kSAsya", ending)),
+        "lat" => match ending {
+            "te" => Some("cazwe".into()),
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+/// दरिद्रा (जक्षादि अभ्यस्त): दरिद्राति, दरिद्रितः, दरिद्रति (7.1.4); 6.4.64 इटि आ-लोप.
+fn join_daridra(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "daridrA" {
+        return None;
+    }
+    let strong = "daridrA";
+    let weak = "daridri";
+    let short = "daridr";
+    let form = match family {
+        "lat" => match ending {
+            "ti" => format!("{strong}ti"),
+            "si" => format!("{strong}si"),
+            "mi" | "Ami" => format!("{strong}mi"),
+            "taH" => format!("{weak}taH"),
+            "TaH" | "thaH" => format!("{weak}TaH"),
+            "Ta" | "tha" => format!("{weak}Ta"),
+            "anti" | "nti" => format!("{short}ati"),
+            "vaH" | "AvaH" => format!("{weak}vaH"),
+            "maH" | "AmaH" => format!("{weak}maH"),
+            _ => format!("{weak}{ending}"),
+        },
+        "lot" => match ending {
+            "tu" => format!("{strong}tu"),
+            "tAt" | "tAd" => format!("{weak}tAt"),
+            "tAm" => format!("{weak}tAm"),
+            "antu" => format!("{short}atu"),
+            "Di" => format!("{weak}tAt"),
+            "tam" => format!("{weak}tam"),
+            "ta" => format!("{weak}ta"),
+            "Ani" => format!("{strong}Ri"),
+            "Ava" => format!("{strong}va"),
+            "Ama" => format!("{strong}ma"),
+            _ => format!("{weak}{ending}"),
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" | "ad" => format!("{strong}t"),
+                "aH" => format!("{strong}H"),
+                "atAm" => format!("{weak}tAm"),
+                "an" => format!("{short}uH"),
+                "atam" => format!("{weak}tam"),
+                "ata" => format!("{weak}ta"),
+                "am" => format!("{strong}m"),
+                "va" => format!("{weak}va"),
+                "ma" => format!("{weak}ma"),
+                _ => format!("{weak}{}", strip_a(ending)),
+            };
+            return Some(apply_aug(inner, family, augment));
+        }
+        "vidhilin" => format!("{weak}{ending}"),
+        "lrt" => thematic_join(&format!("{short}izya"), ending),
+        _ => return None,
+    };
+    Some(form)
+}
+
+/// चकास्: चकास्ति, चकासति (7.1.4); चकाधि (6.4.101); लङ् अचाकात्.
+fn join_cakas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "cakAs" {
+        return None;
+    }
+    let form = match family {
+        "lat" => match ending {
+            "ti" => "cakAsti".into(),
+            "si" => "cakAssi".into(),
+            "mi" | "Ami" => "cakAsmi".into(),
+            "taH" => "cakAstaH".into(),
+            "TaH" | "thaH" => "cakAsTaH".into(),
+            "Ta" | "tha" => "cakAsTa".into(),
+            "anti" | "nti" => "cakAsati".into(),
+            "vaH" | "AvaH" => "cakAsvaH".into(),
+            "maH" | "AmaH" => "cakAsmaH".into(),
+            _ => format!("cakAs{ending}"),
+        },
+        "lot" => match ending {
+            "tu" => "cakAstu".into(),
+            "tAt" | "tAd" => "cakAstAt".into(),
+            "tAm" => "cakAstAm".into(),
+            "antu" => "cakAsatu".into(),
+            "Di" => her_dhih("cakAs"),
+            "tam" => "cakAstam".into(),
+            "ta" => "cakAsta".into(),
+            "Ani" => "cakAsAni".into(),
+            "Ava" => "cakAsAva".into(),
+            "Ama" => "cakAsAma".into(),
+            _ => format!("cakAs{ending}"),
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" | "ad" | "aH" => "cakAt".into(),
+                "atAm" => "cakAstAm".into(),
+                "an" => "cakAsuH".into(),
+                "atam" => "cakAstam".into(),
+                "ata" => "cakAsta".into(),
+                "am" => "cakAsam".into(),
+                "va" => "cakAsva".into(),
+                "ma" => "cakAsma".into(),
+                _ => format!("cakAs{}", strip_a(ending)),
+            };
+            return Some(apply_aug(inner, family, augment));
+        }
+        "vidhilin" => format!("cakAs{ending}"),
+        "lrt" => thematic_join("cakAsizya", ending),
+        _ => return None,
+    };
+    Some(form)
+}
+
+/// षस् → सस्: सस्ति, सधि (6.4.101); लङ् असत्.
+fn join_sasas(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "sas" {
+        return None;
+    }
+    let form = match family {
+        "lat" => match ending {
+            "ti" => "sasti".into(),
+            "si" => "sassi".into(),
+            "mi" | "Ami" => "sasmi".into(),
+            "taH" => "sastaH".into(),
+            "TaH" | "thaH" => "sasTaH".into(),
+            "Ta" | "tha" => "sasTa".into(),
+            "anti" | "nti" => "sasanti".into(),
+            "vaH" | "AvaH" => "sasvaH".into(),
+            "maH" | "AmaH" => "sasmaH".into(),
+            _ => format!("sas{ending}"),
+        },
+        "lot" => match ending {
+            "tu" => "sastu".into(),
+            "tAt" | "tAd" => "sastAt".into(),
+            "tAm" => "sastAm".into(),
+            "antu" => "sasantu".into(),
+            "Di" => her_dhih("sas"),
+            "tam" => "sastam".into(),
+            "ta" => "sasta".into(),
+            "Ani" => "sasAni".into(),
+            "Ava" => "sasAva".into(),
+            "Ama" => "sasAma".into(),
+            _ => format!("sas{ending}"),
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" | "ad" | "aH" => "sat".into(),
+                "atAm" => "sastAm".into(),
+                "an" => "sasan".into(),
+                "atam" => "sastam".into(),
+                "ata" => "sasta".into(),
+                "am" => "sasam".into(),
+                "va" => "sasva".into(),
+                "ma" => "sasma".into(),
+                _ => format!("sas{}", strip_a(ending)),
+            };
+            return Some(apply_aug(inner, family, augment));
+        }
+        "vidhilin" => format!("sas{ending}"),
+        "lrt" => thematic_join("sasizya", ending),
+        _ => return None,
+    };
+    Some(form)
+}
+
+/// षस्ति → संस्त्: संस्ति; लङ् असन् (संयोगान्तलोप).
+fn join_samst(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    if root != "saMst" {
+        return None;
+    }
+    let form = match family {
+        "lat" => match ending {
+            "ti" => "saMsti".into(),
+            "si" => "saMstsi".into(),
+            "mi" | "Ami" => "saMstmi".into(),
+            "taH" => "saMstaH".into(),
+            "TaH" | "thaH" => "saMstTaH".into(),
+            "Ta" | "tha" => "saMstTa".into(),
+            "anti" | "nti" => "saMstanti".into(),
+            "vaH" | "AvaH" => "saMstvaH".into(),
+            "maH" | "AmaH" => "saMstmaH".into(),
+            _ => format!("saMst{ending}"),
+        },
+        "lot" => match ending {
+            "tu" => "saMstu".into(),
+            "tAt" | "tAd" | "Di" => "saMstAt".into(),
+            "tAm" => "saMstAm".into(),
+            "antu" => "saMstantu".into(),
+            "tam" => "saMstam".into(),
+            "ta" => "saMsta".into(),
+            "Ani" => "saMstAni".into(),
+            "Ava" => "saMstAva".into(),
+            "Ama" => "saMstAma".into(),
+            _ => format!("saMst{ending}"),
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" | "ad" | "aH" => "san".into(),
+                "atAm" => "saMstAm".into(),
+                "an" => "saMstan".into(),
+                "atam" => "saMstam".into(),
+                "ata" => "saMsta".into(),
+                "am" => "saMstam".into(),
+                "va" => "saMstva".into(),
+                "ma" => "saMstma".into(),
+                _ => format!("saMst{}", strip_a(ending)),
+            };
+            return Some(apply_aug(inner, family, augment));
+        }
+        "vidhilin" => format!("saMst{ending}"),
+        "lrt" => thematic_join("saMstizya", ending),
+        _ => return None,
+    };
+    Some(form)
+}
+
+/// Full surface form for गण 2, or `None` to fall through (अस्, हन्, इण्, अद्).
 pub fn join_form(
     dhatu: &str,
     family: &str,
@@ -694,12 +997,26 @@ pub fn join_form(
         return None;
     }
     let r = root_of(dhatu);
-    // as / han / iṇ stay in join.rs; अद् too (d+t अत्ति, लङ् आदत्).
-    if r.is_empty() || matches!(r.as_str(), "as" | "han" | "i" | "ik" | "ad") {
+    if r.is_empty() || matches!(r.as_str(), "as" | "han" | "i" | "ad") {
         return None;
     }
-    if r == "ik" || dhatu == "ik" || dhatu == "02.0042" {
-        return None;
+    if let Some(f) = join_adhi_i(dhatu, &r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
+    }
+    if let Some(f) = join_cakz(&r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
+    }
+    if let Some(f) = join_daridra(&r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
+    }
+    if let Some(f) = join_cakas(&r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
+    }
+    if let Some(f) = join_sasas(&r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
+    }
+    if let Some(f) = join_samst(&r, family, ending, augment) {
+        return Some(apply_natva_to_word(&f));
     }
     if let Some(f) = join_vid(&r, family, ending, _purusha, augment) {
         return Some(apply_natva_to_word(&f));
@@ -768,5 +1085,20 @@ mod tests {
         assert_eq!(join_form("vaSa", "lat", "ti", 1, 1, None).as_deref(), Some("vazwi"));
         assert_eq!(join_form("jAgf", "lat", "ti", 1, 1, None).as_deref(), Some("jAgarti"));
         assert_eq!(join_form("jakza", "lat", "anti", 1, 3, None).as_deref(), Some("jakzati"));
+        assert_eq!(join_form("ik", "lat", "ti", 1, 1, None).as_deref(), Some("aDyeti"));
+        assert_eq!(join_form("ik", "lat", "taH", 1, 2, None).as_deref(), Some("aDItaH"));
+        assert_eq!(join_form("ik", "lat", "anti", 1, 3, None).as_deref(), Some("aDiyanti"));
+        assert_eq!(join_form("ik", "lrt", "ti", 1, 1, None).as_deref(), Some("aDyezyati"));
+        assert_eq!(join_form("ik", "lang", "at", 1, 1, None).as_deref(), Some("aDyEt"));
+        assert_eq!(join_form("daridrA", "lat", "ti", 1, 1, None).as_deref(), Some("daridrAti"));
+        assert_eq!(join_form("daridrA", "lat", "anti", 1, 3, None).as_deref(), Some("daridrati"));
+        assert_eq!(join_form("daridrA", "lrt", "ti", 1, 1, None).as_deref(), Some("daridrizyati"));
+        assert_eq!(join_form("cakAsf", "lat", "ti", 1, 1, None).as_deref(), Some("cakAsti"));
+        assert_eq!(join_form("cakAsf", "lot", "Di", 2, 1, None).as_deref(), Some("cakADi"));
+        assert_eq!(join_form("zasa", "lat", "ti", 1, 1, None).as_deref(), Some("sasti"));
+        assert_eq!(join_form("zasa", "lot", "Di", 2, 1, None).as_deref(), Some("saDi"));
+        assert_eq!(join_form("zasti", "lat", "ti", 1, 1, None).as_deref(), Some("saMsti"));
+        assert_eq!(join_form("cakziN", "lrt", "ti", 1, 1, None).as_deref(), Some("kSAsyati"));
+        assert_eq!(join_form("cakziN", "lat", "te", 1, 1, None).as_deref(), Some("cazwe"));
     }
 }
