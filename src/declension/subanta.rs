@@ -78,6 +78,13 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // Extreme commenting: r/s show s→ḥ vs r→r alternation; keeps saptamī tsu consistent
   m.insert(("r".to_string(),"pum".to_string()), vec![vec!["H".to_string(),"rO".to_string(),"raH".to_string(),],vec!["ram".to_string(),"rO".to_string(),"raH".to_string(),],vec!["rA".to_string(),"rByAm".to_string(),"rBiH".to_string(),],vec!["re".to_string(),"rByAm".to_string(),"rByaH".to_string(),],vec!["raH".to_string(),"rByAm".to_string(),"rByaH".to_string(),],vec!["raH".to_string(),"roH".to_string(),"rAm".to_string(),],vec!["ri".to_string(),"roH".to_string(),"tsu".to_string(),],vec!["H".to_string(),"rO".to_string(),"raH".to_string(),],]);
   m.insert(("s".to_string(),"pum".to_string()), vec![vec!["H".to_string(),"sO".to_string(),"saH".to_string(),],vec!["sam".to_string(),"sO".to_string(),"saH".to_string(),],vec!["sA".to_string(),"sByAm".to_string(),"sBiH".to_string(),],vec!["se".to_string(),"sByAm".to_string(),"sByaH".to_string(),],vec!["saH".to_string(),"sByAm".to_string(),"sByaH".to_string(),],vec!["saH".to_string(),"soH".to_string(),"sAm".to_string(),],vec!["si".to_string(),"soH".to_string(),"tsu".to_string(),],vec!["H".to_string(),"sO".to_string(),"saH".to_string(),],]);
+  // as-anta (मनस्) as pum/nap already but pum missing — 8.2.66 ru, 8.3.15 khari? Actually as→aH at pada
+  // sūtra: as→aH (मनस्→मनः), oblique asA/asO; Future devs: as pum mirrors as nap but linga matters for nom
+  // Extreme: keep tsu/zu for saptamī, consistent with s/r/j/d/h/B above
+  m.insert(("as".to_string(),"pum".to_string()), vec![vec!["aH".to_string(),"asO".to_string(),"asaH".to_string(),],vec!["asam".to_string(),"asO".to_string(),"asaH".to_string(),],vec!["asA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ase".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["asaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["asaH".to_string(),"asoH".to_string(),"asAm".to_string(),],vec!["asi".to_string(),"asoH".to_string(),"aHsu".to_string(),],vec!["aH".to_string(),"asO".to_string(),"asaH".to_string(),],]);
+  // is/us with pum — 8.3.15 haviṣ-like but pum (e.g. is pum?) — s→ḥ via ru same as nap
+  m.insert(("is".to_string(),"pum".to_string()), vec![vec!["iH".to_string(),"iSO".to_string(),"iSaH".to_string(),],vec!["iSam".to_string(),"iSO".to_string(),"iSaH".to_string(),],vec!["iSA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["iSe".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["iSaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["iSaH".to_string(),"iSoH".to_string(),"iSAm".to_string(),],vec!["iSi".to_string(),"iSoH".to_string(),"iHsu".to_string(),],vec!["iH".to_string(),"iSO".to_string(),"iSaH".to_string(),],]);
+  m.insert(("us".to_string(),"pum".to_string()), vec![vec!["uH".to_string(),"uSO".to_string(),"uSaH".to_string(),],vec!["uSam".to_string(),"uSO".to_string(),"uSaH".to_string(),],vec!["uSA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["uSe".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["uSaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["uSaH".to_string(),"uSoH".to_string(),"uSAm".to_string(),],vec!["uSi".to_string(),"uSoH".to_string(),"uHsu".to_string(),],vec!["uH".to_string(),"uSO".to_string(),"uSaH".to_string(),],]);
   m
 }
 
@@ -466,6 +473,15 @@ mod tests {
         // tapas as s pum: prathamA tapaH (ru→visarga), dvitIyA tapasam
         has(&s, "prathamA", "tapaH");
         has(&s, "dvitIyA", "tapasam");
+        // as pum: manas-type but pum (sumanas) — as→aH at pada
+        let am = generate("manas", "pum").expect("manas pum");
+        has(&am, "prathamA", "manaH");
+        has(&am, "tfIyA", "manasA");
+        // is/us pum: haviS-type but pum — iS→iH
+        let hm = generate("havis", "pum").expect("havis pum");
+        has(&hm, "prathamA", "haviH");
+        let dm = generate("dhanus", "pum").expect("dhanus pum");
+        has(&dm, "prathamA", "dhanuH");
     }
 
     #[test]
