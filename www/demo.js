@@ -294,7 +294,7 @@ function renderDeclension(res) {
   if (!res || !decl || Object.keys(decl).length === 0) {
     el.innerHTML =
       `<div class="miss">न किञ्चन सुबन्तम् — <b>${esc(toDeva(toSlp1(document.getElementById("nbase").value)))}</b></div>` +
-      `<div class="hint">उदाहरण: राम / rAma, सीता / sItA, हरि / hari, नदी / nadI</div>` +
+      `<div class="hint">उदाहरण: राम / rAma, सीता / sItA, हरि / hari, तद् / tad, द्वि / dvi, त्रि / tri</div>` +
       `<pre>${esc(res ? strfy(res) : "null")}</pre>`;
     return;
   }
@@ -306,9 +306,10 @@ function renderDeclension(res) {
 document.getElementById("btn-noun").onclick = () => {
   const b = toSlp1(document.getElementById("nbase").value) || "rAma";
   const l = document.getElementById("linga").value;
-  let res = generate_noun(b, l);
-  if (!res || !asObj(res.declension) || Object.keys(asObj(res.declension)).length === 0) {
-    res = generate_pronoun(b, l);
+  let res = generate_pronoun(b, l);
+  const pronounHit = res && asObj(res.table) && Object.keys(asObj(res.table)).length > 0;
+  if (!pronounHit) {
+    res = generate_noun(b, l);
   }
   if (res && res.table && !res.declension) {
     const tbl = asObj(res.table);
