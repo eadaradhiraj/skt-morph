@@ -134,14 +134,20 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     if orig == "pac" && va {
         return "pakva".into(); // 8.2.52 पचो वः
     }
-    // Special: अद् + क्त → जग्ध (SLP1 jagDa) — 6.1.36?/2.4.?? ad → jaG, 8.2.32 gha→dha
-    // sūtra: अदो जग्धिर्ल्यप्ति किति (2.4.36) — ad on kit → jagDh; future devs: keep SLP1 jagDa
+    // Special: अद् + क्त → जग्ध (SLP1 jagDa) — 2.4.36 अदो जग्धिर्ल्यप्ति किति
+    // sūtra: ad on kit → jagDh; future devs: keep SLP1 jagDa (ध = Da)
     // Extreme: ad is anit, not it, but kta is jagDa not atta (sandhi alone would give atta)
     // ---------------------------------------------------------------------------
     // ad kta special — must precede generic gfh/ij etc. arms
     // ---------------------------------------------------------------------------
     if orig == "ad" {
         return "jagDa".into(); // जग्ध
+    }
+    // Special: भिद् + क्त → भिन्न (SLP1 Binna) — 8.2.45?/6.4.47? d→n before t, with vowel? Actually Bid→Binna
+    // sūtra: भिद् + क्त → भिन्न (नत्व + चर्त्व); future devs: B=bh, i, nna
+    // Extreme: keep Binna not Bitta; handles 7.2.14? not needed
+    if orig == "Bid" {
+        return "Binna".into(); // भिन्न
     }
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match r.as_str() {
@@ -675,6 +681,9 @@ mod tests {
         // 2.4.36 अदो जग्धिर्ल्यप्ति किति — अद् → जग्ध (atta would be sandhi-only, wrong)
         assert_eq!(derive("ada", "kta"), vec!["jagDa"]); // अद् → जग्ध
         assert_eq!(derive("ad", "kta"), vec!["jagDa"]);
+        // भिद् → भिन्न (Binna) — 8.2.45/6.4.47 special, not Bitta
+        assert_eq!(derive("Bida", "kta"), vec!["Binna"]); // भिद् → भिन्न (Bida is भिद् with a)
+        assert_eq!(derive("Bid", "kta"), vec!["Binna"]);
         assert_eq!(derive("BU", "ktvA"), vec!["BUtvA"]);
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
