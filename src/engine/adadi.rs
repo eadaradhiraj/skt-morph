@@ -243,7 +243,14 @@ fn join_u(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Opti
                 _ => format!("{uy}{}", ending.strip_prefix('y').unwrap_or(ending)),
             }
         }
-        "lrt" => thematic_join(&format!("{avs}izya"), ending),
+        "lrt" => {
+            let stem = if crate::engine::it::anit_sya(root) {
+                crate::engine::it::sya_stem(root)
+            } else {
+                format!("{avs}izya")
+            };
+            thematic_join(&stem, ending)
+        }
         _ => return None,
     };
     Some(form)
@@ -1052,57 +1059,135 @@ fn join_bru(root: &str, family: &str, ending: &str, augment: Option<&str>) -> Op
     Some(form)
 }
 
+/// 7.3.95 स्तुश्च — optional ईट् before सार्वधातुक (स्तवीति / स्तौति).
+fn join_stu_it(family: &str, ending: &str, augment: Option<&str>) -> Option<String> {
+    let form = match family {
+        "lat" => match ending {
+            "ti" => "stavIti".into(),
+            "si" => "stavIzi".into(),
+            "mi" | "Ami" => "stavImi".into(),
+            "taH" => "stuvItaH".into(),
+            "thaH" | "TaH" => "stuvITaH".into(),
+            "tha" | "Ta" => "stuvITa".into(),
+            "vaH" | "AvaH" => "stuvIvaH".into(),
+            "maH" | "AmaH" => "stuvImaH".into(),
+            _ => return None,
+        },
+        "lot" => match ending {
+            "tu" => "stavItu".into(),
+            "tAt" | "tAd" => "stuvItAt".into(),
+            "tAm" => "stuvItAm".into(),
+            "Di" => "stuvIhi".into(),
+            "tam" => "stuvItam".into(),
+            "ta" => "stuvIta".into(),
+            _ => return None,
+        },
+        "lang" => {
+            let inner = match ending {
+                "at" | "ad" => "stavIt".into(),
+                "aH" => "stavIH".into(),
+                "atAm" => "stuvItAm".into(),
+                "atam" => "stuvItam".into(),
+                "ata" => "stuvIta".into(),
+                "va" => "stuvIva".into(),
+                "ma" => "stuvIma".into(),
+                _ => return None,
+            };
+            return Some(apply_aug(inner, family, augment));
+        }
+        "vidhilin" => {
+            if !ending.starts_with('y') {
+                return None;
+            }
+            format!("stuvI{ending}")
+        }
+        _ => return None,
+    };
+    Some(form)
+}
+
+fn join_stu(family: &str, ending: &str, augment: Option<&str>) -> Vec<String> {
+    let mut out = Vec::new();
+    if let Some(f) = join_stu_it(family, ending, augment) {
+        out.push(apply_natva_to_word(&f));
+    }
+    if let Some(f) = join_u("stu", family, ending, augment) {
+        let f = apply_natva_to_word(&f);
+        if !out.contains(&f) {
+            out.push(f);
+        }
+    }
+    out
+}
+
 /// Full surface form for गण 2, or `None` to fall through (अस्, हन्, इण्, अद्).
 pub fn join_form(
+    dhatu: &str,
+    family: &str,
+    ending: &str,
+    purusha: u8,
+    vacana: u8,
+    augment: Option<&str>,
+) -> Option<String> {
+    join_forms(dhatu, family, ending, purusha, vacana, augment)
+        .into_iter()
+        .next()
+}
+
+/// 7.3.95 may yield two forms (स्तवीति, स्तौति).
+pub fn join_forms(
     dhatu: &str,
     family: &str,
     ending: &str,
     _purusha: u8,
     _vacana: u8,
     augment: Option<&str>,
-) -> Option<String> {
+) -> Vec<String> {
     if !matches!(family, "lat" | "lot" | "lang" | "vidhilin" | "lrt") {
-        return None;
+        return vec![];
     }
     let r = root_of(dhatu);
     if r.is_empty() || matches!(r.as_str(), "as" | "han" | "i" | "ad") {
-        return None;
+        return vec![];
+    }
+    if r == "stu" {
+        return join_stu(family, ending, augment);
     }
     if let Some(f) = join_adhi_i(dhatu, &r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_cakz(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_daridra(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_cakas(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_sasas(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_samst(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_vid(&r, family, ending, _purusha, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_rudadi(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_sas(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_vas(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_jagr(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     if let Some(f) = join_bru(&r, family, ending, augment) {
-        return Some(apply_natva_to_word(&f));
+        return vec![apply_natva_to_word(&f)];
     }
     let form = if u_final(&r) {
         join_u(&r, family, ending, augment)
@@ -1115,7 +1200,7 @@ pub fn join_form(
     } else {
         None
     };
-    form.map(|f| apply_natva_to_word(&f))
+    form.map(|f| vec![apply_natva_to_word(&f)]).unwrap_or_default()
 }
 
 #[cfg(test)]
@@ -1147,6 +1232,10 @@ mod tests {
         assert_eq!(join_form("zRu", "lat", "ti", 1, 1, None).as_deref(), Some("snOti"));
         assert_eq!(join_form("brUY", "lat", "ti", 1, 1, None).as_deref(), Some("bravIti"));
         assert_eq!(join_form("brUY", "lrt", "ti", 1, 1, None).as_deref(), Some("vakzyati"));
+        let stu = join_forms("zwuY", "lat", "ti", 1, 1, None);
+        assert!(stu.iter().any(|x| x == "stavIti"), "{:?}", stu);
+        assert!(stu.iter().any(|x| x == "stOti"), "{:?}", stu);
+        assert_eq!(join_form("zwuY", "lrt", "ti", 1, 1, None).as_deref(), Some("stozyati"));
         assert_eq!(join_form("yu", "lrt", "ti", 1, 1, None).as_deref(), Some("yavizyati"));
         assert_eq!(join_form("yu", "lot", "Ani", 3, 1, None).as_deref(), Some("yavAni"));
         assert_eq!(join_form("liha", "lat", "taH", 1, 2, None).as_deref(), Some("lIQaH"));

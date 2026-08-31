@@ -415,6 +415,11 @@ mod tests {
         assert!(f.iter().any(|x| x == "bravIti"), "{:?}", f);
         let f = generate_all("brUY", "plrt", 1, 1);
         assert!(f.iter().any(|x| x == "vakzyati"), "{:?}", f);
+        let f = generate_all("zwuY", "plat", 1, 1);
+        assert!(f.iter().any(|x| x == "stavIti"), "{:?}", f);
+        assert!(f.iter().any(|x| x == "stOti"), "{:?}", f);
+        let f = generate_all("zwuY", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "stozyati"), "{:?}", f);
         let f = generate_all("uCfdir", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "CfRatti"), "{:?}", f);
         let f = generate_all("Sizx", "plat", 1, 1);
@@ -657,6 +662,10 @@ mod tests {
         assert!(f.iter().any(|x| x == "Urvizyati"), "{:?}", f);
         let f = generate_all("divu", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "dIvyati"), "{:?}", f);
+        let f = generate_all("divu", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "devizyati"), "{:?}", f);
+        let f = generate_all("ada", "plrt", 1, 1);
+        assert!(f.iter().any(|x| x == "atsyati"), "{:?}", f);
         let f = generate_all("Sru", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "Sravati"), "{:?}", f);
         let f = generate_all("Sru", "plrt", 1, 1);

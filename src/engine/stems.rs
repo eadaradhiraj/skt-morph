@@ -163,9 +163,7 @@ pub fn future_stem(guna: &str, gana: u8, present_stem: Option<&str>, dhatu: &str
     if gana==1 && dhatu.ends_with("kz") && dhatu!="kzi" { return format!("{}izya", dhatu); }
     // YA-gaṇa future: div->devi, zivu->sevi etc. use guṇa (sev izya) not ya-stem (sIvy)
     if gana==YA_GANA {
-        // apply_guna already for zivu->sev, div->dev? but for zivu stored as siv? Actually guna of siv is sev
-        // For tras/Bram/yas, guna = same (no vowel) -> tras izya
-        if dhatu=="div" || dhatu=="divu" { return "devizya".to_string(); }
+        // श्यन् is शित्: लृट् uses गुण (देविष्यति), not the य-present (दीव्य).
         return format!("{}izya", guna);
     }
     if gana==1 && G1_A_FINAL.contains(&dhatu) {
@@ -455,8 +453,6 @@ pub fn derive_stem(
             "as".to_string()
         } else if dhatu == "brU" {
             "bravI".to_string()
-        } else if matches!(dhatu, "stu" | "zwu") {
-            "stavI".to_string()
         } else if dhatu.ends_with('u') && dhatu.len() >= 2 {
             format!("{}O", &dhatu[..dhatu.len() - 1])
         } else {
@@ -489,23 +485,6 @@ pub fn derive_stem(
 
     // family handling (simplified) — with targeted fixes for ad/div to improve validate
     let ps_clone = present_stem.clone();
-    // div (04.0001) future: YA-gaṇa div -> devizya (devizyati), not dIvy sya
-    // handle both "div" and "divu" (JSON stores divu)
-    if (dhatu == "div" || dhatu == "divu") && family == "lrt" {
-        let f = "devizya".to_string();
-        return (Some(f), None);
-    }
-    // div lang: adIvyat not adIvyyat (single y) – lang_ya endings already include y (
-    // so stem should be dIv not dIvy)
-    if (dhatu.trim() == "div" || dhatu.trim() == "divu") && family.trim() == "lang" {
-        let root = "dIv".to_string();
-        return (Some(root), Some("a".to_string()));
-    }
-    // ad (02.0001) future: atsyati not adizyati (at + sya)
-    if (dhatu.trim() == "ad" || dhatu.trim() == "ada") && family.trim() == "lrt" {
-        let f = "atsya".to_string();
-        return (Some(f), None);
-    }
     match family {
         "lat" => return (present_stem, None),
         "lot" => {

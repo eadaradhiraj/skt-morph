@@ -522,6 +522,43 @@ pub fn join_form(
     crate::engine::phonology::apply_natva_to_word(&form)
 }
 
+fn join_all(
+    stem: &str,
+    ending: &str,
+    gana: u8,
+    family: &str,
+    purusha: u8,
+    pada: &str,
+    augment: Option<&str>,
+    dhatu: Option<&str>,
+    vacana: u8,
+    antarganas: Option<&str>,
+) -> Vec<String> {
+    if gana == 2 {
+        if let Some(d) = dhatu {
+            let fs = crate::engine::adadi::join_forms(d, family, ending, purusha, vacana, augment);
+            if !fs.is_empty() {
+                return fs
+                    .into_iter()
+                    .map(|f| crate::engine::phonology::apply_natva_to_word(&f))
+                    .collect();
+            }
+        }
+    }
+    vec![join_form(
+        stem,
+        ending,
+        gana,
+        family,
+        purusha,
+        pada,
+        augment,
+        dhatu,
+        vacana,
+        antarganas,
+    )]
+}
+
 pub fn join_variants(
     stem: &str,
     variants: &[String],
@@ -541,5 +578,21 @@ pub fn join_variants(
             }
         }
     }
-    variants.iter().map(|v| join_form(stem, v, gana, family, purusha, pada, augment, Some(dhatu), vacana, Some(antarganas))).collect()
+    variants
+        .iter()
+        .flat_map(|v| {
+            join_all(
+                stem,
+                v,
+                gana,
+                family,
+                purusha,
+                pada,
+                augment,
+                Some(dhatu),
+                vacana,
+                Some(antarganas),
+            )
+        })
+        .collect()
 }

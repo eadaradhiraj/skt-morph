@@ -70,6 +70,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **गण 7 उँ इत्:** 1.3.2 initial उँ (उछृदिर् छृणत्ति), not a name list for उछृद्/उत्तृद्.
 - **लृट् 8.2 / 7.4.49 / 8.4.58:** dropped the named `sya_stem` futures. षढोः कः सि कर्क्ष्यति; दादेर् घः + भष् धक्ष्यति; सः स्यार्धधातुके वत्स्यति; परसवर्ण सङ्क्ष्यति. दृश् द्रक्ष्यति and ग्रहोऽलिटि stay. 7.3.77 is शिति (गमिष्यति not गच्छिष्यति).
 - **गण 7 श्नम्:** इत्-strip then न्-infix (णत्व after र); nasal उपधा skips a second nasal; 8.2.30 palatal (शिनष्टि, पिनष्टि, भनक्ति, युनक्ति). Dropped named Sinaz/pinaz/Banak.
+- **7.3.95 स्तुश्च:** optional ईट् (स्तवीति and स्तौति; लृट् स्तोष्यति). Dropped named `stavI`. दिव् लृट् देविष्यति from गुण not the य-present; अद् अत्स्यति from `sya_stem`.
 
 
 

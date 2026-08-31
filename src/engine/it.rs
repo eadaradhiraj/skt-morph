@@ -19,7 +19,7 @@ pub fn anit_sya(root: &str) -> bool {
             | "raYj" | "saYj" | "sanj" | "kfz" | "dfS" | "sfj" | "masj" | "majj" | "ruh" | "guh"
             | "nah" | "vasc" | "vraSc" | "Ced" | "Cid" | "vft" | "syand" | "kfp" | "kalp"
             | "dviz" | "dih" | "sru" | "su" | "dru" | "du" | "Dru" | "nam" | "skand"
-            | "daMS" | "mih" | "tviz" | "Sap" | "Siz" | "viz" | "kruS" | "sad"
+            | "daMS" | "mih" | "tviz" | "Sap" | "Siz" | "viz" | "kruS" | "sad" | "stu"
     )
 }
 
@@ -345,6 +345,7 @@ mod tests {
         assert_eq!(sya_stem("han"), "hanizya");
         assert_eq!(sya_stem("Siz"), "Sekzya");
         assert_eq!(sya_stem("kruS"), "krokzya");
+        assert_eq!(sya_stem("stu"), "stozya");
     }
 
     #[test]
