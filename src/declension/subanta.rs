@@ -40,7 +40,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("u".to_string(),"stri".to_string()), vec![vec!["uH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["um".to_string(),"U".to_string(),"UH".to_string(),],vec!["vA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["vE,ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm,O".to_string(),"voH".to_string(),"uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("u".to_string(),"nap".to_string()), vec![vec!["u".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["u".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["unA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["unaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["unaH".to_string(),"unoH".to_string(),"UnAm".to_string(),],vec!["uni".to_string(),"unoH".to_string(),"uzu".to_string(),],vec!["u,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
   m.insert(("U".to_string(),"pum".to_string()), vec![vec!["UH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["Um".to_string(),"U".to_string(),"Un".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["O".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
-  m.insert(("U".to_string(),"stri".to_string()), vec![vec!["UH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["Um".to_string(),"U".to_string(),"UH".to_string(),],vec!["vA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["vE,ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm,O".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
+  // ऊ-anta स्त्री (वधू) — नदीवत् यण् वध्वौ/वध्वा; सु वधूः; पद वधूभ्याम्/वधूषु; voc वधु. धेनु stays u-stri. भ्रू/स्वभू stay उवङ्.
+  m.insert(("U".to_string(),"stri".to_string()), vec![vec!["UH".to_string(),"vO".to_string(),"vaH".to_string(),],vec!["Um".to_string(),"vO".to_string(),"UH".to_string(),],vec!["vA".to_string(),"UByAm".to_string(),"UBiH".to_string(),],vec!["vE".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vAH".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vAH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["u".to_string(),"vO".to_string(),"vaH".to_string(),],]);
   m.insert(("U".to_string(),"nap".to_string()), vec![vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"UnoH".to_string(),"UnAm".to_string(),],vec!["Uni".to_string(),"UnoH".to_string(),"Uzu".to_string(),],vec!["U,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
   // f-stem: agent (kartf-type, Pāṇini 7.1.9) -> Aram; kinship (pitf) is handled as exception in generate()
   m.insert(("f".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["Aram".to_string(),"arO".to_string(),"Fn".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
@@ -3724,5 +3725,30 @@ mod tests {
         has(&generate("vAri", "nap").unwrap(), "prathamA", "vAri");
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "prarAH"));
         assert!(!p.declension.get("dvitIyA").unwrap().iter().any(|x| x == "prarAyam"));
+    }
+
+    #[test]
+    fn vadhu_vadhvau() {
+        // वधू U-stri यण् वध्वौ/वध्वम्; पद वधूभ्याम्. धेनु stays u-stri धेनवः. भ्रू stays उवङ् भ्रुवम्.
+        let v = generate("vaDU", "stri").expect("vaDU");
+        has(&v, "prathamA", "vaDUH");
+        has(&v, "prathamA", "vaDvO");
+        has(&v, "prathamA", "vaDvaH");
+        has(&v, "dvitIyA", "vaDUm");
+        has(&v, "dvitIyA", "vaDUH");
+        has(&v, "tfIyA", "vaDvA");
+        has(&v, "tfIyA", "vaDUByAm");
+        has(&v, "tfIyA", "vaDUBiH");
+        has(&v, "caturTI", "vaDvE");
+        has(&v, "saptamI", "vaDvAm");
+        has(&v, "saptamI", "vaDvoH");
+        has(&v, "saptamI", "vaDUzu");
+        has(&v, "samboDana", "vaDu");
+        has(&generate("Denu", "stri").unwrap(), "prathamA", "DenuH");
+        has(&generate("Denu", "stri").unwrap(), "prathamA", "DenavaH");
+        has(&generate("BrU", "stri").unwrap(), "dvitIyA", "Bruvam");
+        assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vaDU"));
+        assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vaDavaH"));
+        assert!(!v.declension.get("tfIyA").unwrap().iter().any(|x| x == "vaDuByAm"));
     }
 }
