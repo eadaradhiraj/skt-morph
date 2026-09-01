@@ -54,6 +54,7 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // इन् nap (दण्डिन्) — 7.1.23 स्वमोर्नपुंसकात्: प्रथमा/द्वितीया दण्डि/दण्डिनी/दण्डीनि not पुं दण्डी.
   m.insert(("in".to_string(),"nap".to_string()), vec![vec!["i".to_string(),"inI".to_string(),"Ini".to_string(),],vec!["i".to_string(),"inI".to_string(),"Ini".to_string(),],vec!["inA".to_string(),"iByAm".to_string(),"iBiH".to_string(),],vec!["ine".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"inoH".to_string(),"inAm".to_string(),],vec!["ini".to_string(),"inoH".to_string(),"izu".to_string(),],vec!["in,i".to_string(),"inI".to_string(),"Ini".to_string(),],]);
   m.insert(("as".to_string(),"nap".to_string()), vec![vec!["aH".to_string(),"asI".to_string(),"AMsi".to_string(),],vec!["aH".to_string(),"asI".to_string(),"AMsi".to_string(),],vec!["asA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ase".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["asaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["asaH".to_string(),"asoH".to_string(),"asAm".to_string(),],vec!["asi".to_string(),"asoH".to_string(),"aHsu".to_string(),],vec!["aH".to_string(),"asI".to_string(),"AMsi".to_string(),],]);
+  // अत् पुं: 6.4.14 आन् भवान्/धीमान्; शतृ अधातोः patched पचन्. नुम् भवन्तम्.
   m.insert(("at".to_string(),"pum".to_string()), vec![vec!["An".to_string(),"antO".to_string(),"antaH".to_string(),],vec!["antam".to_string(),"antO".to_string(),"ataH".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["an".to_string(),"antO".to_string(),"antaH".to_string(),],]);
   m.insert(("an".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"AnO".to_string(),"AnaH".to_string(),],vec!["Anam".to_string(),"AnO".to_string(),"YaH".to_string(),],vec!["YA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["Ye".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["YaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["YaH".to_string(),"YoH".to_string(),"YAm".to_string(),],vec!["Yi,Yani".to_string(),"YoH".to_string(),"asu".to_string(),],vec!["an".to_string(),"AnO".to_string(),"AnaH".to_string(),],]);
   m.insert(("an".to_string(),"nap".to_string()), vec![vec!["a".to_string(),"nI".to_string(),"Ani".to_string(),],vec!["a".to_string(),"nI".to_string(),"Ani".to_string(),],vec!["nA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ne".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["naH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["naH".to_string(),"noH".to_string(),"nAm".to_string(),],vec!["ni".to_string(),"noH".to_string(),"asu".to_string(),],vec!["a,an".to_string(),"nI".to_string(),"Ani".to_string(),],]);
@@ -2440,6 +2441,16 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             if cand == "mahat" && best_ending == "at" {
                 mahat_strong(&mut table);
             }
+            // 6.4.14 अत्वसन्तस्य चाधातोः: शतृ पचन् not *पचान्. भवान्/धीमान्/महान् keep आ.
+            if best_ending == "at"
+                && linga == "pum"
+                && cand != "mahat"
+                && !cand.ends_with("mat")
+                && !cand.ends_with("vat")
+                && table.first().is_some_and(|r| !r.is_empty())
+            {
+                table[0][0] = "an".into();
+            }
             let base_no_end = &cand[..cand.len()-best_ending.len()];
             let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
             let mut decl = std::collections::HashMap::new();
@@ -2891,6 +2902,14 @@ mod tests {
         has(&p, "prathamA", "pacati");
         has(&p, "prathamA", "pacanti");
         has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
+        let pp = generate("pacat", "pum").expect("pacat pum");
+        has(&pp, "prathamA", "pacan");
+        has(&pp, "prathamA", "pacantO");
+        has(&pp, "dvitIyA", "pacantam");
+        has(&generate("tudat", "pum").unwrap(), "prathamA", "tudan");
+        has(&generate("DImat", "pum").unwrap(), "prathamA", "DImAn");
+        assert!(!pp.declension.get("prathamA").unwrap().iter().any(|x| x == "pacAn"));
+        assert!(!generate("Bavat", "pum").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "Bavan"));
     }
 
     #[test]
