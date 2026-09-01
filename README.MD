@@ -66,5 +66,5 @@ cargo run --release --bin validate --features native-db -- --full --live
 
 Uses `../skt-morph-data/data/skt_morph.db` (or `--db` / `SKT_MORPH_DB`). That scrape’s prefixes are only the site’s chandrika/upasarga pages.
 
-Recent: 131 iters (2026-09-01) — de-noise 70k, KRTS 19→60+, clamp, yaNluk UI, a11y/Enter, headers for all modules, dhatu HashMap cache 15s→7s, analyze/tinanta empty guards, derived/phonology/join/analyze/tinanta/lib/search hints + natva test, verb try/catch, lib clamp, paradigm hint, yaNluk test, guard refs, vAvac, verb empty hints, noun/krdanta hints, lib yaNluk, boBU/vAvac/cekrI, empty guards, perf docs, cekrI/jaNgam, jaNgam/pApac, pApac/jaNGan, jaNGan/boBU, ceKrI, yaN sūtra (187 tests, 1.2M wasm). Dated engine notes: [CHANGELOG.md](CHANGELOG.md).
+Recent: 134 iters (2026-09-01) — de-noise 70k, KRTS 19→60+, clamp, yaNluk UI, a11y/Enter, headers for all modules, dhatu HashMap cache 15s→7s, analyze/tinanta empty guards, derived/phonology/join/analyze/tinanta/lib/search hints + natva test, verb try/catch, lib clamp, paradigm hint, yaNluk test, guard refs, vAvac, verb empty hints, noun/krdanta hints, lib yaNluk, boBU/vAvac/cekrI, empty guards, perf docs, cekrI/jaNgam, jaNgam/pApac, pApac/jaNGan, jaNGan/boBU, ceKrI, yaN sūtra, straggler (187 tests, 1.2M wasm). Dated engine notes: [CHANGELOG.md](CHANGELOG.md).
 
