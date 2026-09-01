@@ -547,20 +547,24 @@ fn decline_upanah(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// दिव् — 7.1.84 दिव औत् द्यौः; पद सम्प्रसारण द्युभ्याम्/द्युषु. Not v-fallback *दिवा.
+/// दिव् — 7.1.84 दिव औत् द्यौः; पद सम्प्रसारण द्युभ्याम्/द्युषु. Compounds सुद्यौः. Not v-fallback *दिवा.
 fn decline_div(cand: &str, linga: &str) -> Option<Declension> {
-    if cand != "div" || (linga != "stri" && linga != "pum") {
+    let pre = cand.strip_suffix("div")?;
+    if linga != "stri" && linga != "pum" {
         return None;
     }
+    let weak = cand;
+    let pada = format!("{pre}dyu");
+    let nom = format!("{pre}dyOH");
     let mut decl = HashMap::new();
-    decl.insert("prathamA".into(), vec!["dyOH".into(), "divO".into(), "divaH".into()]);
-    decl.insert("dvitIyA".into(), vec!["divam".into(), "divO".into(), "divaH".into()]);
-    decl.insert("tfIyA".into(), vec!["divA".into(), "dyuByAm".into(), "dyuBiH".into()]);
-    decl.insert("caturTI".into(), vec!["dive".into(), "dyuByAm".into(), "dyuByaH".into()]);
-    decl.insert("paYcamI".into(), vec!["divaH".into(), "dyuByAm".into(), "dyuByaH".into()]);
-    decl.insert("zazWI".into(), vec!["divaH".into(), "divoH".into(), "divAm".into()]);
-    decl.insert("saptamI".into(), vec!["divi".into(), "divoH".into(), "dyuzu".into()]);
-    decl.insert("samboDana".into(), vec!["dyOH".into(), "divO".into(), "divaH".into()]);
+    decl.insert("prathamA".into(), vec![nom.clone(), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada}zu")]);
+    decl.insert("samboDana".into(), vec![nom, format!("{weak}O"), format!("{weak}aH")]);
     Some(Declension {
         stem: cand.to_string(),
         linga: linga.to_string(),
@@ -1528,6 +1532,9 @@ mod tests {
         has(&d, "saptamI", "dyuzu");
         has(&d, "samboDana", "dyOH");
         has(&generate("div", "pum").unwrap(), "prathamA", "dyOH");
+        has(&generate("sudiv", "pum").unwrap(), "prathamA", "sudyOH");
+        has(&generate("sudiv", "pum").unwrap(), "tfIyA", "sudyuByAm");
+        has(&generate("sudiv", "pum").unwrap(), "saptamI", "sudyuzu");
     }
 
     #[test]
