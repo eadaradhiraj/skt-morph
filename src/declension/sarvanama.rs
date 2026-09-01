@@ -102,6 +102,8 @@ fn canon_sarvanama(base: &str) -> &str {
         "ubhaya" => "uBaya",
         "purva" => "pUrva",
         "sarvA" => "sarva",
+        "dvitIyA" => "dvitIya",
+        "tftIyA" => "tftIya",
         other => other,
     }
 }
@@ -251,12 +253,14 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   insert_a_sarvanama(&mut m, "uttara", true);
   insert_a_sarvanama(&mut m, "avara", true);
   insert_a_sarvanama(&mut m, "aDara", true);
-  // 1.1.33 प्रथमचरमतयाल्पार्धकतिपयनेमाश्च (नेम already). स्मै not *प्रथमाय.
+  // 1.1.33 प्रथमचरमतयाल्पार्धकतिपयनेमाश्च (नेम already). तय = द्वितीय/तृतीय. स्मै not *प्रथमाय.
   insert_a_sarvanama(&mut m, "praTama", false);
   insert_a_sarvanama(&mut m, "carama", false);
   insert_a_sarvanama(&mut m, "katipaya", false);
   insert_a_sarvanama(&mut m, "alpa", false);
   insert_a_sarvanama(&mut m, "arDa", false);
+  insert_a_sarvanama(&mut m, "dvitIya", false);
+  insert_a_sarvanama(&mut m, "tftIya", false);
   m }
 
 // ---------------------------------------------------------------------------
@@ -538,6 +542,11 @@ mod tests {
         has(&generate("dakziRa", "pum").unwrap(), "tfIyA", "dakziReRa");
         has(&generate("uttara", "stri").unwrap(), "prathamA", "uttarA");
         has(&generate("praTama", "pum").unwrap(), "caturTI", "praTamasmE");
+        has(&generate("dvitIya", "pum").unwrap(), "caturTI", "dvitIyasmE");
+        has(&generate("dvitIya", "pum").unwrap(), "prathamA", "dvitIye");
+        has(&generate("dvitIyA", "stri").unwrap(), "caturTI", "dvitIyasyE");
+        has(&generate("tftIya", "pum").unwrap(), "caturTI", "tftIyasmE");
+        has(&generate("tftIyA", "stri").unwrap(), "caturTI", "tftIyasyE");
         has(&generate("katipaya", "nap").unwrap(), "prathamA", "katipayam");
         has(&generate("arDa", "pum").unwrap(), "tfIyA", "arDena");
         has(&generate("pUrva", "pum").unwrap(), "prathamA", "pUrvaH");
