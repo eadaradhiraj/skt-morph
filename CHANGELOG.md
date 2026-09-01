@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 11: labels yaNluk
+
+- **www/labels:** added `yaN`/`yaNluk` to `PRATYAYA` map (यङ्/यङ्लुक्) for demo display.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 10: tinanta test headers
 
 - **tinanta:** removed generic boilerplate from 9 test headers (7.5k) — kept assertions; 183 tests pass.

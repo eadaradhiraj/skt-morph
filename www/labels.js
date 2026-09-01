@@ -71,6 +71,8 @@ export const PRATYAYA = {
   kta: "क्त",
   ktavatu: "क्तवतु",
   "ktavatu~": "क्तवतुँ",
+  yaN: "यङ्",
+  yaNluk: "यङ्लुक्",
   Satf: "शतृ",
   "Satf~": "शतृँ",
   SAnac: "शानच्",
