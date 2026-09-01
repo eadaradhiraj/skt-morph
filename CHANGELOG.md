@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 81: README 80
+
+- **README:** recent line updated to 80 iters + vAvac (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 80: tinanta yaNluk doc tweak
 
 - **tinanta:** deriv doc + vAvac example; no logic change.
