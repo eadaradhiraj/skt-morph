@@ -1282,6 +1282,30 @@ fn decline_pa(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// क्रोष्टु — 7.1.95 तृज्वत् क्रोष्टुः: सर्वनामस्थान क्रोष्टा/क्रोष्टारौ/क्रोष्टारम् (like कर्तृ);
+/// शस्/पद stay उ क्रोष्टून्/क्रोष्टुभ्याम्/क्रोष्टुषु; voc क्रोष्टो. Weak optional ऋ/उ (क्रोष्ट्रा/क्रोष्टुना).
+/// Exact `krozwu`. गुरु stays u-stem गुरुः.
+fn decline_kroshtu(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "krozwu" || linga != "pum" {
+        return None;
+    }
+    let u = "krozwu";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["krozwA".into(), "krozwArO".into(), "krozwAraH".into()]);
+    decl.insert("dvitIyA".into(), vec!["krozwAram".into(), "krozwArO".into(), "krozwUn".into()]);
+    decl.insert("tfIyA".into(), vec!["krozwrA".into(), "krozwunA".into(), format!("{u}ByAm"), format!("{u}BiH")]);
+    decl.insert("caturTI".into(), vec!["krozwre".into(), "krozwave".into(), format!("{u}ByAm"), format!("{u}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{u}H"), "krozwoH".into(), format!("{u}ByAm"), format!("{u}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{u}H"), "krozwoH".into(), "krozwroH".into(), "krozwvoH".into(), "krozwUnAm".into()]);
+    decl.insert("saptamI".into(), vec!["krozwari".into(), "krozwO".into(), "krozwroH".into(), "krozwvoH".into(), format!("{u}zu")]);
+    decl.insert("samboDana".into(), vec!["krozwo".into(), "krozwArO".into(), "krozwAraH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1405,6 +1429,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_pa(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_kroshtu(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2558,5 +2585,29 @@ mod tests {
         has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjAnO");
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "pUzARO"));
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "aryamARO"));
+    }
+
+    #[test]
+    fn kroshtu_kroshta_kroshtuna() {
+        // क्रोष्टु 7.1.95: क्रोष्टा/क्रोष्टारम् like कर्तृ; पद/शस् उ क्रोष्टुना/क्रोष्टून्. गुरु stays गुरुः.
+        let k = generate("krozwu", "pum").expect("krozwu");
+        has(&k, "prathamA", "krozwA");
+        has(&k, "prathamA", "krozwArO");
+        has(&k, "prathamA", "krozwAraH");
+        has(&k, "dvitIyA", "krozwAram");
+        has(&k, "dvitIyA", "krozwUn");
+        has(&k, "tfIyA", "krozwrA");
+        has(&k, "tfIyA", "krozwunA");
+        has(&k, "tfIyA", "krozwuByAm");
+        has(&k, "caturTI", "krozwre");
+        has(&k, "caturTI", "krozwave");
+        has(&k, "saptamI", "krozwari");
+        has(&k, "saptamI", "krozwO");
+        has(&k, "saptamI", "krozwuzu");
+        has(&k, "samboDana", "krozwo");
+        has(&k, "zazWI", "krozwUnAm");
+        has(&generate("guru", "pum").unwrap(), "prathamA", "guruH");
+        has(&generate("kartf", "pum").unwrap(), "prathamA", "kartA");
+        assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "krozwuH"));
     }
 }
