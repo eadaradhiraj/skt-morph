@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 15: endings header
+
+- **endings:** header → sūtra-cited (3.4.78 etc.); no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 14: sarvanāma header
 
 - **sarvanāma:** header → sūtra-cited (1.1.27/7.1.14 etc.); no logic change.

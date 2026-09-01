@@ -1,4 +1,5 @@
-//! Auto-generated from sktmorph/engine/endings.py
+//! endings — tiṅ/sUP vibhakti endings per lakāra (3.4.78 etc.).
+//! Auto-generated from sktmorph/engine/endings.py — sūtra-cited vectors.
 
 use crate::engine::redup::GANA3;
 
