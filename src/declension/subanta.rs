@@ -1030,6 +1030,29 @@ fn decline_dadhrsh(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// प्रशाम् — 8.2.64 मो नो धातोः: पद प्रशान्/प्रशान्भ्याम्. Not a-stem *प्रशामः.
+fn decline_sham(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "praSAm" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let weak = cand;
+    let pada = "praSAn";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![pada.into(), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada}su")]);
+    decl.insert("samboDana".into(), vec![pada.into(), format!("{weak}O"), format!("{weak}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1132,6 +1155,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_dadhrsh(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_sham(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2082,5 +2108,20 @@ mod tests {
         has(&d, "saptamI", "daDfkzu");
         has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
         assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "daDfw"));
+    }
+
+    #[test]
+    fn prasam_prasan() {
+        // 8.2.64: प्रशान्/प्रशान्भ्याम्, not a-stem *प्रशामः.
+        let p = generate("praSAm", "pum").expect("praSAm");
+        has(&p, "prathamA", "praSAn");
+        has(&p, "prathamA", "praSAmO");
+        has(&p, "dvitIyA", "praSAmam");
+        has(&p, "tfIyA", "praSAmA");
+        has(&p, "tfIyA", "praSAnByAm");
+        has(&p, "saptamI", "praSAmi");
+        has(&p, "saptamI", "praSAnsu");
+        has(&generate("rAma", "pum").unwrap(), "prathamA", "rAmaH");
+        assert!(!p.declension.get("tfIyA").unwrap().iter().any(|x| x == "praSAmena"));
     }
 }
