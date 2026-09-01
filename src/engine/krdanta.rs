@@ -83,7 +83,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ktri" => Some(("trima", vec!["3.3.88"], "ktri")),
         "aN" => Some(("A", vec!["3.3.104"], "an_stri")),
         "ap" => Some(("a", vec!["3.3.57"], "rdorap")),
-        "Ra" => Some(("a", vec!["3.1.140"], "jvala_ra")),
+        "Ra" => Some(("a", vec!["3.1.140", "3.1.141"], "jvala_ra")),
         "Sa" => Some(("a", vec!["3.1.137"], "sa_krt")),
         "ka" => Some(("a", vec!["3.1.135"], "ka_kit")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
@@ -794,12 +794,20 @@ fn rdorap_form(root: &str) -> String {
     }
 }
 
-/// 3.1.140 ज्वलितिकसन्तेभ्यो णः: ज्वाल/चाल; वार्तिक तन् → तान. घञ्/अप् stay कार/कर.
+/// 3.1.140 ज्वलितिकसन्तेभ्यो णः: ज्वाल/चाल; वार्तिक तन् → तान.
+/// 3.1.141 श्याद्व्यधास्रुसंस्र्वतीणवसावहृलिहश्लिषश्वसश्च: व्याध/लेह/श्लेष/श्वास/स्राव/श्याय.
+/// घञ्/अप् stay कार/कर. श stays पिब. कः stays स्थ. Do not dump gold ण.
 fn jvala_ra_form(root: &str) -> String {
     match root {
-        "jval" | "jvala" | "cal" | "cala" | "tan" | "tanu" => {
+        "jval" | "jvala" | "cal" | "cala" | "tan" | "tanu" | "sru" => {
             join_eco(&nit_krt_anga(root, "Ra"), "a")
         }
+        // इत्-a often kept (लिह् ≠ CaC); णित् on the stripped aṅga, not *लिहा.
+        "vyaD" | "vyaDa" => "vyADa".into(),
+        "lih" | "liha" => "leha".into(),
+        "Sliz" | "Sliza" => "Sleza".into(),
+        "Svas" | "Svasa" => "SvAsa".into(),
+        "SyE" | "SyEN" | "SyA" => "SyAya".into(),
         other => format!("{other}a"),
     }
 }
@@ -1727,6 +1735,9 @@ mod tests {
         let d = decline("jvala", "Ra", "pum", &[]).expect("jvAlaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "jvAlaH"), "{:?}", pr);
+        let d = decline("vyaDa", "Ra", "pum", &[]).expect("vyADaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "vyADaH"), "{:?}", pr);
         let d = decline("pA", "Sa", "pum", &[]).expect("pibaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "pibaH"), "{:?}", pr);
@@ -1966,6 +1977,12 @@ mod tests {
         assert_eq!(derive("jvala", "Ra"), vec!["jvAla"]);
         assert_eq!(derive("cala", "Ra"), vec!["cAla"]);
         assert_eq!(derive("tanu", "Ra"), vec!["tAna"]);
+        assert_eq!(derive("vyaDa", "Ra"), vec!["vyADa"]);
+        assert_eq!(derive("liha", "Ra"), vec!["leha"]);
+        assert_eq!(derive("Sliza", "Ra"), vec!["Sleza"]);
+        assert_eq!(derive("Svasa", "Ra"), vec!["SvAsa"]);
+        assert_eq!(derive("sru", "Ra"), vec!["srAva"]);
+        assert_eq!(derive("SyEN", "Ra"), vec!["SyAya"]);
         assert_eq!(derive("pA", "Sa"), vec!["piba"]);
         assert_eq!(derive("GrA", "Sa"), vec!["jiGra"]);
         assert_eq!(derive("DmA", "Sa"), vec!["Dama"]);
