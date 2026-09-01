@@ -93,7 +93,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ukaY" => Some(("uka", vec!["3.2.154"], "ukan")),
         "ini" => Some(("in", vec!["3.2.156", "3.2.157"], "ini")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
-        "kyap" => Some(("ya", vec!["3.1.106", "3.1.107", "3.1.108", "3.1.109", "3.1.120", "3.1.121"], "kyap")),
+        "kyap" => Some(("ya", vec!["3.1.106", "3.1.107", "3.1.108", "3.1.109", "3.1.110", "3.1.120", "3.1.121"], "kyap")),
         "sya-Satf" => Some(("t", vec!["3.2.124"], "present")),
         "sya-Satf~" => Some(("", vec!["3.2.124"], "present")),
         "sya-SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
@@ -430,6 +430,10 @@ fn kyap_form(root: &str) -> String {
     // 3.1.109 एतिस्तुशास्वृदृजुषः: शिष्य (6.4.34 इत्त्व + 8.3.60 षत्व), not *शास्य.
     if matches!(root, "SAs" | "SAsu") {
         return "SiSya".into();
+    }
+    // 3.1.110 ऋदुपधात्: वृध्य vs ण्यत् वर्ध्य. युच् stays वर्धन. क्त stays वृद्ध. Not क्लृप्/चृत् dump.
+    if matches!(root, "vfD" | "vfDu") {
+        return "vfDya".into();
     }
     // 3.1.121 युग्यं च पत्रे: कुत्व निपातन युग्य, not *युज्य. ण्यत् stays योग्य.
     if matches!(root, "yuj" | "yuja" | "yujir") {
@@ -1941,6 +1945,9 @@ mod tests {
         let d = decline("aja", "yat", "nap", &[]).expect("ajyam");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "ajyam"), "{:?}", pr);
+        let d = decline("vfDu", "kyap", "pum", &[]).expect("vfDyaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "vfDyaH"), "{:?}", pr);
     }
 
     #[test]
@@ -2056,6 +2063,10 @@ mod tests {
         assert_eq!(derive("aja", "Ryat"), vec!["Agya"]);
         assert_eq!(derive("aja", "kta"), vec!["akta"]);
         assert_eq!(derive("aja", "GaY"), vec!["Aga"]);
+        assert_eq!(derive("vfDu", "kyap"), vec!["vfDya"]);
+        assert_eq!(derive("vfDu", "Ryat"), vec!["varDya"]);
+        assert_eq!(derive("vfDu", "yuc"), vec!["varDana"]);
+        assert_eq!(derive("vfDu", "kta"), vec!["vfdDa"]);
         assert_eq!(derive("hana", "GaY"), vec!["GAta"]);
         assert_eq!(derive("hana", "Rvul"), vec!["GAtaka"]);
         assert_eq!(derive("hana", "vun"), vec!["hanaka"]);
