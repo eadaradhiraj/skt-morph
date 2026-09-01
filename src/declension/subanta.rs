@@ -737,17 +737,22 @@ fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// आशिस्/पिपठिष् — 8.2.66 सजषो रुः, 8.2.76 दीर्घ आशीः/आशीर्भ्याम्. Not ष-anta *आशिट् (द्विष्).
+/// आशिस्/सजष् — 8.2.66 सजषो रुः, 8.2.76 इक्-upadhā दीर्घ आशीः/सजूः. Not ष-anta *आशिट्; धनुस् stays nap.
 fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "stri" && linga != "pum" {
         return None;
     }
-    let pre = cand.strip_suffix("iz")?;
-    if pre.is_empty() || cand == "dviz" {
-        return None;
-    }
-    let nom = format!("{pre}IH");
-    let pada = format!("{pre}Ir");
+    let (pre, long) = if cand == "sajuz" {
+        ("saj", "U")
+    } else {
+        let p = cand.strip_suffix("iz")?;
+        if p.is_empty() || cand == "dviz" {
+            return None;
+        }
+        (p, "I")
+    };
+    let nom = format!("{pre}{long}H");
+    let pada = format!("{pre}{long}r");
     let mut decl = HashMap::new();
     decl.insert("prathamA".into(), vec![nom.clone(), format!("{cand}O"), format!("{cand}aH")]);
     decl.insert("dvitIyA".into(), vec![format!("{cand}am"), format!("{cand}O"), format!("{cand}aH")]);
@@ -1598,6 +1603,9 @@ mod tests {
         has(&generate("pipaWiz", "pum").unwrap(), "prathamA", "pipaWIH");
         has(&generate("pipaWiz", "pum").unwrap(), "tfIyA", "pipaWIrByAm");
         has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
+        has(&generate("sajuz", "pum").unwrap(), "prathamA", "sajUH");
+        has(&generate("sajuz", "pum").unwrap(), "tfIyA", "sajUrByAm");
+        has(&generate("sajuz", "pum").unwrap(), "saptamI", "sajUHzu");
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "ASiw"));
     }
 
