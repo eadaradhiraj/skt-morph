@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 129: tinanta ceKrI doc
+
+- **tinanta:** deriv doc + ceKrI; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 128: README 127
 
 - **README:** recent line updated to 127 iters + Kaumudī (187 tests).
