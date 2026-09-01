@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 47: README 46
+
+- **README:** recent line updated to 46 iters + derived hint (185 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 46: derived header tweak
 
 - **derived:** header clarified parasmai yaṅluk vs ātmane yaṅ; no logic change.
