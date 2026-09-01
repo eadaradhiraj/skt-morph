@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 109: derived pApac doc
+
+- **derived:** header → pApac; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 108: README 107
 
 - **README:** recent line updated to 107 iters + pApac (187 tests).
