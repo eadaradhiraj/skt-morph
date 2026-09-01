@@ -1474,6 +1474,31 @@ fn decline_jara(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// भू-anta (स्वभू, स्वयम्भू) — 6.1.77 इको यणचि उवङ् भुवौ/भुवम्; सु भूः; पद भूभ्याम्/भूषु.
+/// Not U-pum *स्वभावौ / *स्वभूम्. हूहू stays U-anta.
+fn decline_bhu(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("BU")?;
+    if linga != "pum" && linga != "stri" {
+        return None;
+    }
+    let uv = format!("{pre}Buv");
+    let uu = format!("{pre}BU");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{uu}H"), format!("{uv}O"), format!("{uv}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{uv}am"), format!("{uv}O"), format!("{uv}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{uv}A"), format!("{uu}ByAm"), format!("{uu}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{uv}e"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{uv}aH"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{uv}aH"), format!("{uv}oH"), format!("{uv}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{uv}i"), format!("{uv}oH"), format!("{uu}zu")]);
+    decl.insert("samboDana".into(), vec![format!("{uu}H"), format!("{uv}O"), format!("{uv}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1609,6 +1634,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_jara(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_bhu(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2922,5 +2950,27 @@ mod tests {
         has(&generate("vAc", "stri").unwrap(), "prathamA", "vAk");
         assert!(!d.declension.get("dvitIyA").unwrap().iter().any(|x| x == "dyAvam"));
         assert!(!g.declension.get("dvitIyA").unwrap().iter().any(|x| x == "glAm"));
+    }
+
+    #[test]
+    fn svabhu_svabhuvam_svayambhu() {
+        // स्वभू/स्वयम्भू: 6.1.77 उवङ् स्वभुवौ/स्वभुवम्. Not U-pum *स्वभूम्. हूहू stays हूह्वौ.
+        let s = generate("svaBU", "pum").expect("svaBU");
+        has(&s, "prathamA", "svaBUH");
+        has(&s, "prathamA", "svaBuvO");
+        has(&s, "prathamA", "svaBuvaH");
+        has(&s, "dvitIyA", "svaBuvam");
+        has(&s, "tfIyA", "svaBuvA");
+        has(&s, "tfIyA", "svaBUByAm");
+        has(&s, "saptamI", "svaBuvi");
+        has(&s, "saptamI", "svaBUzu");
+        has(&s, "zazWI", "svaBuvAm");
+        let y = generate("svayamBU", "pum").expect("svayamBU");
+        has(&y, "prathamA", "svayamBUH");
+        has(&y, "dvitIyA", "svayamBuvam");
+        has(&y, "saptamI", "svayamBuvi");
+        has(&generate("hUhU", "pum").unwrap(), "prathamA", "hUhUH");
+        assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "svaBUm"));
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "svaBavO"));
     }
 }
