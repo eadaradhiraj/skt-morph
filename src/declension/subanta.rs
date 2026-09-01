@@ -235,10 +235,14 @@ fn ngeep_stri(cand: &str, linga: &str) -> String {
     if let Some((_, _, weak, _)) = anc_parts(cand) {
         return format!("{weak}I");
     }
-    // 4.1.6 ङीष् of क्वसु weak: विदुषी (not as-pum *विद्वसी).
+    // 4.1.6 ङीष् of क्वसु weak: विदुषी; aṅga-व् kept बभूवुषी (not *बभूषी).
     if let Some(pre) = cand.strip_suffix("vas") {
         if !pre.is_empty() {
-            return format!("{pre}uzI");
+            return if pre.chars().last().is_some_and(|c| !is_cons(c)) {
+                format!("{pre}vuzI")
+            } else {
+                format!("{pre}uzI")
+            };
         }
     }
     // 4.1.6 उगितश्च ङीप्. 7.1.81 शप्श्यनोर्नित्यम्: शतृ नुम् पचन्ती (not *पचती).
@@ -869,20 +873,26 @@ fn decline_krunc(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// क्वसु (विद्वस्) — 7.1.70 नुम् विद्वान्/विद्वांसौ; 6.4.131 विदुषा; 8.2.72 विद्वद्भिः. Not as-pum *विद्वः.
+/// क्वसु (विद्वस्, बभूवस्) — 7.1.70 नुम् विद्वान्/बभूवान्; 6.4.131 विदुषा vs बभूवुषा (aṅga व् kept).
+/// 8.2.72 विद्वद्भिः/बभूवद्भिः. Not as-pum *विद्वः. मनस् stays मनः.
 fn decline_kvasu(cand: &str, linga: &str) -> Option<Declension> {
     let pre = cand.strip_suffix("vas")?;
     if pre.is_empty() || (linga != "pum" && linga != "nap") {
         return None;
     }
-    let weak = format!("{pre}uz");
+    // वस्-प्रत्यय सम्प्रसारण after हल् (विद्-वस् → विदुष्). Vowel-final aṅga keeps व् (बभूव-अस् → बभूवुष्).
+    let weak = if pre.chars().last().is_some_and(|c| !is_cons(c)) {
+        format!("{pre}vuz")
+    } else {
+        format!("{pre}uz")
+    };
     let pada = format!("{pre}vad");
     let mut decl = HashMap::new();
     if linga == "nap" {
         // 7.1.23 स्वमोः: विद्वत्/विदुषी/विद्वांसि (not पुं विद्वान्).
         let nom = vec![
             format!("{pre}vat"),
-            format!("{pre}uzI"),
+            format!("{weak}I"),
             format!("{pre}vAMsi"),
         ];
         decl.insert("prathamA".into(), nom.clone());
@@ -3245,6 +3255,20 @@ mod tests {
         has(&generate("vidvas", "nap").unwrap(), "prathamA", "viduzI");
         has(&generate("vidvas", "nap").unwrap(), "prathamA", "vidvAMsi");
         has(&generate("manas", "nap").unwrap(), "prathamA", "manaH");
+        // 6.4.131: बभूवस् keeps aṅga व् बभूवुषा, not *बभूषा. विद्वस् stays विदुषा.
+        let b = generate("baBUvas", "pum").expect("baBUvas");
+        has(&b, "prathamA", "baBUvAn");
+        has(&b, "prathamA", "baBUvAMsO");
+        has(&b, "dvitIyA", "baBUvAMsam");
+        has(&b, "tfIyA", "baBUvuzA");
+        has(&b, "tfIyA", "baBUvadByAm");
+        has(&b, "saptamI", "baBUvuzi");
+        has(&b, "saptamI", "baBUvatsu");
+        has(&generate("baBUvas", "stri").unwrap(), "prathamA", "baBUvuzI");
+        has(&generate("baBUvas", "nap").unwrap(), "prathamA", "baBUvat");
+        has(&generate("baBUvas", "nap").unwrap(), "prathamA", "baBUvuzI");
+        assert!(!b.declension.get("tfIyA").unwrap().iter().any(|x| x == "baBUuzA"));
+        assert!(!v.declension.get("tfIyA").unwrap().iter().any(|x| x == "vidvuzA"));
     }
 
     #[test]

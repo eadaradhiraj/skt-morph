@@ -993,6 +993,11 @@ mod tests {
         let d = decline("BU", "SAnac", "pum", &[]).expect("BavamAnaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "BavamAnaH"), "{:?}", pr);
+        let d = decline("BU", "kvasu", "pum", &[]).expect("baBUvAn");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "baBUvAn"), "{:?}", pr);
+        let tr = d.declension.get("tfIyA").unwrap();
+        assert!(tr.iter().any(|x| x == "baBUvuzA"), "{:?}", tr);
     }
 
     #[test]
