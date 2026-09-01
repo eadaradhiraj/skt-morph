@@ -978,6 +978,21 @@ mod tests {
         let d = decline("gam", "ktavatu", "pum", &[]).expect("gatavAn");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "gatavAn"), "{:?}", pr);
+        // 4.1.4 टाप् शानच्: एधमानः / एधमाना / एधमानम्. शतृ स्त्री stays पचन्ती.
+        let d = decline("eDa", "SAnac", "pum", &[]).expect("eDamAnaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "eDamAnaH"), "{:?}", pr);
+        let d = decline("eDa", "SAnac", "stri", &[]).expect("eDamAnA");
+        assert_eq!(d.stem, "eDamAnA");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "eDamAnA"), "{:?}", pr);
+        let d = decline("eDa", "SAnac", "nap", &[]).expect("eDamAnam");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "eDamAnam"), "{:?}", pr);
+        assert!(pr.iter().any(|x| x == "eDamAnAni"), "{:?}", pr);
+        let d = decline("BU", "SAnac", "pum", &[]).expect("BavamAnaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "BavamAnaH"), "{:?}", pr);
     }
 
     #[test]
