@@ -792,6 +792,35 @@ fn decline_raj(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// उशनस्/अनेहस् — 7.1.94 ऋदुशनस्पुरुदंहोऽनेहसां च: सु उशना/अनेहा not as-pum *उशनः.
+fn decline_ushanasadi(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "pum" {
+        return None;
+    }
+    let (nom, voc): (&str, Vec<String>) = match cand {
+        "uSanas" => ("uSanA", vec!["uSanan".into(), "uSana".into(), "uSanaH".into()]),
+        "anehas" => ("anehA", vec!["anehaH".into()]),
+        _ => return None,
+    };
+    let pre = cand.strip_suffix("as")?;
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![nom.to_string(), format!("{cand}O"), format!("{cand}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{cand}am"), format!("{cand}O"), format!("{cand}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{cand}A"), format!("{pre}oByAm"), format!("{pre}oBiH")]);
+    decl.insert("caturTI".into(), vec![format!("{cand}e"), format!("{pre}oByAm"), format!("{pre}oByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{cand}aH"), format!("{pre}oByAm"), format!("{pre}oByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{cand}aH"), format!("{cand}oH"), format!("{cand}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{cand}i"), format!("{cand}oH"), format!("{pre}aHsu")]);
+    let mut samb = voc;
+    samb.extend([format!("{cand}O"), format!("{cand}aH")]);
+    decl.insert("samboDana".into(), samb);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -873,6 +902,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_raj(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_ushanasadi(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1644,5 +1676,22 @@ mod tests {
         has(&d, "saptamI", "DanuHzu");
         has(&generate("sajuz", "pum").unwrap(), "prathamA", "sajUH");
         has(&generate("manas", "nap").unwrap(), "prathamA", "manaH");
+    }
+
+    #[test]
+    fn ushanas_ushana() {
+        // 7.1.94: उशना not *उशनः; voc उशनन्. अनेहा. मनस् stays मनः.
+        let u = generate("uSanas", "pum").expect("uSanas");
+        has(&u, "prathamA", "uSanA");
+        has(&u, "prathamA", "uSanasO");
+        has(&u, "dvitIyA", "uSanasam");
+        has(&u, "tfIyA", "uSanasA");
+        has(&u, "tfIyA", "uSanoByAm");
+        has(&u, "samboDana", "uSanan");
+        has(&u, "samboDana", "uSanaH");
+        has(&generate("anehas", "pum").unwrap(), "prathamA", "anehA");
+        has(&generate("anehas", "pum").unwrap(), "tfIyA", "anehoByAm");
+        has(&generate("manas", "pum").unwrap(), "prathamA", "manaH");
+        assert!(!u.declension.get("prathamA").unwrap().iter().any(|x| x == "uSanaH"));
     }
 }
