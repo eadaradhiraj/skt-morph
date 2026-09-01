@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 19: it header
+
+- **it:** header → sūtra-gated 7.2.10/35/58; no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 18: README recent
 
 - **README:** recent line updated to 17 iters summary (183 tests, 1.2M).

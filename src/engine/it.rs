@@ -1,5 +1,5 @@
-//! सेट् / अनिट् for आर्धधातुक (स्य, सिच्, तव्य, …) as in the Kaumudī.
-//! 7.2.10 एकाच उपदेशेऽनुदात्तात्; 7.2.35 आर्धधातुकस्येड् वलादेः; 7.2.58 गमेरिट्.
+//! it — iṭ/aniṭ for ārdhadhātuka (sya/sic/tavya/ktvā). Kaumudī 7.2.10/35/58, sūtra-gated.
+//! Sets/aniṭ for ārdhadhātuka valādi (sya, sic, tavya …) as in the Kaumudī — 7.2.10, 7.2.35, 7.2.58.
 
 #![allow(non_snake_case)]
 
