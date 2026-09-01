@@ -42,7 +42,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ktvA" => Some(("tvA", vec!["3.4.21"], "root")),
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
         "ktin" => Some(("ti", vec!["3.3.94"], "guna")),
-        "yat" => Some(("ya", vec!["3.2.187"], "guna")),
+        "yat" => Some(("ya", vec!["3.1.97"], "yat")),
         "Ryat" => Some(("ya", vec!["3.2.187"], "guna")),
         "GaY" => Some(("a", vec!["3.3.67"], "guna")),
         "Ramul" => Some(("am", vec!["3.3.84"], "guna")),
@@ -867,6 +867,17 @@ fn ini_form(root: &str) -> String {
     }
 }
 
+/// 3.1.97 अचो यत्: चेय/जेय; आ → एय देय. 6.1.45+6.4.65 ऐ → गेय/पेय not *गैय.
+/// थकन् stays गाथक. ण्युट् stays गायन. क्त stays गीत. श stays पिब.
+fn yat_form(root: &str) -> String {
+    match root {
+        "gE" => "geya".into(),
+        "pE" => "peya".into(),
+        r if r.ends_with('A') => format!("{}eya", &r[..r.len() - 1]),
+        other => join_eco(&apply_guna_to_stem(other), "ya"),
+    }
+}
+
 /// 3.1.134 ग्रह्यादेर् णिनिः: ग्राही/स्थायी/मन्त्री (णित् वृद्धि; आतो युक्; इदित् नुम्).
 /// ल्यु stays नन्दन. आलुच् stays गृहयालु. वरच् stays स्थावर. कः stays स्थ. घिनुण् stays शमिन्.
 fn nini_form(root: &str) -> String {
@@ -1348,7 +1359,6 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
                 "ktin" => ktin_form(&root),
                 "GaY" | "Rvul" | "Ryat" => nit_krt_form(&root, pratyaya),
                 "Ramul" => join_eco(&nit_krt_anga(&root, "Rvul"), "am"),
-                "yat" if root.ends_with('A') => format!("{}eya", &root[..root.len() - 1]),
                 _ => join_eco(&guna, suffix),
             }
         }
@@ -1393,6 +1403,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "yuc" => yuc_form(&root),
         "ukan" => ukan_form(&root),
         "ini" => ini_form(&root),
+        "yat" => yat_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1878,6 +1889,12 @@ mod tests {
         assert!(pr.iter().any(|x| x == "SiSyaH"), "{:?}", pr);
         let d = decline("SAsu", "kyap", "stri", &[]).expect("SiSyA");
         assert_eq!(d.stem, "SiSyA");
+        let d = decline("gE", "yat", "pum", &[]).expect("geyaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "geyaH"), "{:?}", pr);
+        let d = decline("gE", "yat", "nap", &[]).expect("geyam");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "geyam"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1926,6 +1943,14 @@ mod tests {
         assert_eq!(derive("BU", "ukaY"), vec!["BAvuka"]);
         assert_eq!(derive("BU", "Ryat"), vec!["BAvya"]);
         assert_eq!(derive("BU", "yat"), vec!["Bavya"]);
+        assert_eq!(derive("gE", "yat"), vec!["geya"]);
+        assert_eq!(derive("pE", "yat"), vec!["peya"]);
+        assert_eq!(derive("ciY", "yat"), vec!["ceya"]);
+        assert_eq!(derive("ji", "yat"), vec!["jeya"]);
+        assert_eq!(derive("gE", "Takan"), vec!["gATaka"]);
+        assert_eq!(derive("gE", "Ryuw"), vec!["gAyana"]);
+        assert_eq!(derive("gE", "kta"), vec!["gIta"]);
+        assert_eq!(derive("pA", "Sa"), vec!["piba"]);
         assert_eq!(derive("RIY", "GaY"), vec!["nAya"]);
         assert_eq!(derive("RIY", "Rvul"), vec!["nAyaka"]);
         assert_eq!(derive("RIY", "vun"), vec!["nayaka"]);
