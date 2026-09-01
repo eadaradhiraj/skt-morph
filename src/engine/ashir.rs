@@ -1,5 +1,4 @@
-//! आशीर्लिङ् (3.3.173). यासुट् kit परस्मै; सीयुट् आत्मने.
-//! भूयात्, क्रियात्, गम्यात्, देयात्; कृषीष्ट, भविषीष्ट.
+//! ashir — āśīrlin (3.3.173, Kaumudī). YāsUT kit P, sIyuT A — bhūyāt/kṛṣīṣṭa etc.
 
 use crate::engine::it::{ruki_s, surface_root, takes_it_tavya};
 use crate::engine::phonology::apply_guna_to_stem;

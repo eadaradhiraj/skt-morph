@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 30: ashir header
+
+- **ashir:** header → Kaumudī 3.3.173; concise.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 29: lun header
 
 - **lun:** header → Kaumudī 3.2.110; concise.
