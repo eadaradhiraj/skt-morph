@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 76: tinanta yaNluk test
+
+- **tinanta:** added `yanluk_tinanta_via_tinanta` (BU/vac yaNluk plat); 187 tests.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 75: README 74
 
 - **README:** recent line updated to 74 iters + search hint (186 tests).

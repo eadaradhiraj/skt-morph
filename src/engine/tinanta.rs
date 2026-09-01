@@ -838,6 +838,14 @@ mod tests {
     }
 
     #[test]
+    fn yanluk_tinanta_via_tinanta() {
+        let f = generate_all_derived("BU", "yaNluk", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x.contains("boB")), "BU yaNluk plat: {:?}", f);
+        let f = generate_all_derived("vac", "yaNluk", "plat", 1, 1, &[]);
+        assert!(f.iter().any(|x| x.contains("vAv")), "vac yaNluk: {:?}", f);
+    }
+
+    #[test]
     fn kram_yam_artha() {
         let vi = vec!["vi".to_string()];
         let f = generate_all_with_prefixes("kramu", "alat", 1, 1, &vi);
