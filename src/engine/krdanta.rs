@@ -84,6 +84,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "aN" => Some(("A", vec!["3.3.104"], "an_stri")),
         "ap" => Some(("a", vec!["3.3.57"], "rdorap")),
         "Ra" => Some(("a", vec!["3.1.140"], "jvala_ra")),
+        "Sa" => Some(("a", vec!["3.1.137"], "sa_krt")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -802,6 +803,28 @@ fn jvala_ra_form(root: &str) -> String {
     }
 }
 
+/// 3.1.137 पाघ्राध्माधेट्दृशः शः: पिब/जिघ्र/धम/धय/पश्य (शित् → 7.3.78).
+/// 3.1.139 ददातिदधात्योर्विभाषा: दद/दध (श्लु). क्त stays पीत/दत्त/हित. घञ् stays दाय.
+fn sa_krt_form(dhatu: &str, root: &str) -> String {
+    let d = dhatu.trim_end_matches('~');
+    if d == "Dew" || root == "De" {
+        return "Daya".into();
+    }
+    if d.starts_with("qudA") || d == "dAY" {
+        return "dada".into();
+    }
+    if d.starts_with("quDA") || d == "DAY" {
+        return "daDa".into();
+    }
+    match root {
+        "pA" => "piba".into(),
+        "GrA" => "jiGra".into(),
+        "DmA" => "Dama".into(),
+        "dfS" => "paSya".into(),
+        other => format!("{other}a"),
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -1033,7 +1056,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
-                | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra"
+                | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -1251,6 +1274,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "an_stri" => an_stri_form(&root),
         "rdorap" => rdorap_form(&root),
         "jvala_ra" => jvala_ra_form(&root),
+        "sa_krt" => sa_krt_form(&dhatu, &root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1683,6 +1707,11 @@ mod tests {
         let d = decline("jvala", "Ra", "pum", &[]).expect("jvAlaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "jvAlaH"), "{:?}", pr);
+        let d = decline("pA", "Sa", "pum", &[]).expect("pibaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "pibaH"), "{:?}", pr);
+        let d = decline("pA", "Sa", "stri", &[]).expect("pibA");
+        assert_eq!(d.stem, "pibA");
         let d = decline("wunadi", "aTuc", "pum", &[]).expect("nandaTuH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "nandaTuH"), "{:?}", pr);
@@ -1914,6 +1943,17 @@ mod tests {
         assert_eq!(derive("jvala", "Ra"), vec!["jvAla"]);
         assert_eq!(derive("cala", "Ra"), vec!["cAla"]);
         assert_eq!(derive("tanu", "Ra"), vec!["tAna"]);
+        assert_eq!(derive("pA", "Sa"), vec!["piba"]);
+        assert_eq!(derive("GrA", "Sa"), vec!["jiGra"]);
+        assert_eq!(derive("DmA", "Sa"), vec!["Dama"]);
+        assert_eq!(derive("Dew", "Sa"), vec!["Daya"]);
+        assert_eq!(derive("dfSir", "Sa"), vec!["paSya"]);
+        assert_eq!(derive("qudAY", "Sa"), vec!["dada"]);
+        assert_eq!(derive("quDAY", "Sa"), vec!["daDa"]);
+        assert_eq!(derive("pA", "kta"), vec!["pIta"]);
+        assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
+        assert_eq!(derive("quDAY", "kta"), vec!["hita"]);
+        assert_eq!(derive("qudAY", "GaY"), vec!["dAya"]);
         assert_eq!(derive("naS", "kvarap"), vec!["naSvara"]);
         assert_eq!(derive("gamx", "Satf"), vec!["gacCat"]);
         assert_eq!(derive("eDa", "SAnac"), vec!["eDamAna"]);
