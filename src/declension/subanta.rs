@@ -34,7 +34,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("i".to_string(),"stri".to_string()), vec![vec!["iH".to_string(),"I".to_string(),"ayaH".to_string(),],vec!["im".to_string(),"I".to_string(),"IH".to_string(),],vec!["yA".to_string(),"iByAm".to_string(),"iBiH".to_string(),],vec!["yE,aye".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["yAH,eH".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["yAH,eH".to_string(),"yoH".to_string(),"InAm".to_string(),],vec!["yAm,O".to_string(),"yoH".to_string(),"izu".to_string(),],vec!["e".to_string(),"I".to_string(),"ayaH".to_string(),],]);
   m.insert(("i".to_string(),"nap".to_string()), vec![vec!["i".to_string(),"inI".to_string(),"Ini".to_string(),],vec!["i".to_string(),"inI".to_string(),"Ini".to_string(),],vec!["inA".to_string(),"iByAm".to_string(),"iBiH".to_string(),],vec!["ine".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"inoH".to_string(),"InAm".to_string(),],vec!["ini".to_string(),"inoH".to_string(),"izu".to_string(),],vec!["i,e".to_string(),"inI".to_string(),"Ini".to_string(),],]);
   m.insert(("I".to_string(),"stri".to_string()), vec![vec!["I".to_string(),"yO".to_string(),"yaH".to_string(),],vec!["Im".to_string(),"yO".to_string(),"IH".to_string(),],vec!["yA".to_string(),"IByAm".to_string(),"IBiH".to_string(),],vec!["yE".to_string(),"IByAm".to_string(),"IByaH".to_string(),],vec!["yAH".to_string(),"IByAm".to_string(),"IByaH".to_string(),],vec!["yAH".to_string(),"yoH".to_string(),"InAm".to_string(),],vec!["yAm".to_string(),"yoH".to_string(),"Izu".to_string(),],vec!["i".to_string(),"yO".to_string(),"yaH".to_string(),],]);
-  m.insert(("I".to_string(),"pum".to_string()), vec![vec!["I".to_string(),"yO".to_string(),"yaH".to_string(),],vec!["Im".to_string(),"yO".to_string(),"In".to_string(),],vec!["yA".to_string(),"IByAm".to_string(),"IBiH".to_string(),],vec!["ye".to_string(),"IByAm".to_string(),"IByaH".to_string(),],vec!["eH".to_string(),"IByAm".to_string(),"IByaH".to_string(),],vec!["eH".to_string(),"yoH".to_string(),"InAm".to_string(),],vec!["O".to_string(),"yoH".to_string(),"Izu".to_string(),],vec!["i".to_string(),"yO".to_string(),"yaH".to_string(),],]);
+  // ई-anta पुं (पपी) — सु पपीः; इयङ् पप्यौ/पप्या; loc पपी not *पपौ. नदी stays I-stri. ग्रामणी is named नदीवत्.
+  m.insert(("I".to_string(),"pum".to_string()), vec![vec!["IH".to_string(),"yO".to_string(),"yaH".to_string(),],vec!["Im".to_string(),"yO".to_string(),"In".to_string(),],vec!["yA".to_string(),"IByAm".to_string(),"IBiH".to_string(),],vec!["ye".to_string(),"IByAm".to_string(),"IByaH".to_string(),],vec!["yaH".to_string(),"IByAm".to_string(),"IByaH".to_string(),],vec!["yaH".to_string(),"yoH".to_string(),"yAm".to_string(),],vec!["I".to_string(),"yoH".to_string(),"Izu".to_string(),],vec!["IH".to_string(),"yO".to_string(),"yaH".to_string(),],]);
   m.insert(("u".to_string(),"pum".to_string()), vec![vec!["uH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["um".to_string(),"U".to_string(),"Un".to_string(),],vec!["unA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["O".to_string(),"voH".to_string(),"uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("u".to_string(),"stri".to_string()), vec![vec!["uH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["um".to_string(),"U".to_string(),"UH".to_string(),],vec!["vA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["vE,ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm,O".to_string(),"voH".to_string(),"uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("u".to_string(),"nap".to_string()), vec![vec!["u".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["u".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["unA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["unaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["unaH".to_string(),"unoH".to_string(),"UnAm".to_string(),],vec!["uni".to_string(),"unoH".to_string(),"uzu".to_string(),],vec!["u,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
@@ -2761,5 +2762,30 @@ mod tests {
         has(&generate("diS", "stri").unwrap(), "prathamA", "dik");
         has(&generate("viS", "pum").unwrap(), "prathamA", "viw");
         assert!(!generate("diS", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "diw"));
+    }
+
+    #[test]
+    fn papi_papih_papyau() {
+        // पपी ई-anta पुं: पपीः/पप्यौ/पपीम्/पपीन्/पप्या/पप्ये/पपी/पपीषु. नदी stays I-stri नद्यौ.
+        let p = generate("papI", "pum").expect("papI");
+        has(&p, "prathamA", "papIH");
+        has(&p, "prathamA", "papyO");
+        has(&p, "prathamA", "papyaH");
+        has(&p, "dvitIyA", "papIm");
+        has(&p, "dvitIyA", "papIn");
+        has(&p, "tfIyA", "papyA");
+        has(&p, "tfIyA", "papIByAm");
+        has(&p, "caturTI", "papye");
+        has(&p, "paYcamI", "papyaH");
+        has(&p, "zazWI", "papyAm");
+        has(&p, "saptamI", "papI");
+        has(&p, "saptamI", "papIzu");
+        has(&p, "samboDana", "papIH");
+        has(&generate("nadI", "stri").unwrap(), "prathamA", "nadI");
+        has(&generate("nadI", "stri").unwrap(), "dvitIyA", "nadIm");
+        has(&generate("nadI", "stri").unwrap(), "saptamI", "nadyAm");
+        assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "papI"));
+        assert!(!p.declension.get("saptamI").unwrap().iter().any(|x| x == "papO"));
+        assert!(!p.declension.get("caturTI").unwrap().iter().any(|x| x == "papyE"));
     }
 }
