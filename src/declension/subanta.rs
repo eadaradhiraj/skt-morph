@@ -1625,14 +1625,17 @@ fn decline_huhu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// 6.4.14 अत्वसन्तस्य चाधातोः सौ आः: वेधाः, सुमनाः (not *वेधः/*सुमनः). Voc aH; पद ओभ्याम्.
-/// Exact `manas` stays मनः. उशनस्/अनेहस् are 7.1.94 named. तपस् stays तपः.
+/// 6.4.14 अत्वसन्तस्य चाधातोः सौ आः: वेधाः, चन्द्रमाः, सुमनाः (not *वेधः/*चन्द्रमः/*सुमनः).
+/// Voc aH; पद ओभ्याम्. Exact `manas` stays मनः. तपस् stays तपः. उशनस् is 7.1.94. Not *mas (तमस्).
 fn decline_atvasantasya_as(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "pum" {
         return None;
     }
     let pre = cand.strip_suffix("as")?;
-    if cand != "veDas" && !cand.strip_suffix("manas").is_some_and(|p| !p.is_empty()) {
+    if cand != "veDas"
+        && cand != "candramas"
+        && !cand.strip_suffix("manas").is_some_and(|p| !p.is_empty())
+    {
         return None;
     }
     let o = format!("{pre}o");
@@ -3926,7 +3929,7 @@ mod tests {
 
     #[test]
     fn vedhas_vedhah() {
-        // 6.4.14: वेधाः, सुमनाः. मनस् stays मनः. तपस् stays तपः.
+        // 6.4.14: वेधाः, चन्द्रमाः, सुमनाः. मनस् stays मनः. तपस् stays तपः.
         let v = generate("veDas", "pum").expect("veDas");
         has(&v, "prathamA", "veDAH");
         has(&v, "prathamA", "veDasO");
@@ -3945,9 +3948,16 @@ mod tests {
         has(&s, "samboDana", "sumanaH");
         has(&generate("manas", "pum").unwrap(), "prathamA", "manaH");
         has(&generate("tapas", "pum").unwrap(), "prathamA", "tapaH");
+        let c = generate("candramas", "pum").expect("candramas");
+        has(&c, "prathamA", "candramAH");
+        has(&c, "prathamA", "candramasO");
+        has(&c, "dvitIyA", "candramasam");
+        has(&c, "tfIyA", "candramoByAm");
+        has(&c, "samboDana", "candramaH");
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "veDaH"));
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sumanaH"));
         assert!(!generate("manas", "pum").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "manAH"));
+        assert!(!c.declension.get("prathamA").unwrap().iter().any(|x| x == "candramaH"));
     }
 
     #[test]
