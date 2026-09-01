@@ -585,22 +585,30 @@ fn decline_rai(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// प्राञ्च्-class पुं — 8.2.23 प्राङ्; 6.4.24 प्राचा; 8.2.30 प्राग्/प्राक्षु. Not च-anta *प्राक्.
+/// प्राञ्च्-class — 8.2.23 प्राङ्; 6.4.24 प्राचा; 8.2.30 प्राग्/प्राक्षु. नपुं 7.1.23 प्राक्/प्राची/प्राञ्चि. Not च-anta *प्राक् as पुं.
 fn decline_anc(cand: &str, linga: &str) -> Option<Declension> {
     let (nom, strong, weak, pada) = anc_parts(cand)?;
-    if linga != "pum" {
+    if linga != "pum" && linga != "nap" {
         return None;
     }
     let loc_pl = format!("{}kzu", pada.strip_suffix('g').unwrap_or(pada));
     let mut decl = HashMap::new();
-    decl.insert("prathamA".into(), vec![nom.into(), format!("{strong}O"), format!("{strong}aH")]);
-    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+    if linga == "nap" {
+        let nom_sg = format!("{}k", pada.strip_suffix('g').unwrap_or(pada));
+        let row = vec![nom_sg, format!("{weak}I"), format!("{strong}i")];
+        decl.insert("prathamA".into(), row.clone());
+        decl.insert("dvitIyA".into(), row.clone());
+        decl.insert("samboDana".into(), row);
+    } else {
+        decl.insert("prathamA".into(), vec![nom.into(), format!("{strong}O"), format!("{strong}aH")]);
+        decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+        decl.insert("samboDana".into(), vec![nom.into(), format!("{strong}O"), format!("{strong}aH")]);
+    }
     decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
     decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
     decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
     decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
     decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), loc_pl]);
-    decl.insert("samboDana".into(), vec![nom.into(), format!("{strong}O"), format!("{strong}aH")]);
     Some(Declension {
         stem: cand.to_string(),
         linga: linga.to_string(),
@@ -1434,6 +1442,9 @@ mod tests {
         has(&generate("samyaYc", "pum").unwrap(), "tfIyA", "samIcA");
         has(&generate("saDryaYc", "pum").unwrap(), "tfIyA", "saDrIcA");
         has(&generate("prAYc", "stri").unwrap(), "prathamA", "prAcI");
+        has(&generate("prAYc", "nap").unwrap(), "prathamA", "prAk");
+        has(&generate("prAYc", "nap").unwrap(), "prathamA", "prAcI");
+        has(&generate("prAYc", "nap").unwrap(), "prathamA", "prAYci");
         has(&generate("vAc", "stri").unwrap(), "prathamA", "vAk");
     }
 
