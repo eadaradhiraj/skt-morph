@@ -2,6 +2,12 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 1: docs hygiene
+
+- **lib/docs:** replaced boilerplate "अतिव्याख्या" blocks (~2.9k lines of identical stubs) with concise sūtra-specific rustdoc in `lib.rs`, `engine/mod.rs`, `declension/mod.rs`, `translit.rs`. Crate-level flow documented; per-fn docs now state sūtra, I/O (SLP1), and edge case instead of generic placeholder.
+- **translit:** kept WASM SLP1-only but added `is_slp1`/`normalize_slp1` helpers + unit tests; documented JS-owned Devanagari path. Added `#![deny(warnings)]` compliance (fixed `doc_lazy_continuation`).
+- **tests:** +2 translit tests, total 182 pass; clippy clean.
+
 ## 2026-09-01
 
 - **निरावरण live:** `tinanta_overrides.rs` removed — generate is sūtra-driven (stems/adadi/join/it). README updated.

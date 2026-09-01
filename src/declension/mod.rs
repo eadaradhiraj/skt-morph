@@ -1,15 +1,5 @@
-//! =============================================================================
-//! src/declension/mod.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
+//! declension — subanta (sup 4.1.2) + sarvanāma (1.1.27 etc.).
+//! Ending-class sup generation; halanta handling via 8.2.30/39/66.
+//! All I/O SLP1.
 pub mod sarvanama;
-// ---------------------------------------------------------------------------
-// mod `subanta`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub mod subanta;

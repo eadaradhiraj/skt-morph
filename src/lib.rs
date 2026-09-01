@@ -1,106 +1,59 @@
-//! =============================================================================
-//! src/lib.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
+//! skt-morph — Pāṇini as ordered in the Siddhānta-Kaumudī.
+//! * `data`      — dhātupāṭha + gold cross-check (never source of truth).
+//! * `engine`    — tinanta / kṛdanta / taddhita live generation (sūtra-driven).
+//! * `declension`— subanta + sarvanāma (ending-class, not site scrape).
+//! * `translit`  — SLP1 internally; Devanagari only at JS boundary (www/translit.js).
+//!
+//! Flow: dhātu → it-strip (1.3.2–9) → aṅga/vikaraṇa → lakāra/ending → sandhi.
 #![deny(warnings)]
 use wasm_bindgen::prelude::*;
 
-// ---------------------------------------------------------------------------
-// mod `data`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub mod data;
-// ---------------------------------------------------------------------------
-// mod `declension`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub mod declension;
-// ---------------------------------------------------------------------------
-// mod `engine`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub mod engine;
-// ---------------------------------------------------------------------------
-// mod `translit`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub mod translit;
 
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
-    // ---------------------------------------------------------------------------
-    // fn `log`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn log(s: &str);
 }
 
 #[wasm_bindgen(start)]
-// ---------------------------------------------------------------------------
-// fn `init`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn init() {}
 
-/// Generate verb conjugation paradigm (9 forms) for a dhatu + lakara
-/// dhatu: SLP1 string like "BU" or dhatu_id "01.0001"
-/// lakara: "plat" | "plrt" | "plot" | "plan" | "pvidhilin" | "plit" | "alat" etc.
+/// Generate single tinanta form. SLP1 dhatu/id + lakara (plat/plrt/…), puruṣa/vacana 1–3.
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_verb`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_verb(dhatu: &str, lakara: &str, purusha: u8, vacana: u8) -> JsValue {
     let result = engine::tinanta::generate(dhatu, lakara, purusha, vacana);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
+/// Tinanta with upasargas (comma-separated SLP1) + optional artha (1.3).
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_verb_with_prefix`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_verb_with_prefix(dhatu: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     let result = engine::tinanta::generate_with_artha(dhatu, lakara, purusha, vacana, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
+/// Full 9-form tinanta paradigm (3 puruṣa × 3 vacana).
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_verb_paradigm`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_verb_paradigm(dhatu: &str, lakara: &str) -> JsValue {
     let result = engine::tinanta::generate_paradigm(dhatu, lakara);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_verb_paradigm_with_prefix`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     let result = engine::tinanta::generate_paradigm_with_artha(dhatu, lakara, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// `derivation`: empty / `shuddha`, or `Ric` / `san` / `yaN` / `yaNluk` (intensive luk, parasmai) / `karma`.
-/// — yaN = सयक् intensive with ya (ātmanepada, boBUyate) — 3.1.22, 2.4.74 retention
-/// — yaNluk = ya-lopa intensive (parasmai, boBUti) — 2.4.74 luk; see derived::yan_luk_stem
+/// Derived tinanta: `Ric`/`san`/`yaN`/`yaNluk`/`karma` (see `engine::derived`).
+/// yaNluk = 2.4.74 ya-lopa intensive (parasmai boBUti vs yaN boBUyate).
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_verb_derived`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     let result = engine::tinanta::generate_derived_artha(dhatu, derivation, lakara, purusha, vacana, &prefs, artha);
@@ -108,112 +61,71 @@ pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purush
 }
 
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_verb_paradigm_derived`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     let result = engine::tinanta::generate_paradigm_derived_artha(dhatu, derivation, lakara, &prefs, artha);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// तद्धित (त्व / तल् / मतुप् / मयट् / इन् / तरप् / तमप् / छ / क / अण् / ढक् / यञ्)
+/// Taddhita (4.1): tva/tal/matup/mayaT/in/tarap/tamap/Ca/ka/aN/Dak/yaY etc.
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_taddhita`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_taddhita(pratipadika: &str, pratyaya: &str) -> JsValue {
     let result = engine::taddhita::generate(pratipadika, pratyaya);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// Generate participle / krdanta
+/// Kṛdanta generation (3.1–3.4): kta/ktavatu/…/kyap etc.
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_krdanta`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_krdanta(dhatu: &str, pratyaya: &str) -> JsValue {
     let result = engine::krdanta::generate(dhatu, pratyaya);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_krdanta_with_prefix`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_krdanta_with_prefix(dhatu: &str, pratyaya: &str, prefixes: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     let result = engine::krdanta::generate_with_prefixes(dhatu, pratyaya, &prefs);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// लिङ्गs this kṛt takes (`pum`/`stri`/`nap`). Empty array = अव्यय.
+/// Liṅgas a kṛt takes (pum/stri/nap); empty = avyaya (ktvA/tumun/lyap).
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `krdanta_lingas`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn krdanta_lingas(pratyaya: &str) -> JsValue {
     serde_wasm_bindgen::to_value(engine::krdanta::lingas(pratyaya)).unwrap_or(JsValue::NULL)
 }
 
-/// Decline a kṛdanta where it takes सुप् (क्त, शतृ, तृच्, …). Avyaya (क्त्वा, तुमुन्, ल्यप्) → null.
+/// Decline kṛdanta where it takes sup (kta/śatṛ/tṛc …); avyaya → null.
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_krdanta_declension`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_krdanta_declension(dhatu: &str, pratyaya: &str, linga: &str, prefixes: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match engine::krdanta::decline(dhatu, pratyaya, linga, &prefs) {
         Some(d) => serde_wasm_bindgen::to_value(&d).unwrap_or(JsValue::NULL),
         None => JsValue::NULL,
     }
 }
 
-/// Generate noun declension table
+/// Subanta generation (sup 4.1.2, halanta via 8.2.30/39/66).
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_noun`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_noun(base: &str, linga: &str) -> JsValue {
     let result = declension::subanta::generate(base, linga);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// Generate pronoun declension
+/// Sarvanāma generation (1.1.27 etc.).
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `generate_pronoun`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_pronoun(base: &str, linga: &str) -> JsValue {
     let result = declension::sarvanama::generate(base, linga);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// Analyze / search: reverse lookup
+/// Reverse lookup: one surface form (SLP1) → every valid parse.
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `analyze`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn analyze(word: &str) -> JsValue {
     let result = engine::analyze::analyze_word(word);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
 #[wasm_bindgen]
-// ---------------------------------------------------------------------------
-// fn `search`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn search(prefix: &str, limit: Option<usize>) -> JsValue {
     let result = engine::analyze::search_prefix(prefix, limit.unwrap_or(10));
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
