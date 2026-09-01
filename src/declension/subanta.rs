@@ -983,6 +983,30 @@ fn decline_bhrasj(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// दाधृष् — पद कुत्व दधृक्/दधृग् (like श-anta), not ष-anta *दधृट्. द्विष् stays द्विट्.
+fn decline_dadhrsh(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "daDfz" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let weak = cand;
+    let k = "daDfk";
+    let g = "daDfg";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![k.into(), g.into(), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{g}ByAm"), format!("{g}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{g}ByAm"), format!("{g}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{g}ByAm"), format!("{g}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{k}zu")]);
+    decl.insert("samboDana".into(), vec![k.into(), g.into(), format!("{weak}O"), format!("{weak}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1082,6 +1106,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_bhrasj(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_dadhrsh(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2003,5 +2030,21 @@ mod tests {
         has(&b, "saptamI", "Bfwsu");
         has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
         assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "Bfsk"));
+    }
+
+    #[test]
+    fn dadhrsh_dadhrik() {
+        // दाधृष्: दधृक्/दधृग्, दधृग्भ्याम्/दधृक्षु. द्विष् stays द्विट्.
+        let d = generate("daDfz", "pum").expect("daDfz");
+        has(&d, "prathamA", "daDfk");
+        has(&d, "prathamA", "daDfg");
+        has(&d, "prathamA", "daDfzO");
+        has(&d, "dvitIyA", "daDfzam");
+        has(&d, "tfIyA", "daDfzA");
+        has(&d, "tfIyA", "daDfgByAm");
+        has(&d, "saptamI", "daDfzi");
+        has(&d, "saptamI", "daDfkzu");
+        has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
+        assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "daDfw"));
     }
 }
