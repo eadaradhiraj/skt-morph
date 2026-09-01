@@ -393,6 +393,31 @@ fn decline_han(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अर्वन् — अनङ् प्रथमा एक अर्वा (not शतृ *अर्वान्); सर्वनामस्थान नुम् अर्वन्तौ/अर्वन्तम् like भवत्;
+/// weak/पद अत्/द् अर्वता/अर्वद्भ्याम्/अर्वत्सु. Voc अर्वन्. Not an-stem *अर्वानम्. Exact `arvan` before `an`.
+fn decline_arvan(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "arvan" || linga != "pum" {
+        return None;
+    }
+    let strong = "arvant";
+    let weak = "arvat";
+    let pada = "arvad";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["arvA".into(), format!("{strong}O"), format!("{strong}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{weak}su")]);
+    decl.insert("samboDana".into(), vec!["arvan".into(), format!("{strong}O"), format!("{strong}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// 6.4.133 श्वयुवमघोनामतद्धिते — सम्प्रसारण in weak; पद श्व/युव/मघव. पुं.
 fn decline_sva_yuv_magha(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "pum" {
@@ -1296,6 +1321,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         let cand = ngeep_stri(&cand, linga);
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(d) = decline_sva_yuv_magha(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_arvan(&cand, linga) {
             return Some(d);
         }
         if cand.ends_with("an") && (linga == "pum" || linga == "nap") {
@@ -2486,5 +2514,26 @@ mod tests {
         has(&generate("sItA", "stri").unwrap(), "tfIyA", "sItayA");
         assert!(!g.declension.get("tfIyA").unwrap().iter().any(|x| x == "gopayA"));
         assert!(!g.declension.get("prathamA").unwrap().iter().any(|x| x == "gopaH"));
+    }
+
+    #[test]
+    fn arvan_arva_arvadbhyam() {
+        // अर्वन्: अनङ् अर्वा; नुम् अर्वन्तौ/अर्वन्तम्; पद अर्वद्भ्याम्/अर्वत्सु. राजन् stays राजा; भवत् stays भवन्.
+        let a = generate("arvan", "pum").expect("arvan");
+        has(&a, "prathamA", "arvA");
+        has(&a, "prathamA", "arvantO");
+        has(&a, "prathamA", "arvantaH");
+        has(&a, "dvitIyA", "arvantam");
+        has(&a, "dvitIyA", "arvataH");
+        has(&a, "tfIyA", "arvatA");
+        has(&a, "tfIyA", "arvadByAm");
+        has(&a, "saptamI", "arvati");
+        has(&a, "saptamI", "arvatsu");
+        has(&a, "samboDana", "arvan");
+        has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjA");
+        has(&generate("rAjan", "pum").unwrap(), "dvitIyA", "rAjAnam");
+        has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
+        assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "arvAn"));
+        assert!(!a.declension.get("dvitIyA").unwrap().iter().any(|x| x == "arvAnam"));
     }
 }
