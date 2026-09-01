@@ -420,6 +420,36 @@ fn decline_sakhi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// पुंस् — सर्वनामस्थान नुम् पुमान्/पुमांसौ; weak पुंसा; पद पुंभ्याम् (8.3.6). Not s-anta *पुः.
+fn decline_pums(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "pum" || !matches!(cand, "puMs" | "pums") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["pumAn".into(), "pumAMsO".into(), "pumAMsaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["pumAMsam".into(), "pumAMsO".into(), "puMsaH".into()]);
+    decl.insert(
+        "tfIyA".into(),
+        vec!["puMsA".into(), "puMByAm".into(), "pumByAm".into(), "puMBiH".into(), "pumBiH".into()],
+    );
+    decl.insert(
+        "caturTI".into(),
+        vec!["puMse".into(), "puMByAm".into(), "pumByAm".into(), "puMByaH".into(), "pumByaH".into()],
+    );
+    decl.insert(
+        "paYcamI".into(),
+        vec!["puMsaH".into(), "puMByAm".into(), "pumByAm".into(), "puMByaH".into(), "pumByaH".into()],
+    );
+    decl.insert("zazWI".into(), vec!["puMsaH".into(), "puMsoH".into(), "puMsAm".into()]);
+    decl.insert("saptamI".into(), vec!["puMsi".into(), "puMsoH".into(), "puMsu".into()]);
+    decl.insert("samboDana".into(), vec!["puman".into(), "pumAMsO".into(), "pumAMsaH".into()]);
+    Some(Declension {
+        stem: "puMs".into(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -462,6 +492,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_sakhi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_pums(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -978,5 +1011,23 @@ mod tests {
         has(&a, "saptamI", "ahaHsu");
         has(&a, "samboDana", "ahaH");
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "aha"));
+    }
+
+    #[test]
+    fn pums_puman_not_s_stem() {
+        // पुंस्: पुमान्/पुमांसम्, पुंसा, पुंभ्याम्. Not s-anta *पुः. Alias `pums`.
+        let p = generate("puMs", "pum").expect("puMs");
+        has(&p, "prathamA", "pumAn");
+        has(&p, "prathamA", "pumAMsO");
+        has(&p, "prathamA", "pumAMsaH");
+        has(&p, "dvitIyA", "pumAMsam");
+        has(&p, "dvitIyA", "puMsaH");
+        has(&p, "tfIyA", "puMsA");
+        has(&p, "tfIyA", "puMByAm");
+        has(&p, "tfIyA", "puMBiH");
+        has(&p, "saptamI", "puMsi");
+        has(&p, "saptamI", "puMsu");
+        has(&p, "samboDana", "puman");
+        has(&generate("pums", "pum").unwrap(), "prathamA", "pumAn");
     }
 }
