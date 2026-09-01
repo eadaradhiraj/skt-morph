@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 124: tinanta fix boBU dup
+
+- **tinanta:** deriv doc → fix duplicate boBU; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 123: derived yaN sūtra
 
 - **derived:** header → yaN 3.1.22 sūtra ref; no logic change.
