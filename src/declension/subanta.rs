@@ -48,6 +48,7 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // f-stem कर्तृ (6.4.11 सर्वनामस्थान आ): कर्तारौ/कर्तारम्. पितृ-class patched short पितरौ/पितरम्. स्वसृ/नप्तृ keep आ.
   m.insert(("f".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"ArO".to_string(),"AraH".to_string(),],vec!["Aram".to_string(),"ArO".to_string(),"Fn".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"ArO".to_string(),"AraH".to_string(),],]);
   m.insert(("f".to_string(),"stri".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["aram".to_string(),"arO".to_string(),"FH".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
+  // ऋ nap (धातृ) — 7.1.23 धातृ/धातृणी/धातॄणि (8.4.1 णत्व). कर्तृ पुं stays कर्ता.
   m.insert(("f".to_string(),"nap".to_string()), vec![vec!["f".to_string(),"fnI".to_string(),"Fni".to_string(),],vec!["f".to_string(),"fnI".to_string(),"Fni".to_string(),],vec!["fnA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["fne".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["fnaH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["fnaH".to_string(),"fnoH".to_string(),"FnAm".to_string(),],vec!["fni".to_string(),"fnoH".to_string(),"fzu".to_string(),],vec!["f,ar".to_string(),"fnI".to_string(),"Fni".to_string(),],]);
   m.insert(("in".to_string(),"pum".to_string()), vec![vec!["I".to_string(),"inO".to_string(),"inaH".to_string(),],vec!["inam".to_string(),"inO".to_string(),"inaH".to_string(),],vec!["inA".to_string(),"iByAm".to_string(),"iBiH".to_string(),],vec!["ine".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"inoH".to_string(),"inAm".to_string(),],vec!["ini".to_string(),"inoH".to_string(),"izu".to_string(),],vec!["in".to_string(),"inO".to_string(),"inaH".to_string(),],]);
   // इन् nap (दण्डिन्) — 7.1.23 स्वमोर्नपुंसकात्: प्रथमा/द्वितीया दण्डि/दण्डिनी/दण्डीनि not पुं दण्डी.
@@ -4396,5 +4397,28 @@ mod tests {
         assert!(!c.declension.get("prathamA").unwrap().iter().any(|x| x == "camavaH"));
         assert!(!c.declension.get("dvitIyA").unwrap().iter().any(|x| x == "camvam"));
         assert!(!c.declension.get("saptamI").unwrap().iter().any(|x| x == "camvAm"));
+    }
+
+    #[test]
+    fn datr_nap_sreyasi_nadi() {
+        // 7.1.23 धातृ nap धातृ/धातृणी/धातॄणि. कर्ता stays पुं. नदी बहुश्रेयसी no visarga; शस् ईः not पुं *ईन्.
+        let d = generate("DAtf", "nap").expect("DAtf nap");
+        has(&d, "prathamA", "DAtf");
+        has(&d, "prathamA", "DAtfRI");
+        has(&d, "prathamA", "DAtFRi");
+        has(&d, "dvitIyA", "DAtf");
+        has(&d, "tfIyA", "DAtfRA");
+        has(&d, "saptamI", "DAtfRi");
+        has(&generate("DAtf", "pum").unwrap(), "prathamA", "DAtA");
+        let b = generate("bahuSreyasI", "stri").expect("bahuSreyasI");
+        has(&b, "prathamA", "bahuSreyasI");
+        has(&b, "prathamA", "bahuSreyasyO");
+        has(&b, "dvitIyA", "bahuSreyasIm");
+        has(&b, "dvitIyA", "bahuSreyasIH");
+        has(&b, "saptamI", "bahuSreyasyAm");
+        has(&generate("gOrI", "stri").unwrap(), "prathamA", "gOrI");
+        assert!(!generate("DAtf", "nap").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "DAtA"));
+        assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "bahuSreyasIH"));
+        assert!(!b.declension.get("dvitIyA").unwrap().iter().any(|x| x == "bahuSreyasIn"));
     }
 }
