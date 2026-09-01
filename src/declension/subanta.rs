@@ -775,19 +775,38 @@ fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
 }
 
 /// राज् (क्विन्) — पद राट्/राड् (not 8.2.30 *राक् like वणिक्); राड्भ्याम्, राट्सु.
+/// Compounds: पद वृद्धि विश्वाराट् (विश्वराज्). राजन् stays राजा.
 fn decline_raj(cand: &str, linga: &str) -> Option<Declension> {
-    if cand != "rAj" || (linga != "pum" && linga != "stri") {
+    if linga != "pum" && linga != "stri" {
         return None;
     }
+    let pre = cand.strip_suffix("rAj")?;
+    let (pada_w, pada_q) = if pre.is_empty() {
+        ("rAw".to_string(), "rAq".to_string())
+    } else {
+        let long = if let Some(p) = pre.strip_suffix('a') {
+            format!("{p}A")
+        } else {
+            pre.to_string()
+        };
+        (format!("{long}rAw"), format!("{long}rAq"))
+    };
+    let strong = cand;
     let mut decl = HashMap::new();
-    decl.insert("prathamA".into(), vec!["rAw".into(), "rAq".into(), "rAjO".into(), "rAjaH".into()]);
-    decl.insert("dvitIyA".into(), vec!["rAjam".into(), "rAjO".into(), "rAjaH".into()]);
-    decl.insert("tfIyA".into(), vec!["rAjA".into(), "rAqByAm".into(), "rAqBiH".into()]);
-    decl.insert("caturTI".into(), vec!["rAje".into(), "rAqByAm".into(), "rAqByaH".into()]);
-    decl.insert("paYcamI".into(), vec!["rAjaH".into(), "rAqByAm".into(), "rAqByaH".into()]);
-    decl.insert("zazWI".into(), vec!["rAjaH".into(), "rAjoH".into(), "rAjAm".into()]);
-    decl.insert("saptamI".into(), vec!["rAji".into(), "rAjoH".into(), "rAwsu".into()]);
-    decl.insert("samboDana".into(), vec!["rAw".into(), "rAq".into(), "rAjO".into(), "rAjaH".into()]);
+    decl.insert(
+        "prathamA".into(),
+        vec![pada_w.clone(), pada_q.clone(), format!("{strong}O"), format!("{strong}aH")],
+    );
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{strong}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{strong}A"), format!("{pada_q}ByAm"), format!("{pada_q}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{strong}e"), format!("{pada_q}ByAm"), format!("{pada_q}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{strong}aH"), format!("{pada_q}ByAm"), format!("{pada_q}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{strong}aH"), format!("{strong}oH"), format!("{strong}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{strong}i"), format!("{strong}oH"), format!("{pada_w}su")]);
+    decl.insert(
+        "samboDana".into(),
+        vec![pada_w, pada_q, format!("{strong}O"), format!("{strong}aH")],
+    );
     Some(Declension {
         stem: cand.to_string(),
         linga: linga.to_string(),
@@ -1881,7 +1900,15 @@ mod tests {
         has(&generate("rAj", "stri").unwrap(), "prathamA", "rAw");
         has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjA");
         has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
+        let vr = generate("viSvarAj", "pum").expect("viSvarAj");
+        has(&vr, "prathamA", "viSvArAw");
+        has(&vr, "prathamA", "viSvArAq");
+        has(&vr, "prathamA", "viSvarAjO");
+        has(&vr, "tfIyA", "viSvarAjA");
+        has(&vr, "tfIyA", "viSvArAqByAm");
+        has(&vr, "saptamI", "viSvArAwsu");
         assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "rAk"));
+        assert!(!vr.declension.get("prathamA").unwrap().iter().any(|x| x == "viSvarAk"));
     }
 
     #[test]
