@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 42: tinanta empty guard
+
+- **tinanta:** `generate_all_derived_artha` early-return on empty dhātu (WASM empty string guard).
+- **wasm:** rebuilt 1.2M; 184 tests.
+
 ## 2026-09-01 — iteration 41: translit doc tweak
 
 - **translit:** header clarified ASCII-only/WASM; no logic change.

@@ -89,6 +89,9 @@ pub fn generate_all_derived_artha(
     prefixes: &[String],
     artha: &str,
 ) -> Vec<String> {
+    if dhatu_query.trim().is_empty() {
+        return Vec::new(); // guard empty dhātu — WASM JS may pass empty string
+    }
     let (canonical, db_lakara) = normalize_lakara(lakara);
     let deriv = derivation.trim();
     if !deriv.is_empty() && deriv != "shuddha" {
