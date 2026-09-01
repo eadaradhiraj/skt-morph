@@ -245,6 +245,15 @@ fn ngeep_stri(cand: &str, linga: &str) -> String {
     if cand.ends_with("in") {
         return format!("{cand}I");
     }
+    // 4.1.5 ऋन्नेभ्यो ङीप्: तृच् कर्त्री/धात्री. मातृ/स्वसृ stay ऋ-stem माता/स्वसा. नृ stays named.
+    if let Some(pre) = cand.strip_suffix('f') {
+        if cand != "nf"
+            && !F_KINSHIP.contains(&cand)
+            && !F_SVASR_NAPTR.contains(&cand)
+        {
+            return format!("{pre}rI");
+        }
+    }
     // 4.1.5 ऋन्नेभ्यो ङीप् after न्; 6.4.134 अल्लोपोऽनः → राज्ञी (8.4.40 श्चुत्व).
     if let Some(pre) = cand.strip_suffix("an") {
         if an_al_lopa(pre) {
@@ -2829,9 +2838,18 @@ mod tests {
         has(&p, "dvitIyA", "pacantIm");
         has(&generate("DImat", "stri").unwrap(), "prathamA", "DImatI");
         has(&generate("dadat", "stri").unwrap(), "prathamA", "dadatI");
+        let k = generate("kartf", "stri").expect("kartf stri");
+        has(&k, "prathamA", "kartrI");
+        has(&k, "prathamA", "kartryO");
+        has(&k, "dvitIyA", "kartrIm");
+        has(&generate("DAtf", "stri").unwrap(), "prathamA", "DAtrI");
+        has(&generate("mAtf", "stri").unwrap(), "prathamA", "mAtA");
+        has(&generate("svasf", "stri").unwrap(), "prathamA", "svasA");
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "pacatI"));
         assert!(!generate("Bavat", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "BavantI"));
         assert!(!generate("dadat", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "dadantI"));
+        assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "kartA"));
+        assert!(!generate("mAtf", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "mAtrI"));
     }
 
     #[test]
