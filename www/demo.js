@@ -226,6 +226,8 @@ document.getElementById("nbase").addEventListener("keydown", (e) => {
 
 function renderVerbParadigm(res) {
   const el = document.getElementById("out-verb");
+  const deriv = document.getElementById("derivation").value;
+  const hint = derivHint(deriv);
   const rows = Array.isArray(res) ? res : res ? Array.from(res) : [];
   if (!rows.length) {
     el.textContent = strfy(res);
@@ -240,6 +242,7 @@ function renderVerbParadigm(res) {
     for (let v = 1; v <= 3; v++) html += `<td>${cellForms(get(p, v))}</td>`;
     html += "</tr>";
   }
+  if (hint) html = `<div class="hint">${esc(hint)}</div>` + html;
   html += `</table><details><summary>JSON (SLP1)</summary><pre>${esc(strfy(res))}</pre></details>`;
   el.innerHTML = html;
 }

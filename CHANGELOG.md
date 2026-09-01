@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 72: demo paradigm hint
+
+- **demo.js:** `renderVerbParadigm` now shows `derivHint` (yaN/yaNluk) above table.
+- **wasm:** rebuilt 1.2M; 186 tests.
+
 ## 2026-09-01 — iteration 71: README 70
 
 - **README:** recent line updated to 70 iters + perf notes (186 tests).
