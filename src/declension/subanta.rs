@@ -2933,6 +2933,11 @@ mod tests {
         has(&p, "prathamA", "pacantI");
         has(&p, "prathamA", "pacati");
         has(&p, "prathamA", "pacanti");
+        let dy = generate("dIvyat", "nap").expect("dIvyat nap");
+        has(&dy, "prathamA", "dIvyat");
+        has(&dy, "prathamA", "dIvyantI");
+        has(&dy, "prathamA", "dIvyanti");
+        has(&dy, "tfIyA", "dIvyadByAm");
         has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
         let pp = generate("pacat", "pum").expect("pacat pum");
         has(&pp, "prathamA", "pacan");
@@ -4571,5 +4576,14 @@ mod tests {
         has(&generate("rAma", "pum").unwrap(), "caturTI", "rAmAya");
         assert!(!p.declension.get("caturTI").unwrap().iter().any(|x| x == "priyaviSvasmE"));
         assert!(!p.declension.get("tfIyA").unwrap().iter().any(|x| x == "priyaviSveRa"));
+        // 1.1.31 द्वन्द्व: उत्तरपूर्वा टाप् अयै, not *स्यै. सीता stays सीतायै.
+        let u = generate("uttarapUrvA", "stri").expect("uttarapUrvA");
+        has(&u, "prathamA", "uttarapUrvA");
+        has(&u, "prathamA", "uttarapUrve");
+        has(&u, "caturTI", "uttarapUrvAyE");
+        has(&u, "tfIyA", "uttarapUrvayA");
+        has(&u, "saptamI", "uttarapUrvAyAm");
+        has(&generate("sItA", "stri").unwrap(), "caturTI", "sItAyE");
+        assert!(!u.declension.get("caturTI").unwrap().iter().any(|x| x == "uttarapUrvasyE"));
     }
 }

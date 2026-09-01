@@ -563,5 +563,9 @@ mod tests {
         assert!(generate("priyaviSva", "pum").is_none());
         has(&generate("viSva", "pum").unwrap(), "caturTI", "viSvasmE");
         has(&generate("ekatara", "pum").unwrap(), "caturTI", "ekatarasmE");
+        // 1.1.31 द्वन्द्वे च: उत्तरपूर्वा is not पूर्व. पूर्व stays पूर्वा.
+        assert!(generate("uttarapUrvA", "stri").is_none());
+        has(&generate("pUrva", "stri").unwrap(), "caturTI", "pUrvasyE");
+        has(&generate("uttara", "stri").unwrap(), "caturTI", "uttarasyE");
     }
 }
