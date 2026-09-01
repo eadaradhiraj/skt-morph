@@ -2123,6 +2123,46 @@ fn decline_sulu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अभ्यस्त शतृ — 7.1.78 नाभ्यस्ताच्छतुः: no नुम् ददत्/ददतौ not *ददन्. जक्षत् same. भवत् stays भवन्.
+fn decline_abhyasta_satr(cand: &str, linga: &str) -> Option<Declension> {
+    if !matches!(cand, "dadat" | "jakzat" | "jAgrat") {
+        return None;
+    }
+    if linga != "pum" && linga != "nap" {
+        return None;
+    }
+    let pada = format!("{}ad", cand.strip_suffix("at")?);
+    let weak = cand;
+    let mut decl = HashMap::new();
+    if linga == "nap" {
+        let row = vec![
+            weak.to_string(),
+            pada.clone(),
+            format!("{weak}I"),
+            format!("{weak}i"),
+            format!("{}anti", cand.strip_suffix("at")?),
+        ];
+        decl.insert("prathamA".into(), row.clone());
+        decl.insert("dvitIyA".into(), row.clone());
+        decl.insert("samboDana".into(), row);
+    } else {
+        let nom = vec![weak.to_string(), pada.clone(), format!("{weak}O"), format!("{weak}aH")];
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+        decl.insert("samboDana".into(), nom);
+    }
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{weak}su")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2210,6 +2250,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_sulu(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_abhyasta_satr(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -4112,5 +4155,29 @@ mod tests {
         has(&generate("maDu", "nap").unwrap(), "prathamA", "maDu");
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sulUH"));
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sulvO"));
+    }
+
+    #[test]
+    fn dadat_jakzat_no_num() {
+        // 7.1.78 नाभ्यस्ताच्छतुः: ददत्/ददतौ not *ददन्. भवत् stays भवन्.
+        let d = generate("dadat", "pum").expect("dadat");
+        has(&d, "prathamA", "dadat");
+        has(&d, "prathamA", "dadad");
+        has(&d, "prathamA", "dadatO");
+        has(&d, "prathamA", "dadataH");
+        has(&d, "dvitIyA", "dadatam");
+        has(&d, "tfIyA", "dadatA");
+        has(&d, "tfIyA", "dadadByAm");
+        has(&d, "saptamI", "dadati");
+        has(&d, "saptamI", "dadatsu");
+        let j = generate("jakzat", "pum").expect("jakzat");
+        has(&j, "prathamA", "jakzat");
+        has(&j, "prathamA", "jakzatO");
+        has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
+        has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavantO");
+        has(&generate("dadat", "stri").unwrap(), "prathamA", "dadatI");
+        assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "dadAn"));
+        assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "dadantO"));
+        assert!(!j.declension.get("prathamA").unwrap().iter().any(|x| x == "jakzAn"));
     }
 }
