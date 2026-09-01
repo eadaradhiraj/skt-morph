@@ -1864,6 +1864,27 @@ fn decline_stri(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// नी — 6.4.77 इयङ् नियौ/नियम्; सु नीः. ग्रामणी stays ग्रामण्यम् (यण्). Exact `nI`.
+fn decline_ni(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "nI" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["nIH".into(), "niyO".into(), "niyaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["niyam".into(), "niyO".into(), "niyaH".into()]);
+    decl.insert("tfIyA".into(), vec!["niyA".into(), "nIByAm".into(), "nIBiH".into()]);
+    decl.insert("caturTI".into(), vec!["niye".into(), "nIByAm".into(), "nIByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["niyaH".into(), "nIByAm".into(), "nIByaH".into()]);
+    decl.insert("zazWI".into(), vec!["niyaH".into(), "niyoH".into(), "niyAm".into()]);
+    decl.insert("saptamI".into(), vec!["niyAm".into(), "niyoH".into(), "nIzu".into()]);
+    decl.insert("samboDana".into(), vec!["nIH".into(), "niyO".into(), "niyaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2035,6 +2056,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_stri(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_ni(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3604,5 +3628,22 @@ mod tests {
         has(&generate("SrI", "stri").unwrap(), "prathamA", "SrIH");
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "strIH"));
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "stryO"));
+    }
+
+    #[test]
+    fn ni_niyam() {
+        // नी: इयङ् नियौ/नियम्; सु नीः. ग्रामणी stays ग्रामण्यम्.
+        let n = generate("nI", "pum").expect("nI");
+        has(&n, "prathamA", "nIH");
+        has(&n, "prathamA", "niyO");
+        has(&n, "prathamA", "niyaH");
+        has(&n, "dvitIyA", "niyam");
+        has(&n, "tfIyA", "niyA");
+        has(&n, "saptamI", "niyAm");
+        has(&n, "saptamI", "nIzu");
+        has(&generate("grAmaRI", "pum").unwrap(), "dvitIyA", "grAmaRyam");
+        has(&generate("strI", "stri").unwrap(), "prathamA", "strI");
+        assert!(!n.declension.get("dvitIyA").unwrap().iter().any(|x| x == "nIm"));
+        assert!(!n.declension.get("prathamA").unwrap().iter().any(|x| x == "nyO"));
     }
 }
