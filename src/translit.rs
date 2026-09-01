@@ -1,4 +1,4 @@
-//! translit — minimal SLP1 helpers for Rust side.
+//! translit — minimal SLP1 helpers for Rust/WASM (ASCII-only, no ICU).
 //! Full Devanagari ↔ SLP1/Harvard-Kyoto lives in `www/translit.js` (browser).
 //! Rust/WASM stays SLP1-only for speed; this module provides:
 //! - identity helpers (to/from SLP1) for type clarity

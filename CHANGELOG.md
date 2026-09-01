@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 41: translit doc tweak
+
+- **translit:** header clarified ASCII-only/WASM; no logic change.
+- **wasm:** rebuilt 1.2M; 184 tests.
+
 ## 2026-09-01 — iteration 40: taddhita header
 
 - **taddhita:** header → Kaumudī 5.1.119/4.1.83; concise.
