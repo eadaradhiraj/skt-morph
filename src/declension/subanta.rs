@@ -1,4 +1,5 @@
-//! Auto-generated from sktmorph/subanta.py
+//! subanta — sup declension tables (1.4.14 + 8.2.30 ff.).
+//! Auto-generated from sktmorph/subanta.py — ending-class, sūtra-gated halanta.
 
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
