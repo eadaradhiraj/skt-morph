@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 23: lang_ya header
+
+- **lang_ya:** header → 3.4.111; no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 22: upa-pada header
 
 - **upa_pada:** header → Kaumudī 1.3.12-77; no logic change.

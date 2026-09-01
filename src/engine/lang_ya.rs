@@ -1,3 +1,5 @@
+//! lang_ya — laṅ + yaṅ edge (3.4.111 etc.), Kaumudī-ordered.
+
 pub fn lang_ya_p() -> Vec<(Vec<String>, Vec<String>)> {
     vec![
         (vec!["yat".into(),"yad".into()], vec!["3.4.111".into()]),
