@@ -602,6 +602,29 @@ fn decline_anc(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// क्रुञ्च् — 8.2.23 संयोगान्तस्य लोपः क्रुङ्; ञ् stays in अङ्ग (क्रुञ्चा) unlike 6.4.24 प्राचा; पद क्रुङ्भ्याम्.
+fn decline_krunc(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "kruYc" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let strong = "kruYc";
+    let pada = "kruN";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["kruN".into(), format!("{strong}O"), format!("{strong}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{strong}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{strong}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{strong}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{strong}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{strong}aH"), format!("{strong}oH"), format!("{strong}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{strong}i"), format!("{strong}oH"), format!("{pada}kzu")]);
+    decl.insert("samboDana".into(), vec!["kruN".into(), format!("{strong}O"), format!("{strong}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// अस्थि/दधि/सक्थि/अक्षि — 7.1.75 अनङ् before vowel (दध्ना); स्वमोः दधि/दधिनी/दधीनि. Not i-nap *दधिना.
 fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "nap" {
@@ -703,6 +726,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_krunc(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_asthyadi(&cand, linga) {
@@ -1359,5 +1385,22 @@ mod tests {
         let v = generate("vAri", "nap").expect("vAri");
         has(&v, "tfIyA", "vAriRA");
         assert!(!d.declension.get("tfIyA").unwrap().iter().any(|x| x == "daDinA"));
+    }
+
+    #[test]
+    fn krunc_krun_krunca() {
+        // क्रुञ्च्: 8.2.23 क्रुङ्; ञ् kept क्रुञ्चा (not 6.4.24 *क्रुचा); पद क्रुङ्भ्याम् not *क्रुग्.
+        let k = generate("kruYc", "pum").expect("kruYc");
+        has(&k, "prathamA", "kruN");
+        has(&k, "prathamA", "kruYcO");
+        has(&k, "dvitIyA", "kruYcam");
+        has(&k, "tfIyA", "kruYcA");
+        has(&k, "tfIyA", "kruNByAm");
+        has(&k, "tfIyA", "kruNBiH");
+        has(&k, "saptamI", "kruYci");
+        has(&k, "saptamI", "kruNkzu");
+        has(&generate("kruYc", "stri").unwrap(), "prathamA", "kruN");
+        has(&generate("prAYc", "pum").unwrap(), "tfIyA", "prAcA");
+        has(&generate("vAc", "stri").unwrap(), "tfIyA", "vAgByAm");
     }
 }
