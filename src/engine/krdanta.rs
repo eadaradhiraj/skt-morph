@@ -55,7 +55,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "knu" => Some(("nu", vec!["3.2.140"], "knu")),
         "GinuR" => Some(("in", vec!["3.2.141"], "ghinun")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
-        "lyap" => Some(("ya", vec!["3.2.187"], "lyap")),
+        "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
         "kyap" => Some(("ya", vec!["3.1.106"], "kyap")),
@@ -558,13 +558,18 @@ fn ktva_base(dhatu: &str) -> String {
 // fn `lyap_base`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
+/// 7.1.37 क्त्वो ल्यप् + 6.1.71 तुक् after ह्रस्व: कृत्य/गत्य (not *कृय/*गय).
+/// दीर्घ भूय; सेट् इत→य गृह्य. क्त्वा without उपसर्ग stays त्वा.
 fn lyap_base(dhatu: &str) -> String {
     let ta = nistha_base(dhatu, false);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(stripped) = ta.strip_suffix("ita") {
         format!("{stripped}ya")
-    } else if let Some(stripped) = ta.strip_suffix("ta") {
-        format!("{stripped}ya")
+    } else if let Some(x) = ta.strip_suffix("ta") {
+        if x.chars().last().is_some_and(|c| matches!(c, 'a' | 'i' | 'u' | 'f' | 'x')) {
+            format!("{x}tya")
+        } else {
+            format!("{x}ya")
+        }
     } else {
         format!("{ta}ya")
     }
@@ -991,6 +996,13 @@ mod tests {
         assert_eq!(derive("gam", "tumun"), vec!["gantum"]);
         let f = generate_with_prefixes("BU", "ktvA", &["pra".into()]);
         assert!(f.forms.iter().any(|x| x == "praBUya"), "{:?}", f.forms);
+        // 7.1.37 ल्यप् from क्त्वा: कृत्य/गत्य not *कृय/*गय. क्त्वा stays कृत्वा.
+        assert_eq!(derive("qukfY", "lyap"), vec!["kftya"]);
+        assert_eq!(derive("gam", "lyap"), vec!["gatya"]);
+        assert_eq!(derive("BU", "lyap"), vec!["BUya"]);
+        assert_eq!(derive("qukfY", "ktvA"), vec!["kftvA"]);
+        let f = generate_with_prefixes("qukfY", "ktvA", &["pra".into()]);
+        assert!(f.forms.iter().any(|x| x == "prakftya"), "{:?}", f.forms);
         assert_eq!(derive("qukfY", "tavya"), vec!["kartavya"]);
         assert_eq!(derive("qukfY", "tfc"), vec!["kartf"]);
         assert_eq!(derive("qukfY", "lyuw"), vec!["karaRa"]);
