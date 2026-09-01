@@ -66,5 +66,5 @@ cargo run --release --bin validate --features native-db -- --full --live
 
 Uses `../skt-morph-data/data/skt_morph.db` (or `--db` / `SKT_MORPH_DB`). That scrape’s prefixes are only the site’s chandrika/upasarga pages.
 
-Recent: 60 iters (2026-09-01) — de-noise 70k, KRTS 19→60+, clamp, yaNluk UI, a11y/Enter, headers for all modules, dhatu HashMap cache 15s→7s, analyze/tinanta empty guards, derived/phonology/join hints + natva test, verb try/catch, lib clamp (186 tests, 1.2M wasm). Dated engine notes: [CHANGELOG.md](CHANGELOG.md).
+Recent: 62 iters (2026-09-01) — de-noise 70k, KRTS 19→60+, clamp, yaNluk UI, a11y/Enter, headers for all modules, dhatu HashMap cache 15s→7s, analyze/tinanta empty guards, derived/phonology/join hints + natva test, verb try/catch, lib clamp (186 tests, 1.2M wasm). Dated engine notes: [CHANGELOG.md](CHANGELOG.md).
 
