@@ -936,6 +936,7 @@ fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
 }
 
 /// आशिस्/सजष् — 8.2.66 सजषो रुः, 8.2.76 इक्-upadhā दीर्घ आशीः/सजूः. चिकीर्ष् चिकीः. Not ष-anta *आशिट्; धनुस् stays nap.
+/// Exact `ASiz`/`pipaWiz`/`sajuz` or `*Irz`. त्विष्/द्विष् stay ट् (not *त्वीः).
 fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "stri" && linga != "pum" {
         return None;
@@ -947,13 +948,12 @@ fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
             return None;
         }
         (format!("{p}IH"), format!("{p}Ir"), format!("{p}Irzu"))
-    } else {
+    } else if matches!(cand, "ASiz" | "pipaWiz") {
         let p = cand.strip_suffix("iz")?;
-        if p.is_empty() || cand == "dviz" {
-            return None;
-        }
         let nom = format!("{p}IH");
         (nom.clone(), format!("{p}Ir"), format!("{nom}zu"))
+    } else {
+        return None;
     };
     let mut decl = HashMap::new();
     decl.insert("prathamA".into(), vec![nom.clone(), format!("{cand}O"), format!("{cand}aH")]);
@@ -4232,5 +4232,40 @@ mod tests {
         has(&generate("vaDU", "stri").unwrap(), "prathamA", "vaDvO");
         assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "DenvO"));
         assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "dfw"));
+    }
+
+    #[test]
+    fn dhatr_matf_hari_mati() {
+        // कर्तृ धातारम् vs पितृ पितरम्; माता; हरिणा; मतिः; रमा; सुयुक्; त्विट्; मधु.
+        let dh = generate("DAtf", "pum").expect("DAtf");
+        has(&dh, "prathamA", "DAtA");
+        has(&dh, "dvitIyA", "DAtAram");
+        has(&dh, "tfIyA", "DAtrA");
+        has(&generate("pitf", "pum").unwrap(), "dvitIyA", "pitaram");
+        let ma = generate("mAtf", "stri").expect("mAtf");
+        has(&ma, "prathamA", "mAtA");
+        has(&ma, "dvitIyA", "mAtaram");
+        has(&ma, "dvitIyA", "mAtFH");
+        let h = generate("hari", "pum").expect("hari");
+        has(&h, "prathamA", "hariH");
+        has(&h, "tfIyA", "hariRA");
+        let mt = generate("mati", "stri").expect("mati");
+        has(&mt, "prathamA", "matiH");
+        has(&mt, "tfIyA", "matyA");
+        has(&mt, "caturTI", "matyE");
+        has(&generate("ramA", "stri").unwrap(), "prathamA", "ramA");
+        has(&generate("ramA", "stri").unwrap(), "saptamI", "ramAsu");
+        has(&generate("suyuj", "pum").unwrap(), "prathamA", "suyuk");
+        has(&generate("suyuj", "pum").unwrap(), "saptamI", "suyukzu");
+        has(&generate("tviz", "stri").unwrap(), "prathamA", "tviw");
+        has(&generate("tviz", "stri").unwrap(), "prathamA", "tviq");
+        has(&generate("tviz", "stri").unwrap(), "saptamI", "tviwsu");
+        has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
+        has(&generate("ASiz", "stri").unwrap(), "prathamA", "ASIH");
+        has(&generate("maDu", "nap").unwrap(), "prathamA", "maDu");
+        has(&generate("yaSasvin", "pum").unwrap(), "prathamA", "yaSasvI");
+        assert!(!dh.declension.get("dvitIyA").unwrap().iter().any(|x| x == "DAtaram"));
+        assert!(!h.declension.get("tfIyA").unwrap().iter().any(|x| x == "harinA"));
+        assert!(!generate("tviz", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "tvIH"));
     }
 }
