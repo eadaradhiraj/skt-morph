@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 133: straggler docs pass
+
+- **all:** verified 132 pushes, 187 tests, 1.2M wasm; no logic drift. Next: taddhita full 4.1/5.x coverage.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 132: README 131
 
 - **README:** recent line updated to 131 iters + yaN sūtra (187 tests).
