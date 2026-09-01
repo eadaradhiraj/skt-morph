@@ -213,6 +213,12 @@ fn ngeep_stri(cand: &str, linga: &str) -> String {
     if let Some((_, _, weak, _)) = anc_parts(cand) {
         return format!("{weak}I");
     }
+    // 4.1.6 ङीष् of क्वसु weak: विदुषी (not as-pum *विद्वसी).
+    if let Some(pre) = cand.strip_suffix("vas") {
+        if !pre.is_empty() {
+            return format!("{pre}uzI");
+        }
+    }
     if cand.ends_with("at") || cand.ends_with("in") {
         return format!("{cand}I");
     }
@@ -625,6 +631,34 @@ fn decline_krunc(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// क्वसु (विद्वस्) — 7.1.70 नुम् विद्वान्/विद्वांसौ; 6.4.131 विदुषा; 8.2.72 विद्वद्भिः. Not as-pum *विद्वः.
+fn decline_kvasu(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("vas")?;
+    if pre.is_empty() || linga != "pum" {
+        return None;
+    }
+    let strong = format!("{pre}vAMs");
+    let weak = format!("{pre}uz");
+    let pada = format!("{pre}vad");
+    let nom = format!("{pre}vAn");
+    let voc = format!("{pre}van");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![nom, format!("{strong}O"), format!("{strong}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    // 8.4.55 खरि च: द्+सु → त्सु विद्वत्सु.
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pre}vatsu")]);
+    decl.insert("samboDana".into(), vec![voc, format!("{strong}O"), format!("{strong}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// नृ — पितृ-type नरम् (not कर्तृ *नारम्); acc नॄन्; 6.4.6 नृ च नॄणाम्/नृणाम्.
 fn decline_nr(cand: &str, linga: &str) -> Option<Declension> {
     if cand != "nf" || linga != "pum" {
@@ -753,6 +787,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_nr(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_kvasu(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_asthyadi(&cand, linga) {
@@ -1446,5 +1483,24 @@ mod tests {
         has(&generate("pitf", "pum").unwrap(), "dvitIyA", "pitaram");
         has(&generate("kartf", "pum").unwrap(), "dvitIyA", "kartAram");
         assert!(!n.declension.get("dvitIyA").unwrap().iter().any(|x| x == "nAram"));
+    }
+
+    #[test]
+    fn kvasu_vidvan_vidusa() {
+        // विद्वस्: 7.1.70 विद्वान्; 6.4.131 विदुषा; 8.2.72 विद्वद्भिः. Not as-pum *विद्वः.
+        let v = generate("vidvas", "pum").expect("vidvas");
+        has(&v, "prathamA", "vidvAn");
+        has(&v, "prathamA", "vidvAMsO");
+        has(&v, "prathamA", "vidvAMsaH");
+        has(&v, "dvitIyA", "vidvAMsam");
+        has(&v, "dvitIyA", "viduzaH");
+        has(&v, "tfIyA", "viduzA");
+        has(&v, "tfIyA", "vidvadByAm");
+        has(&v, "tfIyA", "vidvadBiH");
+        has(&v, "saptamI", "viduzi");
+        has(&v, "saptamI", "vidvatsu");
+        has(&v, "samboDana", "vidvan");
+        has(&generate("vidvas", "stri").unwrap(), "prathamA", "viduzI");
+        has(&generate("manas", "nap").unwrap(), "prathamA", "manaH");
     }
 }
