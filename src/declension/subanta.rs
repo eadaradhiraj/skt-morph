@@ -602,6 +602,44 @@ fn decline_anc(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अस्थि/दधि/सक्थि/अक्षि — 7.1.75 अनङ् before vowel (दध्ना); स्वमोः दधि/दधिनी/दधीनि. Not i-nap *दधिना.
+fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "nap" {
+        return None;
+    }
+    let pre = match cand {
+        "asTi" | "daDi" | "sakTi" | "akzi" => cand.strip_suffix('i')?,
+        _ => return None,
+    };
+    let weak = |v: &str| polish(&format!("{pre}n{v}"));
+    let pada = |v: &str| polish(&format!("{cand}{v}"));
+    let nom = vec![
+        cand.to_string(),
+        format!("{cand}nI"),
+        polish(&format!("{pre}Ini")),
+    ];
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), nom.clone());
+    decl.insert("dvitIyA".into(), nom.clone());
+    decl.insert("tfIyA".into(), vec![weak("A"), pada("ByAm"), pada("BiH")]);
+    decl.insert("caturTI".into(), vec![weak("e"), pada("ByAm"), pada("ByaH")]);
+    decl.insert("paYcamI".into(), vec![weak("aH"), pada("ByAm"), pada("ByaH")]);
+    decl.insert("zazWI".into(), vec![weak("aH"), weak("oH"), weak("Am")]);
+    decl.insert(
+        "saptamI".into(),
+        vec![weak("i"), polish(&format!("{pre}ani")), weak("oH"), pada("zu")],
+    );
+    decl.insert(
+        "samboDana".into(),
+        vec![cand.to_string(), format!("{pre}e"), format!("{cand}nI"), polish(&format!("{pre}Ini"))],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -665,6 +703,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_asthyadi(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1296,5 +1337,27 @@ mod tests {
         has(&generate("saDryaYc", "pum").unwrap(), "tfIyA", "saDrIcA");
         has(&generate("prAYc", "stri").unwrap(), "prathamA", "prAcI");
         has(&generate("vAc", "stri").unwrap(), "prathamA", "vAk");
+    }
+
+    #[test]
+    fn asthyadi_dadhna() {
+        // 7.1.75 अनङ्: दध्ना/दधिभ्याम् not i-nap *दधिना. स्वमोः दधि/दधिनी/दधीनि.
+        let d = generate("daDi", "nap").expect("daDi");
+        has(&d, "prathamA", "daDi");
+        has(&d, "prathamA", "daDinI");
+        has(&d, "prathamA", "daDIni");
+        has(&d, "tfIyA", "daDnA");
+        has(&d, "tfIyA", "daDiByAm");
+        has(&d, "tfIyA", "daDiBiH");
+        has(&d, "saptamI", "daDni");
+        has(&d, "saptamI", "daDani");
+        has(&d, "saptamI", "daDizu");
+        has(&d, "samboDana", "daDe");
+        has(&generate("asTi", "nap").unwrap(), "tfIyA", "asTnA");
+        has(&generate("akzi", "nap").unwrap(), "tfIyA", "akzRA");
+        has(&generate("sakTi", "nap").unwrap(), "tfIyA", "sakTnA");
+        let v = generate("vAri", "nap").expect("vAri");
+        has(&v, "tfIyA", "vAriRA");
+        assert!(!d.declension.get("tfIyA").unwrap().iter().any(|x| x == "daDinA"));
     }
 }
