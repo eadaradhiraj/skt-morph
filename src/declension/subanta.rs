@@ -1842,6 +1842,28 @@ fn decline_pu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// स्त्री — 6.4.79 स्त्रियाः / 6.4.77 इयङ् स्त्रियौ/स्त्रियम्; nom स्त्री (not श्री-like *स्त्रीः).
+/// Optional 7.1.20 स्त्रीम्/स्त्रीः in acc. Voc स्त्रि. नदी stays नद्यौ (यण्). Exact `strI`.
+fn decline_stri(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "strI" || linga != "stri" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["strI".into(), "striyO".into(), "striyaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["striyam".into(), "strIm".into(), "striyO".into(), "striyaH".into(), "strIH".into()]);
+    decl.insert("tfIyA".into(), vec!["striyA".into(), "strIByAm".into(), "strIBiH".into()]);
+    decl.insert("caturTI".into(), vec!["striyE".into(), "strIByAm".into(), "strIByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["striyAH".into(), "strIByAm".into(), "strIByaH".into()]);
+    decl.insert("zazWI".into(), vec!["striyAH".into(), "striyoH".into(), polish("strInAm")]);
+    decl.insert("saptamI".into(), vec!["striyAm".into(), "striyoH".into(), "strIzu".into()]);
+    decl.insert("samboDana".into(), vec!["stri".into(), "striyO".into(), "striyaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2010,6 +2032,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_pu(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_stri(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3557,5 +3582,27 @@ mod tests {
         has(&generate("svaBU", "pum").unwrap(), "dvitIyA", "svaBuvam");
         assert!(!k.declension.get("dvitIyA").unwrap().iter().any(|x| x == "KalapUm"));
         assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "KalapavO"));
+    }
+
+    #[test]
+    fn stri_striyam() {
+        // स्त्री: इयङ् स्त्रियौ/स्त्रियम्; nom स्त्री not *स्त्रीः. नदी stays नद्यौ.
+        let s = generate("strI", "stri").expect("strI");
+        has(&s, "prathamA", "strI");
+        has(&s, "prathamA", "striyO");
+        has(&s, "prathamA", "striyaH");
+        has(&s, "dvitIyA", "striyam");
+        has(&s, "dvitIyA", "strIm");
+        has(&s, "tfIyA", "striyA");
+        has(&s, "caturTI", "striyE");
+        has(&s, "saptamI", "striyAm");
+        has(&s, "saptamI", "strIzu");
+        has(&s, "zazWI", "strIRAm");
+        has(&s, "samboDana", "stri");
+        has(&generate("nadI", "stri").unwrap(), "prathamA", "nadI");
+        has(&generate("nadI", "stri").unwrap(), "dvitIyA", "nadIm");
+        has(&generate("SrI", "stri").unwrap(), "prathamA", "SrIH");
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "strIH"));
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "stryO"));
     }
 }
