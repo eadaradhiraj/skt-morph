@@ -1942,6 +1942,31 @@ fn decline_camu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अम्बा/अक्का/अल्ला — 7.3.107 ह्रस्वो नत्तमम्बार्थे: voc अम्ब not आ-stem *अम्बे.
+/// Rest टाप् अम्बा/अम्बे/अम्बया/अम्बासु. सीता stays voc सीते.
+fn decline_amba(cand: &str, linga: &str) -> Option<Declension> {
+    if !matches!(cand, "ambA" | "akkA" | "allA") || linga != "stri" {
+        return None;
+    }
+    let pre = cand.strip_suffix('A')?;
+    let aa = cand;
+    let a = format!("{pre}a");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![aa.to_string(), format!("{pre}e"), format!("{aa}H")]);
+    decl.insert("dvitIyA".into(), vec![format!("{aa}m"), format!("{pre}e"), format!("{aa}H")]);
+    decl.insert("tfIyA".into(), vec![format!("{pre}ayA"), format!("{aa}ByAm"), format!("{aa}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{aa}yE"), format!("{aa}ByAm"), format!("{aa}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{aa}yAH"), format!("{aa}ByAm"), format!("{aa}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{aa}yAH"), format!("{pre}ayoH"), polish(&format!("{aa}nAm"))]);
+    decl.insert("saptamI".into(), vec![format!("{aa}yAm"), format!("{pre}ayoH"), format!("{aa}su")]);
+    decl.insert("samboDana".into(), vec![a, format!("{pre}e"), format!("{aa}H")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2014,6 +2039,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_camu(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_amba(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -3799,5 +3827,23 @@ mod tests {
         has(&generate("hUhU", "pum").unwrap(), "dvitIyA", "hUhUm");
         assert!(!a.declension.get("dvitIyA").unwrap().iter().any(|x| x == "aticamUH"));
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "aticamavaH"));
+    }
+
+    #[test]
+    fn amba_voc_amba() {
+        // अम्बा 7.3.107 voc अम्ब not *अम्बे. सीता stays voc सीते.
+        let a = generate("ambA", "stri").expect("ambA");
+        has(&a, "prathamA", "ambA");
+        has(&a, "prathamA", "ambe");
+        has(&a, "prathamA", "ambAH");
+        has(&a, "dvitIyA", "ambAm");
+        has(&a, "tfIyA", "ambayA");
+        has(&a, "saptamI", "ambAyAm");
+        has(&a, "saptamI", "ambAsu");
+        has(&a, "samboDana", "amba");
+        has(&generate("sItA", "stri").unwrap(), "samboDana", "sIte");
+        has(&generate("sItA", "stri").unwrap(), "prathamA", "sItA");
+        has(&generate("akkA", "stri").unwrap(), "samboDana", "akka");
+        assert_eq!(a.declension.get("samboDana").unwrap()[0], "amba");
     }
 }
