@@ -65,6 +65,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "kru" => Some(("ru", vec!["3.2.174"], "kru")),
         "klukan" => Some(("luka", vec!["3.2.174"], "klukan")),
         "krukan" => Some(("ruka", vec!["3.2.174"], "krukan")),
+        "Aru" => Some(("Aru", vec!["3.2.173"], "aru")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -564,6 +565,15 @@ fn bhi_kru_form(root: &str, kind: &str) -> String {
     }
 }
 
+/// 3.2.173 शृवन्द्योरारुः: शरारु (गुण); वन्दारु (वन्द्). Not *शृारु.
+fn aru_form(root: &str) -> String {
+    match root {
+        "SF" | "Sf" => "SarAru".into(),
+        "vad" | "vadi" | "vand" => "vandAru".into(),
+        other => format!("{other}Aru"),
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -957,6 +967,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "kru" => bhi_kru_form(&root, "kru"),
         "klukan" => bhi_kru_form(&root, "klukan"),
         "krukan" => bhi_kru_form(&root, "krukan"),
+        "aru" => aru_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1311,6 +1322,9 @@ mod tests {
         let d = decline("YiBI", "kru", "pum", &[]).expect("BIruH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "BIruH"), "{:?}", pr);
+        let d = decline("vadi", "Aru", "pum", &[]).expect("vandAruH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "vandAruH"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1464,6 +1478,8 @@ mod tests {
         assert_eq!(derive("YiBI", "kru"), vec!["BIru"]);
         assert_eq!(derive("YiBI", "klukan"), vec!["BIluka"]);
         assert_eq!(derive("YiBI", "krukan"), vec!["BIruka"]);
+        assert_eq!(derive("SFY", "Aru"), vec!["SarAru"]);
+        assert_eq!(derive("vadi", "Aru"), vec!["vandAru"]);
         assert_eq!(derive("YimidA", "Gurac"), vec!["medura"]);
         assert_eq!(derive("BAsf", "Gurac"), vec!["BAsura"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
