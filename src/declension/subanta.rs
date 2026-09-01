@@ -634,24 +634,35 @@ fn decline_krunc(cand: &str, linga: &str) -> Option<Declension> {
 /// क्वसु (विद्वस्) — 7.1.70 नुम् विद्वान्/विद्वांसौ; 6.4.131 विदुषा; 8.2.72 विद्वद्भिः. Not as-pum *विद्वः.
 fn decline_kvasu(cand: &str, linga: &str) -> Option<Declension> {
     let pre = cand.strip_suffix("vas")?;
-    if pre.is_empty() || linga != "pum" {
+    if pre.is_empty() || (linga != "pum" && linga != "nap") {
         return None;
     }
-    let strong = format!("{pre}vAMs");
     let weak = format!("{pre}uz");
     let pada = format!("{pre}vad");
-    let nom = format!("{pre}vAn");
-    let voc = format!("{pre}van");
     let mut decl = HashMap::new();
-    decl.insert("prathamA".into(), vec![nom, format!("{strong}O"), format!("{strong}aH")]);
-    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+    if linga == "nap" {
+        // 7.1.23 स्वमोः: विद्वत्/विदुषी/विद्वांसि (not पुं विद्वान्).
+        let nom = vec![
+            format!("{pre}vat"),
+            format!("{pre}uzI"),
+            format!("{pre}vAMsi"),
+        ];
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert("samboDana".into(), nom);
+    } else {
+        let strong = format!("{pre}vAMs");
+        let nom = format!("{pre}vAn");
+        decl.insert("prathamA".into(), vec![nom, format!("{strong}O"), format!("{strong}aH")]);
+        decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+        decl.insert("samboDana".into(), vec![format!("{pre}van"), format!("{strong}O"), format!("{strong}aH")]);
+    }
     decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
     decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
     decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
     decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
     // 8.4.55 खरि च: द्+सु → त्सु विद्वत्सु.
     decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pre}vatsu")]);
-    decl.insert("samboDana".into(), vec![voc, format!("{strong}O"), format!("{strong}aH")]);
     Some(Declension {
         stem: cand.to_string(),
         linga: linga.to_string(),
@@ -1501,6 +1512,9 @@ mod tests {
         has(&v, "saptamI", "vidvatsu");
         has(&v, "samboDana", "vidvan");
         has(&generate("vidvas", "stri").unwrap(), "prathamA", "viduzI");
+        has(&generate("vidvas", "nap").unwrap(), "prathamA", "vidvat");
+        has(&generate("vidvas", "nap").unwrap(), "prathamA", "viduzI");
+        has(&generate("vidvas", "nap").unwrap(), "prathamA", "vidvAMsi");
         has(&generate("manas", "nap").unwrap(), "prathamA", "manaH");
     }
 }
