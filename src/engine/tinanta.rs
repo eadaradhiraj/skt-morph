@@ -915,10 +915,19 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `kram_yam_artha`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
+    fn clamp_purusha_vacana() {
+        // 0 and 4 should clamp to 1..3, not panic
+        let f0 = generate("BU", "plat", 0, 0);
+        let f1 = generate("BU", "plat", 1, 1);
+        assert_eq!(f0.forms, f1.forms);
+        let f4 = generate("BU", "plat", 4, 4);
+        let f3 = generate("BU", "plat", 3, 3);
+        assert_eq!(f4.forms, f3.forms);
+        assert_eq!(f4.purusha, 3);
+        assert_eq!(f4.vacana, 3);
+    }
+
+    #[test]
     fn kram_yam_artha() {
         let vi = vec!["vi".to_string()];
         let f = generate_all_with_prefixes("kramu", "alat", 1, 1, &vi);

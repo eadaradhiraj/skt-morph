@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 9: clamp + test
+
+- **tinanta:** added `clamp_purusha_vacana` test for iter 8 guard (0→1, 4→3); 183 tests pass.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 8: clamp puruṣa/vacana + yaNluk
 
 - **tinanta:** `generate`/`generate_with_artha` now `clamp(1,3)` puruṣa/vacana — guards JS manual calls with 0/>3; prevents panic/empty.
