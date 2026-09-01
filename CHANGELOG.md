@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 94: derived yaNluk doc tweak
+
+- **derived:** header → boBU vs boBUyate; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 93: README 92
 
 - **README:** recent line updated to 92 iters + lib yaNluk (187 tests).
