@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 62: tinanta guard comment
+
+- **tinanta:** empty guard comment → iter 42 ref; no logic change.
+- **wasm:** rebuilt 1.2M; 186 tests.
+
 ## 2026-09-01 — iteration 61: README 60
 
 - **README:** recent line updated to 60 iters + lib clamp (186 tests).
