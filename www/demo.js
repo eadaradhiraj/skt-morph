@@ -277,14 +277,16 @@ function derivHint(d) {
 }
 
 document.getElementById("btn-verb").onclick = () => {
-  const d = dhatuQuery();
-  const l = document.getElementById("lakara").value;
-  const deriv = document.getElementById("derivation").value;
-  const pref = prefixArg();
-  const res = deriv
-    ? generate_verb_paradigm_derived(d, deriv, l, pref, "")
-    : generate_verb_paradigm_with_prefix(d, l, pref, "");
-  renderVerbParadigm(res);
+  try {
+    const d = dhatuQuery();
+    const l = document.getElementById("lakara").value;
+    const deriv = document.getElementById("derivation").value;
+    const pref = prefixArg();
+    const res = deriv
+      ? generate_verb_paradigm_derived(d, deriv, l, pref, "")
+      : generate_verb_paradigm_with_prefix(d, l, pref, "");
+    renderVerbParadigm(res);
+  } catch (e) { document.getElementById("out-verb").textContent = "Error: " + e; }
 };
 
 document.getElementById("btn-verb1").onclick = () => {

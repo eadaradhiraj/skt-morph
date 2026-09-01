@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 58: demo verb try/catch
+
+- **demo.js:** `btn-verb` now try/catch (empty dhatu guard); error to #out-verb.
+- **wasm:** rebuilt 1.2M; 186 tests.
+
 ## 2026-09-01 — iteration 57: README 56
 
 - **README:** recent line updated to 56 iters + join hint (186 tests).
