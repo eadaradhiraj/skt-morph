@@ -1762,6 +1762,39 @@ fn decline_sri(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// भ्रू — 6.4.77 उवङ् भ्रुवौ/भ्रुवम्; सु भ्रूः. Optional स्त्री भ्रुवै/भ्रुवाम्. पद भ्रूभ्याम्.
+/// स्वभू stays *भू उवङ् स्वभुवम्. Exact `BrU`.
+fn decline_bru(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "BrU" || (linga != "stri" && linga != "pum") {
+        return None;
+    }
+    let uv = "Bruv";
+    let uu = "BrU";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{uu}H"), format!("{uv}O"), format!("{uv}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{uv}am"), format!("{uv}O"), format!("{uv}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{uv}A"), format!("{uu}ByAm"), format!("{uu}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{uv}e"), format!("{uv}E"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{uv}aH"), format!("{uv}AH"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert(
+        "zazWI".into(),
+        vec![
+            format!("{uv}aH"),
+            format!("{uv}AH"),
+            format!("{uv}oH"),
+            format!("{uv}Am"),
+            polish(&format!("{uu}nAm")),
+        ],
+    );
+    decl.insert("saptamI".into(), vec![format!("{uv}Am"), format!("{uv}i"), format!("{uv}oH"), format!("{uu}zu")]);
+    decl.insert("samboDana".into(), vec![format!("{uu}H"), format!("{uv}O"), format!("{uv}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1921,6 +1954,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_sri(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_bru(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3408,5 +3444,25 @@ mod tests {
         has(&generate("nadI", "stri").unwrap(), "dvitIyA", "nadIm");
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "SrI"));
         assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "SrIm"));
+    }
+
+    #[test]
+    fn bru_bruvam() {
+        // भ्रू: उवङ् भ्रुवौ/भ्रुवम्; सु भ्रूः. स्वभू stays स्वभुवम्.
+        let b = generate("BrU", "stri").expect("BrU");
+        has(&b, "prathamA", "BrUH");
+        has(&b, "prathamA", "BruvO");
+        has(&b, "prathamA", "BruvaH");
+        has(&b, "dvitIyA", "Bruvam");
+        has(&b, "tfIyA", "BruvA");
+        has(&b, "caturTI", "Bruve");
+        has(&b, "caturTI", "BruvE");
+        has(&b, "saptamI", "BruvAm");
+        has(&b, "saptamI", "Bruvi");
+        has(&b, "saptamI", "BrUzu");
+        has(&b, "zazWI", "BrURAm");
+        has(&generate("svaBU", "pum").unwrap(), "dvitIyA", "svaBuvam");
+        assert!(!b.declension.get("dvitIyA").unwrap().iter().any(|x| x == "BrUm"));
+        assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "BravO"));
     }
 }
