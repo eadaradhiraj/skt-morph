@@ -247,6 +247,7 @@ function renderVerbParadigm(res) {
 function renderVerbSingle(res) {
   const el = document.getElementById("out-verb");
   const o = asObj(res);
+  // yaN/yaNluk hint via derivHint — not in WASM meta, just UI aid
   if (!o.forms) {
     el.textContent = strfy(res);
     return;
@@ -267,6 +268,11 @@ function renderVerbSingle(res) {
 
 function dhatuQuery() {
   return toSlp1(document.getElementById("dhatu").value) || "BU";
+}
+function derivHint(d) {
+  if (d === "yaN") return " — सयक् ātmane (बोभूयते)";
+  if (d === "yaNluk") return " — लुक् parasmai (बोभूति) 2.4.74";
+  return "";
 }
 
 document.getElementById("btn-verb").onclick = () => {
