@@ -1,4 +1,4 @@
-//! Upasarga-conditioned pada (Pāṇini 1.3.12-77)
+//! upa-pada — upasarga-conditioned pada (1.3.12-77, Kaumudī).
 //! Determines which padas (Parasmaipadī / Ātmanepadī) are valid for a given dhatu + upasarga combo.
 //!
 //! Phase 1 covers the reporter cases:
