@@ -32,9 +32,9 @@ All तिङन्त is now live (`stems`/`adadi`/`join`/sutras) — no overri
 
 ## Generate
 
-- **तिङन्त** — stem → ending → sandhi (`live_generate`). Optional upasargas (`prefix.rs`). 1.3 अर्थ is engine-only (no demo dropdown). Optional derivation: णिच् / सन् / यङ् / यङ्लुक् (luk 2.4.74, parasmai `boBU`/`vAvac` vs yaN `boBUya` ātmane) / कर्मणि (`derived.rs`; not indexed in analyze) — all with extreme sūtra comments.
-- **कृदन्त** — kṛt such as क्त (class sandhi before इट्: मुक्त/लब्ध/भिन्न/गत/गीत/उत/उष्ट/रक्त; named ādeśa जग्ध/पक्व/सोढ/भग्न/द्यूत/नद्ध/जीन), क्तवतु, शतृ, शानच्, तुमुन्, क्त्वा, ल्यप्, तव्य, तृच्, … Same prefixes. Sūtra comments on every `nistha_base` arm.
-- **सुबन्त / सर्वनाम** — ending-class (now `j/d/t/p/h/B/r/s/S/as/is/us/an/in` halanta + `a/ A/ i/ I/ u/ U/ f` etc., plus `o/O` for गो/नौ) or pronoun paradigms — all with extreme 8.2.30/39/66 headers.
+- **तिङन्त** — stem → ending → sandhi (`live_generate`). Optional upasargas (`prefix.rs`). 1.3 अर्थ is engine-only (no demo dropdown). Optional derivation: णिच् / सन् / यङ् / यङ्लुक् (luk 2.4.74, parasmai `boBU`/`vAvac` vs yaN `boBUya` ātmane) / कर्मणि (`derived.rs`; not indexed in analyze) — sūtra-cited in `phonology`/`join`/`derived`.
+- **कृदन्त** — kṛt such as क्त (class sandhi before इट्: मुक्त/लब्ध/भिन्न/गत/गीत/उत/उष्ट/रक्त; named ādeśa जग्ध/पक्व/सोढ/भग्न/द्यूत/नद्ध/जीन), क्तवतु, शतृ, शानच्, तुमुन्, क्त्वा, ल्यप्, तव्य, तृच्, … Same prefixes. Sūtra docs on `krdanta::nistha_base`.
+- **सुबन्त / सर्वनाम** — ending-class (now `j/d/t/p/h/B/r/s/S/as/is/us/an/in` halanta + `a/ A/ i/ I/ u/ U/ f` etc., plus `o/O` for गो/नौ) or pronoun paradigms — halanta via 8.2.30/39/66 in `declension::subanta`.
 
 ## Analyze
 
@@ -66,5 +66,5 @@ cargo run --release --bin validate --features native-db -- --full --live
 
 Uses `../skt-morph-data/data/skt_morph.db` (or `--db` / `SKT_MORPH_DB`). That scrape’s prefixes are only the site’s chandrika/upasarga pages.
 
-Dated engine notes: [CHANGELOG.md](CHANGELOG.md).
+Recent hygiene: boilerplate de-noised (2026-09-01 iter. 3), analyze KRTS 19→60+, demo asList fix. Dated engine notes: [CHANGELOG.md](CHANGELOG.md).
 

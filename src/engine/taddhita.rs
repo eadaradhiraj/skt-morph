@@ -146,10 +146,6 @@ mod tests {
     use super::*;
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `tva_tal_matup`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn tva_tal_matup() {
         assert_eq!(derive("rAma", "tva"), vec!["rAmatva"]);
         assert_eq!(derive("rAmaH", "tal"), vec!["rAmatA"]);
@@ -162,11 +158,9 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `aR_Dak_yaY`: sūtra 4.1.83/120/105 — vṛddhi + suffix; tests aR/Dak/yaY + aliases
-    // Future devs: aliases a/eya/Rya/yat must stay in sync with derive() match arms above.
-    // ---------------------------------------------------------------------------
     fn aR_Dak_yaY() {
+        // 4.1.83/120/105 — aliases must stay in sync with derive() arms above.
+
         assert_eq!(derive("diti", "aR"), vec!["dEtya"]);
         assert_eq!(derive("upagu", "aR"), vec!["Opagava"]);
         assert_eq!(derive("garga", "aR"), vec!["gArga"]);
