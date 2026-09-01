@@ -43,7 +43,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
         "ktin" => Some(("ti", vec!["3.3.94"], "guna")),
         "yat" => Some(("ya", vec!["3.1.97", "3.1.98", "3.1.99", "3.1.100"], "yat")),
-        "Ryat" => Some(("ya", vec!["3.2.187"], "guna")),
+        "Ryat" => Some(("ya", vec!["3.1.124", "3.1.125"], "guna")),
         "GaY" => Some(("a", vec!["3.3.67"], "guna")),
         "Ramul" => Some(("am", vec!["3.3.84"], "guna")),
         "Rvul" => Some(("aka", vec!["3.2.104"], "guna")),
@@ -1021,6 +1021,7 @@ fn cajo_ku(s: &str) -> String {
 
 /// णित्/ञित् kṛt aṅga: 7.2.115 अचो ञ्णिति, 7.2.116 अत उपधायाः, 7.3.86 इगुपध गुण,
 /// 7.3.33 आतो युक्, 7.3.32/54 हन् → घात्.
+/// 3.1.124 ऋहलोर्ण्यत्: कार्य/हार्य/धार्य/वाक्य/पाक्य. 3.1.125 ओरावश्यके: लाव्य vs यत् लव्य.
 fn nit_krt_anga(root: &str, pratyaya: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root == "han" {
@@ -1909,6 +1910,9 @@ mod tests {
         let d = decline("Saka", "yat", "nap", &[]).expect("Sakyam");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "Sakyam"), "{:?}", pr);
+        let d = decline("hfY", "Ryat", "pum", &[]).expect("hAryaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "hAryaH"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1993,6 +1997,14 @@ mod tests {
         assert_eq!(derive("qukfY", "Rvul"), vec!["kAraka"]);
         assert_eq!(derive("qukfY", "vun"), vec!["karaka"]);
         assert_eq!(derive("qukfY", "Ryat"), vec!["kArya"]);
+        assert_eq!(derive("hfY", "Ryat"), vec!["hArya"]);
+        assert_eq!(derive("DfY", "Ryat"), vec!["DArya"]);
+        assert_eq!(derive("vaca", "Ryat"), vec!["vAkya"]);
+        assert_eq!(derive("lUY", "Ryat"), vec!["lAvya"]);
+        assert_eq!(derive("pUY", "Ryat"), vec!["pAvya"]);
+        assert_eq!(derive("lUY", "yat"), vec!["lavya"]);
+        assert_eq!(derive("pUY", "yat"), vec!["pavya"]);
+        assert_eq!(derive("qukfY", "kyap"), vec!["kftya"]);
         assert_eq!(derive("hana", "GaY"), vec!["GAta"]);
         assert_eq!(derive("hana", "Rvul"), vec!["GAtaka"]);
         assert_eq!(derive("hana", "vun"), vec!["hanaka"]);
