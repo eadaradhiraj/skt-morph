@@ -130,6 +130,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **सुबन्त रत्नमुष्:** रत्नमुट्/रत्नमुड्भ्याम्. धनुस् stays धनुः.
 - **सर्वनाम डतर/डतम:** एकतरस्मै/एकतरेण; ततरेण/ततमस्मै. कतर stays कतरस्मै.
 - **सर्वनाम पूर्व:** पूर्वेण/पूर्वस्मै (SLP1 `pUrva`). `purva` aliases.
+- **सर्वनाम सर्वा:** `sarvA` aliases सर्व स्त्री सर्वस्यै.
 
 ## 2026-08-31
 

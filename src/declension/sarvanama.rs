@@ -101,6 +101,7 @@ fn canon_sarvanama(base: &str) -> &str {
         "navadaSa" => "navadaSan",
         "ubhaya" => "uBaya",
         "purva" => "pUrva",
+        "sarvA" => "sarva",
         other => other,
     }
 }
@@ -483,6 +484,8 @@ mod tests {
         // generate सर्व must not panic on the extra sambodhana row.
         has(&generate("sarva", "pum").expect("sarva"), "prathamA", "sarvaH");
         has(&generate("sarva", "stri").unwrap(), "saptamI", "sarvAsu");
+        has(&generate("sarvA", "stri").unwrap(), "prathamA", "sarvA");
+        has(&generate("sarvA", "stri").unwrap(), "caturTI", "sarvasyE");
         has(&generate("tad", "stri").unwrap(), "saptamI", "tAsu");
         let v = generate("viSva", "pum").expect("viSva");
         has(&v, "prathamA", "viSve");
