@@ -681,3 +681,14 @@ pub fn apply_natva_to_word(word: &str) -> String {
     }
     chars.into_iter().collect()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn natva_pra_nam_vs_bhavani() {
+        assert_eq!(apply_natva_to_word("pranamati"), "praRamati");
+        // tin ending Ani after r should not trigger (prabhavāni)
+        assert_eq!(apply_natva_to_word("praBavAni"), "praBavAni");
+    }
+}
