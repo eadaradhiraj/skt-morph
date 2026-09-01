@@ -85,7 +85,7 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("h".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"hO".to_string(),"haH".to_string(),],vec!["ham".to_string(),"hO".to_string(),"haH".to_string(),],vec!["hA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["he".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"hoH".to_string(),"hAm".to_string(),],vec!["hi".to_string(),"hoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"hO".to_string(),"haH".to_string(),],]);
   let h_pum = m.get(&("h".to_string(), "pum".to_string())).expect("h pum").clone();
   m.insert(("h".to_string(), "stri".to_string()), h_pum);
-  m.insert(("B".to_string(),"pum".to_string()), vec![vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["Bam".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["BA".to_string(),"BByAm".to_string(),"BBiH".to_string(),],vec!["Be".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BoH".to_string(),"BAm".to_string(),],vec!["Bi".to_string(),"BoH".to_string(),"tsu".to_string(),],vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],]);
+  m.insert(("B".to_string(),"pum".to_string()), vec![vec!["p,b".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["Bam".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["BA".to_string(),"bByAm".to_string(),"bBiH".to_string(),],vec!["Be".to_string(),"bByAm".to_string(),"bByaH".to_string(),],vec!["BaH".to_string(),"bByAm".to_string(),"bByaH".to_string(),],vec!["BaH".to_string(),"BoH".to_string(),"BAm".to_string(),],vec!["Bi".to_string(),"BoH".to_string(),"psu".to_string(),],vec!["p,b".to_string(),"BO".to_string(),"BaH".to_string(),],]);
   let b_pum = m.get(&("B".to_string(), "pum".to_string())).expect("B pum").clone();
   m.insert(("B".to_string(), "stri".to_string()), b_pum);
   // प-anta (ककुप्) — पद प्; 8.2.39 before भ् → ब्भ्याम्. Distinct from भ्-anta (लभ्→लप्).
@@ -1403,7 +1403,10 @@ mod tests {
         has(&u, "saptamI", "uzRikzu");
         let b = generate("laB", "pum").expect("laB");
         has(&b, "prathamA", "lap");
+        has(&b, "prathamA", "lab");
         has(&b, "tfIyA", "laBA");
+        has(&b, "tfIyA", "labByAm");
+        has(&b, "saptamI", "lapsu");
         // r-anta: gir (गिर्) — 8.2.66 s→ru gives giH; s-anta: tapas-like s pum — same ru → tapas→tapaH
         let r = generate("gir", "pum").expect("gir");
         has(&r, "prathamA", "gIH");
