@@ -391,6 +391,8 @@ document.getElementById("pratyaya").onchange = syncKrdLinga;
 syncKrdLinga();
 
 document.getElementById("btn-krdanta").onclick = () => {
+  const raw = document.getElementById("dhatu").value.trim();
+  if (!raw) { document.getElementById("out-krdanta").innerHTML = '<span class="hint">धातुं लिखत — कृदन्त e.g. कृ / kṛ</span>'; return; }
   const d = dhatuQuery();
   const p = document.getElementById("pratyaya").value;
   const pref = prefixArg();
