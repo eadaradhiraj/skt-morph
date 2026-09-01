@@ -68,6 +68,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "Aru" => Some(("Aru", vec!["3.2.173"], "aru")),
         "ra" => Some(("ra", vec!["3.2.167"], "ra")),
         "u" => Some(("u", vec!["3.2.168"], "sanu")),
+        "naN" => Some(("na", vec!["3.3.90"], "nan")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -607,6 +608,19 @@ fn san_u_form(dhatu: &str, root: &str) -> String {
     format!("{}u", stem.trim_end_matches('a'))
 }
 
+/// 3.3.90 यजयाच्यतविच्छप्रच्छरक्षो नङ्: यज्ञ/याच्ञा/यत्न/विश्न/प्रश्न/रक्ष्ण (ङित् no गुण).
+fn nan_form(root: &str) -> String {
+    match root {
+        "yaj" => "yajYa".into(),
+        "yAc" => "yAcYA".into(),
+        "yat" => "yatna".into(),
+        "vicC" | "viC" | "viCa" => "viSna".into(),
+        "pracC" | "praC" | "praCa" => "praSna".into(),
+        "rakz" | "rakza" => "rakzRa".into(),
+        other => format!("{other}na"),
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -837,7 +851,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
-                | "ra"
+                | "ra" | "naN"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -1004,6 +1018,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "aru" => aru_form(&root),
         "ra" => ra_form(&root),
         "sanu" => san_u_form(&dhatu, &root),
+        "nan" => nan_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1367,6 +1382,9 @@ mod tests {
         let d = decline("Bikza", "u", "pum", &[]).expect("BikzuH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "BikzuH"), "{:?}", pr);
+        let d = decline("yaja", "naN", "pum", &[]).expect("yajYaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "yajYaH"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1533,6 +1551,11 @@ mod tests {
         assert_eq!(derive("kita", "u"), vec!["cikitsu"]);
         assert_eq!(derive("qukfY", "u"), vec!["cikIrzu"]);
         assert_eq!(derive("mAna", "u"), vec!["mImAMsu"]);
+        assert_eq!(derive("yaja", "naN"), vec!["yajYa"]);
+        assert_eq!(derive("yatI", "naN"), vec!["yatna"]);
+        assert_eq!(derive("quyAcf", "naN"), vec!["yAcYA"]);
+        assert_eq!(derive("praCa", "naN"), vec!["praSna"]);
+        assert_eq!(derive("rakza", "naN"), vec!["rakzRa"]);
         assert_eq!(derive("naS", "kvarap"), vec!["naSvara"]);
         assert_eq!(derive("YimidA", "Gurac"), vec!["medura"]);
         assert_eq!(derive("BAsf", "Gurac"), vec!["BAsura"]);
