@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 127: README 126
+
+- **README:** recent line updated to 126 iters + Kaumudī (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 126: lib analyze Kaumudī doc
 
 - **lib:** `analyze` doc → Kaumudī; no logic change.
