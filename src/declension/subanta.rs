@@ -444,8 +444,38 @@ fn decline_sva_yuv_magha(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// 7.1.85–87 पथिमथोः / इतोऽत् / थो न्थः; ऋभुक्षिन् same सर्वनामस्थान. पुं only.
+/// 7.1.85–87 पथिमथोः / इतोऽत् / थो न्थः; ऋभुक्षिन् same सर्वनामस्थान. पुं; nap compounds 7.1.23 सुपथि/सुपन्थानि.
 fn decline_pathadi(cand: &str, linga: &str) -> Option<Declension> {
+    // पथिन् nap compounds (सुपथिन्) — 7.1.23 स्वमोः सुपथि/सुपथी; 7.1.85 नुम् सुपन्थानि. Not पुं *सुपन्थाः.
+    if linga == "nap" {
+        let pre = cand.strip_suffix("paTin")?;
+        if pre.is_empty() {
+            return None;
+        }
+        let weak = format!("{pre}paT");
+        let pada = format!("{pre}paTi");
+        let nom = vec![
+            format!("{pre}paTi"),
+            format!("{pre}paTI"),
+            format!("{pre}panTAni"),
+        ];
+        let mut decl = HashMap::new();
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+        decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+        decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+        decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+        decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada}zu")]);
+        let mut voc = vec![cand.to_string()];
+        voc.extend(nom);
+        decl.insert("samboDana".into(), voc);
+        return Some(Declension {
+            stem: cand.to_string(),
+            linga: linga.to_string(),
+            declension: decl,
+        });
+    }
     if linga != "pum" {
         return None;
     }
@@ -2609,5 +2639,24 @@ mod tests {
         has(&generate("guru", "pum").unwrap(), "prathamA", "guruH");
         has(&generate("kartf", "pum").unwrap(), "prathamA", "kartA");
         assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "krozwuH"));
+    }
+
+    #[test]
+    fn supathin_nap_supanthani() {
+        // सुपथिन् nap: 7.1.23 सुपथि/सुपथी; 7.1.85 सुपन्थानि. पथिन् पुं stays पन्थाः.
+        let s = generate("supaTin", "nap").expect("supaTin");
+        has(&s, "prathamA", "supaTi");
+        has(&s, "prathamA", "supaTI");
+        has(&s, "prathamA", "supanTAni");
+        has(&s, "dvitIyA", "supaTi");
+        has(&s, "tfIyA", "supaTA");
+        has(&s, "tfIyA", "supaTiByAm");
+        has(&s, "saptamI", "supaTi");
+        has(&s, "saptamI", "supaTizu");
+        has(&s, "zazWI", "supaTAm");
+        has(&s, "samboDana", "supaTin");
+        has(&generate("paTin", "pum").unwrap(), "prathamA", "panTAH");
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "supanTAH"));
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "panTAH"));
     }
 }
