@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 20: redup header
+
+- **redup:** header → Kaumudī 6.1.8/7.4.59; no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 19: it header
 
 - **it:** header → sūtra-gated 7.2.10/35/58; no logic change.

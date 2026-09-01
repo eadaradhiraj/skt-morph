@@ -1,4 +1,5 @@
-//! Port of engine/redup.py
+//! redup — abhyāsa reduplication (6.1.8 ff., 7.4.59 ff.) for gaṇa-3 juhotyādi.
+//! Port of engine/redup.py — Kaumudī-ordered, sūtra-gated.
 
 use crate::engine::phonology::apply_guna_to_stem;
 
