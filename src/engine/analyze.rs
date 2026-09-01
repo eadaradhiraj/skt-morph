@@ -291,6 +291,12 @@ mod tests {
     }
 
     #[test]
+    fn empty_word_returns_empty() {
+        assert!(crate::engine::analyze::analyze_word("").is_empty());
+        assert!(crate::engine::analyze::analyze_word("   ").is_empty());
+    }
+
+    #[test]
     fn trampe_na_is_foreign_instrumental() {
         let hits = crate::declension::subanta::analyze("wrampeRa");
         assert!(hits.iter().any(|m| {

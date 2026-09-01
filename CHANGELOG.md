@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 36: analyze empty test
+
+- **analyze:** added `empty_word_returns_empty` test for iter 35 guard; 184 tests.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 35: analyze empty guard
 
 - **analyze:** `analyze_word` now early-return on empty/whitespace (no peel); + comment guard.
