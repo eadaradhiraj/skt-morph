@@ -36,6 +36,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ktavatu~" => Some(("", vec!["3.2.171"], "kta")),
         "lyuw" => Some(("ana", vec!["3.3.115"], "guna")),
         "lyu" => Some(("ana", vec!["3.1.134"], "guna")),
+        "Nini" => Some(("in", vec!["3.1.134"], "nini")),
         "tumun" => Some(("tum", vec!["3.3.158"], "guna_tum")),
         "ktvA" => Some(("tvA", vec!["3.4.21"], "root")),
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
@@ -794,6 +795,17 @@ fn rdorap_form(root: &str) -> String {
     }
 }
 
+/// 3.1.134 ग्रह्यादेर् णिनिः: ग्राही/स्थायी/मन्त्री (णित् वृद्धि; आतो युक्; इदित् नुम्).
+/// ल्यु stays नन्दन. आलुच् stays गृहयालु. वरच् stays स्थावर. कः stays स्थ. घिनुण् stays शमिन्.
+fn nini_form(root: &str) -> String {
+    match root {
+        "grah" | "graha" => "grAhin".into(),
+        "sTA" => "sTAyin".into(),
+        "matr" | "matri" | "mantr" => "mantrin".into(),
+        other => format!("{other}in"),
+    }
+}
+
 /// 3.1.140 ज्वलितिकसन्तेभ्यो णः: ज्वाल/चाल; वार्तिक तन् → तान.
 /// 3.1.141 श्याद्व्यधास्रुसंस्र्वतीणवसावहृलिहश्लिषश्वसश्च: व्याध/लेह/श्लेष/श्वास/स्राव/श्याय.
 /// घञ्/अप् stay कार/कर. श stays पिब. कः stays स्थ. Do not dump gold ण.
@@ -1303,6 +1315,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "jvala_ra" => jvala_ra_form(&root),
         "sa_krt" => sa_krt_form(&dhatu, &root),
         "ka_kit" => ka_kit_form(&root),
+        "nini" => nini_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1754,6 +1767,11 @@ mod tests {
         assert!(pr.iter().any(|x| x == "nandanaH"), "{:?}", pr);
         let d = decline("wunadi", "lyu", "stri", &[]).expect("nandanA");
         assert_eq!(d.stem, "nandanA");
+        let d = decline("graha", "Nini", "pum", &[]).expect("grAhI");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "grAhI"), "{:?}", pr);
+        let d = decline("graha", "Nini", "stri", &[]).expect("grAhinI");
+        assert_eq!(d.stem, "grAhinI");
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1932,6 +1950,13 @@ mod tests {
         assert_eq!(derive("wunadi", "lyu"), vec!["nandana"]);
         assert_eq!(derive("wunadi", "lyuw"), vec!["nandana"]);
         assert_eq!(derive("qukfY", "lyuw"), vec!["karaRa"]);
+        assert_eq!(derive("graha", "Nini"), vec!["grAhin"]);
+        assert_eq!(derive("zWA", "Nini"), vec!["sTAyin"]);
+        assert_eq!(derive("matri", "Nini"), vec!["mantrin"]);
+        assert_eq!(derive("graha", "Aluc"), vec!["gfhayAlu"]);
+        assert_eq!(derive("zWA", "varac"), vec!["sTAvara"]);
+        assert_eq!(derive("zWA", "ka"), vec!["sTa"]);
+        assert_eq!(derive("Samu", "GinuR"), vec!["Samin"]);
         assert_eq!(derive("wuvepf", "aTuc"), vec!["vepaTu"]);
         assert_eq!(derive("wuBrAjf", "aTuc"), vec!["BrAjaTu"]);
         assert_eq!(derive("yaja", "Nvanip"), vec!["yajvan"]);
