@@ -37,7 +37,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "lyuw" => Some(("ana", vec!["3.3.115"], "guna")),
         "lyu" => Some(("ana", vec!["3.1.134"], "guna")),
         "Nini" => Some(("in", vec!["3.1.134"], "nini")),
-        "yuc" => Some(("ana", vec!["3.2.148", "3.2.150"], "yuc")),
+        "yuc" => Some(("ana", vec!["3.2.148", "3.2.149", "3.2.150", "3.2.151"], "yuc")),
         "tumun" => Some(("tum", vec!["3.3.158"], "guna_tum")),
         "ktvA" => Some(("tvA", vec!["3.4.21"], "root")),
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
@@ -797,14 +797,18 @@ fn rdorap_form(root: &str) -> String {
 }
 
 /// 3.2.148 चलनशब्दार्थादकर्मकाद् युच्: चलन/चोपन/शब्दन/रवण (7.1.1 अन).
+/// 3.2.149 अनुदात्तैतश्च हलादेः: वर्तन/वर्धन. Not सन् *जुगुप्सन dump.
 /// 3.2.150 जुचङ्क्रम्यदन्द्रम्यसृगृधिज्वलशुचलषपतपदः: सरण/गर्धन/ज्वलन/शोचन/लषण/पतन/पदन.
-/// ण stays ज्वाल. ल्यु stays नन्दन. Do not dump यङ चङ्क्रमण.
+/// 3.2.151 क्रुधमण्डार्थेभ्यश्च: क्रोधन/रोषण/मण्डन/भूषण.
+/// ण stays ज्वाल. ल्यु stays नन्दन. क्नु stays गृध्नु. Do not dump यङ चङ्क्रमण.
 fn yuc_form(root: &str) -> String {
     match root {
         "cal" | "cala" => "calana".into(),
         "cup" | "cupa" => "copana".into(),
         "Sabd" | "Sabda" => "Sabdana".into(),
         "ru" => "ravaRa".into(),
+        "vft" | "vftu" => "vartana".into(),
+        "vfD" | "vfDu" => "varDana".into(),
         "sf" => "saraRa".into(),
         "gfD" | "gfDa" | "gfDu" => "garDana".into(),
         "jval" | "jvala" => "jvalana".into(),
@@ -812,6 +816,10 @@ fn yuc_form(root: &str) -> String {
         "laz" | "laza" => "lazaRa".into(),
         "pat" | "pata" | "patx" => "patana".into(),
         "pad" | "pada" => "padana".into(),
+        "kruD" | "kruDa" => "kroDana".into(),
+        "ruz" | "ruza" => "rozaRa".into(),
+        "maq" | "maqi" => "maRqana".into(),
+        "BUz" | "BUza" => "BUzaRa".into(),
         other => format!("{other}ana"),
     }
 }
@@ -2005,6 +2013,12 @@ mod tests {
         assert_eq!(derive("laza", "yuc"), vec!["lazaRa"]);
         assert_eq!(derive("patx", "yuc"), vec!["patana"]);
         assert_eq!(derive("pada", "yuc"), vec!["padana"]);
+        assert_eq!(derive("vftu", "yuc"), vec!["vartana"]);
+        assert_eq!(derive("vfDu", "yuc"), vec!["varDana"]);
+        assert_eq!(derive("kruDa", "yuc"), vec!["kroDana"]);
+        assert_eq!(derive("ruza", "yuc"), vec!["rozaRa"]);
+        assert_eq!(derive("maqi", "yuc"), vec!["maRqana"]);
+        assert_eq!(derive("BUza", "yuc"), vec!["BUzaRa"]);
         assert_eq!(derive("jvala", "Ra"), vec!["jvAla"]);
         assert_eq!(derive("cala", "Ra"), vec!["cAla"]);
         assert_eq!(derive("wunadi", "lyu"), vec!["nandana"]);
