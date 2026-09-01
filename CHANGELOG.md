@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 61: README 60
+
+- **README:** recent line updated to 60 iters + lib clamp (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 60: lib doc clamp
 
 - **lib:** `generate_verb` doc → clamped puruṣa/vacana; no logic change.
