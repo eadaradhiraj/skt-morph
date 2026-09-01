@@ -1233,6 +1233,33 @@ fn decline_khanj(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// पा-anta पुं (गोपा, विश्वपा) — आकारान्त पुं from √पा, not 4.1.4 टाप् स्त्री.
+/// सु गोपाः; औ गोपौ (आ+औ); अम् गोपाम्; जस् गोपाः; शस् गोपः; टा गोपा;
+/// ङे गोपे; ङसि/ङस् गोपः; ङोस् गोपोः; ङि गोपि; पद आभ्याम्/आसु.
+/// nonempty `pA` pre (सीता is `A` not `pA`; कृपा स्त्री stays टाप्).
+fn decline_pa(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("pA")?;
+    if pre.is_empty() || linga != "pum" {
+        return None;
+    }
+    let a = format!("{pre}p");
+    let aa = format!("{pre}pA");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{aa}H"), format!("{a}O"), format!("{aa}H")]);
+    decl.insert("dvitIyA".into(), vec![format!("{aa}m"), format!("{a}O"), format!("{a}aH")]);
+    decl.insert("tfIyA".into(), vec![aa.clone(), format!("{aa}ByAm"), format!("{aa}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{a}e"), format!("{aa}ByAm"), format!("{aa}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{a}aH"), format!("{aa}ByAm"), format!("{aa}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{a}aH"), format!("{a}oH"), format!("{aa}m")]);
+    decl.insert("saptamI".into(), vec![format!("{a}i"), format!("{a}oH"), format!("{aa}su")]);
+    decl.insert("samboDana".into(), vec![format!("{aa}H"), format!("{a}O"), format!("{aa}H")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1350,6 +1377,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_khanj(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_pa(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2432,5 +2462,29 @@ mod tests {
         has(&generate("marut", "pum").unwrap(), "prathamA", "marut");
         has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
         assert!(!a.declension.get("tfIyA").unwrap().iter().any(|x| x == "agnimaTena"));
+    }
+
+    #[test]
+    fn gopa_gopi_gopasu() {
+        // गोपा/विश्वपा: आकारान्त पुं गोपाः/गोपौ/गोपाम्/गोपः/गोपा/गोपि/गोपासु. सीता stays टाप्.
+        let g = generate("gopA", "pum").expect("gopA");
+        has(&g, "prathamA", "gopAH");
+        has(&g, "prathamA", "gopO");
+        has(&g, "dvitIyA", "gopAm");
+        has(&g, "dvitIyA", "gopaH");
+        has(&g, "tfIyA", "gopA");
+        has(&g, "tfIyA", "gopAByAm");
+        has(&g, "caturTI", "gope");
+        has(&g, "saptamI", "gopi");
+        has(&g, "saptamI", "gopAsu");
+        has(&g, "zazWI", "gopoH");
+        has(&g, "zazWI", "gopAm");
+        let v = generate("viSvapA", "pum").expect("viSvapA");
+        has(&v, "prathamA", "viSvapAH");
+        has(&v, "saptamI", "viSvapi");
+        has(&v, "saptamI", "viSvapAsu");
+        has(&generate("sItA", "stri").unwrap(), "tfIyA", "sItayA");
+        assert!(!g.declension.get("tfIyA").unwrap().iter().any(|x| x == "gopayA"));
+        assert!(!g.declension.get("prathamA").unwrap().iter().any(|x| x == "gopaH"));
     }
 }
