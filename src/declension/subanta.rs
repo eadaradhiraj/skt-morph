@@ -540,6 +540,27 @@ fn decline_div(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// रै — 6.1.78 एचोऽयवायावः आय् (रायम्); सु राः; पद राभ्याम्. Not नौ *रावम्.
+fn decline_rai(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "rE" || (linga != "stri" && linga != "pum") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["rAH".into(), "rAyO".into(), "rAyaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["rAyam".into(), "rAyO".into(), "rAyaH".into()]);
+    decl.insert("tfIyA".into(), vec!["rAyA".into(), "rAByAm".into(), "rABiH".into()]);
+    decl.insert("caturTI".into(), vec!["rAye".into(), "rAByAm".into(), "rAByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["rAyaH".into(), "rAByAm".into(), "rAByaH".into()]);
+    decl.insert("zazWI".into(), vec!["rAyaH".into(), "rAyoH".into(), "rAyAm".into()]);
+    decl.insert("saptamI".into(), vec!["rAyi".into(), "rAyoH".into(), "rAsu".into()]);
+    decl.insert("samboDana".into(), vec!["rAH".into(), "rAyO".into(), "rAyaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -597,6 +618,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_div(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_rai(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1185,5 +1209,23 @@ mod tests {
         has(&d, "saptamI", "dyuzu");
         has(&d, "samboDana", "dyOH");
         has(&generate("div", "pum").unwrap(), "prathamA", "dyOH");
+    }
+
+    #[test]
+    fn rai_rah_rayam() {
+        // रै: राः/रायम्/राभ्याम्/रासु. Not नौ *रावम्.
+        let r = generate("rE", "stri").expect("rE");
+        has(&r, "prathamA", "rAH");
+        has(&r, "prathamA", "rAyO");
+        has(&r, "prathamA", "rAyaH");
+        has(&r, "dvitIyA", "rAyam");
+        has(&r, "tfIyA", "rAyA");
+        has(&r, "tfIyA", "rAByAm");
+        has(&r, "saptamI", "rAyi");
+        has(&r, "saptamI", "rAsu");
+        has(&generate("rE", "pum").unwrap(), "prathamA", "rAH");
+        let n = generate("nO", "stri").expect("nO");
+        has(&n, "dvitIyA", "nAvam");
+        assert!(!r.declension.get("dvitIyA").unwrap().iter().any(|x| x == "rAvam"));
     }
 }
