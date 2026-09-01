@@ -1,4 +1,4 @@
-//! derived — ṇic/san/yaṅ/yaṅluk/karma (3.1.26/3.1.7/3.1.22/2.4.74/3.1.67). Kaumudī-ordered, sūtra-gated, parasmai yaṅluk (boBU/vAvac/cekrI/jaNgam/pApac/jaNGan) vs ātmane yaṅ (boBUyate).
+//! derived — ṇic/san/yaṅ/yaṅluk/karma (3.1.26/3.1.7/3.1.22/2.4.74/3.1.67). Kaumudī-ordered, sūtra-gated, parasmai yaṅluk (boBU/vAvac/cekrI/jaNgam/pApac/jaNGan/pApac) vs ātmane yaṅ (boBUyate).
 
 #![allow(non_snake_case)]
 
