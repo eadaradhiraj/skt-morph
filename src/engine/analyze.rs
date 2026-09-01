@@ -36,6 +36,7 @@ fn keys_for(form: &str) -> [String; 2] {
 }
 
 /// Unprefixed surface → analyses. Prefixes are peeled at query time (not stored).
+/// OnceLock HashMaps built on first `analyze_word` (~7s with dhatu cache, then µs).
 static TINANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 static KRDANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 
