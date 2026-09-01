@@ -42,7 +42,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ktvA" => Some(("tvA", vec!["3.4.21"], "root")),
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
         "ktin" => Some(("ti", vec!["3.3.94"], "guna")),
-        "yat" => Some(("ya", vec!["3.1.97"], "yat")),
+        "yat" => Some(("ya", vec!["3.1.97", "3.1.98", "3.1.99", "3.1.100"], "yat")),
         "Ryat" => Some(("ya", vec!["3.2.187"], "guna")),
         "GaY" => Some(("a", vec!["3.3.67"], "guna")),
         "Ramul" => Some(("am", vec!["3.3.84"], "guna")),
@@ -868,11 +868,22 @@ fn ini_form(root: &str) -> String {
 }
 
 /// 3.1.97 अचो यत्: चेय/जेय; आ → एय देय. 6.1.45+6.4.65 ऐ → गेय/पेय not *गैय.
-/// थकन् stays गाथक. ण्युट् stays गायन. क्त stays गीत. श stays पिब.
+/// 3.1.98 पोरदुपधात्: शप्य/लभ्य/आप्य (no वृद्धि). ण्यत् stays पाक्य.
+/// 3.1.99 शकिसहोश्च: शक्य/सह्य. 3.1.100 गदमदचरयमश्चानुपसर्गे: गद्य/मद्य/चर्य/यम्य.
+/// थकन् stays गाथक. ण्युट् stays गायन. क्त stays गीत. श stays पिब. घिनुण् stays मादिन्.
 fn yat_form(root: &str) -> String {
     match root {
         "gE" => "geya".into(),
         "pE" => "peya".into(),
+        "Sap" | "Sapa" => "Sapya".into(),
+        "laB" | "laBa" | "laBaz" => "laBya".into(),
+        "Ap" | "Apx" => "Apya".into(),
+        "Sak" | "Saka" => "Sakya".into(),
+        "sah" | "saha" | "zah" | "zaha" => "sahya".into(),
+        "gad" | "gada" => "gadya".into(),
+        "mad" | "mada" => "madya".into(),
+        "car" | "cara" => "carya".into(),
+        "yam" | "yama" => "yamya".into(),
         r if r.ends_with('A') => format!("{}eya", &r[..r.len() - 1]),
         other => join_eco(&apply_guna_to_stem(other), "ya"),
     }
@@ -1895,6 +1906,9 @@ mod tests {
         let d = decline("gE", "yat", "nap", &[]).expect("geyam");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "geyam"), "{:?}", pr);
+        let d = decline("Saka", "yat", "nap", &[]).expect("Sakyam");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "Sakyam"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1951,6 +1965,17 @@ mod tests {
         assert_eq!(derive("gE", "Ryuw"), vec!["gAyana"]);
         assert_eq!(derive("gE", "kta"), vec!["gIta"]);
         assert_eq!(derive("pA", "Sa"), vec!["piba"]);
+        assert_eq!(derive("Sapa", "yat"), vec!["Sapya"]);
+        assert_eq!(derive("qulaBaz", "yat"), vec!["laBya"]);
+        assert_eq!(derive("Apx", "yat"), vec!["Apya"]);
+        assert_eq!(derive("Saka", "yat"), vec!["Sakya"]);
+        assert_eq!(derive("zaha", "yat"), vec!["sahya"]);
+        assert_eq!(derive("gada", "yat"), vec!["gadya"]);
+        assert_eq!(derive("madI", "yat"), vec!["madya"]);
+        assert_eq!(derive("cara", "yat"), vec!["carya"]);
+        assert_eq!(derive("yama", "yat"), vec!["yamya"]);
+        assert_eq!(derive("qupacaz", "Ryat"), vec!["pAkya"]);
+        assert_eq!(derive("madI", "GinuR"), vec!["mAdin"]);
         assert_eq!(derive("RIY", "GaY"), vec!["nAya"]);
         assert_eq!(derive("RIY", "Rvul"), vec!["nAyaka"]);
         assert_eq!(derive("RIY", "vun"), vec!["nayaka"]);
