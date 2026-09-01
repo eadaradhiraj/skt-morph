@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 46: derived header tweak
+
+- **derived:** header clarified parasmai yaṅluk vs ātmane yaṅ; no logic change.
+- **wasm:** rebuilt 1.2M; 185 tests.
+
 ## 2026-09-01 — iteration 45: demo deriv hint
 
 - **demo.js:** added `derivHint` helper for yaN/yaNluk (सयक् vs लुक् 2.4.74); no logic change.
