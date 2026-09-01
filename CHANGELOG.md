@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 75: README 74
+
+- **README:** recent line updated to 74 iters + search hint (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 74: analyze search doc
 
 - **analyze:** `search_prefix` doc → O(n) + 1.4.59; no logic change.
