@@ -62,6 +62,9 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "itra" => Some(("itra", vec!["3.2.184"], "itra")),
         "zwran" => Some(("tra", vec!["3.2.182"], "zwran")),
         "kurac" => Some(("ura", vec!["3.2.162"], "kurac")),
+        "kru" => Some(("ru", vec!["3.2.174"], "kru")),
+        "klukan" => Some(("luka", vec!["3.2.174"], "klukan")),
+        "krukan" => Some(("ruka", vec!["3.2.174"], "krukan")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -545,6 +548,22 @@ fn kurac_form(root: &str) -> String {
     }
 }
 
+/// 3.2.174 भियः क्रुक्लुकनौ: भीरु/भीलुक (कित् no गुण). वार्तिक क्रुकन् भीरुक. Not *भेरु.
+fn bhi_kru_form(root: &str, kind: &str) -> String {
+    if root != "BI" {
+        return match kind {
+            "kru" => format!("{root}ru"),
+            "klukan" => format!("{root}luka"),
+            _ => format!("{root}ruka"),
+        };
+    }
+    match kind {
+        "kru" => "BIru".into(),
+        "klukan" => "BIluka".into(),
+        _ => "BIruka".into(),
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -774,7 +793,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
         && (matches!(
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
-                | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac"
+                | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -935,6 +954,9 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "itra" => itra_form(&root),
         "zwran" => zwran_form(&root),
         "kurac" => kurac_form(&root),
+        "kru" => bhi_kru_form(&root, "kru"),
+        "klukan" => bhi_kru_form(&root, "klukan"),
+        "krukan" => bhi_kru_form(&root, "krukan"),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1286,6 +1308,9 @@ mod tests {
         assert!(pr.iter().any(|x| x == "viduraH"), "{:?}", pr);
         let d = decline("vida", "kurac", "stri", &[]).expect("vidurA");
         assert_eq!(d.stem, "vidurA");
+        let d = decline("YiBI", "kru", "pum", &[]).expect("BIruH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "BIruH"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1436,6 +1461,9 @@ mod tests {
         assert_eq!(derive("vida", "kurac"), vec!["vidura"]);
         assert_eq!(derive("Bidir", "kurac"), vec!["Bidura"]);
         assert_eq!(derive("Cidir", "kurac"), vec!["Cidura"]);
+        assert_eq!(derive("YiBI", "kru"), vec!["BIru"]);
+        assert_eq!(derive("YiBI", "klukan"), vec!["BIluka"]);
+        assert_eq!(derive("YiBI", "krukan"), vec!["BIruka"]);
         assert_eq!(derive("YimidA", "Gurac"), vec!["medura"]);
         assert_eq!(derive("BAsf", "Gurac"), vec!["BAsura"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
