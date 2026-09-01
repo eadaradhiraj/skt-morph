@@ -450,6 +450,27 @@ fn decline_pums(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अप् स्त्री — 6.4.11 आपः in सर्वनामस्थान; पद अद्भ्याम्/अद्भिः/अप्सु. No एकवचन.
+fn decline_ap(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "ap" || linga != "stri" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![String::new(), "ApO".into(), "ApaH".into()]);
+    decl.insert("dvitIyA".into(), vec![String::new(), "ApO".into(), "ApaH".into()]);
+    decl.insert("tfIyA".into(), vec![String::new(), "adByAm".into(), "adBiH".into()]);
+    decl.insert("caturTI".into(), vec![String::new(), "adByAm".into(), "adByaH".into()]);
+    decl.insert("paYcamI".into(), vec![String::new(), "adByAm".into(), "adByaH".into()]);
+    decl.insert("zazWI".into(), vec![String::new(), "apoH".into(), "apAm".into()]);
+    decl.insert("saptamI".into(), vec![String::new(), "apoH".into(), "apsu".into()]);
+    decl.insert("samboDana".into(), vec![String::new(), "ApO".into(), "ApaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -495,6 +516,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_pums(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_ap(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1029,5 +1053,21 @@ mod tests {
         has(&p, "saptamI", "puMsu");
         has(&p, "samboDana", "puman");
         has(&generate("pums", "pum").unwrap(), "prathamA", "pumAn");
+    }
+
+    #[test]
+    fn ap_apah_adbhih() {
+        // अप्: 6.4.11 आपः/आपौ; पद अद्भिः/अप्सु. No एकवचन. Not p-anta *अप्.
+        let a = generate("ap", "stri").expect("ap");
+        has(&a, "prathamA", "ApaH");
+        has(&a, "prathamA", "ApO");
+        has(&a, "dvitIyA", "ApaH");
+        has(&a, "tfIyA", "adBiH");
+        has(&a, "tfIyA", "adByAm");
+        has(&a, "zazWI", "apAm");
+        has(&a, "zazWI", "apoH");
+        has(&a, "saptamI", "apsu");
+        let pr = a.declension.get("prathamA").unwrap();
+        assert!(!pr.iter().any(|x| x == "ap"), "{:?}", pr);
     }
 }
