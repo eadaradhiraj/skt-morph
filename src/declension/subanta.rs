@@ -1206,6 +1206,29 @@ fn decline_vish(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// खञ्ज् — 8.2.23 संयोगान्त लोपः पद खन्/खन्भ्याम्/खन्सु. Vowel खञ्जौ. Not ज-anta *खङ्क्. क्रुञ्च् stays क्रुङ्.
+fn decline_khanj(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "KaYj" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let vow = cand;
+    let pada = "Kan";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![pada.into(), format!("{vow}O"), format!("{vow}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{vow}am"), format!("{vow}O"), format!("{vow}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{vow}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{vow}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{vow}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{vow}aH"), format!("{vow}oH"), format!("{vow}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{vow}i"), format!("{vow}oH"), format!("{pada}su")]);
+    decl.insert("samboDana".into(), vec![pada.into(), format!("{vow}O"), format!("{vow}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1320,6 +1343,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_vish(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_khanj(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2363,5 +2389,21 @@ mod tests {
         has(&generate("ahan", "nap").unwrap(), "prathamA", "ahaH");
         has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjA");
         assert!(!v.declension.get("tfIyA").unwrap().iter().any(|x| x == "vftrahnA"));
+    }
+
+    #[test]
+    fn khanj_khan_khanbhyam() {
+        // खञ्ज्: 8.2.23 पद खन्/खन्भ्याम्/खन्सु. वणिक् stays कुत्व; क्रुङ् stays क्रुञ्च्.
+        let k = generate("KaYj", "pum").expect("KaYj");
+        has(&k, "prathamA", "Kan");
+        has(&k, "prathamA", "KaYjO");
+        has(&k, "dvitIyA", "KaYjam");
+        has(&k, "tfIyA", "KaYjA");
+        has(&k, "tfIyA", "KanByAm");
+        has(&k, "saptamI", "KaYji");
+        has(&k, "saptamI", "Kansu");
+        has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
+        has(&generate("kruYc", "pum").unwrap(), "prathamA", "kruN");
+        assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "KaYk"));
     }
 }
