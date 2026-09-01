@@ -1885,6 +1885,37 @@ fn decline_ni(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// प्ररै nap — not रै *प्रराः. 7.1.23 स्वमोः प्ररि/प्ररिणी/प्ररीणि (like वारि);
+/// पद from रै प्रराभ्याम्/प्ररासु. Exact `prarE` + nap. रै stays राः.
+fn decline_prarai(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "prarE" || linga != "nap" {
+        return None;
+    }
+    let i = "prari";
+    let aa = "prarA";
+    let nom = vec![
+        i.to_string(),
+        polish(&format!("{i}nI")),
+        "prarIRi".into(),
+    ];
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), nom.clone());
+    decl.insert("dvitIyA".into(), nom.clone());
+    decl.insert("tfIyA".into(), vec![polish(&format!("{i}nA")), format!("{aa}ByAm"), format!("{aa}BiH")]);
+    decl.insert("caturTI".into(), vec![polish(&format!("{i}ne")), format!("{aa}ByAm"), format!("{aa}ByaH")]);
+    decl.insert("paYcamI".into(), vec![polish(&format!("{i}naH")), format!("{aa}ByAm"), format!("{aa}ByaH")]);
+    decl.insert("zazWI".into(), vec![polish(&format!("{i}naH")), polish(&format!("{i}noH")), polish("prarInAm")]);
+    decl.insert("saptamI".into(), vec![polish(&format!("{i}ni")), polish(&format!("{i}noH")), format!("{aa}su")]);
+    let mut voc = vec![i.to_string(), "prare".into()];
+    voc.extend(nom.into_iter().skip(1));
+    decl.insert("samboDana".into(), voc);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1951,6 +1982,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_rai(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_prarai(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -3670,5 +3704,25 @@ mod tests {
         has(&g, "saptamI", "Gftaspfkzu");
         has(&generate("diS", "stri").unwrap(), "prathamA", "dik");
         assert!(!b.declension.get("tfIyA").unwrap().iter().any(|x| x == "brahmnA"));
+    }
+
+    #[test]
+    fn prarai_prari_prarasu() {
+        // प्ररै nap: प्ररि/प्ररिणी/प्ररीणि; पद प्ररासु. रै stays राः. Not *प्रराः.
+        let p = generate("prarE", "nap").expect("prarE");
+        has(&p, "prathamA", "prari");
+        has(&p, "prathamA", "prariRI");
+        has(&p, "prathamA", "prarIRi");
+        has(&p, "tfIyA", "prariRA");
+        has(&p, "tfIyA", "prarAByAm");
+        has(&p, "saptamI", "prariRi");
+        has(&p, "saptamI", "prarAsu");
+        has(&p, "zazWI", "prarIRAm");
+        has(&p, "samboDana", "prare");
+        has(&generate("rE", "stri").unwrap(), "prathamA", "rAH");
+        has(&generate("rE", "stri").unwrap(), "dvitIyA", "rAyam");
+        has(&generate("vAri", "nap").unwrap(), "prathamA", "vAri");
+        assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "prarAH"));
+        assert!(!p.declension.get("dvitIyA").unwrap().iter().any(|x| x == "prarAyam"));
     }
 }
