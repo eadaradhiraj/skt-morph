@@ -471,6 +471,54 @@ fn decline_ap(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अनडुह् — strong अनड्वान्/अनड्वाहौ (वाह्); पद अनडुद्भ्याम्/अनडुत्सु. Not h-anta *अनडुक्.
+fn decline_anaquh(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "anaquh" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["anaqvAn".into(), "anaqvAhO".into(), "anaqvAhaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["anaqvAham".into(), "anaqvAhO".into(), "anaquhaH".into()]);
+    decl.insert("tfIyA".into(), vec!["anaquhA".into(), "anaqudByAm".into(), "anaqudBiH".into()]);
+    decl.insert("caturTI".into(), vec!["anaquhe".into(), "anaqudByAm".into(), "anaqudByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["anaquhaH".into(), "anaqudByAm".into(), "anaqudByaH".into()]);
+    decl.insert("zazWI".into(), vec!["anaquhaH".into(), "anaquhoH".into(), "anaquhAm".into()]);
+    decl.insert("saptamI".into(), vec!["anaquhi".into(), "anaquhoH".into(), "anaqutsu".into()]);
+    decl.insert("samboDana".into(), vec!["anaqvan".into(), "anaqvAhO".into(), "anaqvAhaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
+/// उपानह् — पद ह्→द् (उपानद्भ्याम्/उपानत्सु), nom उपानत्/उपानद्. Not लिह्-type *उपानक्.
+fn decline_upanah(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "upAnah" || (linga != "stri" && linga != "pum") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert(
+        "prathamA".into(),
+        vec!["upAnat".into(), "upAnad".into(), "upAnahO".into(), "upAnahaH".into()],
+    );
+    decl.insert("dvitIyA".into(), vec!["upAnaham".into(), "upAnahO".into(), "upAnahaH".into()]);
+    decl.insert("tfIyA".into(), vec!["upAnahA".into(), "upAnadByAm".into(), "upAnadBiH".into()]);
+    decl.insert("caturTI".into(), vec!["upAnahe".into(), "upAnadByAm".into(), "upAnadByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["upAnahaH".into(), "upAnadByAm".into(), "upAnadByaH".into()]);
+    decl.insert("zazWI".into(), vec!["upAnahaH".into(), "upAnahoH".into(), "upAnahAm".into()]);
+    decl.insert("saptamI".into(), vec!["upAnahi".into(), "upAnahoH".into(), "upAnatsu".into()]);
+    decl.insert(
+        "samboDana".into(),
+        vec!["upAnat".into(), "upAnad".into(), "upAnahO".into(), "upAnahaH".into()],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -519,6 +567,12 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_ap(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_anaquh(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_upanah(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1069,5 +1123,26 @@ mod tests {
         has(&a, "saptamI", "apsu");
         let pr = a.declension.get("prathamA").unwrap();
         assert!(!pr.iter().any(|x| x == "ap"), "{:?}", pr);
+    }
+
+    #[test]
+    fn anaquh_upanah_h_to_d() {
+        // अनडुह्: अनड्वान्/अनड्वाहम्; पद अनडुद्भ्याम्/अनडुत्सु. Not *अनडुक्.
+        let a = generate("anaquh", "pum").expect("anaquh");
+        has(&a, "prathamA", "anaqvAn");
+        has(&a, "prathamA", "anaqvAhO");
+        has(&a, "dvitIyA", "anaqvAham");
+        has(&a, "tfIyA", "anaquhA");
+        has(&a, "tfIyA", "anaqudByAm");
+        has(&a, "tfIyA", "anaqudBiH");
+        has(&a, "saptamI", "anaqutsu");
+        has(&a, "samboDana", "anaqvan");
+        // उपानह्: उपानत्/उपानद्; उपानद्भिः/उपानत्सु. Not *उपानक्.
+        let u = generate("upAnah", "stri").expect("upAnah");
+        has(&u, "prathamA", "upAnat");
+        has(&u, "prathamA", "upAnad");
+        has(&u, "dvitIyA", "upAnaham");
+        has(&u, "tfIyA", "upAnadBiH");
+        has(&u, "saptamI", "upAnatsu");
     }
 }
