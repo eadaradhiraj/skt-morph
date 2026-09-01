@@ -29,9 +29,12 @@ fn load_dhatu_info(dhatu_query: &str) -> Option<(String, u8, String, String, Str
 }
 
 pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> TinantaResult {
-    let forms = generate_all(dhatu_query, lakara, purusha, vacana);
+    // Clamp puruṣa/vacana 1..3 — WASM JS may pass 0 or >3 via manual call.
+    let p = purusha.clamp(1, 3);
+    let v = vacana.clamp(1, 3);
+    let forms = generate_all(dhatu_query, lakara, p, v);
     let (canon, _) = normalize_lakara(lakara);
-    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
+    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha: p, vacana: v }
 }
 
 pub fn generate_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> TinantaResult {
@@ -39,9 +42,11 @@ pub fn generate_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vaca
 }
 
 pub fn generate_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String], artha: &str) -> TinantaResult {
-    let forms = generate_all_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, artha);
+    let p = purusha.clamp(1, 3);
+    let v = vacana.clamp(1, 3);
+    let forms = generate_all_with_artha(dhatu_query, lakara, p, v, prefixes, artha);
     let (canon, _) = normalize_lakara(lakara);
-    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
+    TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha: p, vacana: v }
 }
 
 pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> Vec<String> {

@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 8: clamp puruṣa/vacana + yaNluk
+
+- **tinanta:** `generate`/`generate_with_artha` now `clamp(1,3)` puruṣa/vacana — guards JS manual calls with 0/>3; prevents panic/empty.
+- **www/iter7:** yaNluk UI + doc sync kept; wasm rebuilt.
+
 ## 2026-09-01 — iteration 7: yaNluk UI + docs
 
 - **www:** added `yaNluk` (2.4.74) to derivation dropdown with labels सयक्/लुक्; engine already supported `yaN`/`yaNluk` via `derived::kartari` (boBUyate vs boBUti).
