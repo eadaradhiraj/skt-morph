@@ -764,6 +764,27 @@ fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// राज् (क्विन्) — पद राट्/राड् (not 8.2.30 *राक् like वणिक्); राड्भ्याम्, राट्सु.
+fn decline_raj(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "rAj" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["rAw".into(), "rAq".into(), "rAjO".into(), "rAjaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["rAjam".into(), "rAjO".into(), "rAjaH".into()]);
+    decl.insert("tfIyA".into(), vec!["rAjA".into(), "rAqByAm".into(), "rAqBiH".into()]);
+    decl.insert("caturTI".into(), vec!["rAje".into(), "rAqByAm".into(), "rAqByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["rAjaH".into(), "rAqByAm".into(), "rAqByaH".into()]);
+    decl.insert("zazWI".into(), vec!["rAjaH".into(), "rAjoH".into(), "rAjAm".into()]);
+    decl.insert("saptamI".into(), vec!["rAji".into(), "rAjoH".into(), "rAwsu".into()]);
+    decl.insert("samboDana".into(), vec!["rAw".into(), "rAq".into(), "rAjO".into(), "rAjaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -842,6 +863,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_sajush(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_raj(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1575,5 +1599,24 @@ mod tests {
         has(&generate("pipaWiz", "pum").unwrap(), "tfIyA", "pipaWIrByAm");
         has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "ASiw"));
+    }
+
+    #[test]
+    fn raj_rat_radbhyam() {
+        // राज्: राट्/राड् not ज-anta *राक् (वणिक्). राजन् stays राजा.
+        let r = generate("rAj", "pum").expect("rAj");
+        has(&r, "prathamA", "rAw");
+        has(&r, "prathamA", "rAq");
+        has(&r, "prathamA", "rAjO");
+        has(&r, "dvitIyA", "rAjam");
+        has(&r, "tfIyA", "rAjA");
+        has(&r, "tfIyA", "rAqByAm");
+        has(&r, "tfIyA", "rAqBiH");
+        has(&r, "saptamI", "rAji");
+        has(&r, "saptamI", "rAwsu");
+        has(&generate("rAj", "stri").unwrap(), "prathamA", "rAw");
+        has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjA");
+        has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
+        assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "rAk"));
     }
 }
