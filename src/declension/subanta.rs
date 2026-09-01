@@ -742,22 +742,26 @@ fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// आशिस्/सजष् — 8.2.66 सजषो रुः, 8.2.76 इक्-upadhā दीर्घ आशीः/सजूः. Not ष-anta *आशिट्; धनुस् stays nap.
+/// आशिस्/सजष् — 8.2.66 सजषो रुः, 8.2.76 इक्-upadhā दीर्घ आशीः/सजूः. चिकीर्ष् चिकीः. Not ष-anta *आशिट्; धनुस् stays nap.
 fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "stri" && linga != "pum" {
         return None;
     }
-    let (pre, long) = if cand == "sajuz" {
-        ("saj", "U")
+    let (nom, pada, loc_pl) = if cand == "sajuz" {
+        ("sajUH".to_string(), "sajUr".to_string(), "sajUHzu".to_string())
+    } else if let Some(p) = cand.strip_suffix("Irz") {
+        if p.is_empty() {
+            return None;
+        }
+        (format!("{p}IH"), format!("{p}Ir"), format!("{p}Irzu"))
     } else {
         let p = cand.strip_suffix("iz")?;
         if p.is_empty() || cand == "dviz" {
             return None;
         }
-        (p, "I")
+        let nom = format!("{p}IH");
+        (nom.clone(), format!("{p}Ir"), format!("{nom}zu"))
     };
-    let nom = format!("{pre}{long}H");
-    let pada = format!("{pre}{long}r");
     let mut decl = HashMap::new();
     decl.insert("prathamA".into(), vec![nom.clone(), format!("{cand}O"), format!("{cand}aH")]);
     decl.insert("dvitIyA".into(), vec![format!("{cand}am"), format!("{cand}O"), format!("{cand}aH")]);
@@ -765,7 +769,7 @@ fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
     decl.insert("caturTI".into(), vec![format!("{cand}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
     decl.insert("paYcamI".into(), vec![format!("{cand}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
     decl.insert("zazWI".into(), vec![format!("{cand}aH"), format!("{cand}oH"), format!("{cand}Am")]);
-    decl.insert("saptamI".into(), vec![format!("{cand}i"), format!("{cand}oH"), format!("{nom}zu")]);
+    decl.insert("saptamI".into(), vec![format!("{cand}i"), format!("{cand}oH"), loc_pl]);
     decl.insert("samboDana".into(), vec![nom, format!("{cand}O"), format!("{cand}aH")]);
     Some(Declension {
         stem: cand.to_string(),
@@ -1881,6 +1885,11 @@ mod tests {
         has(&generate("sajuz", "pum").unwrap(), "prathamA", "sajUH");
         has(&generate("sajuz", "pum").unwrap(), "tfIyA", "sajUrByAm");
         has(&generate("sajuz", "pum").unwrap(), "saptamI", "sajUHzu");
+        let c = generate("cikIrz", "pum").expect("cikIrz");
+        has(&c, "prathamA", "cikIH");
+        has(&c, "tfIyA", "cikIrByAm");
+        has(&c, "saptamI", "cikIrzu");
+        assert!(!c.declension.get("prathamA").unwrap().iter().any(|x| x == "cikIrw"));
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "ASiw"));
     }
 
