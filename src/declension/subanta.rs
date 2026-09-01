@@ -823,6 +823,36 @@ fn decline_ushanasadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// पाद् — 6.4.130 पादः पत् weak पद (सुपदा); पद सुपात्/सुपाद्भ्याम्. Not d-anta *सुपादा.
+fn decline_pad(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("pAd")?;
+    if linga != "pum" && linga != "stri" {
+        return None;
+    }
+    let strong = cand;
+    let weak = format!("{pre}pad");
+    let mut decl = HashMap::new();
+    decl.insert(
+        "prathamA".into(),
+        vec![format!("{pre}pAt"), strong.to_string(), format!("{strong}O"), format!("{strong}aH")],
+    );
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{strong}ByAm"), format!("{strong}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{strong}ByAm"), format!("{strong}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{strong}ByAm"), format!("{strong}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pre}pAtsu")]);
+    decl.insert(
+        "samboDana".into(),
+        vec![format!("{pre}pAt"), strong.to_string(), format!("{strong}O"), format!("{strong}aH")],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -907,6 +937,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_ushanasadi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_pad(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1710,5 +1743,23 @@ mod tests {
         has(&generate("jagat", "nap").unwrap(), "prathamA", "jagat");
         has(&generate("jagat", "nap").unwrap(), "prathamA", "jaganti");
         has(&generate("marut", "pum").unwrap(), "prathamA", "marut");
+    }
+
+    #[test]
+    fn supad_supat_supada() {
+        // 6.4.130 पत्: सुपदा/सुपदः not d-anta *सुपादा. Nom सुपात्/सुपाद्.
+        let s = generate("supAd", "pum").expect("supAd");
+        has(&s, "prathamA", "supAt");
+        has(&s, "prathamA", "supAd");
+        has(&s, "prathamA", "supAdO");
+        has(&s, "dvitIyA", "supAdam");
+        has(&s, "dvitIyA", "supadaH");
+        has(&s, "tfIyA", "supadA");
+        has(&s, "tfIyA", "supAdByAm");
+        has(&s, "saptamI", "supadi");
+        has(&s, "saptamI", "supAtsu");
+        has(&generate("suhfd", "pum").unwrap(), "prathamA", "suhft");
+        has(&generate("suhfd", "pum").unwrap(), "tfIyA", "suhfdA");
+        assert!(!s.declension.get("tfIyA").unwrap().iter().any(|x| x == "supAdA"));
     }
 }
