@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 10: tinanta test headers
+
+- **tinanta:** removed generic boilerplate from 9 test headers (7.5k) — kept assertions; 183 tests pass.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 9: clamp + test
 
 - **tinanta:** added `clamp_purusha_vacana` test for iter 8 guard (0→1, 4→3); 183 tests pass.
