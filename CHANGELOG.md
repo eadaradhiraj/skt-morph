@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 83: README 82
+
+- **README:** recent line updated to 82 iters + verb empty hint (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 82: demo verb empty hint
 
 - **demo.js:** `btn-verb` now shows hint on empty dhātu (no silent no-op).
