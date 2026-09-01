@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 39: phonology doc
+
+- **phonology:** `apply_guna_to_stem` doc clarified 7.3.84/86 single pass.
+- **wasm:** rebuilt 1.2M; 184 tests.
+
 ## 2026-09-01 — iteration 38: demo empty hint
 
 - **demo.js:** `runAnalyze` now shows hint on empty query (no silent no-op).

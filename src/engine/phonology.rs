@@ -14,7 +14,7 @@ pub fn ends_with_vowel(stem: &str) -> bool {
 }
 
 /// 7.3.84 sārvadhātuka guṇa ( + 7.3.86 laghūpadha) — last vowel → guṇa.
-/// e.g. ci→ce, hu→ho, kṛ→kar. Idempotent if already guṇita.
+/// e.g. ci→ce, hu→ho, kṛ→kar. Idempotent if already guṇita. Handles 7.3.84/86 in one pass.
 pub fn apply_guna_to_stem(stem: &str) -> String {
     let chars: Vec<char> = stem.chars().collect();
     for idx in (0..chars.len()).rev() {
