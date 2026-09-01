@@ -180,19 +180,32 @@ fn polish(word: &str) -> String {
     scutva_n(&apply_natva_word(word))
 }
 
-/// 4.1.5–6 ङीप्: इन्/उगित् अत् स्त्री → दण्डिनी, भवती. Not त्रिंशत् (त-anta संख्या).
+/// 4.1.5–6 ङीप्: इन्/उगित् अत्/न् स्त्री → दण्डिनी, भवती, राज्ञी. Not त्रिंशत्; अहन् stays nap.
 fn ngeep_stri(cand: &str, linga: &str) -> String {
     if linga != "stri" || cand.ends_with('I') {
         return cand.to_string();
     }
-    if cand.ends_with("Sat") {
+    if cand.ends_with("Sat") || cand == "ahan" {
         return cand.to_string();
     }
-    if cand.ends_with("at") || cand.ends_with("in") {
-        format!("{cand}I")
-    } else {
-        cand.to_string()
+    // 6.4.133 + 4.1.5: शुनी/यूनी/मघोनी (सम्प्रसारण then ङीप्).
+    match cand {
+        "Svan" => return "SunI".into(),
+        "yuvan" => return "yUnI".into(),
+        "maGavan" => return "maGonI".into(),
+        _ => {}
     }
+    if cand.ends_with("at") || cand.ends_with("in") {
+        return format!("{cand}I");
+    }
+    // 4.1.5 ऋन्नेभ्यो ङीप् after न्; 6.4.134 अल्लोपोऽनः → राज्ञी (8.4.40 श्चुत्व).
+    if let Some(pre) = cand.strip_suffix("an") {
+        if an_al_lopa(pre) {
+            return polish(&format!("{pre}nI"));
+        }
+        return format!("{cand}I");
+    }
+    cand.to_string()
 }
 
 /// 6.4.10 सान्तमहतः संयोगस्य — महत् strong न्त् → आ (महान्तम् not शतृ *महन्तम्).
@@ -827,6 +840,15 @@ mod tests {
         let d = generate("daRqin", "stri").expect("daRqin stri");
         has(&d, "prathamA", "daRqinI");
         has(&d, "dvitIyA", "daRqinIm");
+        // 4.1.5 + 6.4.134 + 8.4.40: राजन् स्त्री राज्ञी (not *राजना).
+        let r = generate("rAjan", "stri").expect("rAjan stri");
+        has(&r, "prathamA", "rAjYI");
+        has(&r, "dvitIyA", "rAjYIm");
+        has(&r, "tfIyA", "rAjYyA");
+        has(&generate("nAman", "stri").unwrap(), "prathamA", "nAmnI");
+        // 6.4.133 + ङीप्: शुनी/यूनी.
+        has(&generate("Svan", "stri").unwrap(), "prathamA", "SunI");
+        has(&generate("yuvan", "stri").unwrap(), "prathamA", "yUnI");
         // त्रिंशत् still त-anta (Sat excluded from ङीप्).
         has(&generate("triMSat", "stri").unwrap(), "prathamA", "triMSat");
         // हल् स्त्री same as पुं (not आ-stem fallback).
