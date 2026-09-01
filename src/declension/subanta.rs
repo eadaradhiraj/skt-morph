@@ -1683,6 +1683,51 @@ fn decline_pradhi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// धी-anta इयङ् (सुधी, शुद्धधी) — 6.4.77 अचि श्नुधातुभ्रुवां: सुधियौ/सुधियम् not यण् *सुध्यौ.
+/// सु सुधीः; पद सुधीभ्याम्. नपुं 7.1.23 सुधि/सुधिनी/सुधीनि. प्रधी stays यण्.
+fn decline_dhi_iyan(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("DI")?;
+    if linga != "pum" && linga != "stri" && linga != "nap" {
+        return None;
+    }
+    let iy = format!("{pre}Diy");
+    let ii = format!("{pre}DI");
+    let mut decl = HashMap::new();
+    if linga == "nap" {
+        let short = format!("{pre}Di");
+        let nom = vec![short.clone(), format!("{short}nI"), format!("{pre}DIni")];
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert("tfIyA".into(), vec![format!("{short}nA"), format!("{short}ByAm"), format!("{short}BiH")]);
+        decl.insert("caturTI".into(), vec![format!("{short}ne"), format!("{short}ByAm"), format!("{short}ByaH")]);
+        decl.insert("paYcamI".into(), vec![format!("{short}naH"), format!("{short}ByAm"), format!("{short}ByaH")]);
+        decl.insert("zazWI".into(), vec![format!("{short}naH"), format!("{short}noH"), format!("{pre}DInAm")]);
+        decl.insert("saptamI".into(), vec![format!("{short}ni"), format!("{short}noH"), format!("{short}zu")]);
+        decl.insert("samboDana".into(), nom);
+        return Some(Declension {
+            stem: cand.to_string(),
+            linga: linga.to_string(),
+            declension: decl,
+        });
+    }
+    decl.insert("prathamA".into(), vec![format!("{ii}H"), format!("{iy}O"), format!("{iy}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{iy}am"), format!("{iy}O"), format!("{iy}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{iy}A"), format!("{ii}ByAm"), format!("{ii}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{iy}e"), format!("{ii}ByAm"), format!("{ii}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{iy}aH"), format!("{ii}ByAm"), format!("{ii}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{iy}aH"), format!("{iy}oH"), format!("{iy}Am"), format!("{ii}nAm")]);
+    decl.insert("saptamI".into(), vec![format!("{iy}i"), format!("{iy}oH"), format!("{ii}zu")]);
+    decl.insert(
+        "samboDana".into(),
+        vec![format!("{ii}H"), format!("{pre}De"), format!("{iy}O"), format!("{iy}aH")],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1836,6 +1881,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_pradhi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_dhi_iyan(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3270,5 +3318,33 @@ mod tests {
         has(&generate("grAmaRI", "pum").unwrap(), "dvitIyA", "grAmaRyam");
         assert!(!p.declension.get("dvitIyA").unwrap().iter().any(|x| x == "praDIm"));
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "praDiyO"));
+    }
+
+    #[test]
+    fn sudhi_sudhiyam_suddhadi() {
+        // सुधी/शुद्धधी: इयङ् सुधियौ/सुधियम्. प्रधी stays प्रध्यम्. नपुं सुधि/सुधिनी.
+        let s = generate("suDI", "pum").expect("suDI");
+        has(&s, "prathamA", "suDIH");
+        has(&s, "prathamA", "suDiyO");
+        has(&s, "prathamA", "suDiyaH");
+        has(&s, "dvitIyA", "suDiyam");
+        has(&s, "tfIyA", "suDiyA");
+        has(&s, "caturTI", "suDiye");
+        has(&s, "saptamI", "suDiyi");
+        has(&s, "saptamI", "suDIzu");
+        has(&s, "samboDana", "suDe");
+        let d = generate("SudDaDI", "pum").expect("SudDaDI");
+        has(&d, "prathamA", "SudDaDIH");
+        has(&d, "dvitIyA", "SudDaDiyam");
+        has(&d, "saptamI", "SudDaDiyi");
+        let n = generate("suDI", "nap").expect("suDI nap");
+        has(&n, "prathamA", "suDi");
+        has(&n, "prathamA", "suDinI");
+        has(&n, "prathamA", "suDIni");
+        has(&n, "tfIyA", "suDinA");
+        has(&generate("praDI", "pum").unwrap(), "dvitIyA", "praDyam");
+        has(&generate("papI", "pum").unwrap(), "dvitIyA", "papIm");
+        assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "suDyam"));
+        assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "suDIm"));
     }
 }
