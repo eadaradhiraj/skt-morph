@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 33: demo WASM timing
+
+- **demo.js:** log WASM init ms + show warm hint (183 tests, dhatu cache); no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 32: dhatu HashMap cache
 
 - **dhatu:** `lookup` now OnceLock HashMaps for id/name (was linear scan 2259×); `cargo test` 15s → 7s, analyze warm stays µs; no logic change.

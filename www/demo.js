@@ -14,7 +14,10 @@ import init, {
 import { toSlp1, toDeva, prefixesToSlp1, formsToDeva } from "./translit.js";
 import * as L from "./labels.js";
 
+const t0 = performance.now();
 await init();
+console.log(`WASM init ${(performance.now()-t0).toFixed(0)}ms`);
+document.getElementById("out-analyze").innerHTML = `<span class="hint">WASM ${(performance.now()-t0).toFixed(0)}ms — उदाहरण: रामेण / rAmeNa · गच्छति / gacchati · ट्रम्पेण (183 tests, dhatu cache 7s)</span>`;
 
 function asObj(m) {
   if (!m) return {};
