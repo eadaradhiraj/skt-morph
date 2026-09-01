@@ -4474,4 +4474,19 @@ mod tests {
         assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "bahuSreyasIH"));
         assert!(!b.declension.get("dvitIyA").unwrap().iter().any(|x| x == "bahuSreyasIn"));
     }
+
+    #[test]
+    fn priyavisva_a_stem_not_sarvanama() {
+        // 1.1.29 न बहुव्रीहौ: प्रियविश्वाय/प्रियविश्वेन, not *प्रियविश्वस्मै. राम stays रामाय.
+        let p = generate("priyaviSva", "pum").expect("priyaviSva");
+        has(&p, "prathamA", "priyaviSvaH");
+        has(&p, "prathamA", "priyaviSvAH");
+        has(&p, "dvitIyA", "priyaviSvam");
+        has(&p, "tfIyA", "priyaviSvena");
+        has(&p, "caturTI", "priyaviSvAya");
+        has(&p, "saptamI", "priyaviSve");
+        has(&generate("rAma", "pum").unwrap(), "caturTI", "rAmAya");
+        assert!(!p.declension.get("caturTI").unwrap().iter().any(|x| x == "priyaviSvasmE"));
+        assert!(!p.declension.get("tfIyA").unwrap().iter().any(|x| x == "priyaviSveRa"));
+    }
 }

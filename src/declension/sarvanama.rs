@@ -230,6 +230,7 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("uBaya".to_string(),"stri".to_string()), vec![sg_pl("uBayA","uBayAH"), sg_pl("uBayAm","uBayAH"), sg_pl("uBayayA","uBayABiH"), sg_pl("uBayasyE","uBayAByaH"), sg_pl("uBayasyAH","uBayAByaH"), sg_pl("uBayasyAH","uBayAsAm"), sg_pl("uBayasyAm","uBayAsu")]);
   m.insert(("uBaya".to_string(),"nap".to_string()), vec![sg_pl("uBayam","uBayAni"), sg_pl("uBayam","uBayAni"), sg_pl("uBayena","uBayEH"), sg_pl("uBayasmE","uBayeByaH"), sg_pl("uBayasmAt","uBayeByaH"), sg_pl("uBayasya","uBayezAm"), sg_pl("uBayasmin","uBayezu")]);
   // विश्व — 1.1.27 like सर्व (7.1.14 स्मै, 7.1.9 ऐस्, 8.4.1 णत्व विश्वेण/विश्वाणि).
+  // 1.1.29 न बहुव्रीहौ: exact `viSva` only. प्रियविश्व is a-stem सुबन्त (प्रियविश्वाय), not *विश्वस्मै.
   m.insert(("viSva".to_string(),"pum".to_string()), vec![vec!["viSvaH".to_string(),"viSvO".to_string(),"viSve".to_string()],vec!["viSvam".to_string(),"viSvO".to_string(),"viSvAn".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
   m.insert(("viSva".to_string(),"stri".to_string()), vec![vec!["viSvA".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvAm".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvayA".to_string(),"viSvAByAm".to_string(),"viSvABiH".to_string()],vec!["viSvasyE".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvayoH".to_string(),"viSvAsAm".to_string()],vec!["viSvasyAm".to_string(),"viSvayoH".to_string(),"viSvAsu".to_string()]]);
   m.insert(("viSva".to_string(),"nap".to_string()), vec![vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
@@ -268,6 +269,7 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
 pub fn generate(base: &str, linga: &str) -> Option<PronounTable> {
+    // 1.1.29 न बहुव्रीहौ: exact सर्वादि keys only (प्रियविश्व / उत्तरपूर्वा are not table keys).
     let base = canon_sarvanama(base);
     let linga_eff = if base=="asmad" || base=="yuzmad" { "any" } else { linga };
     let table = pronouns().get(&(base.to_string(), linga_eff.to_string()))?.clone();
@@ -557,5 +559,9 @@ mod tests {
         has(&generate("purva", "pum").unwrap(), "caturTI", "pUrvasmE");
         assert!(!generate("pUrva", "pum").unwrap().table.get("caturTI").unwrap().iter().any(|x| x == "pUrvAya"));
         assert!(analyze("katarasmE").iter().any(|m| m.get("pratipadika") == Some(&"katara".to_string())));
+        // 1.1.29: प्रियविश्व is बहुव्रीहि, not विश्व. एकतर stays listed डतर.
+        assert!(generate("priyaviSva", "pum").is_none());
+        has(&generate("viSva", "pum").unwrap(), "caturTI", "viSvasmE");
+        has(&generate("ekatara", "pum").unwrap(), "caturTI", "ekatarasmE");
     }
 }
