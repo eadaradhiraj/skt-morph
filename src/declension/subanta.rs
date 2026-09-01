@@ -4124,7 +4124,7 @@ mod tests {
 
     #[test]
     fn brahman_brahma_ghrtasprs() {
-        // ब्रह्मन्: 6.4.137 no अल्लोप ब्रह्मणा/ब्रह्माणम्. राजन् stays राज्ञा. घृतस्पृश् श-anta घृतस्पृक्.
+        // ब्रह्मन्/यज्वन्: 6.4.137 no अल्लोप ब्रह्मणा/यज्वना. राजन् stays राज्ञा. घृतस्पृश् श-anta घृतस्पृक्.
         let b = generate("brahman", "pum").expect("brahman");
         has(&b, "prathamA", "brahmA");
         has(&b, "prathamA", "brahmARO");
@@ -4144,7 +4144,17 @@ mod tests {
         has(&g, "tfIyA", "GftaspfgByAm");
         has(&g, "saptamI", "Gftaspfkzu");
         has(&generate("diS", "stri").unwrap(), "prathamA", "dik");
+        let y = generate("yajvan", "pum").expect("yajvan");
+        has(&y, "prathamA", "yajvA");
+        has(&y, "prathamA", "yajvAnO");
+        has(&y, "dvitIyA", "yajvAnam");
+        has(&y, "tfIyA", "yajvanA");
+        has(&y, "tfIyA", "yajvaByAm");
+        has(&y, "saptamI", "yajvani");
+        has(&y, "saptamI", "yajvasu");
+        has(&y, "samboDana", "yajvan");
         assert!(!b.declension.get("tfIyA").unwrap().iter().any(|x| x == "brahmnA"));
+        assert!(!y.declension.get("tfIyA").unwrap().iter().any(|x| x == "yajvnA"));
     }
 
     #[test]
