@@ -2,6 +2,12 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 7: yaNluk UI + docs
+
+- **www:** added `yaNluk` (2.4.74) to derivation dropdown with labels सयक्/लुक्; engine already supported `yaN`/`yaNluk` via `derived::kartari` (boBUyate vs boBUti).
+- **tinanta/lib:** docs updated `Ric/san/yaN/yaNluk/karma` (was missing yaNluk); no logic change.
+- **www:** iterative a11y + debounce kept.
+
 ## 2026-09-01 — iteration 6: www a11y + UX
 
 - **www:** `index.html` added meta description, `aria-label`/`aria-live` for analyze, dhatu/nbase inputs; `demo.js` Enter-to-search/verb/noun with 80ms debounce; avoids double init race.

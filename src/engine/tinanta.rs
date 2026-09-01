@@ -62,7 +62,8 @@ pub fn generate_all_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vac
     generate_all_derived_artha(dhatu_query, "", lakara, purusha, vacana, prefixes, artha)
 }
 
-/// `derivation`: empty = śuddha; `Ric` / `san` / `yaN` / `karma`.
+/// `derivation`: empty = śuddha; `Ric` / `san` / `yaN` / `yaNluk` (2.4.74) / `karma`.
+/// yaN = सयक् ātmane (boBUyate); yaNluk = luk parasmai (boBUti).
 pub fn generate_all_derived(
     dhatu_query: &str,
     derivation: &str,
