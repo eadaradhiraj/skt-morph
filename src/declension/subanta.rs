@@ -1440,6 +1440,40 @@ fn decline_gramani(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// जरा — 7.2.101 जराया जरसन्यतरस्याम्: टाप् जरा/जरया and optional जरस् जरसौ/जरसाम्. पद जराभ्याम्. सीता stays टाप्.
+fn decline_jara(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "jarA" || linga != "stri" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert(
+        "prathamA".into(),
+        vec!["jarA".into(), "jare".into(), "jarasO".into(), "jarAH".into(), "jarasaH".into()],
+    );
+    decl.insert(
+        "dvitIyA".into(),
+        vec![
+            "jarAm".into(),
+            "jarasam".into(),
+            "jare".into(),
+            "jarasO".into(),
+            "jarAH".into(),
+            "jarasaH".into(),
+        ],
+    );
+    decl.insert("tfIyA".into(), vec!["jarayA".into(), "jarasA".into(), "jarAByAm".into(), "jarABiH".into()]);
+    decl.insert("caturTI".into(), vec!["jarAyE".into(), "jarase".into(), "jarAByAm".into(), "jarAByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["jarAyAH".into(), "jarasaH".into(), "jarAByAm".into(), "jarAByaH".into()]);
+    decl.insert("zazWI".into(), vec!["jarAyAH".into(), "jarayoH".into(), "jarARAm".into(), "jarasAm".into()]);
+    decl.insert("saptamI".into(), vec!["jarAyAm".into(), "jarasi".into(), "jarayoH".into(), "jarAsu".into()]);
+    decl.insert("samboDana".into(), vec!["jare".into(), "jarasO".into(), "jarAH".into(), "jarasaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1572,6 +1606,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_gramani(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_jara(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2834,5 +2871,28 @@ mod tests {
         has(&generate("nadI", "stri").unwrap(), "saptamI", "nadyAm");
         assert!(!g.declension.get("dvitIyA").unwrap().iter().any(|x| x == "grAmaRIm"));
         assert!(!g.declension.get("saptamI").unwrap().iter().any(|x| x == "grAmaRI"));
+    }
+
+    #[test]
+    fn jara_jarasa_jaraya() {
+        // जरा 7.2.101: टाप् जरा/जरया and जरस् जरसौ/जरसाम्. सीता stays सीतया.
+        let j = generate("jarA", "stri").expect("jarA");
+        has(&j, "prathamA", "jarA");
+        has(&j, "prathamA", "jare");
+        has(&j, "prathamA", "jarasO");
+        has(&j, "prathamA", "jarAH");
+        has(&j, "prathamA", "jarasaH");
+        has(&j, "dvitIyA", "jarAm");
+        has(&j, "dvitIyA", "jarasam");
+        has(&j, "tfIyA", "jarayA");
+        has(&j, "tfIyA", "jarasA");
+        has(&j, "caturTI", "jarAyE");
+        has(&j, "caturTI", "jarase");
+        has(&j, "saptamI", "jarAyAm");
+        has(&j, "saptamI", "jarasi");
+        has(&j, "zazWI", "jarARAm");
+        has(&j, "zazWI", "jarasAm");
+        has(&generate("sItA", "stri").unwrap(), "tfIyA", "sItayA");
+        assert!(!generate("sItA", "stri").unwrap().declension.get("tfIyA").unwrap().iter().any(|x| x == "sItasA"));
     }
 }
