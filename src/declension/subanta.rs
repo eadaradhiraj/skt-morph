@@ -904,6 +904,61 @@ fn decline_duhadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// वाह् — 6.4.132 ऊठ् + 6.1.87 गुण विश्वौहा; पद 8.2.31/8.4.41 विश्ववाट्. तुरासाह् तुराषाट् (no ऊठ्). Not h-anta *क्.
+fn decline_vah(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "pum" && linga != "stri" {
+        return None;
+    }
+    let (strong, weak, pada_w, pada_q) = if let Some(pre) = cand.strip_suffix("vAh") {
+        if pre.is_empty() {
+            return None;
+        }
+        let weak = if let Some(p) = pre.strip_suffix('a') {
+            format!("{p}Oh")
+        } else {
+            format!("{pre}Uh")
+        };
+        (
+            cand.to_string(),
+            weak,
+            format!("{pre}vAw"),
+            format!("{pre}vAq"),
+        )
+    } else if cand == "turAsAh" {
+        (
+            cand.to_string(),
+            cand.to_string(),
+            "turAzAw".into(),
+            "turAzAq".into(),
+        )
+    } else {
+        return None;
+    };
+    let mut decl = HashMap::new();
+    decl.insert(
+        "prathamA".into(),
+        vec![pada_q.clone(), pada_w.clone(), format!("{strong}O"), format!("{strong}aH")],
+    );
+    decl.insert(
+        "dvitIyA".into(),
+        vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")],
+    );
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada_q}ByAm"), format!("{pada_q}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada_q}ByAm"), format!("{pada_q}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada_q}ByAm"), format!("{pada_q}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada_w}su")]);
+    decl.insert(
+        "samboDana".into(),
+        vec![pada_q, pada_w, format!("{strong}O"), format!("{strong}aH")],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -997,6 +1052,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_duhadi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_vah(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1877,5 +1935,30 @@ mod tests {
         has(&generate("uzRih", "pum").unwrap(), "prathamA", "uzRik");
         has(&generate("lih", "pum").unwrap(), "prathamA", "lik");
         assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "duk"));
+    }
+
+    #[test]
+    fn visvavah_visvauha_turasat() {
+        // 6.4.132 ऊठ्: विश्वौहा; पद विश्ववाट्/विश्ववाड्. तुरासाह् तुराषाट् (no ऊठ्). Not *विश्ववाक्.
+        let v = generate("viSvavAh", "pum").expect("viSvavAh");
+        has(&v, "prathamA", "viSvavAw");
+        has(&v, "prathamA", "viSvavAq");
+        has(&v, "prathamA", "viSvavAhO");
+        has(&v, "dvitIyA", "viSvavAham");
+        has(&v, "dvitIyA", "viSvOhaH");
+        has(&v, "tfIyA", "viSvOhA");
+        has(&v, "tfIyA", "viSvavAqByAm");
+        has(&v, "saptamI", "viSvOhi");
+        has(&v, "saptamI", "viSvavAwsu");
+        let t = generate("turAsAh", "pum").expect("turAsAh");
+        has(&t, "prathamA", "turAzAw");
+        has(&t, "prathamA", "turAzAq");
+        has(&t, "tfIyA", "turAsAhA");
+        has(&t, "tfIyA", "turAzAqByAm");
+        has(&t, "saptamI", "turAsAhi");
+        has(&t, "saptamI", "turAzAwsu");
+        has(&generate("duh", "pum").unwrap(), "prathamA", "Duk");
+        has(&generate("uzRih", "pum").unwrap(), "prathamA", "uzRik");
+        assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "viSvavAk"));
     }
 }
