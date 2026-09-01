@@ -22,7 +22,7 @@ extern "C" {
 #[wasm_bindgen(start)]
 pub fn init() {}
 
-/// Generate single tinanta form. SLP1 dhatu/id + lakara (plat/plrt/…), puruṣa/vacana 1–3.
+/// Generate single tinanta form. SLP1 dhatu/id + lakara (plat/plrt/…), puruṣa/vacana 1–3 (clamped).
 #[wasm_bindgen]
 pub fn generate_verb(dhatu: &str, lakara: &str, purusha: u8, vacana: u8) -> JsValue {
     let result = engine::tinanta::generate(dhatu, lakara, purusha, vacana);
