@@ -1991,6 +1991,31 @@ fn decline_lakshmi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// अतिलक्ष्मी — लक्ष्मीः-class visarga + यण्; शस् अतिलक्ष्मीन् (not स्त्री *अतिलक्ष्मीः).
+/// nonempty `lakzmI` + stri. लक्ष्मी stays acc लक्ष्मीः.
+fn decline_atilakshmi(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("lakzmI")?;
+    if pre.is_empty() || linga != "stri" {
+        return None;
+    }
+    let y = format!("{pre}lakzmy");
+    let ii = format!("{pre}lakzmI");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{ii}H"), format!("{y}O"), format!("{y}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{ii}m"), format!("{y}O"), format!("{ii}n")]);
+    decl.insert("tfIyA".into(), vec![format!("{y}A"), format!("{ii}ByAm"), format!("{ii}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{y}E"), format!("{ii}ByAm"), format!("{ii}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{y}AH"), format!("{ii}ByAm"), format!("{ii}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{y}AH"), format!("{y}oH"), polish(&format!("{ii}nAm"))]);
+    decl.insert("saptamI".into(), vec![format!("{y}Am"), format!("{y}oH"), format!("{ii}zu")]);
+    decl.insert("samboDana".into(), vec![format!("{pre}lakzmi"), format!("{y}O"), format!("{y}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2069,6 +2094,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_lakshmi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_atilakshmi(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -3894,5 +3922,23 @@ mod tests {
         assert!(!l.declension.get("prathamA").unwrap().iter().any(|x| x == "lakzmI"));
         assert!(!generate("gOrI", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "gOrIH"));
         assert!(!l.declension.get("dvitIyA").unwrap().iter().any(|x| x == "lakzmiyam"));
+    }
+
+    #[test]
+    fn atilakshmi_atilakshmin() {
+        // अतिलक्ष्मीः यण्; शस् अतिलक्ष्मीन्. लक्ष्मी stays acc लक्ष्मीः. गौरी stays गौरीः.
+        let a = generate("atilakzmI", "stri").expect("atilakzmI");
+        has(&a, "prathamA", "atilakzmIH");
+        has(&a, "prathamA", "atilakzmyO");
+        has(&a, "prathamA", "atilakzmyaH");
+        has(&a, "dvitIyA", "atilakzmIm");
+        has(&a, "dvitIyA", "atilakzmIn");
+        has(&a, "tfIyA", "atilakzmyA");
+        has(&a, "saptamI", "atilakzmyAm");
+        has(&a, "saptamI", "atilakzmIzu");
+        has(&a, "samboDana", "atilakzmi");
+        has(&generate("lakzmI", "stri").unwrap(), "dvitIyA", "lakzmIH");
+        has(&generate("gOrI", "stri").unwrap(), "dvitIyA", "gOrIH");
+        assert!(!a.declension.get("dvitIyA").unwrap().iter().any(|x| x == "atilakzmIH"));
     }
 }
