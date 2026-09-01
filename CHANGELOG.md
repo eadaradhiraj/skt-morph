@@ -132,6 +132,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **सर्वनाम पूर्व:** पूर्वेण/पूर्वस्मै (SLP1 `pUrva`). `purva` aliases.
 - **सर्वनाम सर्वा:** `sarvA` aliases सर्व स्त्री सर्वस्यै.
 - **सुबन्त 6.4.11:** कर्तारौ/स्वसारम्; पितरौ/पितरम्. माता stays मातरम्.
+- **सुबन्त ऊ-anta पुं:** यण् हूह्वौ-like (चमूः/चम्वौ/चमूम्). खलप्वम्/अतिचम्वाम्/वध्वाम् stay.
 
 ## 2026-08-31
 

@@ -39,7 +39,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("u".to_string(),"pum".to_string()), vec![vec!["uH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["um".to_string(),"U".to_string(),"Un".to_string(),],vec!["unA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["O".to_string(),"voH".to_string(),"uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("u".to_string(),"stri".to_string()), vec![vec!["uH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["um".to_string(),"U".to_string(),"UH".to_string(),],vec!["vA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["vE,ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["vAH,oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm,O".to_string(),"voH".to_string(),"uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
   m.insert(("u".to_string(),"nap".to_string()), vec![vec!["u".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["u".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["unA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["unaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["unaH".to_string(),"unoH".to_string(),"UnAm".to_string(),],vec!["uni".to_string(),"unoH".to_string(),"uzu".to_string(),],vec!["u,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
-  m.insert(("U".to_string(),"pum".to_string()), vec![vec!["UH".to_string(),"U".to_string(),"avaH".to_string(),],vec!["Um".to_string(),"U".to_string(),"Un".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Ave".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["oH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["O".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["o".to_string(),"U".to_string(),"avaH".to_string(),],]);
+  // ऊ-anta पुं (हूहू) — यण् हूह्वौ/हूह्वा; सु हूहूः; अम् हूहूम्; शस् हूहून्; loc हूह्वि. Not *हूहावौ. खलपू acc वम् named; वधू loc वाम् स्त्री; अतिचमू loc वाम् named.
+  m.insert(("U".to_string(),"pum".to_string()), vec![vec!["UH".to_string(),"vO".to_string(),"vaH".to_string(),],vec!["Um".to_string(),"vO".to_string(),"Un".to_string(),],vec!["vA".to_string(),"UByAm".to_string(),"UBiH".to_string(),],vec!["ve".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vaH".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vaH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vi".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["UH".to_string(),"vO".to_string(),"vaH".to_string(),],]);
   // ऊ-anta स्त्री (वधू) — नदीवत् यण् वध्वौ/वध्वा; सु वधूः; पद वधूभ्याम्/वधूषु; voc वधु. धेनु stays u-stri. भ्रू/स्वभू stay उवङ्.
   m.insert(("U".to_string(),"stri".to_string()), vec![vec!["UH".to_string(),"vO".to_string(),"vaH".to_string(),],vec!["Um".to_string(),"vO".to_string(),"UH".to_string(),],vec!["vA".to_string(),"UByAm".to_string(),"UBiH".to_string(),],vec!["vE".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vAH".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vAH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["u".to_string(),"vO".to_string(),"vaH".to_string(),],]);
   m.insert(("U".to_string(),"nap".to_string()), vec![vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"UnoH".to_string(),"UnAm".to_string(),],vec!["Uni".to_string(),"UnoH".to_string(),"Uzu".to_string(),],vec!["U,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
@@ -4334,5 +4335,27 @@ mod tests {
         has(&generate("naptf", "pum").unwrap(), "dvitIyA", "naptAram");
         assert!(!generate("pitf", "pum").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "pitArO"));
         assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "svasaram"));
+    }
+
+    #[test]
+    fn u_pum_yan_not_av() {
+        // Generic ऊ-anta पुं यण् (हूहू-like). खलपू acc वम्; अतिचमू loc वाम्; वधू स्त्री loc वाम् stay.
+        let c = generate("camU", "pum").expect("camU pum");
+        has(&c, "prathamA", "camUH");
+        has(&c, "prathamA", "camvO");
+        has(&c, "prathamA", "camvaH");
+        has(&c, "dvitIyA", "camUm");
+        has(&c, "dvitIyA", "camUn");
+        has(&c, "tfIyA", "camvA");
+        has(&c, "caturTI", "camve");
+        has(&c, "saptamI", "camvi");
+        has(&c, "saptamI", "camUzu");
+        has(&c, "samboDana", "camUH");
+        has(&generate("KalapU", "pum").unwrap(), "dvitIyA", "Kalapvam");
+        has(&generate("aticamU", "pum").unwrap(), "saptamI", "aticamvAm");
+        has(&generate("vaDU", "stri").unwrap(), "saptamI", "vaDvAm");
+        assert!(!c.declension.get("prathamA").unwrap().iter().any(|x| x == "camavaH"));
+        assert!(!c.declension.get("dvitIyA").unwrap().iter().any(|x| x == "camvam"));
+        assert!(!c.declension.get("saptamI").unwrap().iter().any(|x| x == "camvAm"));
     }
 }
