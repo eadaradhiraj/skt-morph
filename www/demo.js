@@ -202,6 +202,21 @@ document.getElementById("btn-search").onclick = () =>
   runAnalyze(["tinanta"], "न किञ्चन तिङन्तम्");
 document.getElementById("btn-subanta").onclick = () =>
   runAnalyze(["subanta", "sarvanama"], "न किञ्चन सुबन्तम्");
+// Enter in #q triggers विश्लेषण; debounced to avoid double WASM init race
+let analyzeTimer = null;
+document.getElementById("q").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    clearTimeout(analyzeTimer);
+    analyzeTimer = setTimeout(() => runAnalyze(null), 80);
+  }
+});
+document.getElementById("dhatu").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("btn-verb").click();
+});
+document.getElementById("nbase").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") document.getElementById("btn-noun").click();
+});
 
 function renderVerbParadigm(res) {
   const el = document.getElementById("out-verb");

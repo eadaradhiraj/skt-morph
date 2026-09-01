@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>skt-morph WASM</title>
+<title>skt-morph — Pāṇini WASM</title>
+<meta name="description" content="Sanskrit morphology WASM: Pāṇini/Kaumudī tinanta/kṛdanta/subanta generate + analyze (SLP1/Devanagari).">
 <style>
 body{font-family:"Noto Sans Devanagari",system-ui,sans-serif;max-width:920px;margin:2rem auto;padding:0 1rem}
 nav button{margin-right:.5rem;margin-bottom:.35rem;padding:.4rem .8rem;border:1px solid #ccc;background:#f5f5f5;cursor:pointer}
@@ -39,16 +40,16 @@ h2.block{font-size:1.05rem;margin:1.1rem 0 .4rem;border-top:1px solid #eee;paddi
 <button id="tab-noun">सुबन्त</button>
 </nav>
 
-<section id="sec-analyze">
-  <input id="q" placeholder="रामेण / rAmeNa / ट्रम्पेण" style="width:360px">
-  <button id="btn-analyze">विश्लेषण</button>
+<section id="sec-analyze" aria-label="विश्लेषण">
+  <input id="q" placeholder="रामेण / rAmeNa / ट्रम्पेण" style="width:360px" aria-label="शब्द" autocomplete="off">
+  <button id="btn-analyze" aria-label="विश्लेषण">विश्लेषण</button>
   <button id="btn-search">तिङन्तान्वेषण</button>
   <button id="btn-subanta">सुबन्तविश्लेषण</button>
-  <div id="out-analyze"></div>
+  <div id="out-analyze" role="status" aria-live="polite"></div>
 </section>
 
-<section id="sec-verb" hidden>
-  <input id="dhatu" placeholder="धातु भू / bhU / 01.0001" value="भू">
+<section id="sec-verb" hidden aria-label="धातु">
+  <input id="dhatu" placeholder="धातु भू / bhU / 01.0001" value="भू" aria-label="धातु">
   <div id="upasargas" class="upasargas"></div>
   <input id="verb-prefix-extra" placeholder="अन्य — आविस्, तिरस्, पुरस्">
   <button type="button" id="btn-upa-clear">निरुपसर्ग</button>

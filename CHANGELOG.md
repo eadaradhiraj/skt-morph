@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 6: www a11y + UX
+
+- **www:** `index.html` added meta description, `aria-label`/`aria-live` for analyze, dhatu/nbase inputs; `demo.js` Enter-to-search/verb/noun with 80ms debounce; avoids double init race.
+- **www:** kept `toArray` split fix from iter 2; UX now keyboard-friendly (विश्लेषण via Enter).
+
 ## 2026-09-01 — iteration 5: Cargo/CI/bench hygiene
 
 - **dhatu:** removed generic test header boilerplate (6 fns) in `dhatu.rs`; kept sūtra-specific lookups.
