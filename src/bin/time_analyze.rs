@@ -1,8 +1,8 @@
-//! Time reverse lookup. First call builds the unprefixed tinanta/kṛdanta indexes.
-//!
-//! ```text
-//! cargo run --release --bin time_analyze -- Bavati pragacCati rAmeRa
-//! ```
+//! Bench reverse lookup — measures OnceLock cold vs warm.
+//! First `analyze_word` builds tinanta (≈300k) + kṛdanta (≈60×2k) indexes; subsequent calls are hash lookups + upasarga peel.
+//! Usage:
+//!   cargo run --release --bin time_analyze -- Bavati pragacCati rAmeRa wrampeRa
+//! Expect: first ~0.8–1.5s (release), warm ~µs.
 
 use std::env;
 use std::time::Instant;

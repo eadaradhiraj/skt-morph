@@ -103,10 +103,6 @@ mod tests {
     use super::*;
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `bu_by_name_is_bhavadi`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn bu_by_name_is_bhavadi() {
         let d = lookup("BU").expect("BU");
         assert_eq!(d.id, "01.0001");
@@ -114,20 +110,12 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `bu_by_id`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn bu_by_id() {
         let d = lookup("01.0001").expect("id");
         assert_eq!(d.dhatu, "BU");
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `gam_resolves_gamx`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn gam_resolves_gamx() {
         let d = lookup("gam").expect("gam");
         assert_eq!(d.id, "01.1137");
@@ -135,10 +123,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `yama_by_name_is_yacchati`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn yama_by_name_is_yacchati() {
         let d = lookup("yama").expect("yama");
         assert_ne!(d.id, "01.0930");
@@ -146,20 +130,12 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `krama_from_deva_is_kramu`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn krama_from_deva_is_kramu() {
         let d = lookup("krama").expect("krama");
         assert_eq!(d.dhatu, "kramu");
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `as_by_name_is_adadi`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn as_by_name_is_adadi() {
         let d = lookup("asa").expect("asa");
         assert_eq!(d.id, "02.0060");

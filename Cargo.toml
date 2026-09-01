@@ -5,6 +5,9 @@ edition = "2021"
 description = "Sanskrit morphology - conjugations, participles, declensions (WASM)"
 license = "MIT"
 repository = "https://github.com/eadaradhiraj/skt-morph"
+readme = "README.MD"
+keywords = ["sanskrit", "panini", "morphology", "wasm", "slp1"]
+categories = ["science", "wasm"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]

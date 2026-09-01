@@ -13,6 +13,9 @@ jobs:
         with:
           targets: wasm32-unknown-unknown
           components: clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-targets: true
       - uses: jetli/wasm-pack-action@v0.4.0
         with:
           version: v0.15.0

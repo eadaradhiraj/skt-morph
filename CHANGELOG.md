@@ -2,6 +2,13 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 5: Cargo/CI/bench hygiene
+
+- **dhatu:** removed generic test header boilerplate (6 fns) in `dhatu.rs`; kept sūtra-specific lookups.
+- **Cargo:** added `readme`/`keywords`/`categories` for crates.io; kept `opt-level 3 + lto` (strip reverted — breaks wasm-opt).
+- **CI:** added `Swatinem/rust-cache@v2` to cache cargo + wasm-pack; faster `clippy`/`test`/`wasm`.
+- **bench:** `time_analyze.rs` docs clarified cold vs warm OnceLock timings; 182 tests still pass.
+
 ## 2026-09-01 — iteration 4: README + taddhita + final polish
 
 - **taddhita:** cleaned test header boilerplate in `taddhita.rs`; docs now sūtra-specific (4.1.83/120/105) instead of generic.
