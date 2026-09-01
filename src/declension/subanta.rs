@@ -1546,6 +1546,28 @@ fn decline_huhu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// वेधस् — 6.4.14 अत्वसन्तस्य चाऽधातोः सौ वेधाः (not as-pum *वेधः); voc वेधः; पद वेधोभ्याम्/वेधःसु.
+/// मनस् पुं stays मनः. Exact `veDas`.
+fn decline_vedhas(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "veDas" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["veDAH".into(), "veDasO".into(), "veDasaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["veDasam".into(), "veDasO".into(), "veDasaH".into()]);
+    decl.insert("tfIyA".into(), vec!["veDasA".into(), "veDoByAm".into(), "veDoBiH".into()]);
+    decl.insert("caturTI".into(), vec!["veDase".into(), "veDoByAm".into(), "veDoByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["veDasaH".into(), "veDoByAm".into(), "veDoByaH".into()]);
+    decl.insert("zazWI".into(), vec!["veDasaH".into(), "veDasoH".into(), "veDasAm".into()]);
+    decl.insert("saptamI".into(), vec!["veDasi".into(), "veDasoH".into(), "veDassu".into(), "veDaHsu".into()]);
+    decl.insert("samboDana".into(), vec!["veDaH".into(), "veDasO".into(), "veDasaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1690,6 +1712,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_huhu(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_vedhas(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3063,5 +3088,22 @@ mod tests {
         has(&generate("svaBU", "pum").unwrap(), "dvitIyA", "svaBuvam");
         assert!(!h.declension.get("prathamA").unwrap().iter().any(|x| x == "hUhavO"));
         assert!(!h.declension.get("dvitIyA").unwrap().iter().any(|x| x == "hUhUvam"));
+    }
+
+    #[test]
+    fn vedhas_vedhah() {
+        // वेधस् 6.4.14: सौ वेधाः; voc वेधः; पद वेधोभ्याम्. मनस् पुं stays मनः.
+        let v = generate("veDas", "pum").expect("veDas");
+        has(&v, "prathamA", "veDAH");
+        has(&v, "prathamA", "veDasO");
+        has(&v, "prathamA", "veDasaH");
+        has(&v, "dvitIyA", "veDasam");
+        has(&v, "tfIyA", "veDasA");
+        has(&v, "tfIyA", "veDoByAm");
+        has(&v, "saptamI", "veDasi");
+        has(&v, "saptamI", "veDaHsu");
+        has(&v, "samboDana", "veDaH");
+        has(&generate("manas", "pum").unwrap(), "prathamA", "manaH");
+        assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "veDaH"));
     }
 }
