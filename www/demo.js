@@ -341,7 +341,9 @@ function renderDeclension(res) {
 }
 
 document.getElementById("btn-noun").onclick = () => {
-  const b = toSlp1(document.getElementById("nbase").value) || "rAma";
+  const raw = document.getElementById("nbase").value.trim();
+  if (!raw) { document.getElementById("out-noun").innerHTML = '<span class="hint">प्रातिपदिकं लिखत — e.g. राम / rAma / सीता</span>'; return; }
+  const b = toSlp1(raw) || "rAma";
   const l = document.getElementById("linga").value;
   let res = generate_pronoun(b, l);
   const pronounHit = res && asObj(res.table) && Object.keys(asObj(res.table)).length > 0;

@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 86: demo noun empty hint
+
+- **demo.js:** `btn-noun` now shows hint on empty pratipadika.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 85: README 84
 
 - **README:** recent line updated to 84 iters + verb1 hint (187 tests).
