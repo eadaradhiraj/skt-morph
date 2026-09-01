@@ -519,6 +519,27 @@ fn decline_upanah(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// दिव् — 7.1.84 दिव औत् द्यौः; पद सम्प्रसारण द्युभ्याम्/द्युषु. Not v-fallback *दिवा.
+fn decline_div(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "div" || (linga != "stri" && linga != "pum") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["dyOH".into(), "divO".into(), "divaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["divam".into(), "divO".into(), "divaH".into()]);
+    decl.insert("tfIyA".into(), vec!["divA".into(), "dyuByAm".into(), "dyuBiH".into()]);
+    decl.insert("caturTI".into(), vec!["dive".into(), "dyuByAm".into(), "dyuByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["divaH".into(), "dyuByAm".into(), "dyuByaH".into()]);
+    decl.insert("zazWI".into(), vec!["divaH".into(), "divoH".into(), "divAm".into()]);
+    decl.insert("saptamI".into(), vec!["divi".into(), "divoH".into(), "dyuzu".into()]);
+    decl.insert("samboDana".into(), vec!["dyOH".into(), "divO".into(), "divaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -573,6 +594,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_upanah(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_div(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1144,5 +1168,22 @@ mod tests {
         has(&u, "dvitIyA", "upAnaham");
         has(&u, "tfIyA", "upAnadBiH");
         has(&u, "saptamI", "upAnatsu");
+    }
+
+    #[test]
+    fn div_dyauh_dyubhih() {
+        // 7.1.84 दिव औत् द्यौः; पद द्युभ्याम्/द्युषु. Not *दिवा.
+        let d = generate("div", "stri").expect("div");
+        has(&d, "prathamA", "dyOH");
+        has(&d, "prathamA", "divO");
+        has(&d, "prathamA", "divaH");
+        has(&d, "dvitIyA", "divam");
+        has(&d, "tfIyA", "divA");
+        has(&d, "tfIyA", "dyuByAm");
+        has(&d, "tfIyA", "dyuBiH");
+        has(&d, "saptamI", "divi");
+        has(&d, "saptamI", "dyuzu");
+        has(&d, "samboDana", "dyOH");
+        has(&generate("div", "pum").unwrap(), "prathamA", "dyOH");
     }
 }
