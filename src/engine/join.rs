@@ -1,6 +1,5 @@
-//! join — aṅga+suffix sandhi (thematic + augment + gaṇa overrides).
-//! Port of engine/join.py — lat/lot/lṛṭ/laṅ/vidhi for all gaṇas live.
-//! sūtra-gated: 3.1.80 śnu, 7.1.58, gaṇa-7 śnam (n-infix), gaṇa-9 snā.
+//! join — aṅga+suffix sandhi (thematic + augment + gaṇa overrides, Kaumudī).
+//! Port of engine/join.py — lat/lot/lṛṭ/laṅ/vidhi for all gaṇas live, sūtra-gated.
 use crate::engine::phonology::thematic_join;
 
 /// 3.1.80 धिन्विकृण्व्योर च: श्नु-like o/u/v after 7.1.58 (धिनोति, कृणोति).

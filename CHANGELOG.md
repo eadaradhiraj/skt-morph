@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 56: join header tweak
+
+- **join:** header → Kaumudī; concise.
+- **wasm:** rebuilt 1.2M; 186 tests.
+
 ## 2026-09-01 — iteration 55: README 54
 
 - **README:** recent line updated to 54 iters + labels/translit (186 tests).
