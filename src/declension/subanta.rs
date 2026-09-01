@@ -292,6 +292,42 @@ fn decline_an(stem: &str, linga: &str) -> Declension {
     }
 }
 
+/// अहन् nap — 8.2.69 रु in स्वमोः अहः; 6.4.134 अह्ना; पद अहर् → अहोभ्याम्/अहोभिः. Dual अहनी/अह्नी.
+fn decline_ahan(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "ahan" || linga != "nap" {
+        return None;
+    }
+    let nom = vec![
+        "ahaH".into(),
+        "ahanI".into(),
+        "ahnI".into(),
+        "ahAni".into(),
+    ];
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), nom.clone());
+    decl.insert("dvitIyA".into(), nom.clone());
+    decl.insert("tfIyA".into(), vec!["ahnA".into(), "ahoByAm".into(), "ahoBiH".into()]);
+    decl.insert("caturTI".into(), vec!["ahne".into(), "ahoByAm".into(), "ahoByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["ahnaH".into(), "ahoByAm".into(), "ahoByaH".into()]);
+    decl.insert("zazWI".into(), vec!["ahnaH".into(), "ahnoH".into(), "ahnAm".into()]);
+    decl.insert(
+        "saptamI".into(),
+        vec![
+            "ahni".into(),
+            "ahani".into(),
+            "ahnoH".into(),
+            "ahaHsu".into(),
+            "ahassu".into(),
+        ],
+    );
+    decl.insert("samboDana".into(), nom);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// 6.4.133 श्वयुवमघोनामतद्धिते — सम्प्रसारण in weak; पद श्व/युव/मघव. पुं.
 fn decline_sva_yuv_magha(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "pum" {
@@ -398,6 +434,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     for cand in cands {
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if cand.is_empty() { continue; }
+        if let Some(d) = decline_ahan(&cand, linga) {
+            return Some(d);
+        }
         let cand = ngeep_stri(&cand, linga);
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(d) = decline_sva_yuv_magha(&cand, linga) {
@@ -896,5 +935,26 @@ mod tests {
         has(&m, "tfIyA", "maGonA");
         has(&m, "saptamI", "maGoni");
         has(&m, "samboDana", "maGavan");
+    }
+
+    #[test]
+    fn ahan_ahas_ahobhih() {
+        // अहन् nap: अहः not *अह; अह्ना; अहोभ्याम्/अहोभिः; dual अहनी/अह्नी.
+        let a = generate("ahan", "nap").expect("ahan");
+        has(&a, "prathamA", "ahaH");
+        has(&a, "prathamA", "ahanI");
+        has(&a, "prathamA", "ahnI");
+        has(&a, "prathamA", "ahAni");
+        has(&a, "dvitIyA", "ahaH");
+        has(&a, "tfIyA", "ahnA");
+        has(&a, "tfIyA", "ahoByAm");
+        has(&a, "tfIyA", "ahoBiH");
+        has(&a, "caturTI", "ahne");
+        has(&a, "zazWI", "ahnAm");
+        has(&a, "saptamI", "ahni");
+        has(&a, "saptamI", "ahani");
+        has(&a, "saptamI", "ahaHsu");
+        has(&a, "samboDana", "ahaH");
+        assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "aha"));
     }
 }
