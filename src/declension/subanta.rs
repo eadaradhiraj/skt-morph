@@ -575,7 +575,34 @@ fn decline_ap(cand: &str, linga: &str) -> Option<Declension> {
 }
 
 /// अनडुह् — strong अनड्वान्/अनड्वाहौ (वाह्); पद अनडुद्भ्याम्/अनडुत्सु. Not h-anta *अनडुक्.
+/// Compounds nap (7.1.23): स्वनडुत्/स्वनडुही/स्वनड्वांहि.
 fn decline_anaquh(cand: &str, linga: &str) -> Option<Declension> {
+    if linga == "nap" {
+        let pre = cand.strip_suffix("anaquh")?;
+        if pre.is_empty() {
+            return None;
+        }
+        let t = format!("{pre}anaqut");
+        let d = format!("{pre}anaqud");
+        let dual = format!("{pre}anaquhI");
+        let pl = format!("{pre}anaqvAMhi");
+        let weak = format!("{pre}anaquh");
+        let nom = vec![t.clone(), d.clone(), dual, pl];
+        let mut decl = HashMap::new();
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{d}ByAm"), format!("{d}BiH")]);
+        decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{d}ByAm"), format!("{d}ByaH")]);
+        decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{d}ByAm"), format!("{d}ByaH")]);
+        decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+        decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{t}su")]);
+        decl.insert("samboDana".into(), nom);
+        return Some(Declension {
+            stem: cand.to_string(),
+            linga: linga.to_string(),
+            declension: decl,
+        });
+    }
     if cand != "anaquh" || linga != "pum" {
         return None;
     }
@@ -1895,6 +1922,16 @@ mod tests {
         has(&u, "dvitIyA", "upAnaham");
         has(&u, "tfIyA", "upAnadBiH");
         has(&u, "saptamI", "upAnatsu");
+        let s = generate("svanaquh", "nap").expect("svanaquh");
+        has(&s, "prathamA", "svanaqut");
+        has(&s, "prathamA", "svanaqud");
+        has(&s, "prathamA", "svanaquhI");
+        has(&s, "prathamA", "svanaqvAMhi");
+        has(&s, "tfIyA", "svanaquhA");
+        has(&s, "tfIyA", "svanaqudByAm");
+        has(&s, "saptamI", "svanaqutsu");
+        has(&generate("anaquh", "pum").unwrap(), "prathamA", "anaqvAn");
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "svanaqvAn"));
     }
 
     #[test]
