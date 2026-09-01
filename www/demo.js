@@ -295,6 +295,8 @@ document.getElementById("btn-verb").onclick = () => {
 };
 
 document.getElementById("btn-verb1").onclick = () => {
+  const raw = document.getElementById("dhatu").value.trim();
+  if (!raw) { document.getElementById("out-verb").innerHTML = '<span class="hint">धातुं लिखत — e.g. भू / bhU / गम्</span>'; return; }
   const d = dhatuQuery();
   const l = document.getElementById("lakara").value;
   const deriv = document.getElementById("derivation").value;
