@@ -237,30 +237,18 @@ mod tests {
     use super::*;
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `bu_lat_prathama_ekavacana`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn bu_lat_prathama_ekavacana() {
         let f = generate_all("BU", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "Bavati"), "{:?}", f);
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `gam_lat_prathama_ekavacana`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn gam_lat_prathama_ekavacana() {
         let f = generate_all("gam", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "gacCati"), "{:?}", f);
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `pra_bu_lat`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn pra_bu_lat() {
         let prefs = vec!["pra".to_string()];
         let f = generate_all_with_prefixes("BU", "plat", 1, 1, &prefs);
@@ -268,10 +256,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `live_kakzi_vidhilin`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn live_kakzi_vidhilin() {
         let (canon, db) = normalize_lakara("pvidhilin");
         let f = live_generate("kAkzi", &canon, &db, 1, 1, &[], "");
@@ -279,10 +263,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `live_gamx_no_override`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn live_gamx_no_override() {
         let (canon, db) = normalize_lakara("plat");
         let f = live_generate("gamx", &canon, &db, 1, 1, &[], "");
@@ -293,10 +273,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `pra_bu_lat_third_plural_no_natva`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn pra_bu_lat_third_plural_no_natva() {
         let prefs = vec!["pra".to_string()];
         let f = generate_all_with_prefixes("BU", "plat", 1, 3, &prefs);
@@ -305,10 +281,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `gam_lit_jagama`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn gam_lit_jagama() {
         let f = generate_all("gam", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "jagAma"), "{:?}", f);
@@ -317,30 +289,18 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `bu_lit_babhuva`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn bu_lit_babhuva() {
         let f = generate_all("BU", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "baBUva"), "{:?}", f);
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `han_lit_jaghana`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn han_lit_jaghana() {
         let f = generate_all("hana", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "jaGAna"), "{:?}", f);
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `vac_yaj_lit`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn vac_yaj_lit() {
         let f = generate_all("vaca", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "uvAca"), "{:?}", f);
@@ -349,10 +309,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `grah_ni_kf_lit`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn grah_ni_kf_lit() {
         let f = generate_all("graha", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "jagrAha"), "{:?}", f);
@@ -369,10 +325,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `yaj_kf_alit`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn yaj_kf_alit() {
         let f = generate_all("yaja", "alit", 1, 1);
         assert!(f.iter().any(|x| x == "Ije"), "{:?}", f);
@@ -383,10 +335,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `da_dha_stha_lit`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn da_dha_stha_lit() {
         let f = generate_all("qudAY", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "dadO"), "{:?}", f);
@@ -399,10 +347,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `ve_vye_hve_lit`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn ve_vye_hve_lit() {
         let f = generate_all("veY", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "uvAya") && f.iter().any(|x| x == "vavO"), "{:?}", f);
@@ -415,10 +359,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `i_as_lit`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn i_as_lit() {
         let f = generate_all("iR", "plit", 1, 1);
         assert!(f.iter().any(|x| x == "iyAya"), "{:?}", f);
@@ -429,10 +369,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `lun_ashir_am_bru`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn lun_ashir_am_bru() {
         let f = generate_all("BU", "plun", 1, 1);
         assert!(f.iter().any(|x| x == "aBUt"), "{:?}", f);
@@ -449,10 +385,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `gana_2_3_5_7_8_9_lat`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn gana_2_3_5_7_8_9_lat() {
         let f = generate_all("ada", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "atti"), "{:?}", f);
@@ -570,10 +502,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `lun_han_ashir_a_lrt`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn lun_han_ashir_a_lrt() {
         let f = generate_all("hana", "plun", 1, 1);
         assert!(f.iter().any(|x| x == "avaDIt"), "{:?}", f);
@@ -590,10 +518,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `pra_jagama_roundtrip`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn pra_jagama_roundtrip() {
         let prefs = vec!["pra".to_string()];
         let f = generate_all_with_prefixes("gam", "plit", 1, 1, &prefs);
@@ -611,10 +535,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `gana_athematic_lang_vidhilin`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn gana_athematic_lang_vidhilin() {
         let f = generate_all("ada", "plan", 1, 1);
         assert!(f.iter().any(|x| x == "Adat" || x == "Adad"), "{:?}", f);
@@ -639,10 +559,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `nic_san_yan_karma`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn nic_san_yan_karma() {
         let f = generate_all_derived("BU", "Ric", "plat", 1, 1, &[]);
         assert!(f.iter().any(|x| x == "BAvayati"), "{:?}", f);
@@ -687,10 +603,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `akzi_live_vidhilin_lrt`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn akzi_live_vidhilin_lrt() {
         let f = generate_all("kAkzi", "pvidhilin", 1, 1);
         assert!(f.iter().any(|x| x == "kANkzet" || x == "kANkzed"), "{:?}", f);
@@ -699,10 +611,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `kri_pari_atmanepada`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn kri_pari_atmanepada() {
         let prefs = vec!["pari".to_string()];
         let f = generate_all_with_prefixes("qukrIY", "plat", 1, 1, &prefs);
@@ -712,10 +620,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `folded_g1_live`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn folded_g1_live() {
         let f = generate_all("RIY", "plat", 1, 1);
         assert!(f.iter().any(|x| x == "nayati"), "{:?}", f);
@@ -883,10 +787,6 @@ mod tests {
     }
 
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `gana6_lrt_sutra`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn gana6_lrt_sutra() {
         let f = generate_all("06.0001", "plrt", 1, 1);
         assert!(f.iter().any(|x| x == "totsyati"), "{:?}", f);
