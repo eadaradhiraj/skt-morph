@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 52: README 51
+
+- **README:** recent line updated to 51 iters + natva test (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 51: phonology natva test
 
 - **phonology:** added `natva_pra_nam_vs_bhavani` test (8.4.1); 186 tests.
