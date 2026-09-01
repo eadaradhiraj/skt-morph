@@ -253,8 +253,9 @@ function renderVerbSingle(res) {
     return;
   }
   const forms = formsToDeva(o.forms).join(", ");
+  const deriv = document.getElementById("derivation").value;
   const meta = [
-    toDeva(o.dhatu),
+    toDeva(o.dhatu) + derivHint(deriv),
     L.lakara(o.lakara),
     L.purusha(o.purusha),
     L.vacana(o.vacana),

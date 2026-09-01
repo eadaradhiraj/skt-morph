@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 49: demo deriv hint wired
+
+- **demo.js:** `renderVerbSingle` now shows `derivHint` (yaN/yaNluk) in meta; UI aid for 2.4.74.
+- **wasm:** rebuilt 1.2M; 185 tests.
+
 ## 2026-09-01 — iteration 48: phonology natva doc
 
 - **phonology:** `apply_natva_to_word` doc → Kaumudī 8.4.1; no logic change.
