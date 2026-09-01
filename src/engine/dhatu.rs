@@ -15,6 +15,31 @@ fn row((id, dhatu, gana, pada, tags, ant, aup): &(&'static str, &'static str, u8
     DhatuRow { id, dhatu, gana: *gana, pada, tags, antarganas: ant, aupadeshik: aup }
 }
 
+use std::collections::HashMap;
+use std::sync::OnceLock;
+
+static ID_MAP: OnceLock<HashMap<&'static str, usize>> = OnceLock::new();
+static NAME_MAP: OnceLock<HashMap<&'static str, Vec<usize>>> = OnceLock::new();
+
+fn id_map() -> &'static HashMap<&'static str, usize> {
+    ID_MAP.get_or_init(|| {
+        let mut m = HashMap::new();
+        for (i, rec) in crate::data::DHATUS.iter().enumerate() {
+            m.insert(rec.0, i);
+        }
+        m
+    })
+}
+fn name_map() -> &'static HashMap<&'static str, Vec<usize>> {
+    NAME_MAP.get_or_init(|| {
+        let mut m: HashMap<&'static str, Vec<usize>> = HashMap::new();
+        for (i, rec) in crate::data::DHATUS.iter().enumerate() {
+            m.entry(rec.1).or_default().push(i);
+        }
+        m
+    })
+}
+
 fn is_it_suffix(s: &str) -> bool {
     matches!(
         s,
@@ -23,26 +48,24 @@ fn is_it_suffix(s: &str) -> bool {
 }
 
 /// First matching row: exact id, then exact name (file order, so bhvādi before curādi), then name+it (gam → gamx).
+/// Uses OnceLock HashMaps for O(1) id/name after first call (was linear scan per lookup).
 pub fn lookup(query: &str) -> Option<DhatuRow> {
     let q = query.trim();
     if q.is_empty() {
         return None;
     }
-    for rec in crate::data::DHATUS {
-        if rec.0 == q {
-            return Some(row(rec));
-        }
+    if let Some(&idx) = id_map().get(q) {
+        return Some(row(&crate::data::DHATUS[idx]));
     }
     // अस् by name: Kaumudī अस्ति (02.0060), not भ्वादि 01.1029.
     if q == "as" || q == "asa" {
-        for rec in crate::data::DHATUS {
-            if rec.0 == "02.0060" {
-                return Some(row(rec));
-            }
+        if let Some(&idx) = id_map().get("02.0060") {
+            return Some(row(&crate::data::DHATUS[idx]));
         }
     }
-    for rec in crate::data::DHATUS {
-        if rec.1 == q {
+    if let Some(idxs) = name_map().get(q) {
+        for &i in idxs {
+            let rec = &crate::data::DHATUS[i];
             // यम् by name: Kaumudī यच्छति (not ghaṭādi 01.0930 mittva).
             if q == "yama" && rec.5.contains("GawAdi") {
                 continue;
