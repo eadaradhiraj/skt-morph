@@ -53,6 +53,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "cAnaS" => Some(("mAna", vec!["3.2.124"], "present")),
         "gsnu" => Some(("snu", vec!["3.2.139"], "gsnu")),
         "knu" => Some(("nu", vec!["3.2.140"], "knu")),
+        "GinuR" => Some(("in", vec!["3.2.141"], "ghinun")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["3.2.187"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -422,6 +423,16 @@ fn knu_form(root: &str) -> String {
     crate::engine::phonology::apply_natva_to_word(&format!("{root}nu"))
 }
 
+/// 3.2.141 शमित्यष्टाभ्यो घिनुण्: शमी/तमी/दमी/श्रमी/भ्रमी/क्षमी/क्लमी (मित् ह्रस्व);
+/// मदी is 7.2.116 मादी. इन्-anta (शमी not *शमा). Not क्त शान्त.
+fn ghinun_form(root: &str) -> String {
+    match root {
+        "Sam" | "tam" | "dam" | "Sram" | "Bram" | "kzam" | "klam" => format!("{root}in"),
+        "mad" => "mAdin".into(),
+        other => format!("{other}in"),
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -782,6 +793,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "kyap" => kyap_form(&root),
         "gsnu" => gsnu_form(&root),
         "knu" => knu_form(&root),
+        "ghinun" => ghinun_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1090,6 +1102,11 @@ mod tests {
         let d = decline("trasI", "knu", "pum", &[]).expect("trasnuH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "trasnuH"), "{:?}", pr);
+        let d = decline("Samu", "GinuR", "pum", &[]).expect("SamI");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "SamI"), "{:?}", pr);
+        let d = decline("Samu", "GinuR", "stri", &[]).expect("SaminI");
+        assert_eq!(d.stem, "SaminI");
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1194,6 +1211,10 @@ mod tests {
         assert_eq!(derive("gfDu", "knu"), vec!["gfDnu"]);
         assert_eq!(derive("YiDfzA", "knu"), vec!["DfzRu"]);
         assert_eq!(derive("kzip", "knu"), vec!["kzipRu"]);
+        assert_eq!(derive("Samu", "GinuR"), vec!["Samin"]);
+        assert_eq!(derive("tamu", "GinuR"), vec!["tamin"]);
+        assert_eq!(derive("madI", "GinuR"), vec!["mAdin"]);
+        assert_eq!(derive("kzamU", "GinuR"), vec!["kzamin"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
         assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
