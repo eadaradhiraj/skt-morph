@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 38: demo empty hint
+
+- **demo.js:** `runAnalyze` now shows hint on empty query (no silent no-op).
+- **wasm:** rebuilt 1.2M; 184 tests.
+
 ## 2026-09-01 — iteration 37: README 36
 
 - **README:** recent line updated to 36 iters + empty guard (184 tests).

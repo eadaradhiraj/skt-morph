@@ -181,7 +181,10 @@ function asList(raw) {
 
 function runAnalyze(types, miss) {
   const typed = document.getElementById("q").value.trim();
-  if (!typed) return;
+  if (!typed) {
+    document.getElementById("out-analyze").innerHTML = '<span class="hint">शब्दं लिखत — e.g. रामेण / rAmeNa / गच्छति</span>';
+    return;
+  }
   const slp = toSlp1(typed);
   const res = analyze(slp);
   const queryDeva = toDeva(slp) || typed;
