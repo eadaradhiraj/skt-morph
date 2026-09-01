@@ -970,6 +970,10 @@ mod tests {
         assert!(pr.iter().any(|x| x == "kartA"), "{:?}", pr);
         let dv = d.declension.get("dvitIyA").unwrap();
         assert!(dv.iter().any(|x| x == "kartAram"), "{:?}", dv);
+        let d = decline("qukfY", "tfc", "stri", &[]).expect("kartrI");
+        assert_eq!(d.stem, "kartrI");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "kartrI"), "{:?}", pr);
         assert!(decline("BU", "ktvA", "pum", &[]).is_none());
         let d = decline("gam", "ktavatu", "pum", &[]).expect("gatavAn");
         let pr = d.declension.get("prathamA").unwrap();
