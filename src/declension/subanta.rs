@@ -1499,6 +1499,29 @@ fn decline_bhu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// हाहा — आकारान्त पुं (गन्धर्व): हाहाः/हाहौ/हाहाम्/हाहाान्; टा हाहा; ङे हाहै; ङि हाहे; ङोस् हाहोः.
+/// Not पा-anta *हाहाि / *हाहाः शस् like गोपः. Exact `hAhA`. गोपा stays गोपि.
+fn decline_haha(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "hAhA" || linga != "pum" {
+        return None;
+    }
+    let aa = "hAhA";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["hAhAH".into(), "hAhO".into(), "hAhAH".into()]);
+    decl.insert("dvitIyA".into(), vec!["hAhAm".into(), "hAhO".into(), "hAhAn".into()]);
+    decl.insert("tfIyA".into(), vec![aa.into(), "hAhAByAm".into(), "hAhABiH".into()]);
+    decl.insert("caturTI".into(), vec!["hAhE".into(), "hAhAByAm".into(), "hAhAByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["hAhAH".into(), "hAhAByAm".into(), "hAhAByaH".into()]);
+    decl.insert("zazWI".into(), vec!["hAhAH".into(), "hAhOH".into(), "hAhAm".into()]);
+    decl.insert("saptamI".into(), vec!["hAhe".into(), "hAhOH".into(), "hAhAsu".into()]);
+    decl.insert("samboDana".into(), vec!["hAhAH".into(), "hAhO".into(), "hAhAH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1637,6 +1660,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_bhu(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_haha(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2972,5 +2998,24 @@ mod tests {
         has(&generate("hUhU", "pum").unwrap(), "prathamA", "hUhUH");
         assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "svaBUm"));
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "svaBavO"));
+    }
+
+    #[test]
+    fn haha_hahah_hahau() {
+        // हाहा: हाहाः/हाहौ/हाहाम्/हाहाान्/हाहा/हाहै/हाहे. गोपा stays गोपि/गोपः शस्.
+        let h = generate("hAhA", "pum").expect("hAhA");
+        has(&h, "prathamA", "hAhAH");
+        has(&h, "prathamA", "hAhO");
+        has(&h, "dvitIyA", "hAhAm");
+        has(&h, "dvitIyA", "hAhAn");
+        has(&h, "tfIyA", "hAhA");
+        has(&h, "caturTI", "hAhE");
+        has(&h, "saptamI", "hAhe");
+        has(&h, "saptamI", "hAhAsu");
+        has(&h, "zazWI", "hAhOH");
+        has(&generate("gopA", "pum").unwrap(), "saptamI", "gopi");
+        has(&generate("gopA", "pum").unwrap(), "dvitIyA", "gopaH");
+        assert!(!h.declension.get("saptamI").unwrap().iter().any(|x| x == "hAhi"));
+        assert!(!h.declension.get("dvitIyA").unwrap().iter().any(|x| x == "hAhaH"));
     }
 }
