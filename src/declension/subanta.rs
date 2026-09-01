@@ -74,6 +74,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // ज-anta (वणिज्) — 8.2.30 कुत्व वणिक्/वणग्; भ् ग्; सप्तमी क्षु not *षु. राज् stays named ट्.
   m.insert(("j".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"jO".to_string(),"jaH".to_string(),],]);
   m.insert(("j".to_string(),"stri".to_string()), vec![vec!["k,g".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"jO".to_string(),"jaH".to_string(),],]);
+  // ज-anta nap (ऊर्ज्) — 7.1.19/20 ऊर्क्/ऊर्जी/ऊर्जि; पद ऊर्ग्भ्याम्/ऊर्क्षु. Gold *Unrji is scrape.
+  m.insert(("j".to_string(),"nap".to_string()), vec![vec!["k,g".to_string(),"jI".to_string(),"ji".to_string(),],vec!["k,g".to_string(),"jI".to_string(),"ji".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"jI".to_string(),"ji".to_string(),],]);
   m.insert(("d".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
   m.insert(("d".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
   // त-anta (मरुत्, सरित्, त्रिंशत्) — पद त्; 8.2.39 before भ् → द्भ्याम्/द्भिः. `at` शतृ stays longer-match.
@@ -2125,6 +2127,22 @@ mod tests {
         has(&b, "saptamI", "Bfwsu");
         has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
         assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "Bfsk"));
+    }
+
+    #[test]
+    fn urj_urk_urji() {
+        // ऊर्ज् nap: ऊर्क्/ऊर्जी/ऊर्जि, ऊर्ग्भ्याम्/ऊर्क्षु. वणिक् stays पुं ज-anta.
+        let u = generate("Urj", "nap").expect("Urj");
+        has(&u, "prathamA", "Urk");
+        has(&u, "prathamA", "Urg");
+        has(&u, "prathamA", "UrjI");
+        has(&u, "prathamA", "Urji");
+        has(&u, "tfIyA", "UrjA");
+        has(&u, "tfIyA", "UrgByAm");
+        has(&u, "saptamI", "Urji");
+        has(&u, "saptamI", "Urkzu");
+        has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
+        has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRijO");
     }
 
     #[test]
