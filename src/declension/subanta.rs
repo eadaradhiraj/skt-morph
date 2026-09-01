@@ -84,10 +84,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("t".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tam".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],]);
   // त-anta nap (शकृत्) — 7.1.23 शकृत्/शकृती/शकृन्ति, शकृद्भ्याम्. `at` जगत् keeps longer match.
   m.insert(("t".to_string(),"nap".to_string()), vec![vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],]);
-  // h-anta (लिह्) and B-anta (लभ्-type bh) — 8.2.31 हो ढः, 8.2.32 दादेर्धातोर्घः + जश्त्व
-  // sūtra: 8.2.31 h→Q/ḍh at jhal, pada h→k (दुह्→धुक्); Future devs: h shows ढ/क, B shows प्/भ्
-  // Extreme: keep tsu/zu for saptamī bahu, consistent with j/d paradigms above
-  m.insert(("h".to_string(),"pum".to_string()), vec![vec!["k".to_string(),"hO".to_string(),"haH".to_string(),],vec!["ham".to_string(),"hO".to_string(),"haH".to_string(),],vec!["hA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["he".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"hoH".to_string(),"hAm".to_string(),],vec!["hi".to_string(),"hoH".to_string(),"tsu".to_string(),],vec!["k".to_string(),"hO".to_string(),"haH".to_string(),],]);
+  // h-anta (उष्णिह्) — पद क्/ग् (8.2.30/8.4.56); सप्तमी क्षु not *त्सु. अनडुह्/उपानह् stay named द्.
+  m.insert(("h".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"hO".to_string(),"haH".to_string(),],vec!["ham".to_string(),"hO".to_string(),"haH".to_string(),],vec!["hA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["he".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"hoH".to_string(),"hAm".to_string(),],vec!["hi".to_string(),"hoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"hO".to_string(),"haH".to_string(),],]);
   let h_pum = m.get(&("h".to_string(), "pum".to_string())).expect("h pum").clone();
   m.insert(("h".to_string(), "stri".to_string()), h_pum);
   m.insert(("B".to_string(),"pum".to_string()), vec![vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["Bam".to_string(),"BO".to_string(),"BaH".to_string(),],vec!["BA".to_string(),"BByAm".to_string(),"BBiH".to_string(),],vec!["Be".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BByAm".to_string(),"BByaH".to_string(),],vec!["BaH".to_string(),"BoH".to_string(),"BAm".to_string(),],vec!["Bi".to_string(),"BoH".to_string(),"tsu".to_string(),],vec!["p".to_string(),"BO".to_string(),"BaH".to_string(),],]);
@@ -1141,10 +1139,17 @@ mod tests {
         has(&s, "prathamA", "suhft");
         has(&s, "dvitIyA", "suhfdam");
         has(&s, "tfIyA", "suhfdA");
-        // h-anta: lih-like (दुह्→धुक्) — 8.2.31; B-anta: laB-type bh→p at pada
+        // h-anta: उष्णिह् उष्णिक्/उष्णिग्, उष्णिक्षु (8.2.30/8.4.56); लिह् same कुत्व लिक्
         let h = generate("lih", "pum").expect("lih");
         has(&h, "prathamA", "lik");
         has(&h, "tfIyA", "lihA");
+        let u = generate("uzRih", "pum").expect("uzRih");
+        has(&u, "prathamA", "uzRik");
+        has(&u, "prathamA", "uzRig");
+        has(&u, "tfIyA", "uzRihA");
+        has(&u, "tfIyA", "uzRigByAm");
+        has(&u, "saptamI", "uzRihi");
+        has(&u, "saptamI", "uzRikzu");
         let b = generate("laB", "pum").expect("laB");
         has(&b, "prathamA", "lap");
         has(&b, "tfIyA", "laBA");
