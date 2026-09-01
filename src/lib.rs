@@ -51,7 +51,7 @@ pub fn generate_verb_paradigm_with_prefix(dhatu: &str, lakara: &str, prefixes: &
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// Derived tinanta: `Ric`/`san`/`yaN`/`yaNluk`/`karma` (see `engine::derived` + `www` dropdown).
+/// Derived tinanta: `Ric`/`san`/`yaN`/`yaNluk`/`karma` (see `engine::derived` + `www` dropdown, Kaumudī 3.1.26/2.4.74).
 /// yaNluk = 2.4.74 ya-luk intensive (parasmai boBUti vs yaN boBUyate ātmane).
 #[wasm_bindgen]
 pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &str, artha: &str) -> JsValue {
