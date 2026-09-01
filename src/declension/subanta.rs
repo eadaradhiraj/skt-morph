@@ -62,7 +62,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("z".to_string(),"pum".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
   m.insert(("z".to_string(),"stri".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
   // अत् nap (जगत्) — 7.1.23 स्वमोः; नपुं जगत्/जगती/जगन्ति not *जगांसि (as-anta). भ्: 8.2.39 जगद्भ्याम्.
-  m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],]);
+  // अत् nap (जगत्) — 7.1.23 स्वमोः; 7.1.80 वा नपुंसकस्य नुम् जगती/जगन्ती, जगति/जगन्ति. भ्: 8.2.39 जगद्भ्याम्.
+  m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI,antI".to_string(),"ati,anti".to_string(),],vec!["at".to_string(),"atI,antI".to_string(),"ati,anti".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI,antI".to_string(),"ati,anti".to_string(),],]);
   m.insert(("us".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["usA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["use".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"usoH".to_string(),"usAm".to_string(),],vec!["usi".to_string(),"usoH".to_string(),"uHsu".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],]);
   // उष् nap (धनुस् as Danuz) — 8.2.66 रु धनुः/धनुर्भ्याम्; 8.3.59 धनुषी/धूंषि. Not a-stem *धनुषः.
   m.insert(("uz".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uzI".to_string(),"UMzi".to_string(),],vec!["uH".to_string(),"uzI".to_string(),"UMzi".to_string(),],vec!["uzA".to_string(),"urByAm".to_string(),"urBiH".to_string(),],vec!["uze".to_string(),"urByAm".to_string(),"urByaH".to_string(),],vec!["uzaH".to_string(),"urByAm".to_string(),"urByaH".to_string(),],vec!["uzaH".to_string(),"uzoH".to_string(),"uzAm".to_string(),],vec!["uzi".to_string(),"uzoH".to_string(),"uHzu".to_string(),],vec!["uH".to_string(),"uzI".to_string(),"UMzi".to_string(),],]);
@@ -249,6 +250,7 @@ fn mahat_strong(table: &mut [Vec<String>]) {
                 .replace("antO", "AntO")
                 .replace("antaH", "AntaH")
                 .replace("antam", "Antam")
+                .replace("antI", "AntI")
                 .replace("anti", "Anti");
         }
     }
@@ -2809,7 +2811,17 @@ mod tests {
         has(&j, "tfIyA", "jagadByAm");
         has(&j, "zazWI", "jagatAm");
         has(&j, "saptamI", "jagatsu");
+        has(&j, "prathamA", "jagantI");
+        has(&j, "prathamA", "jagati");
         has(&generate("mahat", "nap").unwrap(), "prathamA", "mahAnti");
+        has(&generate("mahat", "nap").unwrap(), "prathamA", "mahAntI");
+        let p = generate("pacat", "nap").expect("pacat nap");
+        has(&p, "prathamA", "pacat");
+        has(&p, "prathamA", "pacatI");
+        has(&p, "prathamA", "pacantI");
+        has(&p, "prathamA", "pacati");
+        has(&p, "prathamA", "pacanti");
+        has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
     }
 
     #[test]
