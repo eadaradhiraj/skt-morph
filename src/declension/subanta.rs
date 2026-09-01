@@ -2895,4 +2895,32 @@ mod tests {
         has(&generate("sItA", "stri").unwrap(), "tfIyA", "sItayA");
         assert!(!generate("sItA", "stri").unwrap().declension.get("tfIyA").unwrap().iter().any(|x| x == "sItasA"));
     }
+
+    #[test]
+    fn dyo_glau_payomuc() {
+        // द्यो like गो द्यौः/द्याम्/द्यवि; ग्लौ like नौ ग्लौः/ग्लावम्; पयोमुच् च-anta पयोमुक्/पयोमुक्षु.
+        let d = generate("dyo", "pum").expect("dyo");
+        has(&d, "prathamA", "dyOH");
+        has(&d, "prathamA", "dyAvO");
+        has(&d, "dvitIyA", "dyAm");
+        has(&d, "tfIyA", "dyavA");
+        has(&d, "saptamI", "dyavi");
+        has(&d, "saptamI", "dyozu");
+        has(&generate("go", "pum").unwrap(), "prathamA", "gOH");
+        let g = generate("glO", "stri").expect("glO");
+        has(&g, "prathamA", "glOH");
+        has(&g, "dvitIyA", "glAvam");
+        has(&g, "saptamI", "glAvi");
+        has(&g, "saptamI", "glOzu");
+        has(&generate("nO", "stri").unwrap(), "dvitIyA", "nAvam");
+        let p = generate("payomuc", "pum").expect("payomuc");
+        has(&p, "prathamA", "payomuk");
+        has(&p, "prathamA", "payomug");
+        has(&p, "prathamA", "payomucO");
+        has(&p, "tfIyA", "payomugByAm");
+        has(&p, "saptamI", "payomukzu");
+        has(&generate("vAc", "stri").unwrap(), "prathamA", "vAk");
+        assert!(!d.declension.get("dvitIyA").unwrap().iter().any(|x| x == "dyAvam"));
+        assert!(!g.declension.get("dvitIyA").unwrap().iter().any(|x| x == "glAm"));
+    }
 }
