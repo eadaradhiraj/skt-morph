@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 67: README 66
+
+- **README:** recent line updated to 66 iters + tinanta deriv (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 66: tinanta deriv doc
 
 - **tinanta:** deriv doc → Kaumudī 3.1.26/3.1.7/3.1.22/2.4.74/3.1.67; no logic change.
