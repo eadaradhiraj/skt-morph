@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 43: tinanta empty test
+
+- **tinanta:** added `empty_dhatu_returns_empty` test for iter 42 guard; 185 tests.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 42: tinanta empty guard
 
 - **tinanta:** `generate_all_derived_artha` early-return on empty dhātu (WASM empty string guard).

@@ -831,6 +831,13 @@ mod tests {
     }
 
     #[test]
+    fn empty_dhatu_returns_empty() {
+        assert!(generate_all("", "plat", 1, 1).is_empty());
+        assert!(generate_all("   ", "plat", 1, 1).is_empty());
+        assert!(generate("", "plat", 1, 1).forms.is_empty());
+    }
+
+    #[test]
     fn kram_yam_artha() {
         let vi = vec!["vi".to_string()];
         let f = generate_all_with_prefixes("kramu", "alat", 1, 1, &vi);
