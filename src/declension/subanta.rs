@@ -62,6 +62,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // अत् nap (जगत्) — 7.1.23 स्वमोः; नपुं जगत्/जगती/जगन्ति not *जगांसि (as-anta). भ्: 8.2.39 जगद्भ्याम्.
   m.insert(("at".to_string(),"nap".to_string()), vec![vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],vec!["atA".to_string(),"adByAm".to_string(),"adBiH".to_string(),],vec!["ate".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"adByAm".to_string(),"adByaH".to_string(),],vec!["ataH".to_string(),"atoH".to_string(),"atAm".to_string(),],vec!["ati".to_string(),"atoH".to_string(),"atsu".to_string(),],vec!["at".to_string(),"atI".to_string(),"anti".to_string(),],]);
   m.insert(("us".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],vec!["usA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["use".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["usaH".to_string(),"usoH".to_string(),"usAm".to_string(),],vec!["usi".to_string(),"usoH".to_string(),"uHsu".to_string(),],vec!["uH".to_string(),"uSI".to_string(),"UMSi".to_string(),],]);
+  // उष् nap (धनुस् as Danuz) — 8.2.66 रु धनुः/धनुर्भ्याम्; 8.3.59 धनुषी/धूंषि. Not a-stem *धनुषः.
+  m.insert(("uz".to_string(),"nap".to_string()), vec![vec!["uH".to_string(),"uzI".to_string(),"UMzi".to_string(),],vec!["uH".to_string(),"uzI".to_string(),"UMzi".to_string(),],vec!["uzA".to_string(),"urByAm".to_string(),"urBiH".to_string(),],vec!["uze".to_string(),"urByAm".to_string(),"urByaH".to_string(),],vec!["uzaH".to_string(),"urByAm".to_string(),"urByaH".to_string(),],vec!["uzaH".to_string(),"uzoH".to_string(),"uzAm".to_string(),],vec!["uzi".to_string(),"uzoH".to_string(),"uHzu".to_string(),],vec!["uH".to_string(),"uzI".to_string(),"UMzi".to_string(),],]);
   m.insert(("is".to_string(),"nap".to_string()), vec![vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],vec!["isA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ise".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["isaH".to_string(),"isoH".to_string(),"isAm".to_string(),],vec!["isi".to_string(),"isoH".to_string(),"iHsu".to_string(),],vec!["iH".to_string(),"iSI".to_string(),"IMSi".to_string(),],]);
   // गो: 7.1.90 णित्, 6.1.93 औतोऽम्शसोः (गाम्/गाः), 6.1.78 अव्
   m.insert(("o".to_string(),"pum".to_string()), vec![vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],vec!["Am".to_string(),"AvO".to_string(),"AH".to_string(),],vec!["avA".to_string(),"oByAm".to_string(),"oBiH".to_string(),],vec!["ave".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"oByAm".to_string(),"oByaH".to_string(),],vec!["oH".to_string(),"avoH".to_string(),"avAm".to_string(),],vec!["avi".to_string(),"avoH".to_string(),"ozu".to_string(),],vec!["OH".to_string(),"AvO".to_string(),"AvaH".to_string(),],]);
@@ -1626,5 +1628,21 @@ mod tests {
         has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjA");
         has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
         assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "rAk"));
+    }
+
+    #[test]
+    fn dhanus_dhanuh_dhanurbhyam() {
+        // धनुस् (Danuz): धनुः/धनुषी/धूंषि, धनुर्भ्याम्. Not a-stem *धनुषः; सजष् पुं stays सजूः.
+        let d = generate("Danuz", "nap").expect("Danuz");
+        has(&d, "prathamA", "DanuH");
+        has(&d, "prathamA", "DanuzI");
+        has(&d, "prathamA", "DanUMzi");
+        has(&d, "tfIyA", "DanuzA");
+        has(&d, "tfIyA", "DanurByAm");
+        has(&d, "tfIyA", "DanurBiH");
+        has(&d, "saptamI", "Danuzi");
+        has(&d, "saptamI", "DanuHzu");
+        has(&generate("sajuz", "pum").unwrap(), "prathamA", "sajUH");
+        has(&generate("manas", "nap").unwrap(), "prathamA", "manaH");
     }
 }
