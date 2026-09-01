@@ -206,7 +206,7 @@ fn anc_parts(cand: &str) -> Option<(&'static str, &'static str, &'static str, &'
     })
 }
 
-/// 4.1.5–6 ङीप्: इन्/उगित् अत्/न् स्त्री → दण्डिनी, भवती, राज्ञी. Not त्रिंशत्; अहन् stays nap.
+/// 4.1.5–6 ङीप्: इन्/उगित् अत्/न् स्त्री → दण्डिनी, भवती, राज्ञी; शतृ 7.1.81 पचन्ती. Not त्रिंशत्; अहन् stays nap.
 fn ngeep_stri(cand: &str, linga: &str) -> String {
     if linga != "stri" || cand.ends_with('I') {
         return cand.to_string();
@@ -231,7 +231,18 @@ fn ngeep_stri(cand: &str, linga: &str) -> String {
             return format!("{pre}uzI");
         }
     }
-    if cand.ends_with("at") || cand.ends_with("in") {
+    // 4.1.6 उगितश्च ङीप्. 7.1.81 शप्श्यनोर्नित्यम्: शतृ नुम् पचन्ती (not *पचती).
+    // मतुप्/वतुप्/महत्/अभ्यस्त stay atI: धीमती, भवती, महती, ददती.
+    if let Some(pre) = cand.strip_suffix("at") {
+        if matches!(cand, "mahat" | "dadat" | "jakzat" | "jAgrat")
+            || cand.ends_with("mat")
+            || cand.ends_with("vat")
+        {
+            return format!("{cand}I");
+        }
+        return format!("{pre}antI");
+    }
+    if cand.ends_with("in") {
         return format!("{cand}I");
     }
     // 4.1.5 ऋन्नेभ्यो ङीप् after न्; 6.4.134 अल्लोपोऽनः → राज्ञी (8.4.40 श्चुत्व).
@@ -2811,6 +2822,16 @@ mod tests {
         // हल् स्त्री same as पुं (not आ-stem fallback).
         has(&generate("lih", "stri").unwrap(), "prathamA", "liw");
         has(&generate("laB", "stri").unwrap(), "prathamA", "lap");
+        // 7.1.81 शतृ ङीप् नुम् पचन्ती. भवती/धीमती/महती/ददती stay.
+        let p = generate("pacat", "stri").expect("pacat stri");
+        has(&p, "prathamA", "pacantI");
+        has(&p, "prathamA", "pacantyO");
+        has(&p, "dvitIyA", "pacantIm");
+        has(&generate("DImat", "stri").unwrap(), "prathamA", "DImatI");
+        has(&generate("dadat", "stri").unwrap(), "prathamA", "dadatI");
+        assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "pacatI"));
+        assert!(!generate("Bavat", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "BavantI"));
+        assert!(!generate("dadat", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "dadantI"));
     }
 
     #[test]
