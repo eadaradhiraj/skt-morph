@@ -1,17 +1,6 @@
-//! Simplified port of engine/join.py
-//! Handles thematic join + augment + gana-specific overrides via stubs.
-//! Full 1874 LOC will be expanded, but this covers lat/lot/lrt/lang/vidhilin for gana 1,4,6 shuddha.
-
-
-//! =============================================================================
-//! src/engine/join.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
+//! join — aṅga+suffix sandhi (thematic + augment + gaṇa overrides).
+//! Port of engine/join.py — lat/lot/lṛṭ/laṅ/vidhi for all gaṇas live.
+//! sūtra-gated: 3.1.80 śnu, 7.1.58, gaṇa-7 śnam (n-infix), gaṇa-9 snā.
 use crate::engine::phonology::thematic_join;
 
 /// 3.1.80 धिन्विकृण्व्योर च: श्नु-like o/u/v after 7.1.58 (धिनोति, कृणोति).
@@ -101,18 +90,14 @@ fn apply_lang_aug(form: String, family: &str, augment: Option<&str>) -> String {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `internal_sandhi`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// Internal sandhi for consonant-initial suffixes (8.2.30 ff.).
+/// Caller ensures consonant suffix; vowel suffixes bypass. Safe on empty.
 pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if stem.is_empty() || suffix.is_empty() { return format!("{}{}", stem, suffix); }
-    let suff_first = suffix.chars().next().unwrap();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
+    let Some(suff_first) = suffix.chars().next() else { return format!("{}{}", stem, suffix); };
     if "aAiIuUfFeEoO".contains(suff_first) { return format!("{}{}", stem, suffix); }
     let stem_chars: Vec<char> = stem.chars().collect();
-    let s_last = *stem_chars.last().unwrap();
+    let Some(&s_last) = stem_chars.last() else { return format!("{}{}", stem, suffix); };
     let stem_body: String = stem_chars[..stem_chars.len()-1].iter().collect();
     // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match (s_last, suff_first) {

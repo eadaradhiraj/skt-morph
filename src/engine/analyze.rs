@@ -1,23 +1,15 @@
-//! =============================================================================
-//! src/engine/analyze.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
+//! analyze — reverse lookup (surface SLP1 → parses).
+//! Builds tinanta/kṛdanta maps lazily (OnceLock); subanta/sarvanāma are live.
+//! Upasargas are peeled at query time via `prefix::split_upasarga_candidates`.
+//! No DB used; pure sūtra generation inverted.
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::sync::OnceLock;
 
 use crate::engine::prefix::split_upasarga_candidates;
 
+/// Single parse — covers tinanta/kṛdanta/subanta/sarvanāma.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-// ---------------------------------------------------------------------------
-// struct `Analysis`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub struct Analysis {
     pub word: String,
     pub word_type: String,
@@ -33,18 +25,12 @@ pub struct Analysis {
     pub upasarga: Option<String>,
 }
 
-// ---------------------------------------------------------------------------
-// fn `normalize_nasal`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// Normalize anusvāra variants (8.3.23/8.4.58) for key equivalence.
 fn normalize_nasal(s: &str) -> String {
     s.replace("saG", "saM").replace("saN", "saM").replace("saM", "sam")
 }
 
-// ---------------------------------------------------------------------------
-// fn `keys_for`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// Two lookup keys: raw + anusvāra-normalized.
 fn keys_for(form: &str) -> [String; 2] {
     [form.to_string(), normalize_nasal(form)]
 }

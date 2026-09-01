@@ -322,7 +322,8 @@ document.getElementById("btn-noun").onclick = () => {
   renderDeclension(res);
 };
 
-function asList(v) {
+// toArray — for WASM Vec returns (krdanta_lingas etc.) without Analysis mapping.
+function toArray(v) {
   if (!v) return [];
   if (Array.isArray(v)) return [...v];
   if (typeof v.length === "number") return Array.from(v);
@@ -332,7 +333,7 @@ function asList(v) {
 function syncKrdLinga() {
   const p = document.getElementById("pratyaya").value;
   const sel = document.getElementById("krd-linga");
-  const allowed = asList(krdanta_lingas(p));
+  const allowed = toArray(krdanta_lingas(p));
   const labels = { pum: "पुंलिङ्ग", stri: "स्त्रीलिङ्ग", nap: "नपुंसकलिङ्ग" };
   if (allowed.length === 0) {
     sel.hidden = true;
@@ -363,7 +364,7 @@ document.getElementById("btn-krdanta").onclick = () => {
         `<pre>${esc(strfy(res))}</pre>`;
       return;
     }
-    const allowed = asList(krdanta_lingas(p));
+    const allowed = toArray(krdanta_lingas(p));
     let html = `<div>रूप: <b>${esc(formsToDeva(res.forms).join(", "))}</b> (${esc(toDeva(d))} + ${esc(L.pratyaya(p))})</div>`;
     if (allowed.length === 0) {
       html += '<div class="hint">अव्यय — न सुबन्तम्</div>';

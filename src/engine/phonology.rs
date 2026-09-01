@@ -1,38 +1,20 @@
-//! Port of sktmorph/engine/phonology.py
-//! SLP1 strings are ASCII - we operate on bytes/chars safely.
-
-
-//! =============================================================================
-//! src/engine/phonology.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
+//! phonology — guṇa/vṛddhi (7.3.84 ff.), sandhi, ṇatva/ṣatva, śnu/siz etc.
+//! Port of sktmorph/engine/phonology.py — SLP1 ASCII, char-safe.
+//! All helpers are sūtra-gated; no DB fallback.
 pub const VOWEL_FINAL: &str = "aeiouAIUEOfF";
 
-// ---------------------------------------------------------------------------
-// fn `is_vowel_final`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// 1.1.3 vowel check — SLP1 vowel set.
 fn is_vowel_final(c: char) -> bool {
     VOWEL_FINAL.contains(c)
 }
 
-// ---------------------------------------------------------------------------
-// fn `ends_with_vowel`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// True if stem ends in vowel (a/A/i/I/u/U/f/F …) — for guṇa eligibility.
 pub fn ends_with_vowel(stem: &str) -> bool {
     stem.chars().last().is_some_and(is_vowel_final)
 }
 
-// ---------------------------------------------------------------------------
-// fn `apply_guna_to_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// 7.3.84 sārvadhātuka guṇa ( + 7.3.86 laghūpadha) — last vowel → guṇa.
+/// e.g. ci→ce, hu→ho, kṛ→kar. Idempotent if already guṇita.
 pub fn apply_guna_to_stem(stem: &str) -> String {
     let chars: Vec<char> = stem.chars().collect();
     // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
@@ -63,10 +45,7 @@ pub fn apply_guna_to_stem(stem: &str) -> String {
     stem.to_string()
 }
 
-// ---------------------------------------------------------------------------
-// fn `apply_causative_grade`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
+/// Causative grade (ṇic 7.3.86 + 7.2.115 vṛddhi) — for ṇic/san stems.
 pub fn apply_causative_grade(stem: &str) -> String {
     let chars: Vec<char> = stem.chars().collect();
     // — for — iterate dhātu/ending variants; sūtra gating, see comments above.

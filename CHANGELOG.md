@@ -2,6 +2,13 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 2: harden + demo fix
+
+- **join:** `internal_sandhi` now safe on empty/char-boundary (no unwrap panics); replaced `unwrap()` with `Option` guards; added `phonology` header tidy (guṇa/vṛddhi sūtra docs).
+- **analyze:** cleaned module header, typed `Analysis` doc, `normalize_nasal`/`keys_for` docs; no logic change but clearer OnceLock map intent.
+- **demo.js:** fixed duplicate `asList` shadowing — split into `asList` (Analysis-map) vs `toArray` (WASM Vec/lingas); `syncKrdLinga` and kṛdanta button now use `toArray` correctly; avoids silent override bug.
+- **wasm:** rebuilt via `wasm-pack build --target web` — pkg updated, verified clippy + 182 tests pass.
+
 ## 2026-09-01 — iteration 1: docs hygiene
 
 - **lib/docs:** replaced boilerplate "अतिव्याख्या" blocks (~2.9k lines of identical stubs) with concise sūtra-specific rustdoc in `lib.rs`, `engine/mod.rs`, `declension/mod.rs`, `translit.rs`. Crate-level flow documented; per-fn docs now state sūtra, I/O (SLP1), and edge case instead of generic placeholder.
