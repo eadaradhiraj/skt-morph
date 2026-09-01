@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 13: prefix docs
+
+- **prefix:** header → sūtra-cited (1.4.59/8.4.58 etc.), cleaned generic test headers (6 fns) but kept `pra_bhavanti_no_natva` sutra note; 183 tests.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 12: build.rs docs
 
 - **build.rs:** added crate doc (DHATUS source, fallback, sūtra gating); no logic change.

@@ -1,5 +1,5 @@
-//! Port of morphology.py UPASARGA handling + apply_forward_sandhi
-//! Pāṇini sandhi for prefixes (upasarga) + verb/participle
+//! prefix — upasarga sandhi (1.4.59, 6.1.87 ff., 8.3/8.4). Pāṇini sandhi for prefix+verb/kṛt.
+//! Handles sam+karoti→saṅkaroti (8.4.58), pra+eti→preti (6.1.87), ni+sad→niṣad etc.
 
 pub fn apply_forward_sandhi(prefix: &str, word: &str) -> String {
     if prefix.is_empty() { return word.to_string(); }
@@ -186,18 +186,10 @@ pub fn split_upasarga_candidates(word: &str) -> Vec<(Vec<String>, String)> {
 mod tests {
     use super::*;
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `test_sam_bhu`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn test_sam_bhu() {
         assert_eq!(apply_forward_sandhi("sam", "BUtvA"), "saMBUtvA");
     }
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `test_pra_ets`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn test_pra_ets() {
         assert_eq!(apply_forward_sandhi("pra", "eti"), "preti");
     }
@@ -214,36 +206,20 @@ mod tests {
         assert_eq!(f, "aBipraBavanti");
     }
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `pra_namati_has_natva`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn pra_namati_has_natva() {
         assert_eq!(apply_forward_sandhi("pra", "namati"), "praRamati");
     }
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `unapply_pra_gacchati`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn unapply_pra_gacchati() {
         let rest = unapply_prefix("pra", "pragacCati");
         assert!(rest.iter().any(|r| r == "gacCati"), "{:?}", rest);
     }
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `unapply_sam_bhu`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn unapply_sam_bhu() {
         let rest = unapply_prefix("sam", "saMBUtvA");
         assert!(rest.iter().any(|r| r == "BUtvA"), "{:?}", rest);
     }
     #[test]
-    // ---------------------------------------------------------------------------
-    // fn `sam_kf_satva_a_r`: purpose, inputs→outputs, edge cases.
-    // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-    // ---------------------------------------------------------------------------
     fn sam_kf_satva_a_r() {
         assert_eq!(apply_forward_sandhi("sam", "karoti"), "saNkaroti");
         assert_eq!(apply_forward_sandhi("A", "fcCati"), "ArcCati");
