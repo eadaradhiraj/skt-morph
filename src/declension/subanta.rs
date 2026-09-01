@@ -311,23 +311,20 @@ fn decline_an(stem: &str, linga: &str) -> Declension {
         decl.insert("saptamI".into(), sap);
         decl.insert("samboDana".into(), nom);
     } else {
-        decl.insert(
-            "prathamA".into(),
-            vec![strong("A"), strong("AnO"), strong("AnaH")],
-        );
-        decl.insert(
-            "dvitIyA".into(),
-            vec![strong("Anam"), strong("AnO"), weak("aH")],
-        );
+        // SK पूषन्/अर्यमन्: सौ still आ; other सर्वनामस्थान no 6.4.7 नोपधा दीर्घ (पूषणौ not *पूषाणौ).
+        let (du, pl, acc) = if matches!(stem, "pUzan" | "aryaman") {
+            (strong("anO"), strong("anaH"), strong("anam"))
+        } else {
+            (strong("AnO"), strong("AnaH"), strong("Anam"))
+        };
+        decl.insert("prathamA".into(), vec![strong("A"), du.clone(), pl.clone()]);
+        decl.insert("dvitIyA".into(), vec![acc, du.clone(), weak("aH")]);
         decl.insert("tfIyA".into(), vec![weak("A"), pada("aByAm"), pada("aBiH")]);
         decl.insert("caturTI".into(), vec![weak("e"), pada("aByAm"), pada("aByaH")]);
         decl.insert("paYcamI".into(), vec![weak("aH"), pada("aByAm"), pada("aByaH")]);
         decl.insert("zazWI".into(), vec![weak("aH"), weak("oH"), weak("Am")]);
         decl.insert("saptamI".into(), sap);
-        decl.insert(
-            "samboDana".into(),
-            vec![stem.to_string(), strong("AnO"), strong("AnaH")],
-        );
+        decl.insert("samboDana".into(), vec![stem.to_string(), du, pl]);
     }
     Declension {
         stem: stem.to_string(),
@@ -2535,5 +2532,31 @@ mod tests {
         has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
         assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "arvAn"));
         assert!(!a.declension.get("dvitIyA").unwrap().iter().any(|x| x == "arvAnam"));
+    }
+
+    #[test]
+    fn puzan_puzanau_aryaman() {
+        // पूषन्/अर्यमन्: सौ पूषा; dual पूषणौ not *पूषाणौ (6.4.7 skipped). राजन् stays राजानम्.
+        let p = generate("pUzan", "pum").expect("pUzan");
+        has(&p, "prathamA", "pUzA");
+        has(&p, "prathamA", "pUzaRO");
+        has(&p, "prathamA", "pUzaRaH");
+        has(&p, "dvitIyA", "pUzaRam");
+        has(&p, "dvitIyA", "pUzRaH");
+        has(&p, "tfIyA", "pUzRA");
+        has(&p, "tfIyA", "pUzaByAm");
+        has(&p, "saptamI", "pUzRi");
+        has(&p, "saptamI", "pUzaRi");
+        has(&p, "saptamI", "pUzasu");
+        has(&p, "samboDana", "pUzan");
+        let a = generate("aryaman", "pum").expect("aryaman");
+        has(&a, "prathamA", "aryamA");
+        has(&a, "prathamA", "aryamaRO");
+        has(&a, "dvitIyA", "aryamaRam");
+        has(&a, "tfIyA", "aryamRA");
+        has(&generate("rAjan", "pum").unwrap(), "dvitIyA", "rAjAnam");
+        has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjAnO");
+        assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "pUzARO"));
+        assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "aryamARO"));
     }
 }
