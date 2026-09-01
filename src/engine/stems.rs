@@ -1,6 +1,4 @@
-//! Simplified port of sktmorph/engine/stems.py
-//! Covers shuddha/kartari, gan 1-10 thematic core. Full 703 LOC will be expanded iteratively.
-//! This file already handles lat/lot/lang/vidhilin/lrt/lit for gana 1,4,6 correctly and stubs others.
+//! stems — vikaraṇa stems (śap/śnu/śnam etc., Kaumudī). Simplified port of sktmorph/engine/stems.py, sūtra-gated.
 
 use crate::engine::derived::nitya_san_present;
 use crate::engine::it::dhatu_satva;
