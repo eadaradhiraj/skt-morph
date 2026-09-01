@@ -42,7 +42,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ktvA" => Some(("tvA", vec!["3.4.21"], "root")),
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
         "ktin" => Some(("ti", vec!["3.3.94"], "guna")),
-        "yat" => Some(("ya", vec!["3.1.97", "3.1.98", "3.1.99", "3.1.100", "3.1.102"], "yat")),
+        "yat" => Some(("ya", vec!["3.1.97", "3.1.98", "3.1.99", "3.1.100", "3.1.102", "3.1.105"], "yat")),
         "Ryat" => Some(("ya", vec!["3.1.124", "3.1.125"], "guna")),
         "GaY" => Some(("a", vec!["3.3.67"], "guna")),
         "Ramul" => Some(("am", vec!["3.3.84"], "guna")),
@@ -880,6 +880,8 @@ fn ini_form(root: &str) -> String {
 /// 3.1.98 पोरदुपधात्: शप्य/लभ्य/आप्य (no वृद्धि). ण्यत् stays पाक्य.
 /// 3.1.99 शकिसहोश्च: शक्य/सह्य. 3.1.100 गदमदचरयमश्चानुपसर्गे: गद्य/मद्य/चर्य/यम्य.
 /// 3.1.102 वह्यं करणम्: वह्य vs ण्यत् वाह्य. क्यप् stays ऊह्य. क्त stays ऊढ.
+/// 3.1.105 अजेर् यत्: अज्य vs ण्यत् आग्य (7.3.52 कु). क्त stays अक्त. घञ् stays आग.
+/// थकन् stays गाथक. ण्युट् stays गायन. क्त stays गीत. श stays पिब. घिनुण् stays मादिन्.
 /// थकन् stays गाथक. ण्युट् stays गायन. क्त stays गीत. श stays पिब. घिनुण् stays मादिन्.
 fn yat_form(root: &str) -> String {
     match root {
@@ -895,6 +897,7 @@ fn yat_form(root: &str) -> String {
         "car" | "cara" => "carya".into(),
         "yam" | "yama" => "yamya".into(),
         "vah" | "vaha" => "vahya".into(),
+        "aj" | "aja" => "ajya".into(),
         r if r.ends_with('A') => format!("{}eya", &r[..r.len() - 1]),
         other => join_eco(&apply_guna_to_stem(other), "ya"),
     }
@@ -1935,6 +1938,9 @@ mod tests {
         let d = decline("vaha", "yat", "nap", &[]).expect("vahyam");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "vahyam"), "{:?}", pr);
+        let d = decline("aja", "yat", "nap", &[]).expect("ajyam");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "ajyam"), "{:?}", pr);
     }
 
     #[test]
@@ -2046,6 +2052,10 @@ mod tests {
         assert_eq!(derive("vaha", "kta"), vec!["UQa"]);
         assert_eq!(derive("vaha", "kyap"), vec!["uhya"]);
         assert_eq!(derive("vaha", "GaY"), vec!["vAha"]);
+        assert_eq!(derive("aja", "yat"), vec!["ajya"]);
+        assert_eq!(derive("aja", "Ryat"), vec!["Agya"]);
+        assert_eq!(derive("aja", "kta"), vec!["akta"]);
+        assert_eq!(derive("aja", "GaY"), vec!["Aga"]);
         assert_eq!(derive("hana", "GaY"), vec!["GAta"]);
         assert_eq!(derive("hana", "Rvul"), vec!["GAtaka"]);
         assert_eq!(derive("hana", "vun"), vec!["hanaka"]);
