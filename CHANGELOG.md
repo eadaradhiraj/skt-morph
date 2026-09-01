@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 112: README 111
+
+- **README:** recent line updated to 111 iters + jaNGan (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 111: tinanta jaNGan doc
 
 - **tinanta:** deriv doc + jaNGan; no logic change.
