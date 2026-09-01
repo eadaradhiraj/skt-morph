@@ -1529,14 +1529,20 @@ fn decline_jara(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-/// भू-anta (स्वभू, स्वयम्भू) — 6.1.77 इको यणचि उवङ् भुवौ/भुवम्; सु भूः; पद भूभ्याम्/भूषु.
-/// Not U-pum *स्वभावौ / *स्वभूम्. हूहू stays U-anta.
+/// भू-anta: 6.4.77 उवङ् on धातु भू (भू/स्वभू/स्वयम्भू भुवम्). 6.4.83 ओः सुपि यण् on other *भू (वर्षाभ्वम्).
+/// Not U-pum *वर्षाभूम् / उवङ् *वर्षाभुवम्. खलपू stays पू-anta. हूहू stays हूहूम्.
 fn decline_bhu(cand: &str, linga: &str) -> Option<Declension> {
     let pre = cand.strip_suffix("BU")?;
     if linga != "pum" && linga != "stri" {
         return None;
     }
-    let uv = format!("{pre}Buv");
+    // 6.4.77 श्रुधातुभ्रुवां: only the dhātu भू and its स्व/स्वयम् compounds. वर्षाभू is 6.4.83.
+    let dhatu_bhu = pre.is_empty() || pre == "sva" || pre == "svayam";
+    let uv = if dhatu_bhu {
+        format!("{pre}Buv")
+    } else {
+        format!("{pre}Bv")
+    };
     let uu = format!("{pre}BU");
     let mut decl = HashMap::new();
     decl.insert("prathamA".into(), vec![format!("{uu}H"), format!("{uv}O"), format!("{uv}aH")]);
@@ -3801,6 +3807,20 @@ mod tests {
         has(&generate("hUhU", "pum").unwrap(), "prathamA", "hUhUH");
         assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "svaBUm"));
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "svaBavO"));
+        // 6.4.83 वर्षाभू यण् (खलपू-like), not धातु उवङ् *वर्षाभुवम् / हूहू *वर्षाभूम्.
+        let v = generate("varzABU", "pum").expect("varzABU");
+        has(&v, "prathamA", "varzABUH");
+        has(&v, "prathamA", "varzABvO");
+        has(&v, "prathamA", "varzABvaH");
+        has(&v, "dvitIyA", "varzABvam");
+        has(&v, "dvitIyA", "varzABvaH");
+        has(&v, "tfIyA", "varzABvA");
+        has(&v, "tfIyA", "varzABUByAm");
+        has(&v, "saptamI", "varzABvi");
+        has(&v, "saptamI", "varzABUzu");
+        has(&generate("KalapU", "pum").unwrap(), "dvitIyA", "Kalapvam");
+        assert!(!v.declension.get("dvitIyA").unwrap().iter().any(|x| x == "varzABuvam"));
+        assert!(!v.declension.get("dvitIyA").unwrap().iter().any(|x| x == "varzABUm"));
     }
 
     #[test]
