@@ -118,7 +118,7 @@ pub fn generate_pronoun(base: &str, linga: &str) -> JsValue {
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// Reverse lookup: one surface form (SLP1) → every valid parse (tinanta/kṛdanta/subanta/sarvanāma, upasarga-peeled).
+/// Reverse lookup: one surface form (SLP1) → every valid parse (tinanta/kṛdanta/subanta/sarvanāma, upasarga-peeled, Kaumudī).
 #[wasm_bindgen]
 pub fn analyze(word: &str) -> JsValue {
     let result = engine::analyze::analyze_word(word);
