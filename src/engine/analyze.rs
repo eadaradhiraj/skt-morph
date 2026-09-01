@@ -253,8 +253,8 @@ pub fn analyze_word(word: &str) -> Vec<Analysis> {
     out
 }
 
-/// Prefix search for demo autocomplete — dhātus + common pratipadikas (SLP1).
-/// Case-insensitive for dhātu; exact prefix for stems.
+/// Prefix search for demo autocomplete — dhātus + common pratipadikas (SLP1, 1.4.59).
+/// Case-insensitive for dhātu; exact prefix for stems. Fast O(n) scan (≈2k).
 pub fn search_prefix(prefix: &str, limit: usize) -> Vec<String> {
     let mut results = Vec::new();
     let prefix_lower = prefix.to_lowercase();
