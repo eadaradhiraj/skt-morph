@@ -1093,7 +1093,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
     if linga == "stri"
         && (matches!(
             pratyaya,
-            "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
+            "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
                 | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa" | "ka" | "lyu"
         ) || pratyaya.contains("SAnac")
@@ -1141,8 +1141,9 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             return Some(format!("{base}I"));
         }
     }
-    // 3.2.146 वुञ् स्त्री खादिका (अक→इका), not टाप् *खादका / ष्वुन् *खादकी.
-    if pratyaya == "vuY" && linga == "stri" {
+    // 3.2.146 वुञ् / 3.1.133 ण्वुल् / वुन् स्त्री: 7.3.44 कात् पूर्वस्य इत् → कारिका not टाप् *कारका.
+    // ष्वुन् stays नर्तकी (ङीष्, already above).
+    if matches!(pratyaya, "vuY" | "Rvul" | "vun") && linga == "stri" {
         if let Some(base) = form.strip_suffix("aka") {
             return Some(format!("{base}ikA"));
         }
@@ -1733,6 +1734,15 @@ mod tests {
         assert!(pr.iter().any(|x| x == "KAdakaH"), "{:?}", pr);
         let d = decline("KAdf", "vuY", "stri", &[]).expect("KAdikA");
         assert_eq!(d.stem, "KAdikA");
+        let d = decline("qukfY", "Rvul", "pum", &[]).expect("kArakaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "kArakaH"), "{:?}", pr);
+        let d = decline("qukfY", "Rvul", "stri", &[]).expect("kArikA");
+        assert_eq!(d.stem, "kArikA");
+        let d = decline("BU", "vun", "stri", &[]).expect("BavikA");
+        assert_eq!(d.stem, "BavikA");
+        let d = decline("nftI", "zvun", "stri", &[]).expect("nartakI");
+        assert_eq!(d.stem, "nartakI");
         let d = decline("qukfY", "ktri", "pum", &[]).expect("kftrimaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "kftrimaH"), "{:?}", pr);
