@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 107: tinanta pApac doc
+
+- **tinanta:** deriv doc + pApac; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 106: README 105
 
 - **README:** recent line updated to 105 iters + jaNgam (187 tests).
