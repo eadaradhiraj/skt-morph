@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 71: README 70
+
+- **README:** recent line updated to 70 iters + perf notes (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 70: tinanta perf doc
 
 - **tinanta:** deriv doc + dhatu cache perf note; no logic change.
