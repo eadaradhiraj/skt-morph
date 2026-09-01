@@ -1,27 +1,10 @@
 //! Port of engine/redup.py
 
-//! =============================================================================
-//! src/engine/redup.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 use crate::engine::phonology::apply_guna_to_stem;
 
-// ---------------------------------------------------------------------------
-// const `GANA3`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub const GANA3: u8 = 3;
 
 #[derive(Debug, Clone)]
-// ---------------------------------------------------------------------------
-// struct `Gana3Profile`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub struct Gana3Profile {
     pub present: String,
     pub join: String, // nu | ad
@@ -30,12 +13,7 @@ pub struct Gana3Profile {
     pub future: String,
 }
 
-// ---------------------------------------------------------------------------
-// fn `profile` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn profile(dhatu: &str, guna: &str) -> Gana3Profile {
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match dhatu {
         "YiBI" => return Gana3Profile { present:"biBe".into(), join:"ad".into(), lang:"biBe".into(), vidhilin:"biBe".into(), future: format!("{}zya", guna) },
         "ohAk" => return Gana3Profile { present:"jahA".into(), join:"ad".into(), lang:"jah".into(), vidhilin:"jah".into(), future: format!("{}sya", guna) },
@@ -49,7 +27,6 @@ fn profile(dhatu: &str, guna: &str) -> Gana3Profile {
         "Bf" => return Gana3Profile { present:"biBf".into(), join:"ad".into(), lang:"biBar".into(), vidhilin:"biBf".into(), future:"Barizya".into() },
         "mA" => return Gana3Profile { present:"mimI".into(), join:"ad".into(), lang:"mimI".into(), vidhilin:"mimI".into(), future: format!("{}sya", guna) },
         "hA" => {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if guna=="hA" { return Gana3Profile { present:"jihI".into(), join:"ad".into(), lang:"jihI".into(), vidhilin:"jihI".into(), future: format!("{}sya", guna)}; }
             return Gana3Profile { present:"jahA".into(), join:"ad".into(), lang:"jah".into(), vidhilin:"jah".into(), future: format!("{}sya", guna)};
         }
@@ -60,11 +37,9 @@ fn profile(dhatu: &str, guna: &str) -> Gana3Profile {
         "viz" => return Gana3Profile { present:"veviz".into(), join:"ad".into(), lang:"veviz".into(), vidhilin:"veviz".into(), future:"vejizya".into()},
         _ => {}
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if dhatu.len()==1 {
         return Gana3Profile { present: format!("j{}{}", guna, dhatu), join:"nu".into(), lang: guna.to_string(), vidhilin: format!("{}uy", guna), future: format!("{}zya", guna)};
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if dhatu.len()==2 && dhatu.starts_with('h') {
         return Gana3Profile { present: format!("ji{}", guna), join:"ad".into(), lang: format!("ji{}", guna), vidhilin: format!("ji{}", guna), future: format!("{}zya", guna)};
     }
@@ -74,55 +49,29 @@ fn profile(dhatu: &str, guna: &str) -> Gana3Profile {
     Gana3Profile { present: present.clone(), join:"ad".into(), lang: present.clone(), vidhilin: present, future: format!("{}zya", guna)}
 }
 
-// ---------------------------------------------------------------------------
-// fn `gana3_present_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_present_stem(dhatu: &str, guna: Option<&str>) -> String {
     let g = guna.map(|s| s.to_string()).unwrap_or_else(|| apply_guna_to_stem(dhatu));
     profile(dhatu, &g).present
 }
-// ---------------------------------------------------------------------------
-// fn `gana3_join_mode` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_join_mode(dhatu: &str, guna: Option<&str>) -> String {
     let g = guna.map(|s| s.to_string()).unwrap_or_else(|| apply_guna_to_stem(dhatu));
     profile(dhatu, &g).join
 }
-// ---------------------------------------------------------------------------
-// fn `gana3_lang_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_lang_stem(dhatu: &str, guna: Option<&str>) -> String {
     let g = guna.map(|s| s.to_string()).unwrap_or_else(|| apply_guna_to_stem(dhatu));
     profile(dhatu, &g).lang
 }
-// ---------------------------------------------------------------------------
-// fn `gana3_vidhilin_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_vidhilin_stem(dhatu: &str, guna: Option<&str>) -> String {
     let g = guna.map(|s| s.to_string()).unwrap_or_else(|| apply_guna_to_stem(dhatu));
     profile(dhatu, &g).vidhilin
 }
-// ---------------------------------------------------------------------------
-// fn `gana3_future_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_future_stem(dhatu: &str, guna: Option<&str>) -> String {
     let g = guna.map(|s| s.to_string()).unwrap_or_else(|| apply_guna_to_stem(dhatu));
     profile(dhatu, &g).future
 }
-// ---------------------------------------------------------------------------
-// fn `gana3_weak_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_weak_stem(dhatu: &str, guna: &str, ending: &str, purusha: u8) -> String {
     let prof = profile(dhatu, guna);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if ending=="ti" && purusha==1 {
-        // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
         match dhatu {
             "BI" => return format!("bi{}", guna),
             "YiBI" => return "biBe".to_string(),
@@ -138,8 +87,4 @@ pub fn gana3_weak_stem(dhatu: &str, guna: &str, ending: &str, purusha: u8) -> St
     }
     prof.present
 }
-// ---------------------------------------------------------------------------
-// fn `gana3_perfect_stem` — sūtra: 7.3.84/7.3.86 guṇa: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn gana3_perfect_stem(dhatu: &str, guna: Option<&str>) -> String { gana3_present_stem(dhatu, guna) }

@@ -64,23 +64,16 @@ fn join_snu_anga(base: &str, family: &str, ending: &str, augment: Option<&str>) 
     Some(apply_lang_aug(inner, family, augment))
 }
 
-// ---------------------------------------------------------------------------
-// fn `apply_lang_aug`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn apply_lang_aug(form: String, family: &str, augment: Option<&str>) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family != "lang" {
         return form;
     }
     let Some(aug) = augment else {
         return format!("a{form}");
     };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if aug != "a" {
         return format!("{aug}{form}");
     }
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match form.chars().next() {
         Some('a') | Some('A') => format!("A{}", &form[1..]),
         Some('i') | Some('I') | Some('e') | Some('E') => format!("E{}", &form[1..]),
@@ -99,7 +92,6 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
     let stem_chars: Vec<char> = stem.chars().collect();
     let Some(&s_last) = stem_chars.last() else { return format!("{}{}", stem, suffix); };
     let stem_body: String = stem_chars[..stem_chars.len()-1].iter().collect();
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match (s_last, suff_first) {
         ('d', 't') => format!("{}t{}", stem_body, suffix),
         ('d', 'T') => format!("{}tT{}", stem_body, &suffix[1..]),
@@ -132,7 +124,6 @@ pub fn internal_sandhi(stem: &str, suffix: &str) -> String {
 /// 3.1.78 श्नम्: strip leftover इत्, then infix न before the last consonant.
 fn gana7_root(raw: &str) -> String {
     let mut s = raw.trim_end_matches('~').to_string();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s.ends_with("ir") && s.len() > 3 {
         s = s[..s.len() - 2].to_string();
     } else if s.ends_with('a') && s.len() > 2 {
@@ -140,7 +131,6 @@ fn gana7_root(raw: &str) -> String {
     }
     // 1.3.2/3 Sizx, Banjo, kftI, anjU.
     while let Some(last) = s.chars().last() {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if s.len() <= 2 {
             break;
         }
@@ -152,7 +142,6 @@ fn gana7_root(raw: &str) -> String {
             }
             _ => false,
         };
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if strip {
             s.truncate(rest_len);
         } else {
@@ -170,10 +159,6 @@ fn gana7_root(raw: &str) -> String {
     s
 }
 
-// ---------------------------------------------------------------------------
-// fn `join_form`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn join_form(
     stem: &str,
     ending: &str,
@@ -188,9 +173,7 @@ pub fn join_form(
 ) -> String {
     // अदादि: `adadi::join_form`.
     if gana == 2 {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(d) = dhatu {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if let Some(f) = crate::engine::adadi::join_form(d, family, ending, purusha, _vacana, augment) {
                 return crate::engine::phonology::apply_natva_to_word(&f);
             }
@@ -198,21 +181,17 @@ pub fn join_form(
     }
     // 3.1.80 धिन्विकृण्व्योर च — श्नु for all sārvadhātuka / लृट्
     if let Some(base) = dhatu.and_then(crate::engine::phonology::dhinvi_krnvi_snu_base) {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(f) = join_snu_anga(base, family, ending, augment) {
             return crate::engine::phonology::apply_natva_to_word(&f);
         }
     }
     // G3 (3) reduplicated – juhu→juhoti, bibhI→bibheti, pF→piparti
     if gana == 3 {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if stem.ends_with("Ur") && ending == "ti" {
             return format!("{}arti", &stem[..stem.len()-2]); // pipUr+ti→piparti
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if stem.ends_with('u') {
             let base = &stem[..stem.len()-1];
-            // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
             match ending {
                 "ti" => return format!("{}oti", base),
                 "taH" => return format!("{}utaH", base),
@@ -228,14 +207,11 @@ pub fn join_form(
                 _ => {}
             }
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if stem.ends_with('y') && (family == "vidhilin" || ending.starts_with('A')) {
             return format!("{}{}", stem, ending);
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if stem.ends_with('I') {
             let base = &stem[..stem.len()-1];
-            // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
             match ending {
                 "ti" => return format!("{}eti", base), // bibhI→bibheti
                 "taH" => return format!("{}ItaH", base),
@@ -245,16 +221,13 @@ pub fn join_form(
     }
     // NU gaṇa (5,8) – port of _join_nu (lat/lot/lrt core)
     if gana == 5 || gana == 8 {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if family == "lrt" {
             // future stems already like "to" etc, simple concat
             if ending.is_empty() { return stem.to_string(); }
             return format!("{}{}", stem, ending);
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if stem.ends_with('u') {
             let base = &stem[..stem.len()-1];
-            // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
             match ending {
                 "ti" => return format!("{}oti", base),
                 "taH" => return format!("{}taH", stem),
@@ -277,16 +250,13 @@ pub fn join_form(
                 "uta" => return format!("{}{}", base, ending),
                 "u" => return format!("{}u", base),
                 _ => {
-                    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                     if ending.starts_with('u') {
                         return format!("{}{}", base, ending);
                     }
                 }
             }
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if stem.ends_with('R') {
-            // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
             match ending {
                 "ti" => return format!("{}oti", stem),
                 "taH" => return format!("{}taH", stem),
@@ -299,15 +269,12 @@ pub fn join_form(
     }
     // N (7) श्नम्: रुणद्धि, रुन्द्धः, रुन्धन्ति; शिनष्टि, भनक्ति.
     if gana == 7 {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if family == "lrt" {
             return format!("{}{}", stem, ending);
         }
         let root = gana7_root(dhatu.unwrap_or(""));
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if !root.is_empty() {
             let chars: Vec<char> = root.chars().collect();
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if chars.len() >= 2 {
                 let last = chars[chars.len() - 1];
                 let body: String = chars[..chars.len() - 1].iter().collect();
@@ -328,7 +295,6 @@ pub fn join_form(
                 let pit = matches!(ending, "ti" | "si" | "mi" | "Ami" | "tu" | "tAt" | "tAd");
                 let base = if pit { &strong } else { &weak };
                 let out = |s: String| crate::engine::phonology::apply_natva_to_word(&s);
-                // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
                 match ending {
                     "ti" => return out(internal_sandhi(&strong, "ti")),
                     "si" => return out(internal_sandhi(&strong, "si")),
@@ -359,14 +325,12 @@ pub fn join_form(
     }
     // NI (9) punāti / krIRAti – handle nA → RA / nA
     if gana == 9 && stem.ends_with("nA") {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if family == "lrt" {
             return format!("{}{}", stem, ending);
         }
         let base = &stem[..stem.len()-2];
         let use_n = crate::engine::phonology::g9_uses_n_infix(dhatu.unwrap_or(""), _antarganas.unwrap_or(""));
         let nasal = if use_n { "n" } else { "R" };
-        // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
         match ending {
             "ti" => return format!("{}{}Ati", base, nasal),
             "taH" => return format!("{}{}ItaH", base, nasal),
@@ -378,9 +342,7 @@ pub fn join_form(
             "yAt" | "yAd" => return format!("{}{}IyA{}", base, nasal, &ending[1..]),
             "At" | "Ad" => {
                 let inner = format!("{}{}A{}", base, nasal, &ending[1..]);
-                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if family == "lang" {
-                    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                     if let Some(aug) = augment {
                         return format!("{aug}{inner}");
                     }
@@ -400,7 +362,6 @@ pub fn join_form(
 
     // augment handling (a- for lang) with proper Pāṇini vowel sandhi
     if let Some(aug) = augment {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if aug == "a" && (form.starts_with('a') || form.starts_with('A')) {
             form = format!("A{}", &form[1..]);
         } else if aug == "a" && (form.starts_with('i') || form.starts_with('I') || form.starts_with('e') || form.starts_with('E')) {
@@ -417,10 +378,6 @@ pub fn join_form(
     crate::engine::phonology::apply_natva_to_word(&form)
 }
 
-// ---------------------------------------------------------------------------
-// fn `join_all`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn join_all(
     stem: &str,
     ending: &str,
@@ -433,12 +390,9 @@ fn join_all(
     vacana: u8,
     antarganas: Option<&str>,
 ) -> Vec<String> {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if gana == 2 {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(d) = dhatu {
             let fs = crate::engine::adadi::join_forms(d, family, ending, purusha, vacana, augment);
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if !fs.is_empty() {
                 return fs
                     .into_iter()
@@ -461,10 +415,6 @@ fn join_all(
     )]
 }
 
-// ---------------------------------------------------------------------------
-// fn `join_variants`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn join_variants(
     stem: &str,
     variants: &[String],
@@ -477,11 +427,8 @@ pub fn join_variants(
     vacana: u8,
     antarganas: &str,
 ) -> Vec<String> {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lit" {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(out) = crate::engine::lit::kartari(dhatu, purusha, vacana, pada) {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if !out.is_empty() {
                 return out;
             }

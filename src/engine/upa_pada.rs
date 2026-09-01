@@ -7,16 +7,6 @@
 //!
 //! Design is declarative so adding further sūtras is just adding entries.
 
-
-//! =============================================================================
-//! src/engine/upa_pada.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 fn normalize_one(p: &str) -> String {
     let t = p.trim().trim_matches([',', ';']).trim();
     // handle SLP1 variants with anusvāra/ṅ etc
@@ -30,18 +20,12 @@ fn normalize_one(p: &str) -> String {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `normalized_prefixes`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn normalized_prefixes(prefixes: &[String]) -> Vec<String> {
     let mut out = Vec::new();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for raw in prefixes {
         // split compound entries like "sam;A" or "sam, A" or "sam A"
         for part in raw.split([',', ';', ' ']) {
             let t = part.trim();
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if t.is_empty() { continue; }
             out.push(normalize_one(t));
         }
@@ -53,10 +37,6 @@ fn normalized_prefixes(prefixes: &[String]) -> Vec<String> {
     out
 }
 
-// ---------------------------------------------------------------------------
-// fn `has_prefix`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn has_prefix(norm: &[String], target: &str) -> bool {
     norm.iter().any(|p| p == target)
 }
@@ -67,10 +47,6 @@ pub fn allowed_padas(root_pada: &str, dhatu: &str, prefixes: &[String]) -> Vec<S
     allowed_padas_artha(root_pada, dhatu, prefixes, "")
 }
 
-// ---------------------------------------------------------------------------
-// fn `allowed_padas_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], artha: &str) -> Vec<String> {
     let d = dhatu.trim();
     let norm = normalized_prefixes(prefixes);
@@ -82,7 +58,6 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     // 1.3.29 sam + gam -> optional Ātmanepada (vA). Includes sam+A+gam (samAgam)
     // bare gam or A+gam alone -> P only
     if matches!(d, "gam" | "gamx" | "gamy") {
-        // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
         match root_pada {
             "P" if has_sam => return vec!["P".to_string(), "A".to_string()],
             "P" => return vec!["P".to_string()],
@@ -98,11 +73,9 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     // Cross-check: gold (ashtadhyayi.com) has ji ting only plat; vi+ji should be alat only.
     if d == "ji" && root_pada == "P" {
         let has_vi = has_prefix(&norm, "vi");
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if norm.is_empty() {
             return vec!["P".to_string()];
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if has_vi || has_prefix(&norm, "parA") {
             return vec!["A".to_string()];
         }
@@ -158,11 +131,9 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
 
     // --- 1.3.38 वृत्तिसर्गतायनेषु क्रमः / 1.3.43 अनुपसर्गाद्वा ---
     if matches!(d, "kramu" | "kram" | "krama") && kram_sense {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if has_prefix(&norm, "vi") || has_sam || has_prefix(&norm, "pari") {
             return vec!["A".to_string()];
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if norm.is_empty() {
             return vec!["P".to_string(), "A".to_string()];
         }
@@ -172,11 +143,9 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     if matches!(d, "yama" | "yam" | "yamx")
         && (has_sam || has_prefix(&norm, "ud") || has_prefix(&norm, "A"))
     {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if a == "agranthe" {
             return vec!["A".to_string()];
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if a == "granthe" {
             return vec!["P".to_string()];
         }
@@ -191,18 +160,10 @@ pub fn allowed_padas_artha(root_pada: &str, dhatu: &str, prefixes: &[String], ar
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `pada_allowed`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn pada_allowed(root_pada: &str, requested_pada: &str, dhatu: &str, prefixes: &[String]) -> bool {
     allowed_padas(root_pada, dhatu, prefixes).iter().any(|p| p == requested_pada)
 }
 
-// ---------------------------------------------------------------------------
-// fn `pada_allowed_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn pada_allowed_artha(
     root_pada: &str,
     requested_pada: &str,
@@ -217,10 +178,6 @@ pub fn pada_allowed_artha(
 
 #[cfg(test)]
 #[allow(non_snake_case)] // SLP1 fixtures (saG = सङ्)
-// ---------------------------------------------------------------------------
-// mod `tests`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 

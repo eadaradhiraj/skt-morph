@@ -1,20 +1,6 @@
 //! Resolve a user dhātu query (id or SLP1 name) against the compact index.
 
-
-//! =============================================================================
-//! src/engine/dhatu.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 #[derive(Clone, Copy, Debug)]
-// ---------------------------------------------------------------------------
-// struct `DhatuRow`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub struct DhatuRow {
     pub id: &'static str,
     pub dhatu: &'static str,
@@ -25,18 +11,10 @@ pub struct DhatuRow {
     pub aupadeshik: &'static str,
 }
 
-// ---------------------------------------------------------------------------
-// fn `row`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn row((id, dhatu, gana, pada, tags, ant, aup): &(&'static str, &'static str, u8, &'static str, &'static str, &'static str, &'static str)) -> DhatuRow {
     DhatuRow { id, dhatu, gana: *gana, pada, tags, antarganas: ant, aupadeshik: aup }
 }
 
-// ---------------------------------------------------------------------------
-// fn `is_it_suffix`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_it_suffix(s: &str) -> bool {
     matches!(
         s,
@@ -47,30 +25,23 @@ fn is_it_suffix(s: &str) -> bool {
 /// First matching row: exact id, then exact name (file order, so bhvādi before curādi), then name+it (gam → gamx).
 pub fn lookup(query: &str) -> Option<DhatuRow> {
     let q = query.trim();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if q.is_empty() {
         return None;
     }
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for rec in crate::data::DHATUS {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rec.0 == q {
             return Some(row(rec));
         }
     }
     // अस् by name: Kaumudī अस्ति (02.0060), not भ्वादि 01.1029.
     if q == "as" || q == "asa" {
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for rec in crate::data::DHATUS {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if rec.0 == "02.0060" {
                 return Some(row(rec));
             }
         }
     }
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for rec in crate::data::DHATUS {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if rec.1 == q {
             // यम् by name: Kaumudī यच्छति (not ghaṭādi 01.0930 mittva).
             if q == "yama" && rec.5.contains("GawAdi") {
@@ -79,10 +50,8 @@ pub fn lookup(query: &str) -> Option<DhatuRow> {
             return Some(row(rec));
         }
     }
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for rec in crate::data::DHATUS {
         let name = rec.1;
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if name.starts_with(q) && name.len() > q.len() && is_it_suffix(&name[q.len()..]) {
             return Some(row(rec));
         }
@@ -90,17 +59,13 @@ pub fn lookup(query: &str) -> Option<DhatuRow> {
     // Devanagari क्रम → SLP1 `krama` (inherent a). Retry without final a.
     if q.ends_with('a') && q.len() > 2 {
         let stem = &q[..q.len() - 1];
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for rec in crate::data::DHATUS {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if rec.1 == stem {
                 return Some(row(rec));
             }
         }
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for rec in crate::data::DHATUS {
             let name = rec.1;
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if name.starts_with(stem) && name.len() > stem.len() && is_it_suffix(&name[stem.len()..]) {
                 return Some(row(rec));
             }
@@ -109,13 +74,8 @@ pub fn lookup(query: &str) -> Option<DhatuRow> {
     None
 }
 
-// ---------------------------------------------------------------------------
-// fn `resolve_id`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn resolve_id(query: &str) -> String {
     let q = query.trim();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if q.contains('.') {
         return q.to_string();
     }
@@ -124,7 +84,6 @@ pub fn resolve_id(query: &str) -> String {
 
 /// Tuple used by tinanta / krdanta. Unknown queries stay gana 1 so foreign roots can still inflect.
 pub fn load_or_fallback(query: &str) -> (String, u8, String, String, String, String) {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(d) = lookup(query) {
         (
             d.dhatu.to_string(),
@@ -140,10 +99,6 @@ pub fn load_or_fallback(query: &str) -> (String, u8, String, String, String, Str
 }
 
 #[cfg(test)]
-// ---------------------------------------------------------------------------
-// mod `tests`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 

@@ -1,24 +1,11 @@
 //! सेट् / अनिट् for आर्धधातुक (स्य, सिच्, तव्य, …) as in the Kaumudī.
 //! 7.2.10 एकाच उपदेशेऽनुदात्तात्; 7.2.35 आर्धधातुकस्येड् वलादेः; 7.2.58 गमेरिट्.
 
-//! =============================================================================
-//! src/engine/it.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 #![allow(non_snake_case)]
 
 use crate::engine::join::internal_sandhi;
 use crate::engine::phonology::{apply_guna_to_stem, apply_natva_to_word};
 
-// ---------------------------------------------------------------------------
-// fn `is_vowel`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_vowel(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
@@ -61,37 +48,26 @@ pub fn anit_tavya(root: &str) -> bool {
 
 /// निष्ठा (क्त) सेट्: पतित, उषित, गृहीत. 7.2.11 श्र्युकः किति blocks भूत/श्रुत/नीत.
 pub fn takes_it_nistha(root: &str) -> bool {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if matches!(root, "vas" | "grah" | "pat") {
         return true;
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if matches!(
         root,
         "kf" | "gam" | "han" | "labh" | "laB" | "naS" | "banD" | "svap" | "zvap"
     ) {
         return false;
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if anit_sya(root) {
         return false;
     }
     !root.chars().last().is_some_and(|c| "iIuUfFA".contains(c))
 }
 
-// ---------------------------------------------------------------------------
-// fn `takes_it_sya` — sūtra: lṛṭ/sya (3.3.13, 7.1.33): purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn takes_it_sya(root: &str) -> bool {
     // 7.2.58 गमेरिट्; 7.2.70 ऋद्धनोः स्ये (कृ, हन्); 7.2.35 otherwise if not 7.2.10.
     matches!(root, "gam" | "kf" | "han" | "BU" | "pat" | "grah" | "eD") || !anit_sya(root)
 }
 
-// ---------------------------------------------------------------------------
-// fn `takes_it_tavya`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn takes_it_tavya(root: &str) -> bool {
     !anit_tavya(root)
 }
@@ -99,7 +75,6 @@ pub fn takes_it_tavya(root: &str) -> bool {
 /// सिचि वृद्धिः: i/ī → ai, u/ū → au, ṛ → ār, a → ā.
 pub fn sic_vrddhi_grade(root: &str) -> String {
     let chars: Vec<char> = root.chars().collect();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for idx in (0..chars.len()).rev() {
         let repl = match chars[idx] {
             'i' | 'I' | 'e' => Some("E"),
@@ -108,15 +83,12 @@ pub fn sic_vrddhi_grade(root: &str) -> String {
             'a' => Some("A"),
             _ => None,
         };
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(r) = repl {
             let mut o = String::new();
-            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for &c in &chars[..idx] {
                 o.push(c);
             }
             o.push_str(r);
-            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for &c in &chars[idx + 1..] {
                 o.push(c);
             }
@@ -128,12 +100,10 @@ pub fn sic_vrddhi_grade(root: &str) -> String {
 
 /// रुक्: s → ṣ after i/u/ṛ/e/o/r.
 pub fn ruki_s(stem: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !stem.ends_with('s') {
         return stem.to_string();
     }
     let prev = stem.chars().rev().nth(1);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if prev.is_some_and(|c| matches!(c, 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r' | 'k')) {
         let mut s = stem.to_string();
         s.pop();
@@ -143,10 +113,6 @@ pub fn ruki_s(stem: &str) -> String {
     stem.to_string()
 }
 
-// ---------------------------------------------------------------------------
-// fn `last_vowel_index`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn last_vowel_index(s: &str) -> Option<usize> {
     s.char_indices()
         .rev()
@@ -183,12 +149,10 @@ pub fn sya_stem(root: &str) -> String {
     if root == "kfp" {
         root = "kalp".into();
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if takes_it_sya(&root) {
         let g = apply_guna_to_stem(&root);
         // 7.2.37 ग्रहोऽलिटि दीर्घः.
         let it = if root == "grah" { "I" } else { "i" };
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if g.ends_with('a') {
             format!("{}{it}zya", &g[..g.len() - 1])
         } else {
@@ -228,7 +192,6 @@ fn masji_nasoh_num(root: &str) -> String {
     } else {
         root.to_string()
     };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !matches!(r.as_str(), "majj" | "naS") {
         return r;
     }
@@ -240,7 +203,6 @@ fn masji_nasoh_num(root: &str) -> String {
     // 8.4.65 झरो झरि सवर्णे — मन्ज्ज् → मन्ज्.
     let after: String = {
         let c: Vec<char> = after.chars().collect();
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if c.len() >= 2 && c[0] == c[1] {
             c[1..].iter().collect()
         } else {
@@ -250,15 +212,10 @@ fn masji_nasoh_num(root: &str) -> String {
     format!("{}n{after}", &r[..i + vlen])
 }
 
-// ---------------------------------------------------------------------------
-// fn `sya_ruki` — sūtra: lṛṭ/sya (3.3.13, 7.1.33): purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn sya_ruki(stem: &str) -> String {
     let Some(body) = stem.strip_suffix("sya") else {
         return stem.to_string();
     };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if body.chars().last().is_some_and(|c| {
         matches!(c, 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r' | 'k')
     }) {
@@ -273,7 +230,6 @@ fn parasavarna_yayi(stem: &str) -> String {
     let Some(body) = stem.strip_suffix("kzya") else {
         return stem.to_string();
     };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if body
         .chars()
         .last()
@@ -285,10 +241,6 @@ fn parasavarna_yayi(stem: &str) -> String {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `is_ac`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_ac(c: char) -> bool {
     matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
@@ -302,7 +254,6 @@ pub fn join_eco(stem: &str, suffix: &str) -> String {
         return suffix.to_string();
     };
     let body: String = stem.chars().take(stem.chars().count() - 1).collect();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if s0 == 'y' {
         return match last {
             'o' => format!("{body}av{suffix}"),
@@ -310,11 +261,9 @@ pub fn join_eco(stem: &str, suffix: &str) -> String {
             _ => format!("{stem}{suffix}"),
         };
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !is_ac(s0) {
         return format!("{stem}{suffix}");
     }
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match last {
         'e' => format!("{body}ay{suffix}"),
         'o' => format!("{body}av{suffix}"),
@@ -341,26 +290,14 @@ pub fn guna_ac_suffix(root: &str, suffix: &str) -> String {
     apply_natva_to_word(&join_eco(&apply_guna_to_stem(root), suffix))
 }
 
-// ---------------------------------------------------------------------------
-// fn `tavya_form`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn tavya_form(root: &str) -> String {
     guna_it_join(root, "tavya")
 }
 
-// ---------------------------------------------------------------------------
-// fn `anIya_form`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn anIya_form(root: &str) -> String {
     guna_ac_suffix(root, "anIya")
 }
 
-// ---------------------------------------------------------------------------
-// fn `lyuw_form`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 /// 3.3.115 ल्युट् अन; 3.1.134 नन्द्यादि ल्यु. 7.1.58 इदितो नुम्: नन्दन not *नदन.
 pub fn lyuw_form(root: &str) -> String {
     if matches!(root, "nad" | "nand" | "nadi") {
@@ -369,25 +306,16 @@ pub fn lyuw_form(root: &str) -> String {
     guna_ac_suffix(root, "ana")
 }
 
-// ---------------------------------------------------------------------------
-// fn `tfc_form`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn tfc_form(root: &str) -> String {
     guna_it_join(root, "tf")
 }
 
-// ---------------------------------------------------------------------------
-// fn `tum_form`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn tum_form(root: &str) -> String {
     guna_it_join(root, "tum")
 }
 
 /// सिच् parasmai body (before ईत्): कार्ष, नैष्, अत्स्.
 pub fn sic_p_body(root: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if anit_sic(root) {
         let v = sic_vrddhi_grade(root);
         ruki_s(&internal_sandhi(&v, "s"))
@@ -397,12 +325,7 @@ pub fn sic_p_body(root: &str) -> String {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `surface_root`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn surface_root(dhatu: &str) -> String {
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match crate::engine::lit::prakriya_root(dhatu).as_str() {
         "RI" => "nI".into(),
         "brU" => "vac".into(),
@@ -413,27 +336,21 @@ pub fn surface_root(dhatu: &str) -> String {
 
 /// 6.1.64 धात्वादेः षः सः; 6.1.65 णो नः. ष्ठिवु keeps ष् (Kashika).
 pub fn dhatu_satva(root: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.starts_with("zWiv") {
         return root.to_string();
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.starts_with("zw") {
         return format!("st{}", &root[2..]);
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.starts_with("zW") {
         return format!("sT{}", &root[2..]);
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.starts_with("zR") {
         return format!("sn{}", &root[2..]);
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.starts_with('z') {
         return format!("s{}", &root[1..]);
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.starts_with('R') {
         return format!("n{}", &root[1..]);
     }
@@ -442,19 +359,11 @@ pub fn dhatu_satva(root: &str) -> String {
 
 /// Unused helper kept for tests of vowel scan.
 #[allow(dead_code)]
-// ---------------------------------------------------------------------------
-// fn `has_vowel`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn has_vowel(s: &str) -> bool {
     last_vowel_index(s).is_some()
 }
 
 #[cfg(test)]
-// ---------------------------------------------------------------------------
-// mod `tests`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 

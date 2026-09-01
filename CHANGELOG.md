@@ -2,6 +2,13 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 3: de-noise + analyze coverage
+
+- **de-noise:** removed ~70k chars of boilerplate "extreme commenting" (`// — for —`, `// — if-branch —`, generic `purpose/inputs` blocks) from 21 modules (`phonology`, `stems`, `adadi`, `join`, `lit`, `lun`, `krdanta`, `subanta` …). Headers now concise sūtra-gated rustdoc; no logic change, clippy clean.
+- **analyze KRTS:** expanded `KRTS` from 19 → 60+ (gsnu/knu/yaNluk-eligible, kvasu, lyu, sya-Satf, etc.) syncing with `krdanta::pratyaya_rule`; `gAsnu`/`jizRu`/`jigamizu` etc. now reverse-searchable.
+- **search:** `search_prefix` now seeds common subanta/sarvanāma stems (`rAjan`, `pitf`, `go`, `tad/etad/idam`, `dvi/tri`, foreign `wrampa`) for demo autocomplete.
+- **wasm:** pending rebuild (next iteration will publish pkg); 182 tests pass.
+
 ## 2026-09-01 — iteration 2: harden + demo fix
 
 - **join:** `internal_sandhi` now safe on empty/char-boundary (no unwrap panics); replaced `unwrap()` with `Option` guards; added `phonology` header tidy (guṇa/vṛddhi sūtra docs).

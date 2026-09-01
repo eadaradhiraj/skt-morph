@@ -1,15 +1,6 @@
 //! णिच् (3.1.26), सन् (3.1.7), यङ् (3.1.22), कर्मणि यक् (3.1.67).
 //! Śuddha kartari stays the default path; this module is the derived aṅga.
 
-//! =============================================================================
-//! src/engine/derived.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 #![allow(non_snake_case)]
 
 use crate::engine::endings::family_endings;
@@ -17,20 +8,11 @@ use crate::engine::it::surface_root;
 use crate::engine::join::join_variants;
 use crate::engine::phonology::{apply_guna_to_stem, apply_vrddhi_to_stem};
 
-// ---------------------------------------------------------------------------
-// fn `is_cons`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_cons(c: char) -> bool {
     !matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
 
-// ---------------------------------------------------------------------------
-// fn `deaspirate`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn deaspirate(c: char) -> char {
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match c {
         'K' => 'k',
         'G' => 'g',
@@ -44,12 +26,7 @@ fn deaspirate(c: char) -> char {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `palatalize_kuho`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn palatalize_kuho(c: char) -> char {
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match c {
         'k' => 'c',
         'g' => 'j',
@@ -58,26 +35,14 @@ fn palatalize_kuho(c: char) -> char {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `is_sar`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_sar(c: char) -> bool {
     matches!(c, 's' | 'S' | 'z')
 }
 
-// ---------------------------------------------------------------------------
-// fn `is_khay`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_khay(c: char) -> bool {
     matches!(c, 'k' | 'K' | 'c' | 'C' | 'w' | 'W' | 't' | 'T' | 'p' | 'P')
 }
 
-// ---------------------------------------------------------------------------
-// fn `first_abhyasa_cons`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn first_abhyasa_cons(root: &str) -> char {
     let chars: Vec<char> = root.chars().take_while(|&c| is_cons(c)).collect();
     let c0 = if chars.len() >= 2 && is_sar(chars[0]) && is_khay(chars[1]) {
@@ -88,10 +53,6 @@ fn first_abhyasa_cons(root: &str) -> char {
     palatalize_kuho(deaspirate(c0))
 }
 
-// ---------------------------------------------------------------------------
-// fn `last_vowel`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn last_vowel(root: &str) -> Option<char> {
     root.chars().rev().find(|c| !is_cons(*c))
 }
@@ -106,24 +67,17 @@ fn san_abhyasa(root: &str) -> String {
     format!("{c}{v}")
 }
 
-// ---------------------------------------------------------------------------
-// fn `ruki_stutva`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn ruki_stutva(s: &str) -> String {
     let chars: Vec<char> = s.chars().collect();
     let mut out: Vec<char> = Vec::with_capacity(chars.len());
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for (i, &ch) in chars.iter().enumerate() {
         let mut c = ch;
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if c == 's'
             && i > 0
             && matches!(chars[i - 1], 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'e' | 'o' | 'E' | 'O' | 'r')
         {
             c = 'z';
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if matches!(c, 't' | 'T' | 'd' | 'D' | 'n') && out.last() == Some(&'z') {
             c = match c {
                 't' => 'w',
@@ -142,7 +96,6 @@ fn ruki_stutva(s: &str) -> String {
 /// 8.2.37 एकाचो बशो भष् झषन्तस्य स्ध्वोः (after 8.2.31 हो ढः, ढ is झष्).
 fn bhas_initial(s: &str) -> String {
     let mut c: Vec<char> = s.chars().collect();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(first) = c.first_mut() {
         *first = match *first {
             'g' => 'G',
@@ -155,13 +108,8 @@ fn bhas_initial(s: &str) -> String {
     c.into_iter().collect()
 }
 
-// ---------------------------------------------------------------------------
-// fn `thematic_sa`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn thematic_sa(body: &str) -> String {
     let mut body = body.to_string();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if body.ends_with('h') {
         body = bhas_initial(&body);
     }
@@ -170,7 +118,6 @@ fn thematic_sa(body: &str) -> String {
         body = format!("{}M", &body[..body.len() - 1]);
     }
     let joined = crate::engine::join::internal_sandhi(&body, "sa");
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if joined.ends_with('a') {
         joined
     } else {
@@ -180,11 +127,9 @@ fn thematic_sa(body: &str) -> String {
 
 /// Aṅga before झलादि सन्. 6.1.16 ग्रह्; 6.4.16 + 7.3.54 हन्.
 fn san_anga(root: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root == "grah" {
         return "gfh".into();
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root == "han" {
         let dirgha = root.replace('a', "A");
         return format!("G{}", &dirgha[1..]);
@@ -194,7 +139,6 @@ fn san_anga(root: &str) -> String {
 
 /// 7.4.54 सनि मीमाघुर्भलभशकपतपदामच इस् (no अभ्यास). 2.4.55 दाधा घ्वदाप्; आप् ईप्स.
 fn san_is_adesha(root: &str) -> Option<String> {
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match root {
         "labh" => Some("lipsa".into()),
         "pat" => Some("pitsa".into()),
@@ -219,7 +163,6 @@ pub(crate) fn nitya_san_present(dhatu: &str) -> Option<String> {
         _ => return None,
     };
     let mut abh = san_abhyasa(root);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if dirgha && abh.ends_with('i') {
         abh.pop();
         abh.push('I');
@@ -230,7 +173,6 @@ pub(crate) fn nitya_san_present(dhatu: &str) -> Option<String> {
 
 /// सन् present aṅga.
 pub fn san_stem(root: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(s) = san_is_adesha(root) {
         return s;
     }
@@ -241,7 +183,6 @@ pub fn san_stem(root: &str) -> String {
         return ruki_stutva(&format!("{abh}{onset}Irza"));
     }
     let last = root.chars().last();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if last.is_some_and(|c| matches!(c, 'A' | 'i' | 'I' | 'u' | 'U' | 'e' | 'o')) {
         // 6.4.16 अज्झनगमां सनि: श्रु → श्रूष्
         let anga = if last == Some('u') {
@@ -262,16 +203,10 @@ pub fn san_stem(root: &str) -> String {
     ruki_stutva(&format!("{abh}{root}iza"))
 }
 
-// ---------------------------------------------------------------------------
-// fn `root_of`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn root_of(dhatu: &str) -> String {
     let mut r = surface_root(dhatu);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if r.ends_with('a') && r.len() >= 3 {
         let core = &r[..r.len() - 1];
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if core.chars().any(|c| !is_cons(c)) {
             r = core.to_string();
         }
@@ -288,17 +223,12 @@ fn is_mit(root: &str) -> bool {
     )
 }
 
-// ---------------------------------------------------------------------------
-// fn `last_is_cons`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn last_is_cons(root: &str) -> bool {
     root.chars().last().is_some_and(is_cons)
 }
 
 /// 6.1.45 आदेच for 7.3.37 roots (शो/छो/षो/ह्वे/व्ये).
 fn yuk_base(root: &str) -> String {
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match root {
         "So" | "SA" => "SA".into(),
         "Co" | "CA" => "CA".into(),
@@ -318,7 +248,6 @@ fn takes_yuk(root: &str) -> bool {
 pub fn nic_stem(root: &str) -> String {
     let root = yuk_base(root);
     let root = root.as_str();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if takes_yuk(root) {
         return if root.ends_with("vep") {
             format!("{root}aya")
@@ -330,11 +259,9 @@ pub fn nic_stem(root: &str) -> String {
     if root == "i" {
         return "gamaya".into();
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if is_mit(root) {
         return format!("{root}aya");
     }
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     match root.chars().last() {
         Some('A') => format!("{root}paya"),
         Some('i') | Some('I') => format!("{}Ayaya", &root[..root.len() - 1]),
@@ -351,7 +278,6 @@ pub fn nic_stem(root: &str) -> String {
             };
             // 7.3.54 हो हन्तेर्ञ्णिन्नेषु (णिच् is णित्)
             if root == "han" {
-                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if let Some(rest) = anga.strip_prefix('h') {
                     anga = format!("G{rest}");
                 }
@@ -362,40 +288,31 @@ pub fn nic_stem(root: &str) -> String {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `abhyasa_i`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn abhyasa_i(root: &str) -> String {
     format!("{}i", first_abhyasa_cons(root))
 }
 
 /// 7.4.27 रीङ् ऋतः; आ → ई; 7.3.54 हन् (यङ् is ङित्); short i/u lengthen.
 fn yan_anga(root: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root == "han" {
         return "Gan".into();
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.ends_with('f') || root.ends_with('F') {
         let onset: String = root.chars().take_while(|&c| is_cons(c)).collect();
         return format!("{onset}rI");
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.ends_with('A') {
         let mut s = root.to_string();
         s.pop();
         s.push('I');
         return s;
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.ends_with('u') {
         let mut s = root.to_string();
         s.pop();
         s.push('U');
         return s;
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if root.ends_with('i') {
         let mut s = root.to_string();
         s.pop();
@@ -408,7 +325,6 @@ fn yan_anga(root: &str) -> String {
 /// 7.4.82 गुणो यङ्लुकोः (इगुपध अभ्यास); 7.4.83 दीर्घोऽकितः; 7.4.85 नुगतोऽनुनासिकान्तस्य.
 fn yan_abhyasa(orig: &str, anga: &str) -> String {
     let c = first_abhyasa_cons(orig);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if orig.chars().last().is_some_and(|ch| matches!(ch, 'n' | 'm' | 'N' | 'Y' | 'R')) {
         let n = match anga.chars().next() {
             Some('k' | 'K' | 'g' | 'G' | 'h') => 'N',
@@ -440,10 +356,6 @@ pub fn yan_stem(root: &str) -> String {
 /// sūtra: 2.4.74 यङोऽचि च / लुक् — ya of 3.1.22 is elided; abhyāsa+anga remains.
 /// Uses same aṅga/abhyāsa as yaṄ; pada is parasmai (not forced ātmanepada).
 /// Future devs: yan = ātmanepada with ya; yanluk = parasmai without ya.
-// ---------------------------------------------------------------------------
-// fn `yan_luk_stem` — sūtra: yaN luk (2.4.74): purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn yan_luk_stem(root: &str) -> String {
     // — inner: reuse yaṄ aṅga/abhyāsa then strip ya; keeps 7.4.82 guṇa, 7.4.85 nut.
     let anga = yan_anga(root);
@@ -463,13 +375,11 @@ pub fn karma_stem(root: &str) -> String {
         "i" => "I".into(),
         other => other.to_string(),
     };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if r.ends_with('A') {
         let mut s = r;
         s.pop();
         return format!("{s}Iya");
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if r.ends_with('f') || r.ends_with('F') {
         let onset: String = r.chars().take_while(|&c| is_cons(c)).collect();
         return format!("{onset}riya");
@@ -482,27 +392,18 @@ fn nic_shortened(root: &str) -> String {
     let stem = nic_stem(root);
     let inner = stem.strip_suffix("aya").unwrap_or(&stem);
     let mut c: Vec<char> = inner.chars().collect();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(i) = c.iter().rposition(|&ch| ch == 'A') {
         c[i] = 'a';
     }
     c.into_iter().collect()
 }
 
-// ---------------------------------------------------------------------------
-// fn `nic_cang_stem`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn nic_cang_stem(root: &str) -> String {
     let inner = nic_shortened(root);
     let abh = abhyasa_i(&inner).chars().next().map(|c| format!("{c}I")).unwrap_or_else(|| "I".into());
     format!("{abh}{inner}")
 }
 
-// ---------------------------------------------------------------------------
-// fn `inflect`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn inflect(stem: &str, family: &str, pada: &str, purusha: u8, vacana: u8) -> Vec<String> {
     let (use_stem, aug) = match family {
         "lat" | "lot" => (stem.to_string(), None),
@@ -521,7 +422,6 @@ fn inflect(stem: &str, family: &str, pada: &str, purusha: u8, vacana: u8) -> Vec
         return vec![];
     };
     let idx = ((purusha - 1) * 3 + (vacana - 1)) as usize;
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if idx >= table.len() {
         return vec![];
     }
@@ -552,7 +452,6 @@ pub fn kartari(
     pada: &str,
 ) -> Option<Vec<String>> {
     let root = root_of(dhatu);
-    // — match — pada/lakāra/gaṇa dispatch; sūtra gating, see comments above.
     let (stem, force_pada) = match kind {
         "Ric" | "nic" | "R" => (nic_stem(&root), None),
         "san" => (san_stem(&root), None),
@@ -562,24 +461,19 @@ pub fn kartari(
         _ => return None,
     };
     let pada = force_pada.unwrap_or(pada);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "ashir" {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if matches!(kind, "karma" | "yak" | "BAve") {
             return None;
         }
         return crate::engine::ashir::from_anga(&stem, purusha, vacana, pada);
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lit" {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if matches!(kind, "karma" | "yak" | "BAve") {
             return None;
         }
         let forms = crate::engine::lit::am_forms(&stem, purusha, vacana, pada);
         return if forms.is_empty() { None } else { Some(forms) };
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lun" {
         let forms = match kind {
             "Ric" | "nic" | "R" => {
@@ -587,7 +481,6 @@ pub fn kartari(
             }
             "san" => {
                 let base = stem.strip_suffix('a').unwrap_or(&stem);
-                // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if pada == "A" {
                     crate::engine::lun::sic_a(base, purusha, vacana)
                 } else {
@@ -608,7 +501,6 @@ pub fn kartari(
         return if forms.is_empty() { None } else { Some(forms) };
     }
     let forms = inflect(&stem, family, pada, purusha, vacana);
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if forms.is_empty() {
         None
     } else {
@@ -617,10 +509,6 @@ pub fn kartari(
 }
 
 #[cfg(test)]
-// ---------------------------------------------------------------------------
-// mod `tests`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 

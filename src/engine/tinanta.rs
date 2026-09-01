@@ -1,15 +1,6 @@
 //! तिङन्त: Pāṇini as arranged in the Siddhānta-Kaumudī (stem → ending → sandhi).
 //! Scrape DBs are for cross-check only — they never supply a form.
 
-//! =============================================================================
-//! src/engine/tinanta.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 use serde::{Deserialize, Serialize};
 use crate::engine::lakara::{lakara_family, normalize_lakara};
 use crate::engine::stems::{derive_stem, conjugation_gana};
@@ -18,10 +9,6 @@ use crate::engine::join::join_variants;
 use crate::engine::upa_pada::pada_allowed_artha;
 
 #[derive(Serialize, Deserialize, Debug)]
-// ---------------------------------------------------------------------------
-// struct `TinantaResult` — tin/sUP endings: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub struct TinantaResult {
     pub forms: Vec<String>,
     pub dhatu: String,
@@ -31,84 +18,46 @@ pub struct TinantaResult {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-// ---------------------------------------------------------------------------
-// struct `ParadigmEntry`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub struct ParadigmEntry {
     pub purusha: u8,
     pub vacana: u8,
     pub forms: Vec<String>,
 }
 
-// ---------------------------------------------------------------------------
-// fn `load_dhatu_info`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn load_dhatu_info(dhatu_query: &str) -> Option<(String, u8, String, String, String, String)> {
     Some(crate::engine::dhatu::load_or_fallback(dhatu_query))
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate` — tin/sUP endings: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> TinantaResult {
     let forms = generate_all(dhatu_query, lakara, purusha, vacana);
     let (canon, _) = normalize_lakara(lakara);
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_with_prefixes` — tin/sUP endings: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> TinantaResult {
     generate_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, "")
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_with_artha` — tin/sUP endings: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String], artha: &str) -> TinantaResult {
     let forms = generate_all_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, artha);
     let (canon, _) = normalize_lakara(lakara);
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_all`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_all(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> Vec<String> {
     generate_all_with_prefixes(dhatu_query, lakara, purusha, vacana, &[])
 }
 
-
-// ---------------------------------------------------------------------------
-// fn `attach_prefixes`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn attach_prefixes(prefixes: &[String], forms: Vec<String>) -> Vec<String> {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if prefixes.is_empty() { forms }
     // — else-branch — fallback / apavāda; sūtra gating, see comments above.
     else { forms.into_iter().map(|f| crate::engine::prefix::apply_prefixes(prefixes, &f)).collect() }
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_all_with_prefixes`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_all_with_prefixes(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String]) -> Vec<String> {
     generate_all_with_artha(dhatu_query, lakara, purusha, vacana, prefixes, "")
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_all_with_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_all_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8, prefixes: &[String], artha: &str) -> Vec<String> {
     generate_all_derived_artha(dhatu_query, "", lakara, purusha, vacana, prefixes, artha)
 }
@@ -125,10 +74,6 @@ pub fn generate_all_derived(
     generate_all_derived_artha(dhatu_query, derivation, lakara, purusha, vacana, prefixes, "")
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_all_derived_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_all_derived_artha(
     dhatu_query: &str,
     derivation: &str,
@@ -140,17 +85,12 @@ pub fn generate_all_derived_artha(
 ) -> Vec<String> {
     let (canonical, db_lakara) = normalize_lakara(lakara);
     let deriv = derivation.trim();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !deriv.is_empty() && deriv != "shuddha" {
         return live_generate_derived(dhatu_query, deriv, &canonical, &db_lakara, purusha, vacana, prefixes, artha);
     }
     live_generate(dhatu_query, &canonical, &db_lakara, purusha, vacana, prefixes, artha)
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_derived`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_derived(
     dhatu_query: &str,
     derivation: &str,
@@ -164,10 +104,6 @@ pub fn generate_derived(
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_derived_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_derived_artha(
     dhatu_query: &str,
     derivation: &str,
@@ -182,23 +118,13 @@ pub fn generate_derived_artha(
     TinantaResult { forms, dhatu: dhatu_query.to_string(), lakara: canon, purusha, vacana }
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_paradigm_derived`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
     generate_paradigm_derived_artha(dhatu, derivation, lakara, prefixes, "")
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_paradigm_derived_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_paradigm_derived_artha(dhatu: &str, derivation: &str, lakara: &str, prefixes: &[String], artha: &str) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for p in 1..=3 {
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for v in 1..=3 {
             let forms = generate_all_derived_artha(dhatu, derivation, lakara, p, v, prefixes, artha);
             out.push(ParadigmEntry { purusha: p, vacana: v, forms });
@@ -207,10 +133,6 @@ pub fn generate_paradigm_derived_artha(dhatu: &str, derivation: &str, lakara: &s
     out
 }
 
-// ---------------------------------------------------------------------------
-// fn `live_generate_derived`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn live_generate_derived(
     dhatu_query: &str,
     kind: &str,
@@ -228,7 +150,6 @@ fn live_generate_derived(
         return vec![];
     };
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(forms) = crate::engine::derived::kartari(&dhatu, kind, &family, purusha, vacana, pada) {
         return attach_prefixes(prefixes, forms);
     }
@@ -250,30 +171,23 @@ pub fn live_generate(
     };
     let Some(family) = lakara_family(db_lakara) else { return vec![]; };
     let pada = if db_lakara.starts_with('a') || canonical.starts_with('a') { "A" } else { "P" };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !pada_allowed_artha(&root_pada, pada, &dhatu, prefixes, artha) {
         // 2.4.54 चक्षिङः ख्याञ् — लृट् of ख्या/क्ष्या is parasmai.
         if !(pada == "P" && family == "lrt" && matches!(dhatu.as_str(), "cakziN")) {
             return vec![];
         }
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lit" {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(forms) = crate::engine::lit::kartari(&dhatu, purusha, vacana, pada) {
             return attach_prefixes(prefixes, forms);
         }
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "lun" {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(forms) = crate::engine::lun::kartari_tagged(&dhatu, purusha, vacana, pada, &antarganas) {
             return attach_prefixes(prefixes, forms);
         }
     }
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if family == "ashir" {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(forms) = crate::engine::ashir::kartari(&dhatu, purusha, vacana, pada) {
             return attach_prefixes(prefixes, forms);
         }
@@ -284,20 +198,14 @@ pub fn live_generate(
     let table = family_endings(&family, "kartari", pada, cgana, Some(&dhatu));
     let Some(table) = table else { return vec![]; };
     let idx = ((purusha - 1) * 3 + (vacana - 1)) as usize;
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if idx >= table.len() { return vec![]; }
     let (variants, _) = &table[idx];
     let forms = join_variants(&stem, variants, cgana, &family, purusha, pada, augment.as_deref(), &dhatu, vacana, &antarganas);
     attach_prefixes(prefixes, forms)
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_paradigm`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_paradigm(dhatu: &str, lakara: &str) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for p in 1..=3 { for v in 1..=3 {
         let forms = generate_all(dhatu, lakara, p, v);
         out.push(ParadigmEntry { purusha: p, vacana: v, forms });
@@ -305,21 +213,12 @@ pub fn generate_paradigm(dhatu: &str, lakara: &str) -> Vec<ParadigmEntry> {
     out
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_paradigm_with_prefixes`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_paradigm_with_prefixes(dhatu: &str, lakara: &str, prefixes: &[String]) -> Vec<ParadigmEntry> {
     generate_paradigm_with_artha(dhatu, lakara, prefixes, "")
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate_paradigm_with_artha`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate_paradigm_with_artha(dhatu: &str, lakara: &str, prefixes: &[String], artha: &str) -> Vec<ParadigmEntry> {
     let mut out = Vec::new();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for p in 1..=3 { for v in 1..=3 {
         let forms = generate_all_with_artha(dhatu, lakara, p, v, prefixes, artha);
         out.push(ParadigmEntry { purusha: p, vacana: v, forms });
@@ -328,10 +227,6 @@ pub fn generate_paradigm_with_artha(dhatu: &str, lakara: &str, prefixes: &[Strin
 }
 
 #[cfg(test)]
-// ---------------------------------------------------------------------------
-// mod `tests`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 

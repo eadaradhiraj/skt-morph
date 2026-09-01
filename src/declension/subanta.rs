@@ -1,30 +1,13 @@
 //! Auto-generated from sktmorph/subanta.py
 
-//! =============================================================================
-//! src/declension/subanta.rs: Pāṇini/Kaumudī implementation — extreme commenting pass (2026-09-01)
-//! ---------------------------------------------------------------------------
-//! Purpose: see inline block comments below. Every public/private block is
-//! documented with sūtra reference, input/output, and edge-case notes.
-//! Script: SLP1 internally; Devanagari only at demo boundary.
-//! Flow: dhātu → it-strip → aṅga/vikaraṇa → lakāra/ending → sandhi → surface.
-//! Gold DB is cross-check only, never source of truth.
-//! =============================================================================
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-// ---------------------------------------------------------------------------
-// struct `Declension`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub struct Declension {
   pub stem: String, pub linga: String, pub declension: HashMap<String, Vec<String>>,
 }
 
-// ---------------------------------------------------------------------------
-// fn `paradigms`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   let mut m = HashMap::new();
   m.insert(("a".to_string(),"pum".to_string()), vec![vec!["aH".to_string(),"O".to_string(),"AH".to_string(),],vec!["am".to_string(),"O".to_string(),"An".to_string(),],vec!["ena".to_string(),"AByAm".to_string(),"EH".to_string(),],vec!["Aya".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["At".to_string(),"AByAm".to_string(),"eByaH".to_string(),],vec!["asya".to_string(),"ayoH".to_string(),"AnAm".to_string(),],vec!["e".to_string(),"ayoH".to_string(),"ezu".to_string(),],vec!["a".to_string(),"O".to_string(),"AH".to_string(),],]);
@@ -137,12 +120,6 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m
 }
 
-
-
-// ---------------------------------------------------------------------------
-// fn `is_cons`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn is_cons(c: char) -> bool {
     !matches!(c, 'a' | 'A' | 'i' | 'I' | 'u' | 'U' | 'f' | 'F' | 'x' | 'X' | 'e' | 'E' | 'o' | 'O')
 }
@@ -151,9 +128,7 @@ fn is_cons(c: char) -> bool {
 fn scutva_n(word: &str) -> String {
     let c: Vec<char> = word.chars().collect();
     let mut out = String::with_capacity(word.len());
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for (i, &ch) in c.iter().enumerate() {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if ch == 'n' && i > 0 && matches!(c[i - 1], 'S' | 'c' | 'C' | 'j' | 'J') {
             out.push('Y');
         } else {
@@ -170,23 +145,18 @@ fn apply_natva_word(word: &str) -> String {
         'c', 'C', 'j', 'J', 'Y', 'S', 'w', 'W', 'q', 'Q', 'R', 't', 'T', 'd', 'D', 'l', 's',
     ];
     let mut out = chars.clone();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for i in 0..chars.len() {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if chars[i] != 'n' || i + 1 == chars.len() {
             continue;
         }
         let mut trigger = false;
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for &ch in &chars[..i] {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if matches!(ch, 'r' | 'f' | 'F' | 'z') {
                 trigger = true;
             } else if trigger && blockers.contains(&ch) {
                 trigger = false;
             }
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if trigger {
             out[i] = 'R';
         }
@@ -194,10 +164,6 @@ fn apply_natva_word(word: &str) -> String {
     out.into_iter().collect()
 }
 
-// ---------------------------------------------------------------------------
-// fn `polish`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn polish(word: &str) -> String {
     scutva_n(&apply_natva_word(word))
 }
@@ -292,12 +258,7 @@ fn mahat_strong(table: &mut [Vec<String>]) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `apply_natva`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn apply_natva(word_stem: &str, suffix: &str) -> String {
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if !suffix.contains('n') {
         return suffix.to_string();
     }
@@ -311,10 +272,6 @@ fn an_al_lopa(pre: &str) -> bool {
     !matches!(c.as_slice(), [.., a, 'v' | 'm'] if is_cons(*a))
 }
 
-// ---------------------------------------------------------------------------
-// fn `decline_an`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 fn decline_an(stem: &str, linga: &str) -> Declension {
     let pre = stem.strip_suffix("an").unwrap_or(stem);
     let lopa = an_al_lopa(pre);
@@ -328,17 +285,14 @@ fn decline_an(stem: &str, linga: &str) -> Declension {
     let strong = |v: &str| polish(&format!("{pre}{v}"));
     let pada = |v: &str| polish(&format!("{pre}{v}"));
     let mut sap = vec![weak("i")];
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if lopa {
         sap.push(polish(&format!("{stem}i")));
     }
     sap.push(weak("oH"));
     sap.push(pada("asu"));
     let mut decl = HashMap::new();
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if linga == "nap" {
         let mut nom = vec![strong("a"), weak("I"), strong("Ani")];
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if lopa {
             nom.insert(1, polish(&format!("{stem}I")));
         }
@@ -2221,10 +2175,6 @@ fn decline_abhyasta_satr(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
-// ---------------------------------------------------------------------------
-// const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf"];
 /// 6.4.11 स्वसृनप्तृ… — सर्वनामस्थान आ (स्वसारौ/स्वसारम्). Not पितृ *पितारौ.
 const F_SVASR_NAPTR: &[&str] = &["svasf", "naptf"];
@@ -2250,10 +2200,6 @@ fn patch_r_sarvanamasthana(table: &mut [Vec<String>], vrddhi: bool) {
     }
 }
 
-// ---------------------------------------------------------------------------
-// fn `generate`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     let paradigms = paradigms();
     // 6.4.11 कर्तृ/स्वसृ आ in सर्वनामस्थान; पितृ-class keeps short अ (पितरम्/पितरौ).
@@ -2267,9 +2213,7 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         base.trim_end_matches("AH").to_string(),
         base.trim_end_matches("AM").to_string(),
     ];
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for cand in cands {
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if cand.is_empty() { continue; }
         if let Some(d) = decline_ahan(&cand, linga) {
             return Some(d);
@@ -2278,7 +2222,6 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         let cand = ngeep_stri(&cand, linga);
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(d) = decline_sva_yuv_magha(&cand, linga) {
             return Some(d);
         }
@@ -2447,20 +2390,16 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
         let mut best_len = 0;
         let mut best_ending = String::new();
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for ((ending, l), table) in &paradigms {
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if l != linga { continue; }
             // त्रिंशत्/चत्वारिंशत्/पञ्चाशत् — त-anta संख्या, not शतृ `at` (भवन्).
             if ending == "at" && cand.ends_with("Sat") { continue; }
-            // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
             if cand.ends_with(ending) && ending.len() > best_len {
                 best = Some((ending.clone(), table.clone()));
                 best_len = ending.len();
                 best_ending = ending.clone();
             }
         }
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some((_, mut table)) = best {
             // 6.4.11: स्वसृ/नप्तृ आ; पितृ-class पुं short अ. मातृ स्त्री already short in f-stri.
             if best_ending == "f" {
@@ -2486,12 +2425,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             let base_no_end = &cand[..cand.len()-best_ending.len()];
             let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
             let mut decl = std::collections::HashMap::new();
-            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for (i, vib) in vibhaktis.iter().enumerate() {
                 let mut row: Vec<String> = Vec::new();
-                // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                 for suffix_group in &table[i] {
-                    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                     for s in suffix_group.split(',') {
                         row.push(polish(&format!("{base_no_end}{s}")));
                     }
@@ -2504,23 +2440,18 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     // Fallback: foreign/unknown ending — match ending sound by last char, otherwise use a-stem
     // e.g. apolo (o) -> treat as a-stem with base "apol" + a-suffixes => apolaH
     let fallback_key = if linga == "stri" { ("A","stri") } else { ("a","pum") };
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if let Some(table) = paradigms.get(&(fallback_key.0.to_string(), fallback_key.1.to_string())) {
         let base_no_end = if base.chars().last().is_some_and(|c| "aAiIuUeEoO".contains(c)) {
             &base[..base.len()-1]
         } else {
             base
         };
-        // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if !base_no_end.is_empty() {
             let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
             let mut decl = std::collections::HashMap::new();
-            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for (i, vib) in vibhaktis.iter().enumerate() {
                 let mut row: Vec<String> = Vec::new();
-                // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                 for suffix_group in &table[i] {
-                    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                     for s in suffix_group.split(',') {
                         row.push(polish(&format!("{base_no_end}{s}")));
                     }
@@ -2533,27 +2464,17 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     None
 }
 
-// ---------------------------------------------------------------------------
-// fn `analyze`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 pub fn analyze(word: &str) -> Vec<HashMap<String, String>> {
     let paradigms = paradigms();
     let vibhaktis = ["prathamA","dvitIyA","tfIyA","caturTI","paYcamI","zazWI","saptamI","samboDana"];
     let mut out = Vec::new();
-    // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
     for ((ending, linga), table) in &paradigms {
-        // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
         for (vi, vib) in vibhaktis.iter().enumerate() {
-            // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
             for (vac_idx, suffix_group) in table[vi].iter().enumerate() {
-                // — for — iterate dhātu/ending variants; sūtra gating, see comments above.
                 for orig_suffix in suffix_group.split(',') {
-                    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                     if word.len() <= orig_suffix.len() { continue; }
                     let base_stripped = &word[..word.len()-orig_suffix.len()];
                     let surface = apply_natva(base_stripped, orig_suffix);
-                    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                     if word == format!("{}{}", base_stripped, surface) {
                         let pratipadika = format!("{}{}", base_stripped, ending);
                         let mut m = HashMap::new();
@@ -2571,10 +2492,6 @@ pub fn analyze(word: &str) -> Vec<HashMap<String, String>> {
 }
 
 #[cfg(test)]
-// ---------------------------------------------------------------------------
-// mod `tests`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
 mod tests {
     use super::*;
 
