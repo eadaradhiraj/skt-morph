@@ -93,7 +93,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ukaY" => Some(("uka", vec!["3.2.154"], "ukan")),
         "ini" => Some(("in", vec!["3.2.156", "3.2.157"], "ini")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
-        "kyap" => Some(("ya", vec!["3.1.106", "3.1.108", "3.1.109", "3.1.120"], "kyap")),
+        "kyap" => Some(("ya", vec!["3.1.106", "3.1.108", "3.1.109", "3.1.120", "3.1.121"], "kyap")),
         "sya-Satf" => Some(("t", vec!["3.2.124"], "present")),
         "sya-Satf~" => Some(("", vec!["3.2.124"], "present")),
         "sya-SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
@@ -415,9 +415,9 @@ fn ktin_form(root: &str) -> String {
     internal_sandhi(&kit_anga(&base), "ti")
 }
 
-/// क्यप् (3.1.106–110, 3.1.120): कित् no गुण; पित् 6.1.71 तुक् after ह्रस्व (कृत्य, भृत्य, स्तुत्य).
+/// क्यप् (3.1.106–110, 3.1.120–121): कित् no गुण; पित् 6.1.71 तुक् after ह्रस्व (कृत्य, भृत्य, स्तुत्य).
 /// 6.1.15 इज्या/उच्य; 3.1.108 हत्य; 3.1.109 शिष्य (इत्त्व+षत्व). 3.1.120 कृत्य/वृष्य vs ण्यत् कार्य/वर्ष्य.
-/// यक् stays क्रियमाण.
+/// 3.1.121 युग्य vs ण्यत् योग्य. यक् stays क्रियमाण.
 fn kyap_form(root: &str) -> String {
     // 3.1.108 हनस्त च: हत्य not *हन्य.
     if root == "han" {
@@ -426,6 +426,10 @@ fn kyap_form(root: &str) -> String {
     // 3.1.109 एतिस्तुशास्वृदृजुषः: शिष्य (6.4.34 इत्त्व + 8.3.60 षत्व), not *शास्य.
     if matches!(root, "SAs" | "SAsu") {
         return "SiSya".into();
+    }
+    // 3.1.121 युग्यं च पत्रे: कुत्व निपातन युग्य, not *युज्य. ण्यत् stays योग्य.
+    if matches!(root, "yuj" | "yuja" | "yujir") {
+        return "yugya".into();
     }
     let r = match root {
         "vac" => "uc".into(),
@@ -1916,6 +1920,9 @@ mod tests {
         assert!(pr.iter().any(|x| x == "hAryaH"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
+        let d = decline("yujir", "kyap", "pum", &[]).expect("yugyaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "yugyaH"), "{:?}", pr);
     }
 
     #[test]
@@ -2008,6 +2015,10 @@ mod tests {
         assert_eq!(derive("qukfY", "kyap"), vec!["kftya"]);
         assert_eq!(derive("vfzu", "kyap"), vec!["vfzya"]);
         assert_eq!(derive("vfzu", "Ryat"), vec!["varzya"]);
+        assert_eq!(derive("yujir", "kyap"), vec!["yugya"]);
+        assert_eq!(derive("yujir", "Ryat"), vec!["yogya"]);
+        assert_eq!(derive("yujir", "kta"), vec!["yukta"]);
+        assert_eq!(derive("yujir", "GaY"), vec!["yoga"]);
         assert_eq!(derive("hana", "GaY"), vec!["GAta"]);
         assert_eq!(derive("hana", "Rvul"), vec!["GAtaka"]);
         assert_eq!(derive("hana", "vun"), vec!["hanaka"]);
