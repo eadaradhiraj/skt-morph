@@ -2044,6 +2044,35 @@ fn decline_atilakshmi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// सुनौ nap — 7.1.23 सुनु/सुनुनी/सुनूनि (u-nap), not नौ *सुनावम् / *सुनौः. Exact `sunO` + nap. नौ stays नावम्.
+fn decline_suno(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "sunO" || linga != "nap" {
+        return None;
+    }
+    let u = "sunu";
+    let nom = vec![
+        u.to_string(),
+        polish(&format!("{u}nI")),
+        "sunUni".into(),
+    ];
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), nom.clone());
+    decl.insert("dvitIyA".into(), nom.clone());
+    decl.insert("tfIyA".into(), vec![polish(&format!("{u}nA")), format!("{u}ByAm"), format!("{u}BiH")]);
+    decl.insert("caturTI".into(), vec![polish(&format!("{u}ne")), format!("{u}ByAm"), format!("{u}ByaH")]);
+    decl.insert("paYcamI".into(), vec![polish(&format!("{u}naH")), format!("{u}ByAm"), format!("{u}ByaH")]);
+    decl.insert("zazWI".into(), vec![polish(&format!("{u}naH")), polish(&format!("{u}noH")), polish("sunUnAm")]);
+    decl.insert("saptamI".into(), vec![polish(&format!("{u}ni")), polish(&format!("{u}noH")), format!("{u}zu")]);
+    let mut voc = vec![u.to_string(), "suno".into()];
+    voc.extend(nom.into_iter().skip(1));
+    decl.insert("samboDana".into(), voc);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2125,6 +2154,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_atilakshmi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_suno(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -3988,5 +4020,24 @@ mod tests {
         has(&generate("go", "pum").unwrap(), "prathamA", "gOH");
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "pradyOH"));
         assert!(!p.declension.get("dvitIyA").unwrap().iter().any(|x| x == "pradyAm"));
+    }
+
+    #[test]
+    fn suno_sunu_nap() {
+        // सुनौ nap: सुनु/सुनुनी/सुनूनि. नौ stays नावम्. Not *सुनावम्.
+        let s = generate("sunO", "nap").expect("sunO");
+        has(&s, "prathamA", "sunu");
+        has(&s, "prathamA", "sununI");
+        has(&s, "prathamA", "sunUni");
+        has(&s, "tfIyA", "sununA");
+        has(&s, "tfIyA", "sunuByAm");
+        has(&s, "saptamI", "sununi");
+        has(&s, "saptamI", "sunuzu");
+        has(&s, "samboDana", "suno");
+        has(&generate("nO", "stri").unwrap(), "prathamA", "nOH");
+        has(&generate("nO", "stri").unwrap(), "dvitIyA", "nAvam");
+        has(&generate("maDu", "nap").unwrap(), "prathamA", "maDu");
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sunOH"));
+        assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "sunAvam"));
     }
 }
