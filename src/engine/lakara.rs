@@ -1,4 +1,5 @@
-//! Port of engine/lakara.py
+//! lakara — lakāra codes ↔ family/pada (3.2–3.4, 1.4.99 ff.).
+//! Port of engine/lakara.py — Kaumudī-ordered.
 
 pub fn normalize_lakara(lakara: &str) -> (String, String) {
     let code = lakara.trim();
