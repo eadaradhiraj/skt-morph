@@ -875,6 +875,35 @@ fn decline_gir(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// दुह्/द्रुह् — 8.2.32 दादेर्धातोर्घः: पद धुक्/धुग्, ध्रुक्. Not generic h *दुक्. उष्णिह् stays उष्णिक्.
+fn decline_duhadi(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "pum" && linga != "stri" {
+        return None;
+    }
+    let pada = match cand {
+        "duh" => "Du",
+        "druh" => "Dru",
+        _ => return None,
+    };
+    let weak = cand;
+    let k = format!("{pada}k");
+    let g = format!("{pada}g");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![k.clone(), g.clone(), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{g}ByAm"), format!("{g}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{g}ByAm"), format!("{g}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{g}ByAm"), format!("{g}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{k}zu")]);
+    decl.insert("samboDana".into(), vec![k, g, format!("{weak}O"), format!("{weak}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -965,6 +994,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_gir(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_duhadi(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1823,5 +1855,27 @@ mod tests {
         has(&generate("vAri", "nap").unwrap(), "tfIyA", "vAriRA");
         has(&generate("gir", "pum").unwrap(), "prathamA", "gIH");
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vAram"));
+    }
+
+    #[test]
+    fn duh_dhuk_dhugbhyam() {
+        // 8.2.32 दादेर्धातोर्घः: धुक्/धुग्, ध्रुक्. उष्णिह् stays उष्णिक् (not *उष्णिधुक्).
+        let d = generate("duh", "pum").expect("duh");
+        has(&d, "prathamA", "Duk");
+        has(&d, "prathamA", "Dug");
+        has(&d, "prathamA", "duhO");
+        has(&d, "dvitIyA", "duham");
+        has(&d, "tfIyA", "duhA");
+        has(&d, "tfIyA", "DugByAm");
+        has(&d, "tfIyA", "DugBiH");
+        has(&d, "saptamI", "duhi");
+        has(&d, "saptamI", "Dukzu");
+        let r = generate("druh", "pum").expect("druh");
+        has(&r, "prathamA", "Druk");
+        has(&r, "tfIyA", "DrugByAm");
+        has(&r, "saptamI", "Drukzu");
+        has(&generate("uzRih", "pum").unwrap(), "prathamA", "uzRik");
+        has(&generate("lih", "pum").unwrap(), "prathamA", "lik");
+        assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "duk"));
     }
 }
