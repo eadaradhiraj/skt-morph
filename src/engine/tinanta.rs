@@ -29,7 +29,7 @@ fn load_dhatu_info(dhatu_query: &str) -> Option<(String, u8, String, String, Str
 }
 
 pub fn generate(dhatu_query: &str, lakara: &str, purusha: u8, vacana: u8) -> TinantaResult {
-    // Clamp puruṣa/vacana 1..3 — WASM JS may pass 0 or >3 via manual call.
+    // Clamp puruṣa/vacana 1..3 — WASM JS may pass 0 or >3 via manual call (iter 8).
     let p = purusha.clamp(1, 3);
     let v = vacana.clamp(1, 3);
     let forms = generate_all(dhatu_query, lakara, p, v);

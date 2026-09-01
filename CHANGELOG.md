@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 88: tinanta clamp ref
+
+- **tinanta:** clamp comment → iter 8 ref; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 87: README 86
 
 - **README:** recent line updated to 86 iters + noun hint (187 tests).
