@@ -737,6 +737,33 @@ fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// आशिस्/पिपठिष् — 8.2.66 सजषो रुः, 8.2.76 दीर्घ आशीः/आशीर्भ्याम्. Not ष-anta *आशिट् (द्विष्).
+fn decline_sajush(cand: &str, linga: &str) -> Option<Declension> {
+    if linga != "stri" && linga != "pum" {
+        return None;
+    }
+    let pre = cand.strip_suffix("iz")?;
+    if pre.is_empty() || cand == "dviz" {
+        return None;
+    }
+    let nom = format!("{pre}IH");
+    let pada = format!("{pre}Ir");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![nom.clone(), format!("{cand}O"), format!("{cand}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{cand}am"), format!("{cand}O"), format!("{cand}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{cand}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{cand}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{cand}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{cand}aH"), format!("{cand}oH"), format!("{cand}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{cand}i"), format!("{cand}oH"), format!("{nom}zu")]);
+    decl.insert("samboDana".into(), vec![nom, format!("{cand}O"), format!("{cand}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -812,6 +839,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_asthyadi(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_sajush(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1527,5 +1557,23 @@ mod tests {
         has(&generate("vidvas", "nap").unwrap(), "prathamA", "viduzI");
         has(&generate("vidvas", "nap").unwrap(), "prathamA", "vidvAMsi");
         has(&generate("manas", "nap").unwrap(), "prathamA", "manaH");
+    }
+
+    #[test]
+    fn asis_asih_asirbhyam() {
+        // आशिस्: 8.2.66/76 आशीः/आशीर्भ्याम्, not ष-anta *आशिट्.
+        let a = generate("ASiz", "stri").expect("ASiz");
+        has(&a, "prathamA", "ASIH");
+        has(&a, "prathamA", "ASizO");
+        has(&a, "dvitIyA", "ASizam");
+        has(&a, "tfIyA", "ASizA");
+        has(&a, "tfIyA", "ASIrByAm");
+        has(&a, "tfIyA", "ASIrBiH");
+        has(&a, "saptamI", "ASizi");
+        has(&a, "saptamI", "ASIHzu");
+        has(&generate("pipaWiz", "pum").unwrap(), "prathamA", "pipaWIH");
+        has(&generate("pipaWiz", "pum").unwrap(), "tfIyA", "pipaWIrByAm");
+        has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
+        assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "ASiw"));
     }
 }
