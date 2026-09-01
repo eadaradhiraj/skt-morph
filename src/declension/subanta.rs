@@ -44,7 +44,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("U".to_string(),"stri".to_string()), vec![vec!["UH".to_string(),"vO".to_string(),"vaH".to_string(),],vec!["Um".to_string(),"vO".to_string(),"UH".to_string(),],vec!["vA".to_string(),"UByAm".to_string(),"UBiH".to_string(),],vec!["vE".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vAH".to_string(),"UByAm".to_string(),"UByaH".to_string(),],vec!["vAH".to_string(),"voH".to_string(),"UnAm".to_string(),],vec!["vAm".to_string(),"voH".to_string(),"Uzu".to_string(),],vec!["u".to_string(),"vO".to_string(),"vaH".to_string(),],]);
   m.insert(("U".to_string(),"nap".to_string()), vec![vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["U".to_string(),"unI".to_string(),"Uni".to_string(),],vec!["UnA".to_string(),"uByAm".to_string(),"uBiH".to_string(),],vec!["Une".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"uByAm".to_string(),"uByaH".to_string(),],vec!["UnaH".to_string(),"UnoH".to_string(),"UnAm".to_string(),],vec!["Uni".to_string(),"UnoH".to_string(),"Uzu".to_string(),],vec!["U,o".to_string(),"unI".to_string(),"Uni".to_string(),],]);
   // f-stem: agent (kartf-type, Pāṇini 7.1.9) -> Aram; kinship (pitf) is handled as exception in generate()
-  m.insert(("f".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["Aram".to_string(),"arO".to_string(),"Fn".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
+  // f-stem कर्तृ (6.4.11 सर्वनामस्थान आ): कर्तारौ/कर्तारम्. पितृ-class patched short पितरौ/पितरम्. स्वसृ/नप्तृ keep आ.
+  m.insert(("f".to_string(),"pum".to_string()), vec![vec!["A".to_string(),"ArO".to_string(),"AraH".to_string(),],vec!["Aram".to_string(),"ArO".to_string(),"Fn".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"ArO".to_string(),"AraH".to_string(),],]);
   m.insert(("f".to_string(),"stri".to_string()), vec![vec!["A".to_string(),"arO".to_string(),"araH".to_string(),],vec!["aram".to_string(),"arO".to_string(),"FH".to_string(),],vec!["rA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["re".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["uH".to_string(),"roH".to_string(),"FnAm".to_string(),],vec!["ari".to_string(),"roH".to_string(),"fzu".to_string(),],vec!["aH".to_string(),"arO".to_string(),"araH".to_string(),],]);
   m.insert(("f".to_string(),"nap".to_string()), vec![vec!["f".to_string(),"fnI".to_string(),"Fni".to_string(),],vec!["f".to_string(),"fnI".to_string(),"Fni".to_string(),],vec!["fnA".to_string(),"fByAm".to_string(),"fBiH".to_string(),],vec!["fne".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["fnaH".to_string(),"fByAm".to_string(),"fByaH".to_string(),],vec!["fnaH".to_string(),"fnoH".to_string(),"FnAm".to_string(),],vec!["fni".to_string(),"fnoH".to_string(),"fzu".to_string(),],vec!["f,ar".to_string(),"fnI".to_string(),"Fni".to_string(),],]);
   m.insert(("in".to_string(),"pum".to_string()), vec![vec!["I".to_string(),"inO".to_string(),"inaH".to_string(),],vec!["inam".to_string(),"inO".to_string(),"inaH".to_string(),],vec!["inA".to_string(),"iByAm".to_string(),"iBiH".to_string(),],vec!["ine".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"iByAm".to_string(),"iByaH".to_string(),],vec!["inaH".to_string(),"inoH".to_string(),"inAm".to_string(),],vec!["ini".to_string(),"inoH".to_string(),"izu".to_string(),],vec!["in".to_string(),"inO".to_string(),"inaH".to_string(),],]);
@@ -2169,7 +2170,30 @@ fn decline_abhyasta_satr(cand: &str, linga: &str) -> Option<Declension> {
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
-const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf","svasf","naptf"];
+const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf"];
+/// 6.4.11 स्वसृनप्तृ… — सर्वनामस्थान आ (स्वसारौ/स्वसारम्). Not पितृ *पितारौ.
+const F_SVASR_NAPTR: &[&str] = &["svasf", "naptf"];
+
+/// 6.4.11 vs पितृ-class: long आ or short अ in dual/pl/acc of ऋ-stems.
+fn patch_r_sarvanamasthana(table: &mut [Vec<String>], vrddhi: bool) {
+    let du = if vrddhi { "ArO" } else { "arO" };
+    let pl = if vrddhi { "AraH" } else { "araH" };
+    let acc = if vrddhi { "Aram" } else { "aram" };
+    if table.first().is_some_and(|r| r.len() >= 3) {
+        table[0][1] = du.into();
+        table[0][2] = pl.into();
+    }
+    if table.get(1).is_some_and(|r| r.len() >= 2) {
+        table[1][0] = acc.into();
+        table[1][1] = du.into();
+    }
+    if let Some(voc) = table.last_mut() {
+        if voc.len() >= 3 {
+            voc[1] = du.into();
+            voc[2] = pl.into();
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // fn `generate`: purpose, inputs→outputs, edge cases.
@@ -2177,9 +2201,9 @@ const F_KINSHIP: &[&str] = &["pitf","mAtf","BrAtf","jAmAtf","duhitf","nanAndf","
 // ---------------------------------------------------------------------------
 pub fn generate(base: &str, linga: &str) -> Option<Declension> {
     let paradigms = paradigms();
-    // Pāṇini 7.1.9 exception: kinship f-stems keep short a in acc.sg (pitaram), agents take vṛddhi (kartAram <- netAram)
-    // We store agent as default (Aram); if kinship, patch dvitīyā eka to aram
+    // 6.4.11 कर्तृ/स्वसृ आ in सर्वनामस्थान; पितृ-class keeps short अ (पितरम्/पितरौ).
     let is_kinship = F_KINSHIP.contains(&base);
+    let is_svasr_naptr = F_SVASR_NAPTR.contains(&base);
     // try candidates to handle bases passed as declined forms (e.g. rAmaH)
     let cands = [
         base.to_string(),
@@ -2383,9 +2407,13 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         }
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some((_, mut table)) = best {
-            // Pāṇini exception: kinship keeps short a
-            if is_kinship && best_ending == "f" && linga == "pum" && table.len() > 1 && !table[1].is_empty() {
-                table[1][0] = "aram".to_string();
+            // 6.4.11: स्वसृ/नप्तृ आ; पितृ-class पुं short अ. मातृ स्त्री already short in f-stri.
+            if best_ending == "f" {
+                if is_svasr_naptr {
+                    patch_r_sarvanamasthana(&mut table, true);
+                } else if is_kinship && linga == "pum" {
+                    patch_r_sarvanamasthana(&mut table, false);
+                }
             }
             if cand == "mahat" && best_ending == "at" {
                 mahat_strong(&mut table);
@@ -4282,5 +4310,29 @@ mod tests {
         has(&generate("Danuz", "nap").unwrap(), "prathamA", "DanuH");
         has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
         assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "ratnamuH"));
+    }
+
+    #[test]
+    fn kartf_svasr_pitr_vrddhi() {
+        // 6.4.11 कर्तारौ/स्वसारम्; पितृ stays पितरौ/पितरम्. माता stays मातरम्.
+        let k = generate("kartf", "pum").expect("kartf");
+        has(&k, "prathamA", "kartA");
+        has(&k, "prathamA", "kartArO");
+        has(&k, "prathamA", "kartAraH");
+        has(&k, "dvitIyA", "kartAram");
+        has(&k, "samboDana", "kartaH");
+        let s = generate("svasf", "stri").expect("svasf");
+        has(&s, "prathamA", "svasA");
+        has(&s, "prathamA", "svasArO");
+        has(&s, "prathamA", "svasAraH");
+        has(&s, "dvitIyA", "svasAram");
+        has(&s, "dvitIyA", "svasFH");
+        has(&generate("pitf", "pum").unwrap(), "prathamA", "pitarO");
+        has(&generate("pitf", "pum").unwrap(), "dvitIyA", "pitaram");
+        has(&generate("mAtf", "stri").unwrap(), "dvitIyA", "mAtaram");
+        has(&generate("mAtf", "stri").unwrap(), "prathamA", "mAtarO");
+        has(&generate("naptf", "pum").unwrap(), "dvitIyA", "naptAram");
+        assert!(!generate("pitf", "pum").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "pitArO"));
+        assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "svasaram"));
     }
 }
