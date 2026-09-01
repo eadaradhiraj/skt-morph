@@ -90,7 +90,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ka" => Some(("a", vec!["3.1.135"], "ka_kit")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
-        "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
+        "ukaY" => Some(("uka", vec!["3.2.154"], "ukan")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
         "kyap" => Some(("ya", vec!["3.1.106"], "kyap")),
         "sya-Satf" => Some(("t", vec!["3.2.124"], "present")),
@@ -824,6 +824,24 @@ fn yuc_form(root: &str) -> String {
     }
 }
 
+/// 3.2.154 लषपतपदस्थाभूवृषहनकमगमशॄभ्य उकञ्: लाषुक/पातुक/पादुक/स्थायुक/भावुक/वर्षुक/घातुक/कामुक/गामुक/शारुक.
+/// युच् stays लषण/पतन. वरच् stays स्थावर. कः stays स्थ. णिनि stays स्थायी. आरु stays शरारु.
+fn ukan_form(root: &str) -> String {
+    match root {
+        "laz" | "laza" => "lAzuka".into(),
+        "pat" | "pata" | "patx" => "pAtuka".into(),
+        "pad" | "pada" => "pAduka".into(),
+        "sTA" => "sTAyuka".into(),
+        "BU" => "BAvuka".into(),
+        "vfz" | "vfza" | "vfzu" => "varzuka".into(),
+        "han" => "GAtuka".into(),
+        "kam" | "kamu" => "kAmuka".into(),
+        "gam" | "gamx" => "gAmuka".into(),
+        "SF" | "SFY" => "SAruka".into(),
+        other => nit_krt_form(other, "ukaY"),
+    }
+}
+
 /// 3.1.134 ग्रह्यादेर् णिनिः: ग्राही/स्थायी/मन्त्री (णित् वृद्धि; आतो युक्; इदित् नुम्).
 /// ल्यु stays नन्दन. आलुच् stays गृहयालु. वरच् stays स्थावर. कः stays स्थ. घिनुण् stays शमिन्.
 fn nini_form(root: &str) -> String {
@@ -1125,6 +1143,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
                 | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa" | "ka" | "lyu" | "yuc"
+                | "ukaY"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -1302,7 +1321,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
                 "lyuw" | "lyu" => crate::engine::it::lyuw_form(&root),
                 "tfc" => crate::engine::it::tfc_form(&root),
                 "ktin" => ktin_form(&root),
-                "GaY" | "Rvul" | "ukaY" | "Ryat" => nit_krt_form(&root, pratyaya),
+                "GaY" | "Rvul" | "Ryat" => nit_krt_form(&root, pratyaya),
                 "Ramul" => join_eco(&nit_krt_anga(&root, "Rvul"), "am"),
                 "yat" if root.ends_with('A') => format!("{}eya", &root[..root.len() - 1]),
                 _ => join_eco(&guna, suffix),
@@ -1347,6 +1366,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "ka_kit" => ka_kit_form(&root),
         "nini" => nini_form(&root),
         "yuc" => yuc_form(&root),
+        "ukan" => ukan_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1817,6 +1837,11 @@ mod tests {
         assert!(pr.iter().any(|x| x == "calanaH"), "{:?}", pr);
         let d = decline("cala", "yuc", "stri", &[]).expect("calanA");
         assert_eq!(d.stem, "calanA");
+        let d = decline("kamu", "ukaY", "pum", &[]).expect("kAmukaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "kAmukaH"), "{:?}", pr);
+        let d = decline("kamu", "ukaY", "stri", &[]).expect("kAmukA");
+        assert_eq!(d.stem, "kAmukA");
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -2019,6 +2044,18 @@ mod tests {
         assert_eq!(derive("ruza", "yuc"), vec!["rozaRa"]);
         assert_eq!(derive("maqi", "yuc"), vec!["maRqana"]);
         assert_eq!(derive("BUza", "yuc"), vec!["BUzaRa"]);
+        assert_eq!(derive("laza", "ukaY"), vec!["lAzuka"]);
+        assert_eq!(derive("patx", "ukaY"), vec!["pAtuka"]);
+        assert_eq!(derive("pada", "ukaY"), vec!["pAduka"]);
+        assert_eq!(derive("zWA", "ukaY"), vec!["sTAyuka"]);
+        assert_eq!(derive("vfzu", "ukaY"), vec!["varzuka"]);
+        assert_eq!(derive("hana", "ukaY"), vec!["GAtuka"]);
+        assert_eq!(derive("kamu", "ukaY"), vec!["kAmuka"]);
+        assert_eq!(derive("gamx", "ukaY"), vec!["gAmuka"]);
+        assert_eq!(derive("SFY", "ukaY"), vec!["SAruka"]);
+        assert_eq!(derive("laza", "yuc"), vec!["lazaRa"]);
+        assert_eq!(derive("zWA", "Nini"), vec!["sTAyin"]);
+        assert_eq!(derive("SFY", "Aru"), vec!["SarAru"]);
         assert_eq!(derive("jvala", "Ra"), vec!["jvAla"]);
         assert_eq!(derive("cala", "Ra"), vec!["cAla"]);
         assert_eq!(derive("wunadi", "lyu"), vec!["nandana"]);
