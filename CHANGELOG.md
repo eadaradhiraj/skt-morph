@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 100: README 100 🎉
+
+- **README:** 100 iters — de-noise 70k, KRTS 19→60+, dhatu cache 15s→7s, 187 tests, 1.2M wasm. Milestone.
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 99: README 98
 
 - **README:** recent line updated to 98 iters + cekrI (187 tests).
