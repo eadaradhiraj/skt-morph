@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 98: derived cekrI doc
+
+- **derived:** header → cekrI; no logic change.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 97: README 96
 
 - **README:** recent line updated to 96 iters + vAvac (187 tests).
