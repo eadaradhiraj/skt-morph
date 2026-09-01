@@ -1795,6 +1795,28 @@ fn decline_bru(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// पति — 1.4.8 पतिः समास एव: unsuffixed पति is not घि, so पत्या/पत्ये/पत्युः/पत्यौ (like सखि weak);
+/// सर्वनामस्थान पतिः/पती/पतयः (not सखा). हरि stays घि पतिना-class हरिणा. Exact `pati`.
+fn decline_pati(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "pati" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["patiH".into(), "patI".into(), "patayaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["patim".into(), "patI".into(), "patIn".into()]);
+    decl.insert("tfIyA".into(), vec!["patyA".into(), "patiByAm".into(), "patiBiH".into()]);
+    decl.insert("caturTI".into(), vec!["patye".into(), "patiByAm".into(), "patiByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["patyuH".into(), "patiByAm".into(), "patiByaH".into()]);
+    decl.insert("zazWI".into(), vec!["patyuH".into(), "patyoH".into(), "patInAm".into()]);
+    decl.insert("saptamI".into(), vec!["patyO".into(), "patyoH".into(), "patizu".into()]);
+    decl.insert("samboDana".into(), vec!["pate".into(), "patI".into(), "patayaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1957,6 +1979,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_bru(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_pati(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3464,5 +3489,28 @@ mod tests {
         has(&generate("svaBU", "pum").unwrap(), "dvitIyA", "svaBuvam");
         assert!(!b.declension.get("dvitIyA").unwrap().iter().any(|x| x == "BrUm"));
         assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "BravO"));
+    }
+
+    #[test]
+    fn pati_patya_patyuh() {
+        // पति 1.4.8: पत्या/पत्ये/पत्युः/पत्यौ; nom पतिः not सखा. हरि stays हरिणा.
+        let p = generate("pati", "pum").expect("pati");
+        has(&p, "prathamA", "patiH");
+        has(&p, "prathamA", "patI");
+        has(&p, "prathamA", "patayaH");
+        has(&p, "dvitIyA", "patim");
+        has(&p, "dvitIyA", "patIn");
+        has(&p, "tfIyA", "patyA");
+        has(&p, "tfIyA", "patiByAm");
+        has(&p, "caturTI", "patye");
+        has(&p, "paYcamI", "patyuH");
+        has(&p, "saptamI", "patyO");
+        has(&p, "saptamI", "patizu");
+        has(&p, "samboDana", "pate");
+        has(&p, "zazWI", "patInAm");
+        has(&generate("hari", "pum").unwrap(), "tfIyA", "hariRA");
+        has(&generate("saKi", "pum").unwrap(), "prathamA", "saKA");
+        assert!(!p.declension.get("tfIyA").unwrap().iter().any(|x| x == "patinA"));
+        assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "patA"));
     }
 }
