@@ -854,6 +854,27 @@ fn decline_pad(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// गिर — 8.2.77 हलि च: इर् दीर्घ before हल् गीः/गीर्भ्याम्/गीर्षु. Not generic r *गिः/*गित्सु.
+fn decline_gir(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "gir" || (linga != "stri" && linga != "pum") {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["gIH".into(), "girO".into(), "giraH".into()]);
+    decl.insert("dvitIyA".into(), vec!["giram".into(), "girO".into(), "giraH".into()]);
+    decl.insert("tfIyA".into(), vec!["girA".into(), "gIrByAm".into(), "gIrBiH".into()]);
+    decl.insert("caturTI".into(), vec!["gire".into(), "gIrByAm".into(), "gIrByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["giraH".into(), "gIrByAm".into(), "gIrByaH".into()]);
+    decl.insert("zazWI".into(), vec!["giraH".into(), "giroH".into(), "girAm".into()]);
+    decl.insert("saptamI".into(), vec!["giri".into(), "giroH".into(), "gIrzu".into()]);
+    decl.insert("samboDana".into(), vec!["gIH".into(), "girO".into(), "giraH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -941,6 +962,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_pad(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_gir(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1159,8 +1183,10 @@ mod tests {
         has(&b, "tfIyA", "laBA");
         // r-anta: gir (गिर्) — 8.2.66 s→ru gives giH; s-anta: tapas-like s pum — same ru → tapas→tapaH
         let r = generate("gir", "pum").expect("gir");
-        has(&r, "prathamA", "giH");
+        has(&r, "prathamA", "gIH");
         has(&r, "tfIyA", "girA");
+        has(&r, "tfIyA", "gIrByAm");
+        has(&r, "saptamI", "gIrzu");
         let s = generate("tapas", "pum").expect("tapas");
         // tapas as s pum: prathamA tapaH (ru→visarga), dvitIyA tapasam
         has(&s, "prathamA", "tapaH");
@@ -1795,7 +1821,7 @@ mod tests {
         has(&v, "saptamI", "vArzu");
         has(&v, "zazWI", "vArAm");
         has(&generate("vAri", "nap").unwrap(), "tfIyA", "vAriRA");
-        has(&generate("gir", "pum").unwrap(), "prathamA", "giH");
+        has(&generate("gir", "pum").unwrap(), "prathamA", "gIH");
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vAram"));
     }
 }
