@@ -4268,4 +4268,19 @@ mod tests {
         assert!(!h.declension.get("tfIyA").unwrap().iter().any(|x| x == "harinA"));
         assert!(!generate("tviz", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "tvIH"));
     }
+
+    #[test]
+    fn ratnamuz_ratnamut() {
+        // रत्नमुष् ष-anta रत्नमुट्. धनुस् nap stays धनुः. द्विष् stays द्विट्.
+        let r = generate("ratnamuz", "pum").expect("ratnamuz");
+        has(&r, "prathamA", "ratnamuw");
+        has(&r, "prathamA", "ratnamuq");
+        has(&r, "prathamA", "ratnamuzO");
+        has(&r, "dvitIyA", "ratnamuzam");
+        has(&r, "tfIyA", "ratnamuqByAm");
+        has(&r, "saptamI", "ratnamuwsu");
+        has(&generate("Danuz", "nap").unwrap(), "prathamA", "DanuH");
+        has(&generate("dviz", "pum").unwrap(), "prathamA", "dviw");
+        assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "ratnamuH"));
+    }
 }
