@@ -368,6 +368,27 @@ fn decline_ahan(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// वृत्रहन् — सर्वनामस्थान वृत्रहा/वृत्रहणौ (8.4.1); weak घ्न वृत्रघ्ना (6.4.98); पद वृत्रहभ्याम्. Not an-stem *वृत्रह्ना. अहन् stays अहः.
+fn decline_han(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "vftrahan" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["vftrahA".into(), "vftrahaRO".into(), "vftrahaRaH".into()]);
+    decl.insert("dvitIyA".into(), vec!["vftrahaRam".into(), "vftrahaRO".into(), "vftraGnaH".into()]);
+    decl.insert("tfIyA".into(), vec!["vftraGnA".into(), "vftrahaByAm".into(), "vftrahaBiH".into()]);
+    decl.insert("caturTI".into(), vec!["vftraGne".into(), "vftrahaByAm".into(), "vftrahaByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["vftraGnaH".into(), "vftrahaByAm".into(), "vftrahaByaH".into()]);
+    decl.insert("zazWI".into(), vec!["vftraGnaH".into(), "vftraGnoH".into(), "vftraGnAm".into()]);
+    decl.insert("saptamI".into(), vec!["vftraGni".into(), "vftrahaRi".into(), "vftraGnoH".into(), "vftrahasu".into()]);
+    decl.insert("samboDana".into(), vec!["vftrahan".into(), "vftrahaRO".into(), "vftrahaRaH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// 6.4.133 श्वयुवमघोनामतद्धिते — सम्प्रसारण in weak; पद श्व/युव/मघव. पुं.
 fn decline_sva_yuv_magha(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "pum" {
@@ -1131,6 +1152,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if cand.is_empty() { continue; }
         if let Some(d) = decline_ahan(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_han(&cand, linga) {
             return Some(d);
         }
         let cand = ngeep_stri(&cand, linga);
@@ -2218,5 +2242,24 @@ mod tests {
         has(&generate("diS", "stri").unwrap(), "prathamA", "dik");
         has(&generate("tAdfS", "pum").unwrap(), "prathamA", "tAdfk");
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vik"));
+    }
+
+    #[test]
+    fn vrtrahan_vrtraha_vrtraghna() {
+        // वृत्रहन्: वृत्रहा/वृत्रहणम्/वृत्रघ्ना; पद वृत्रहभ्याम्. अहन् stays अहः; राजन् stays राजा.
+        let v = generate("vftrahan", "pum").expect("vftrahan");
+        has(&v, "prathamA", "vftrahA");
+        has(&v, "prathamA", "vftrahaRO");
+        has(&v, "prathamA", "vftrahaRaH");
+        has(&v, "dvitIyA", "vftrahaRam");
+        has(&v, "dvitIyA", "vftraGnaH");
+        has(&v, "tfIyA", "vftraGnA");
+        has(&v, "tfIyA", "vftrahaByAm");
+        has(&v, "saptamI", "vftraGni");
+        has(&v, "saptamI", "vftrahasu");
+        has(&v, "samboDana", "vftrahan");
+        has(&generate("ahan", "nap").unwrap(), "prathamA", "ahaH");
+        has(&generate("rAjan", "pum").unwrap(), "prathamA", "rAjA");
+        assert!(!v.declension.get("tfIyA").unwrap().iter().any(|x| x == "vftrahnA"));
     }
 }
