@@ -1,5 +1,4 @@
-//! णिच् (3.1.26), सन् (3.1.7), यङ् (3.1.22), कर्मणि यक् (3.1.67).
-//! Śuddha kartari stays the default path; this module is the derived aṅga.
+//! derived — ṇic/san/yaṅ/yaṅluk/karma (3.1.26/3.1.7/3.1.22/2.4.74/3.1.67). Kaumudī-ordered, sūtra-gated.
 
 #![allow(non_snake_case)]
 
