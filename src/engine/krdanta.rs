@@ -91,6 +91,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.154"], "ukan")),
+        "ini" => Some(("in", vec!["3.2.156", "3.2.157"], "ini")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
         "kyap" => Some(("ya", vec!["3.1.106"], "kyap")),
         "sya-Satf" => Some(("t", vec!["3.2.124"], "present")),
@@ -842,6 +843,26 @@ fn ukan_form(root: &str) -> String {
     }
 }
 
+/// 3.2.156 प्रजोरिनिः: जविन् (प्रजवी with उपसर्ग). सौत्र जु, not in धातुपाठ.
+/// 3.2.157 जिदृक्षिविश्रीण्वमाव्यथाभ्यमपरिभूप्रसूभ्यश्च: जयिन्/दरिन्/क्षयिन्/श्रयिन्/अयिन्/वमिन्;
+/// अव्यथिन् निपातन नञ्. णिनि stays ग्राहिन्. क्वरप् stays जित्वर. घिनुण् stays शमिन्.
+fn ini_form(root: &str) -> String {
+    match root {
+        "ju" => "javin".into(),
+        "ji" => "jayin".into(),
+        "df" => "darin".into(),
+        "kzi" => "ksayin".into(),
+        "Sri" => "Srayin".into(),
+        "i" => "ayin".into(),
+        "vam" | "vama" => "vamin".into(),
+        "vyaT" | "vyaTa" => "avyaTin".into(),
+        "am" | "ama" => "amin".into(),
+        "BU" => "Bavin".into(),
+        "sU" | "zU" => "savin".into(),
+        other => format!("{other}in"),
+    }
+}
+
 /// 3.1.134 ग्रह्यादेर् णिनिः: ग्राही/स्थायी/मन्त्री (णित् वृद्धि; आतो युक्; इदित् नुम्).
 /// ल्यु stays नन्दन. आलुच् stays गृहयालु. वरच् stays स्थावर. कः stays स्थ. घिनुण् stays शमिन्.
 fn nini_form(root: &str) -> String {
@@ -1367,6 +1388,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "nini" => nini_form(&root),
         "yuc" => yuc_form(&root),
         "ukan" => ukan_form(&root),
+        "ini" => ini_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1842,6 +1864,11 @@ mod tests {
         assert!(pr.iter().any(|x| x == "kAmukaH"), "{:?}", pr);
         let d = decline("kamu", "ukaY", "stri", &[]).expect("kAmukA");
         assert_eq!(d.stem, "kAmukA");
+        let d = decline("ji", "ini", "pum", &[]).expect("jayI");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "jayI"), "{:?}", pr);
+        let d = decline("ji", "ini", "stri", &[]).expect("jayinI");
+        assert_eq!(d.stem, "jayinI");
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -2056,6 +2083,32 @@ mod tests {
         assert_eq!(derive("laza", "yuc"), vec!["lazaRa"]);
         assert_eq!(derive("zWA", "Nini"), vec!["sTAyin"]);
         assert_eq!(derive("SFY", "Aru"), vec!["SarAru"]);
+        assert_eq!(derive("ju", "ini"), vec!["javin"]);
+        assert_eq!(derive("ji", "ini"), vec!["jayin"]);
+        assert_eq!(derive("dfN", "ini"), vec!["darin"]);
+        assert_eq!(derive("kzi", "ini"), vec!["ksayin"]);
+        assert_eq!(derive("SriY", "ini"), vec!["Srayin"]);
+        assert_eq!(derive("iR", "ini"), vec!["ayin"]);
+        assert_eq!(derive("wuvama", "ini"), vec!["vamin"]);
+        assert_eq!(derive("vyaTa", "ini"), vec!["avyaTin"]);
+        assert_eq!(derive("ama", "ini"), vec!["amin"]);
+        assert_eq!(derive("BU", "ini"), vec!["Bavin"]);
+        assert_eq!(derive("zU", "ini"), vec!["savin"]);
+        let f = generate_with_prefixes("ju", "ini", &["pra".into()]);
+        assert!(f.forms.iter().any(|x| x == "prajavin"), "{:?}", f.forms);
+        let f = generate_with_prefixes("iR", "ini", &["ati".into()]);
+        assert!(f.forms.iter().any(|x| x == "atyayin"), "{:?}", f.forms);
+        let f = generate_with_prefixes("SriY", "ini", &["vi".into()]);
+        assert!(f.forms.iter().any(|x| x == "viSrayin"), "{:?}", f.forms);
+        let f = generate_with_prefixes("BU", "ini", &["pari".into()]);
+        assert!(f.forms.iter().any(|x| x == "pariBavin"), "{:?}", f.forms);
+        let f = generate_with_prefixes("zU", "ini", &["pra".into()]);
+        assert!(f.forms.iter().any(|x| x == "prasavin"), "{:?}", f.forms);
+        let f = generate_with_prefixes("ama", "ini", &["aBi".into()]);
+        assert!(f.forms.iter().any(|x| x == "aByamin"), "{:?}", f.forms);
+        assert_eq!(derive("ji", "kvarap"), vec!["jitvara"]);
+        assert_eq!(derive("graha", "Nini"), vec!["grAhin"]);
+        assert_eq!(derive("Samu", "GinuR"), vec!["Samin"]);
         assert_eq!(derive("jvala", "Ra"), vec!["jvAla"]);
         assert_eq!(derive("cala", "Ra"), vec!["cAla"]);
         assert_eq!(derive("wunadi", "lyu"), vec!["nandana"]);
