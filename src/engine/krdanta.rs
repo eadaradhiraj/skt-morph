@@ -612,28 +612,6 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
     Some(form.to_string())
 }
 
-// ---------------------------------------------------------------------------
-// fn `satr_nap`: purpose, inputs→outputs, edge cases.
-// Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
-// ---------------------------------------------------------------------------
-fn satr_nap(stem: &str) -> Option<crate::declension::subanta::Declension> {
-    let mut d = crate::declension::subanta::generate(stem, "pum")?;
-    let Some(base) = stem.strip_suffix("at") else {
-        d.linga = "nap".into();
-        return Some(d);
-    };
-    let nom = vec![
-        stem.to_string(),
-        format!("{stem}I"),
-        format!("{base}anti"),
-    ];
-    d.declension.insert("prathamA".into(), nom.clone());
-    d.declension.insert("dvitIyA".into(), nom.clone());
-    d.declension.insert("samboDana".into(), nom);
-    d.linga = "nap".into();
-    Some(d)
-}
-
 /// सुबन्त of a kṛdanta pratipadika. `None` for अव्यय or a लिङ्ग the kṛt does not take.
 pub fn decline(
     dhatu_query: &str,
@@ -648,10 +626,6 @@ pub fn decline(
     let res = generate_with_prefixes(dhatu_query, pratyaya, prefixes);
     let form = res.forms.first()?.as_str();
     let stem = pratipadika(form, pratyaya, linga)?;
-    // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
-    if is_at_participle(pratyaya) && linga == "nap" {
-        return satr_nap(&stem);
-    }
     let mut d = crate::declension::subanta::generate(&stem, linga)?;
     // 6.4.14 अत्वसन्तस्य चाधातोः: शतृ has no दीर्घ (भवन् not भवान्). क्तवतु keeps आन्.
     if matches!(pratyaya, "Satf" | "Satf~") && linga == "pum" {
@@ -990,6 +964,7 @@ mod tests {
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "Bavat"), "{:?}", pr);
         assert!(pr.iter().any(|x| x == "Bavanti"), "{:?}", pr);
+        assert!(pr.iter().any(|x| x == "BavantI"), "{:?}", pr);
         let d = decline("qukfY", "tfc", "pum", &[]).expect("kartA");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "kartA"), "{:?}", pr);
