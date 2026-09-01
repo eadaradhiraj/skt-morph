@@ -1079,6 +1079,30 @@ fn decline_sham(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// विश् — 8.2.36 षः then ष्टुत्व विट्/विड्. दिश् stays दिक् (कुत्व).
+fn decline_vish(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "viS" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let weak = cand;
+    let w = "viw";
+    let q = "viq";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![w.into(), q.into(), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{q}ByAm"), format!("{q}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{q}ByAm"), format!("{q}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{q}ByAm"), format!("{q}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{w}su")]);
+    decl.insert("samboDana".into(), vec![w.into(), q.into(), format!("{weak}O"), format!("{weak}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1187,6 +1211,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_sham(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_vish(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2174,5 +2201,22 @@ mod tests {
         has(&p, "saptamI", "praSAnsu");
         has(&generate("rAma", "pum").unwrap(), "prathamA", "rAmaH");
         assert!(!p.declension.get("tfIyA").unwrap().iter().any(|x| x == "praSAmena"));
+    }
+
+    #[test]
+    fn vish_vit_vidbhyam() {
+        // विश्: विट्/विड्, विड्भ्याम्/विट्सु. दिश् stays दिक्; तादृश् stays तादृक्.
+        let v = generate("viS", "pum").expect("viS");
+        has(&v, "prathamA", "viw");
+        has(&v, "prathamA", "viq");
+        has(&v, "prathamA", "viSO");
+        has(&v, "dvitIyA", "viSam");
+        has(&v, "tfIyA", "viSA");
+        has(&v, "tfIyA", "viqByAm");
+        has(&v, "saptamI", "viSi");
+        has(&v, "saptamI", "viwsu");
+        has(&generate("diS", "stri").unwrap(), "prathamA", "dik");
+        has(&generate("tAdfS", "pum").unwrap(), "prathamA", "tAdfk");
+        assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vik"));
     }
 }
