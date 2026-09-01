@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 55: README 54
+
+- **README:** recent line updated to 54 iters + labels/translit (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 54: labels doc
 
 - **www/labels:** header → Kaumudī; no logic change.
