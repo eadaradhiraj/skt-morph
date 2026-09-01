@@ -662,7 +662,10 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
     let form = match mode {
         "present" => {
             // 3.1.33 स्यतासी लृलुटोः: स्य-शतृ/शानच् on लृट् स्य, not लट् *गच्छत्.
-            let lak = if matches!(pratyaya, "sya-Satf" | "sya-Satf~" | "sya-SAnac" | "sya-cAnaS") {
+            let lak = if matches!(
+                pratyaya,
+                "sya-Satf" | "sya-Satf~" | "sya-SAnac" | "sya-cAnaS" | "sya-BAvakarma-SAnac"
+            ) {
                 "lrt"
             } else {
                 "lat"
@@ -695,14 +698,21 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
                     format!("{}ant", base)
                 }
             } else if pratyaya == "SAnac" || pratyaya == "cAnaS" || pratyaya.contains("SAnac") || pratyaya.contains("cAnaS") {
-                // 7.2.82 आने मुक्: keep शप् अ (एधमान not एध्मान).
-                if base.ends_with('a') {
+                // 3.1.67 यक् + 3.2.124: भावे/कर्मणि गम्यमान (not लट् *गच्छमान). स्य-भावकर्म is लृट् गमिष्यमाण, no यक्.
+                let base = if pratyaya == "BAvakarma-SAnac" {
+                    crate::engine::derived::karma_stem(&root)
+                } else {
+                    base
+                };
+                // 7.2.82 आने मुक्: keep अ (एधमान / गम्यमान, not *एध्मान / *गम्य्मान).
+                let raw = if base.ends_with('a') {
                     format!("{}mAna", base)
                 } else if base.ends_with('u') {
                     format!("{}vAna", &base[..base.len() - 1])
                 } else {
                     format!("{}Ana", base)
-                }
+                };
+                crate::engine::phonology::apply_natva_to_word(&raw)
             } else {
                 format!("{}{}", base, suffix)
             }
@@ -1019,6 +1029,14 @@ mod tests {
         let d = decline("gamx", "Satf", "pum", &[]).expect("gacCan");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "gacCan"), "{:?}", pr);
+        let d = decline("gamx", "BAvakarma-SAnac", "pum", &[]).expect("gamyamAnaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gamyamAnaH"), "{:?}", pr);
+        let d = decline("gamx", "BAvakarma-SAnac", "stri", &[]).expect("gamyamAnA");
+        assert_eq!(d.stem, "gamyamAnA");
+        let d = decline("BU", "SAnac", "pum", &[]).expect("BavamAnaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "BavamAnaH"), "{:?}", pr);
     }
 
     #[test]
@@ -1096,8 +1114,15 @@ mod tests {
         // 3.1.33 स्य + 3.2.124 शतृ/शानच्: गमिष्यत्/भविष्यत्, not लट् *गच्छत्. शतृ stays गच्छत्.
         assert_eq!(derive("gamx", "sya-Satf"), vec!["gamizyat"]);
         assert_eq!(derive("BU", "sya-Satf"), vec!["Bavizyat"]);
-        assert_eq!(derive("gamx", "sya-SAnac"), vec!["gamizyamAna"]);
-        assert_eq!(derive("eDa", "sya-SAnac"), vec!["eDizyamAna"]);
+        assert_eq!(derive("gamx", "sya-SAnac"), vec!["gamizyamARa"]);
+        assert_eq!(derive("eDa", "sya-SAnac"), vec!["eDizyamARa"]);
+        // 3.1.67 यक् शानच्: गम्यमान / क्रियमाण / भूयमान. कर्तरि शानच् stays एधमान/भवमान.
+        assert_eq!(derive("gamx", "BAvakarma-SAnac"), vec!["gamyamAna"]);
+        assert_eq!(derive("qukfY", "BAvakarma-SAnac"), vec!["kriyamARa"]);
+        assert_eq!(derive("BU", "BAvakarma-SAnac"), vec!["BUyamAna"]);
+        assert_eq!(derive("qudAY", "BAvakarma-SAnac"), vec!["dIyamAna"]);
+        assert_eq!(derive("gamx", "sya-BAvakarma-SAnac"), vec!["gamizyamARa"]);
+        assert_eq!(derive("BU", "SAnac"), vec!["BavamAna"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
         assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
