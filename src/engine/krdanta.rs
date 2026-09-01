@@ -85,6 +85,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ap" => Some(("a", vec!["3.3.57"], "rdorap")),
         "Ra" => Some(("a", vec!["3.1.140"], "jvala_ra")),
         "Sa" => Some(("a", vec!["3.1.137"], "sa_krt")),
+        "ka" => Some(("a", vec!["3.1.135"], "ka_kit")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -825,6 +826,24 @@ fn sa_krt_form(dhatu: &str, root: &str) -> String {
     }
 }
 
+/// 3.1.135 इगुपधज्ञाप्रीकिरः कः: ज्ञ/प्रिय/किर/बुध/कृश/क्षिप (कित् no गुण).
+/// 3.1.136 आतश्चोपसर्गे: ग्ल/स्थ (आ-lopa). श stays पिब. गस्नु stays ग्लास्नु. वुञ् stays क्षेपक.
+fn ka_kit_form(root: &str) -> String {
+    match root {
+        "jYA" => "jYa".into(),
+        "prI" => "priya".into(),
+        "kF" => "kira".into(),
+        "buD" | "buDa" => "buDa".into(),
+        "kfS" | "kfSa" => "kfSa".into(),
+        "kzip" | "kzipa" => "kzipa".into(),
+        "liK" | "liKa" => "liKa".into(),
+        "glA" | "glE" => "gla".into(),
+        "mlA" | "mlE" => "mla".into(),
+        "sTA" => "sTa".into(),
+        other => format!("{other}a"),
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -1056,7 +1075,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
-                | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa"
+                | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa" | "ka"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -1275,6 +1294,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "rdorap" => rdorap_form(&root),
         "jvala_ra" => jvala_ra_form(&root),
         "sa_krt" => sa_krt_form(&dhatu, &root),
+        "ka_kit" => ka_kit_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1712,6 +1732,9 @@ mod tests {
         assert!(pr.iter().any(|x| x == "pibaH"), "{:?}", pr);
         let d = decline("pA", "Sa", "stri", &[]).expect("pibA");
         assert_eq!(d.stem, "pibA");
+        let d = decline("jYA", "ka", "pum", &[]).expect("jYaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "jYaH"), "{:?}", pr);
         let d = decline("wunadi", "aTuc", "pum", &[]).expect("nandaTuH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "nandaTuH"), "{:?}", pr);
@@ -1954,6 +1977,18 @@ mod tests {
         assert_eq!(derive("qudAY", "kta"), vec!["datta"]);
         assert_eq!(derive("quDAY", "kta"), vec!["hita"]);
         assert_eq!(derive("qudAY", "GaY"), vec!["dAya"]);
+        assert_eq!(derive("jYA", "ka"), vec!["jYa"]);
+        assert_eq!(derive("prIY", "ka"), vec!["priya"]);
+        assert_eq!(derive("kF", "ka"), vec!["kira"]);
+        assert_eq!(derive("buDa", "ka"), vec!["buDa"]);
+        assert_eq!(derive("kfSa", "ka"), vec!["kfSa"]);
+        assert_eq!(derive("kzipa", "ka"), vec!["kzipa"]);
+        assert_eq!(derive("kzipa", "vuY"), vec!["kzepaka"]);
+        assert_eq!(derive("kzip", "knu"), vec!["kzipRu"]);
+        assert_eq!(derive("liKa", "ka"), vec!["liKa"]);
+        assert_eq!(derive("glE", "ka"), vec!["gla"]);
+        assert_eq!(derive("zWA", "ka"), vec!["sTa"]);
+        assert_eq!(derive("pA", "Sa"), vec!["piba"]);
         assert_eq!(derive("naS", "kvarap"), vec!["naSvara"]);
         assert_eq!(derive("gamx", "Satf"), vec!["gacCat"]);
         assert_eq!(derive("eDa", "SAnac"), vec!["eDamAna"]);
