@@ -1568,6 +1568,97 @@ fn decline_vedhas(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// निरजर — a-stem निरजरः/निरजरेण plus 7.2.101-like जरस् निरजरसौ/निरजरसा. राम stays a-stem. Exact `nirjara`.
+fn decline_nirjara(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "nirjara" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert(
+        "prathamA".into(),
+        vec![
+            polish("nirjaraH"),
+            polish("nirjarO"),
+            polish("nirjarasO"),
+            polish("nirjarAH"),
+            polish("nirjarasaH"),
+        ],
+    );
+    decl.insert(
+        "dvitIyA".into(),
+        vec![
+            polish("nirjaram"),
+            polish("nirjarO"),
+            polish("nirjarasO"),
+            polish("nirjarAn"),
+            polish("nirjarasaH"),
+        ],
+    );
+    decl.insert(
+        "tfIyA".into(),
+        vec![
+            polish("nirjarena"),
+            polish("nirjarasA"),
+            polish("nirjarAByAm"),
+            polish("nirjarEH"),
+        ],
+    );
+    decl.insert(
+        "caturTI".into(),
+        vec![
+            polish("nirjarAya"),
+            polish("nirjarase"),
+            polish("nirjarAByAm"),
+            polish("nirjareByaH"),
+        ],
+    );
+    decl.insert(
+        "paYcamI".into(),
+        vec![
+            polish("nirjarAt"),
+            polish("nirjarasaH"),
+            polish("nirjarAByAm"),
+            polish("nirjareByaH"),
+        ],
+    );
+    decl.insert(
+        "zazWI".into(),
+        vec![
+            polish("nirjarasya"),
+            polish("nirjarasaH"),
+            polish("nirjarayoH"),
+            polish("nirjarasoH"),
+            polish("nirjarARAm"),
+            polish("nirjarasAm"),
+        ],
+    );
+    decl.insert(
+        "saptamI".into(),
+        vec![
+            polish("nirjare"),
+            polish("nirjarasi"),
+            polish("nirjarayoH"),
+            polish("nirjarasoH"),
+            polish("nirjarezu"),
+        ],
+    );
+    decl.insert(
+        "samboDana".into(),
+        vec![
+            polish("nirjara"),
+            polish("nirjarO"),
+            polish("nirjarasO"),
+            polish("nirjarAH"),
+            polish("nirjarasaH"),
+        ],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1715,6 +1806,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_vedhas(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_nirjara(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3105,5 +3199,27 @@ mod tests {
         has(&v, "samboDana", "veDaH");
         has(&generate("manas", "pum").unwrap(), "prathamA", "manaH");
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "veDaH"));
+    }
+
+    #[test]
+    fn nirjara_nirjarasau() {
+        // निरजर: a-stem निरजरः/निरजरेण and जरस् निरजरसौ/निरजरसा. राम stays रामेण.
+        let n = generate("nirjara", "pum").expect("nirjara");
+        has(&n, "prathamA", "nirjaraH");
+        has(&n, "prathamA", "nirjarO");
+        has(&n, "prathamA", "nirjarasO");
+        has(&n, "prathamA", "nirjarAH");
+        has(&n, "dvitIyA", "nirjaram");
+        has(&n, "dvitIyA", "nirjarAn");
+        has(&n, "tfIyA", "nirjareRa");
+        has(&n, "tfIyA", "nirjarasA");
+        has(&n, "caturTI", "nirjarAya");
+        has(&n, "caturTI", "nirjarase");
+        has(&n, "saptamI", "nirjare");
+        has(&n, "saptamI", "nirjarasi");
+        has(&n, "zazWI", "nirjarARAm");
+        has(&n, "zazWI", "nirjarasAm");
+        has(&generate("rAma", "pum").unwrap(), "tfIyA", "rAmeRa");
+        assert!(!generate("rAma", "pum").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "rAmasO"));
     }
 }
