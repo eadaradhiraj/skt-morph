@@ -1817,6 +1817,31 @@ fn decline_pati(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// पू-anta (खलपू) — यण् खलप्वौ/खलप्वम् (not U-pum *खलपूम् / उवङ् *खलपुवम्). सु खलपूः; पद खलपूभ्याम्.
+/// nonempty `pU`. हूहू stays Um/Un; स्वभू stays उवङ्.
+fn decline_pu(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("pU")?;
+    if pre.is_empty() || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let v = format!("{pre}pv");
+    let uu = format!("{pre}pU");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{uu}H"), format!("{v}O"), format!("{v}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{v}am"), format!("{v}O"), format!("{v}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{v}A"), format!("{uu}ByAm"), format!("{uu}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{v}e"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{v}aH"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{v}aH"), format!("{v}oH"), format!("{v}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{v}i"), format!("{v}oH"), format!("{uu}zu")]);
+    decl.insert("samboDana".into(), vec![format!("{uu}H"), format!("{v}O"), format!("{v}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1982,6 +2007,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_pati(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_pu(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -3512,5 +3540,22 @@ mod tests {
         has(&generate("saKi", "pum").unwrap(), "prathamA", "saKA");
         assert!(!p.declension.get("tfIyA").unwrap().iter().any(|x| x == "patinA"));
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "patA"));
+    }
+
+    #[test]
+    fn kalapu_kalapvam() {
+        // खलपू: यण् खलप्वौ/खलप्वम्. हूहू stays हूहूम्; स्वभू stays स्वभुवम्.
+        let k = generate("KalapU", "pum").expect("KalapU");
+        has(&k, "prathamA", "KalapUH");
+        has(&k, "prathamA", "KalapvO");
+        has(&k, "prathamA", "KalapvaH");
+        has(&k, "dvitIyA", "Kalapvam");
+        has(&k, "tfIyA", "KalapvA");
+        has(&k, "saptamI", "Kalapvi");
+        has(&k, "saptamI", "KalapUzu");
+        has(&generate("hUhU", "pum").unwrap(), "dvitIyA", "hUhUm");
+        has(&generate("svaBU", "pum").unwrap(), "dvitIyA", "svaBuvam");
+        assert!(!k.declension.get("dvitIyA").unwrap().iter().any(|x| x == "KalapUm"));
+        assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "KalapavO"));
     }
 }
