@@ -180,6 +180,20 @@ fn polish(word: &str) -> String {
     scutva_n(&apply_natva_word(word))
 }
 
+/// अञ्च्-class: nom ङ् (8.2.23), strong ञ्च्, weak 6.4.24 ञ्-lopa (+ 6.4.139 ई / सम्प्रसारण), पद 8.2.30 ग्.
+/// Closed list (not क्रुञ्च्, which keeps ञ्).
+fn anc_parts(cand: &str) -> Option<(&'static str, &'static str, &'static str, &'static str)> {
+    Some(match cand {
+        "prAYc" => ("prAN", "prAYc", "prAc", "prAg"),
+        "pratyaYc" => ("pratyaN", "pratyaYc", "pratIc", "pratyag"),
+        "udaYc" => ("udaN", "udaYc", "udIc", "udag"),
+        "saDryaYc" => ("saDryaN", "saDryaYc", "saDrIc", "saDryag"),
+        "tiryaYc" => ("tiryaN", "tiryaYc", "tiraSc", "tiryag"),
+        "samyaYc" => ("samyaN", "samyaYc", "samIc", "samyag"),
+        _ => return None,
+    })
+}
+
 /// 4.1.5–6 ङीप्: इन्/उगित् अत्/न् स्त्री → दण्डिनी, भवती, राज्ञी. Not त्रिंशत्; अहन् stays nap.
 fn ngeep_stri(cand: &str, linga: &str) -> String {
     if linga != "stri" || cand.ends_with('I') {
@@ -194,6 +208,10 @@ fn ngeep_stri(cand: &str, linga: &str) -> String {
         "yuvan" => return "yUnI".into(),
         "maGavan" => return "maGonI".into(),
         _ => {}
+    }
+    // 4.1.5 ङीप् of अञ्च् weak: प्राची/प्रतीची (not च-anta *प्राक्).
+    if let Some((_, _, weak, _)) = anc_parts(cand) {
+        return format!("{weak}I");
     }
     if cand.ends_with("at") || cand.ends_with("in") {
         return format!("{cand}I");
@@ -561,6 +579,29 @@ fn decline_rai(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// प्राञ्च्-class पुं — 8.2.23 प्राङ्; 6.4.24 प्राचा; 8.2.30 प्राग्/प्राक्षु. Not च-anta *प्राक्.
+fn decline_anc(cand: &str, linga: &str) -> Option<Declension> {
+    let (nom, strong, weak, pada) = anc_parts(cand)?;
+    if linga != "pum" {
+        return None;
+    }
+    let loc_pl = format!("{}kzu", pada.strip_suffix('g').unwrap_or(pada));
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![nom.into(), format!("{strong}O"), format!("{strong}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{strong}am"), format!("{strong}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{pada}ByAm"), format!("{pada}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{pada}ByAm"), format!("{pada}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), loc_pl]);
+    decl.insert("samboDana".into(), vec![nom.into(), format!("{strong}O"), format!("{strong}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -621,6 +662,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_rai(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_anc(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1227,5 +1271,30 @@ mod tests {
         let n = generate("nO", "stri").expect("nO");
         has(&n, "dvitIyA", "nAvam");
         assert!(!r.declension.get("dvitIyA").unwrap().iter().any(|x| x == "rAvam"));
+    }
+
+    #[test]
+    fn anc_pranc_pran_prac() {
+        // प्राञ्च्: 8.2.23 प्राङ्; 6.4.24 प्राचा; 8.2.30 प्राग्/प्राक्षु. Not च-anta *प्राक्.
+        let p = generate("prAYc", "pum").expect("prAYc");
+        has(&p, "prathamA", "prAN");
+        has(&p, "prathamA", "prAYcO");
+        has(&p, "prathamA", "prAYcaH");
+        has(&p, "dvitIyA", "prAYcam");
+        has(&p, "dvitIyA", "prAcaH");
+        has(&p, "tfIyA", "prAcA");
+        has(&p, "tfIyA", "prAgByAm");
+        has(&p, "tfIyA", "prAgBiH");
+        has(&p, "saptamI", "prAci");
+        has(&p, "saptamI", "prAkzu");
+        has(&generate("pratyaYc", "pum").unwrap(), "prathamA", "pratyaN");
+        has(&generate("pratyaYc", "pum").unwrap(), "tfIyA", "pratIcA");
+        has(&generate("pratyaYc", "pum").unwrap(), "tfIyA", "pratyagBiH");
+        has(&generate("udaYc", "pum").unwrap(), "tfIyA", "udIcA");
+        has(&generate("tiryaYc", "pum").unwrap(), "tfIyA", "tiraScA");
+        has(&generate("samyaYc", "pum").unwrap(), "tfIyA", "samIcA");
+        has(&generate("saDryaYc", "pum").unwrap(), "tfIyA", "saDrIcA");
+        has(&generate("prAYc", "stri").unwrap(), "prathamA", "prAcI");
+        has(&generate("vAc", "stri").unwrap(), "prathamA", "vAk");
     }
 }
