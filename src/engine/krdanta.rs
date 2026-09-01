@@ -80,6 +80,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "SAnan" => Some(("mAna", vec!["3.2.128"], "sanan")),
         "atfn" => Some(("at", vec!["3.2.104"], "atfn")),
         "vuY" => Some(("aka", vec!["3.2.146"], "vuy")),
+        "ktri" => Some(("trima", vec!["3.3.88"], "ktri")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["7.1.37"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -745,6 +746,25 @@ fn vuy_form(root: &str) -> String {
     }
 }
 
+/// 3.3.88 ड्वितः क्त्रिः + 4.4.20 क्त्रेर्मम्: कृत्रिम/पक्त्रिम (कित्; not निष्ठा पक्व).
+/// याच् is सेट् याचित्रिम (not palatal *याक्त्रिम).
+fn ktri_form(dhatu: &str) -> String {
+    let d = dhatu.trim_end_matches('~');
+    if !d.starts_with("qu") {
+        return format!("{}trima", surface_root(dhatu));
+    }
+    let root = surface_root(dhatu);
+    if matches!(root.as_str(), "yAc") {
+        return "yAcitrima".into();
+    }
+    let ta = nistha_base(dhatu, false);
+    if let Some(base) = ta.strip_suffix('a') {
+        format!("{base}rima")
+    } else {
+        format!("{ta}rima")
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -975,7 +995,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
-                | "ra" | "naN" | "SAnan"
+                | "ra" | "naN" | "SAnan" | "ktri"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -1189,6 +1209,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "sanan" => sanan_form(&dhatu, &root),
         "atfn" => atfn_form(&root),
         "vuy" => vuy_form(&root),
+        "ktri" => ktri_form(&dhatu),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1606,6 +1627,11 @@ mod tests {
         assert!(pr.iter().any(|x| x == "KAdakaH"), "{:?}", pr);
         let d = decline("KAdf", "vuY", "stri", &[]).expect("KAdikA");
         assert_eq!(d.stem, "KAdikA");
+        let d = decline("qukfY", "ktri", "pum", &[]).expect("kftrimaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "kftrimaH"), "{:?}", pr);
+        let d = decline("qukfY", "ktri", "stri", &[]).expect("kftrimA");
+        assert_eq!(d.stem, "kftrimA");
         let d = decline("wunadi", "aTuc", "pum", &[]).expect("nandaTuH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "nandaTuH"), "{:?}", pr);
@@ -1811,6 +1837,17 @@ mod tests {
         assert_eq!(derive("hisi", "vuY"), vec!["hiMsaka"]);
         assert_eq!(derive("kliSa", "vuY"), vec!["kleSaka"]);
         assert_eq!(derive("qukfY", "Rvul"), vec!["kAraka"]);
+        assert_eq!(derive("qukfY", "ktri"), vec!["kftrima"]);
+        assert_eq!(derive("qupacaz", "ktri"), vec!["paktrima"]);
+        assert_eq!(derive("qupacaz", "kta"), vec!["pakva"]);
+        assert_eq!(derive("quyAcf", "ktri"), vec!["yAcitrima"]);
+        assert_eq!(derive("qulaBaz", "ktri"), vec!["labDrima"]);
+        assert_eq!(derive("quvapa", "ktri"), vec!["uptrima"]);
+        assert_eq!(derive("quDAY", "ktri"), vec!["hitrima"]);
+        assert_eq!(derive("qudAY", "ktri"), vec!["dattrima"]);
+        assert_eq!(derive("quBfY", "ktri"), vec!["Bftrima"]);
+        assert_eq!(derive("qumiY", "ktri"), vec!["mitrima"]);
+        assert_eq!(derive("qukrIY", "ktri"), vec!["krItrima"]);
         assert_eq!(derive("naS", "kvarap"), vec!["naSvara"]);
         assert_eq!(derive("gamx", "Satf"), vec!["gacCat"]);
         assert_eq!(derive("eDa", "SAnac"), vec!["eDamAna"]);
