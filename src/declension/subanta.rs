@@ -1416,6 +1416,30 @@ fn decline_kroshtu(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// ग्रामणी — ई-anta पुं नदीवत् + सु visarga ग्रामणीः; अम् ग्रामण्यम् (not पपी *ग्रामणीम्);
+/// loc ग्रामण्याम्. पपी stays Im/In/loc पपी.
+fn decline_gramani(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "grAmaRI" || linga != "pum" {
+        return None;
+    }
+    let i = "grAmaRI";
+    let y = "grAmaRy";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{i}H"), format!("{y}O"), format!("{y}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{y}am"), format!("{y}O"), format!("{y}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{y}A"), format!("{i}ByAm"), format!("{i}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{y}e"), format!("{i}ByAm"), format!("{i}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{y}aH"), format!("{i}ByAm"), format!("{i}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{y}aH"), format!("{y}oH"), format!("{y}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{y}Am"), format!("{y}oH"), format!("{i}zu")]);
+    decl.insert("samboDana".into(), vec![format!("{i}H"), format!("{y}O"), format!("{y}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1545,6 +1569,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_kroshtu(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_gramani(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -2787,5 +2814,25 @@ mod tests {
         assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "papI"));
         assert!(!p.declension.get("saptamI").unwrap().iter().any(|x| x == "papO"));
         assert!(!p.declension.get("caturTI").unwrap().iter().any(|x| x == "papyE"));
+    }
+
+    #[test]
+    fn gramani_gramanih_gramanyam() {
+        // ग्रामणी: ग्रामणीः/ग्रामण्यम्/ग्रामण्याम् (नदीवत्). पपी stays पपीम्/पपी.
+        let g = generate("grAmaRI", "pum").expect("grAmaRI");
+        has(&g, "prathamA", "grAmaRIH");
+        has(&g, "prathamA", "grAmaRyO");
+        has(&g, "prathamA", "grAmaRyaH");
+        has(&g, "dvitIyA", "grAmaRyam");
+        has(&g, "dvitIyA", "grAmaRyaH");
+        has(&g, "tfIyA", "grAmaRyA");
+        has(&g, "caturTI", "grAmaRye");
+        has(&g, "saptamI", "grAmaRyAm");
+        has(&g, "saptamI", "grAmaRIzu");
+        has(&g, "zazWI", "grAmaRyAm");
+        has(&generate("papI", "pum").unwrap(), "dvitIyA", "papIm");
+        has(&generate("nadI", "stri").unwrap(), "saptamI", "nadyAm");
+        assert!(!g.declension.get("dvitIyA").unwrap().iter().any(|x| x == "grAmaRIm"));
+        assert!(!g.declension.get("saptamI").unwrap().iter().any(|x| x == "grAmaRI"));
     }
 }
