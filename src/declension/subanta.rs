@@ -708,7 +708,35 @@ fn decline_upanah(cand: &str, linga: &str) -> Option<Declension> {
 }
 
 /// दिव् — 7.1.84 दिव औत् द्यौः; पद सम्प्रसारण द्युभ्याम्/द्युषु. Compounds सुद्यौः. Not v-fallback *दिवा.
+/// नपुं 7.1.23 द्यु/द्युनी/द्यूनि (not o-stem *द्यौः). `*div` or nap `*dyo` (gold प्रद्यो).
 fn decline_div(cand: &str, linga: &str) -> Option<Declension> {
+    if linga == "nap" {
+        let pre = cand
+            .strip_suffix("div")
+            .or_else(|| cand.strip_suffix("dyo"))?;
+        let u = format!("{pre}dyu");
+        let nom = vec![
+            u.clone(),
+            polish(&format!("{u}nI")),
+            format!("{pre}dyUni"),
+        ];
+        let mut decl = HashMap::new();
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert("tfIyA".into(), vec![polish(&format!("{u}nA")), format!("{u}ByAm"), format!("{u}BiH")]);
+        decl.insert("caturTI".into(), vec![polish(&format!("{u}ne")), format!("{u}ByAm"), format!("{u}ByaH")]);
+        decl.insert("paYcamI".into(), vec![polish(&format!("{u}naH")), format!("{u}ByAm"), format!("{u}ByaH")]);
+        decl.insert("zazWI".into(), vec![polish(&format!("{u}naH")), polish(&format!("{u}noH")), polish(&format!("{pre}dyUnAm"))]);
+        decl.insert("saptamI".into(), vec![polish(&format!("{u}ni")), polish(&format!("{u}noH")), format!("{u}zu")]);
+        let mut voc = vec![u, format!("{pre}dyo")];
+        voc.extend(nom.into_iter().skip(1));
+        decl.insert("samboDana".into(), voc);
+        return Some(Declension {
+            stem: cand.to_string(),
+            linga: linga.to_string(),
+            declension: decl,
+        });
+    }
     let pre = cand.strip_suffix("div")?;
     if linga != "stri" && linga != "pum" {
         return None;
@@ -3940,5 +3968,25 @@ mod tests {
         has(&generate("lakzmI", "stri").unwrap(), "dvitIyA", "lakzmIH");
         has(&generate("gOrI", "stri").unwrap(), "dvitIyA", "gOrIH");
         assert!(!a.declension.get("dvitIyA").unwrap().iter().any(|x| x == "atilakzmIH"));
+    }
+
+    #[test]
+    fn pradyo_pradyu_nap() {
+        // दिव् nap: 7.1.23 प्रद्यु/प्रद्युनी/प्रद्यूनि not o-stem *प्रद्यौः. दिव् पुं stays द्यौः. गो stays गौः.
+        let p = generate("pradyo", "nap").expect("pradyo");
+        has(&p, "prathamA", "pradyu");
+        has(&p, "prathamA", "pradyunI");
+        has(&p, "prathamA", "pradyUni");
+        has(&p, "tfIyA", "pradyunA");
+        has(&p, "tfIyA", "pradyuByAm");
+        has(&p, "saptamI", "pradyuni");
+        has(&p, "saptamI", "pradyuzu");
+        has(&p, "samboDana", "pradyo");
+        has(&generate("pradiv", "nap").unwrap(), "prathamA", "pradyu");
+        has(&generate("div", "nap").unwrap(), "prathamA", "dyu");
+        has(&generate("div", "pum").unwrap(), "prathamA", "dyOH");
+        has(&generate("go", "pum").unwrap(), "prathamA", "gOH");
+        assert!(!p.declension.get("prathamA").unwrap().iter().any(|x| x == "pradyOH"));
+        assert!(!p.declension.get("dvitIyA").unwrap().iter().any(|x| x == "pradyAm"));
     }
 }
