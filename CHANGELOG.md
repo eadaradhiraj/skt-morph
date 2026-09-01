@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 50: README 49
+
+- **README:** recent line updated to 49 iters + deriv/phonology hints (185 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 49: demo deriv hint wired
 
 - **demo.js:** `renderVerbSingle` now shows `derivHint` (yaN/yaNluk) in meta; UI aid for 2.4.74.
