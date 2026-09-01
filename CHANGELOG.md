@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 14: sarvanāma header
+
+- **sarvanāma:** header → sūtra-cited (1.1.27/7.1.14 etc.); no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 13: prefix docs
 
 - **prefix:** header → sūtra-cited (1.4.59/8.4.58 etc.), cleaned generic test headers (6 fns) but kept `pra_bhavanti_no_natva` sutra note; 183 tests.

@@ -1,4 +1,5 @@
-//! Auto-generated from sktmorph/sarvanama.py
+//! sarvanāma — pronoun paradigms (1.1.27 सर्वादि, 7.1.14/17 etc.).
+//! Auto-generated from sktmorph/sarvanama.py — sūtra-gated tables (a-stem etc.).
 
 use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
