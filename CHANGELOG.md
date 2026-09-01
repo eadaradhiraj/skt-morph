@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 132: README 131
+
+- **README:** recent line updated to 131 iters + yaN sūtra (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 131: lib yaN sūtra fix
 
 - **lib:** `generate_verb_derived` doc → Kaumudī 3.1.22; no logic change.
