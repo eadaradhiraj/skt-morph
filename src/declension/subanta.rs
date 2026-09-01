@@ -927,6 +927,30 @@ fn decline_duhadi(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// लिह् — 8.2.31 हो ढः: पद लिट्/लिड्, लिड्भ्याम्/लिट्सु. Not कुत्व *लिक् (उष्णिह् stays उष्णिक्).
+fn decline_lih(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "lih" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let weak = cand;
+    let w = "liw";
+    let q = "liq";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![w.into(), q.into(), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{weak}A"), format!("{q}ByAm"), format!("{q}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{weak}e"), format!("{q}ByAm"), format!("{q}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{weak}aH"), format!("{q}ByAm"), format!("{q}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{w}su")]);
+    decl.insert("samboDana".into(), vec![w.into(), q.into(), format!("{weak}O"), format!("{weak}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// वाह् — 6.4.132 ऊठ् + 6.1.87 गुण विश्वौहा; पद 8.2.31/8.4.41 विश्ववाट्. तुरासाह् तुराषाट् (no ऊठ्). Not h-anta *क्.
 fn decline_vah(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "pum" && linga != "stri" {
@@ -1148,6 +1172,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
         if let Some(d) = decline_duhadi(&cand, linga) {
             return Some(d);
         }
+        if let Some(d) = decline_lih(&cand, linga) {
+            return Some(d);
+        }
         if let Some(d) = decline_vah(&cand, linga) {
             return Some(d);
         }
@@ -1360,10 +1387,13 @@ mod tests {
         has(&s, "prathamA", "suhft");
         has(&s, "dvitIyA", "suhfdam");
         has(&s, "tfIyA", "suhfdA");
-        // h-anta: उष्णिह् उष्णिक्/उष्णिग्, उष्णिक्षु (8.2.30/8.4.56); लिह् same कुत्व लिक्
+        // लिह्: 8.2.31 लिट्/लिड्; उष्णिह् stays कुत्व उष्णिक्
         let h = generate("lih", "pum").expect("lih");
-        has(&h, "prathamA", "lik");
+        has(&h, "prathamA", "liw");
+        has(&h, "prathamA", "liq");
         has(&h, "tfIyA", "lihA");
+        has(&h, "tfIyA", "liqByAm");
+        has(&h, "saptamI", "liwsu");
         let u = generate("uzRih", "pum").expect("uzRih");
         has(&u, "prathamA", "uzRik");
         has(&u, "prathamA", "uzRig");
@@ -1563,7 +1593,7 @@ mod tests {
         // त्रिंशत् still त-anta (Sat excluded from ङीप्).
         has(&generate("triMSat", "stri").unwrap(), "prathamA", "triMSat");
         // हल् स्त्री same as पुं (not आ-stem fallback).
-        has(&generate("lih", "stri").unwrap(), "prathamA", "lik");
+        has(&generate("lih", "stri").unwrap(), "prathamA", "liw");
         has(&generate("laB", "stri").unwrap(), "prathamA", "lap");
     }
 
@@ -2049,7 +2079,7 @@ mod tests {
         has(&r, "tfIyA", "DrugByAm");
         has(&r, "saptamI", "Drukzu");
         has(&generate("uzRih", "pum").unwrap(), "prathamA", "uzRik");
-        has(&generate("lih", "pum").unwrap(), "prathamA", "lik");
+        has(&generate("lih", "pum").unwrap(), "prathamA", "liw");
         assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "duk"));
     }
 
