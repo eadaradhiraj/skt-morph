@@ -2073,6 +2073,56 @@ fn decline_suno(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// सुलू nap — 7.1.23 सुलु/सुलुनी/सुलूनि; optional यण् सुल्वा/सुल्वे (not U-nap *सुलू only).
+/// पद सुलुभ्याम्/सुलुषु. Exact `sulU` + nap. वधू stays स्त्री; मधु stays मधु.
+fn decline_sulu(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "sulU" || linga != "nap" {
+        return None;
+    }
+    let u = "sulu";
+    let v = "sulv";
+    let nom = vec![
+        u.to_string(),
+        polish(&format!("{u}nI")),
+        "sulUni".into(),
+    ];
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), nom.clone());
+    decl.insert("dvitIyA".into(), nom.clone());
+    decl.insert("tfIyA".into(), vec![format!("{v}A"), polish(&format!("{u}nA")), format!("{u}ByAm"), format!("{u}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{v}e"), polish(&format!("{u}ne")), format!("{u}ByAm"), format!("{u}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{v}aH"), polish(&format!("{u}naH")), format!("{u}ByAm"), format!("{u}ByaH")]);
+    decl.insert(
+        "zazWI".into(),
+        vec![
+            format!("{v}aH"),
+            polish(&format!("{u}naH")),
+            format!("{v}oH"),
+            polish(&format!("{u}noH")),
+            format!("{v}Am"),
+            polish("sulUnAm"),
+        ],
+    );
+    decl.insert(
+        "saptamI".into(),
+        vec![
+            format!("{v}i"),
+            polish(&format!("{u}ni")),
+            format!("{v}oH"),
+            polish(&format!("{u}noH")),
+            format!("{u}zu"),
+        ],
+    );
+    let mut voc = vec![u.to_string(), "sulo".into()];
+    voc.extend(nom.into_iter().skip(1));
+    decl.insert("samboDana".into(), voc);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2157,6 +2207,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_suno(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_sulu(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -4039,5 +4092,25 @@ mod tests {
         has(&generate("maDu", "nap").unwrap(), "prathamA", "maDu");
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sunOH"));
         assert!(!s.declension.get("dvitIyA").unwrap().iter().any(|x| x == "sunAvam"));
+    }
+
+    #[test]
+    fn sulu_sulu_nap() {
+        // सुलू nap: सुलु/सुलुनी; यण् सुल्वा. वधू stays स्त्री वधूः. मधु stays मधु.
+        let s = generate("sulU", "nap").expect("sulU");
+        has(&s, "prathamA", "sulu");
+        has(&s, "prathamA", "sulunI");
+        has(&s, "prathamA", "sulUni");
+        has(&s, "tfIyA", "sulvA");
+        has(&s, "tfIyA", "sulunA");
+        has(&s, "tfIyA", "suluByAm");
+        has(&s, "caturTI", "sulve");
+        has(&s, "saptamI", "sulvi");
+        has(&s, "saptamI", "suluzu");
+        has(&s, "samboDana", "sulo");
+        has(&generate("vaDU", "stri").unwrap(), "prathamA", "vaDUH");
+        has(&generate("maDu", "nap").unwrap(), "prathamA", "maDu");
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sulUH"));
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "sulvO"));
     }
 }
