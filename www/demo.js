@@ -274,7 +274,7 @@ function dhatuQuery() {
   return toSlp1(document.getElementById("dhatu").value) || "BU";
 }
 function derivHint(d) {
-  if (d === "yaN") return " — सयक् ātmane (बोभूयते)";
+  if (d === "yaN") return " — सयक् ātmane (बोभूयते) 3.1.22";
   if (d === "yaNluk") return " — लुक् parasmai (बोभूति) 2.4.74";
   return "";
 }

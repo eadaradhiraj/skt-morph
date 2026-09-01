@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 121: demo yaN sūtra
+
+- **demo.js:** `derivHint` yaN → 3.1.22 sūtra ref.
+- **wasm:** rebuilt 1.2M; 187 tests.
+
 ## 2026-09-01 — iteration 120: README 119
 
 - **README:** recent line updated to 119 iters + boBU (187 tests).
