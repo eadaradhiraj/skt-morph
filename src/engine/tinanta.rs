@@ -68,7 +68,7 @@ pub fn generate_all_with_artha(dhatu_query: &str, lakara: &str, purusha: u8, vac
 }
 
 /// `derivation`: empty = śuddha; `Ric` / `san` / `yaN` / `yaNluk` (2.4.74) / `karma` (Kaumudī 3.1.26/3.1.7/3.1.22/2.4.74/3.1.67).
-/// yaN = सयक् ātmane (boBUyate); yaNluk = luk parasmai (boBUti, vAvac, cekrI, jaNgam, pApac, jaNGan). Perf: dhatu cache 7s cold, 187 tests.
+/// yaN = सयक् ātmane (boBUyate); yaNluk = luk parasmai (boBUti, vAvac, cekrI, jaNgam, pApac, jaNGan, boBU). Perf: dhatu cache 7s cold, 187 tests.
 pub fn generate_all_derived(
     dhatu_query: &str,
     derivation: &str,
