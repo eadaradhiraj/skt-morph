@@ -567,7 +567,7 @@ pub fn lingas(pratyaya: &str) -> &'static [&'static str] {
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
 fn is_at_participle(pratyaya: &str) -> bool {
-    matches!(pratyaya, "Satf" | "Satf~" | "ktavatu" | "ktavatu~")
+    matches!(pratyaya, "Satf" | "Satf~" | "sya-Satf" | "sya-Satf~" | "ktavatu" | "ktavatu~")
 }
 
 // ---------------------------------------------------------------------------
@@ -598,11 +598,12 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
     }
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
     if linga == "stri"
-        && matches!(
+        && (matches!(
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
                 | "yat" | "Ryat"
-        )
+        ) || pratyaya.contains("SAnac")
+            || pratyaya.contains("cAnaS"))
     {
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(base) = form.strip_suffix('a') {
@@ -628,7 +629,7 @@ pub fn decline(
     let stem = pratipadika(form, pratyaya, linga)?;
     let mut d = crate::declension::subanta::generate(&stem, linga)?;
     // 6.4.14 अत्वसन्तस्य चाधातोः: शतृ has no दीर्घ (भवन् not भवान्). क्तवतु keeps आन्.
-    if matches!(pratyaya, "Satf" | "Satf~") && linga == "pum" {
+    if matches!(pratyaya, "Satf" | "Satf~" | "sya-Satf" | "sya-Satf~") && linga == "pum" {
         // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
         if let Some(row) = d.declension.get_mut("prathamA") {
             // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -660,10 +661,22 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
 
     let form = match mode {
         "present" => {
-            let (st, _) = crate::engine::stems::derive_stem(&dhatu, gana, "lat", "shuddha", &tags, &ant, &aup);
-            let base = st.unwrap_or_else(|| present_stem(&dhatu, gana));
+            // 3.1.33 स्यतासी लृलुटोः: स्य-शतृ/शानच् on लृट् स्य, not लट् *गच्छत्.
+            let lak = if matches!(pratyaya, "sya-Satf" | "sya-Satf~" | "sya-SAnac" | "sya-cAnaS") {
+                "lrt"
+            } else {
+                "lat"
+            };
+            let (st, _) = crate::engine::stems::derive_stem(&dhatu, gana, lak, "shuddha", &tags, &ant, &aup);
+            let base = st.unwrap_or_else(|| {
+                if lak == "lrt" {
+                    crate::engine::it::sya_stem(&root)
+                } else {
+                    present_stem(&dhatu, gana)
+                }
+            });
             // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
-            if pratyaya == "Satf" {
+            if pratyaya == "Satf" || pratyaya == "sya-Satf" {
                 // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if base.ends_with('a') {
                     format!("{}at", &base[..base.len() - 1])
@@ -674,7 +687,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
                 } else {
                     format!("{}at", base)
                 }
-            } else if pratyaya == "Satf~" {
+            } else if pratyaya == "Satf~" || pratyaya == "sya-Satf~" {
                 // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
                 if base.ends_with('a') {
                     format!("{}n", &base[..base.len() - 1])
@@ -998,6 +1011,14 @@ mod tests {
         assert!(pr.iter().any(|x| x == "baBUvAn"), "{:?}", pr);
         let tr = d.declension.get("tfIyA").unwrap();
         assert!(tr.iter().any(|x| x == "baBUvuzA"), "{:?}", tr);
+        let d = decline("gamx", "sya-Satf", "pum", &[]).expect("gamizyan");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gamizyan"), "{:?}", pr);
+        let d = decline("gamx", "sya-Satf", "stri", &[]).expect("gamizyantI");
+        assert_eq!(d.stem, "gamizyantI");
+        let d = decline("gamx", "Satf", "pum", &[]).expect("gacCan");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "gacCan"), "{:?}", pr);
     }
 
     #[test]
@@ -1072,6 +1093,11 @@ mod tests {
         assert_eq!(derive("eDa", "SAnac"), vec!["eDamAna"]);
         assert_eq!(derive("BU", "SAnac"), vec!["BavamAna"]);
         assert_eq!(derive("gamx", "Satf"), vec!["gacCat"]);
+        // 3.1.33 स्य + 3.2.124 शतृ/शानच्: गमिष्यत्/भविष्यत्, not लट् *गच्छत्. शतृ stays गच्छत्.
+        assert_eq!(derive("gamx", "sya-Satf"), vec!["gamizyat"]);
+        assert_eq!(derive("BU", "sya-Satf"), vec!["Bavizyat"]);
+        assert_eq!(derive("gamx", "sya-SAnac"), vec!["gamizyamAna"]);
+        assert_eq!(derive("eDa", "sya-SAnac"), vec!["eDizyamAna"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
         assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
