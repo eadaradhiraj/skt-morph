@@ -1,3 +1,6 @@
+//! build.rs — regenerates `src/data/dhatus_compact.rs` from scrape DB if present.
+//! Falls back to committed compact (2259 roots) for CI/browser without DB.
+//! sūtra gating: dhātupāṭha is source; DB never drives generate.
 use std::fs;
 use std::path::Path;
 
