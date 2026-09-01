@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 65: README 64
+
+- **README:** recent line updated to 64 iters + analyze OnceLock (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 64: analyze OnceLock doc
 
 - **analyze:** OnceLock maps doc → 7s cold, µs warm (dhatu cache); no logic change.
