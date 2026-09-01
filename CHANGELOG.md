@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 93: README 92
+
+- **README:** recent line updated to 92 iters + lib yaNluk (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 92: lib yaNluk doc
 
 - **lib:** `generate_verb_derived` doc → Kaumudī 3.1.26/2.4.74; no logic change.
