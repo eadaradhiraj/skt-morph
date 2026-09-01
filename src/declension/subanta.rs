@@ -959,6 +959,30 @@ fn decline_vah(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// भृस्ज् — 8.2.29 स्-lopa + 8.4.41 ष्टुत्व: पद भृट्/भृड्; vowel भृज्जौ. Not ज-anta *भृस्क्.
+fn decline_bhrasj(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "Bfsj" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let vow = "Bfjj";
+    let w = "Bfw";
+    let q = "Bfq";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![w.into(), q.into(), format!("{vow}O"), format!("{vow}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{vow}am"), format!("{vow}O"), format!("{vow}aH")]);
+    decl.insert("tfIyA".into(), vec![format!("{vow}A"), format!("{q}ByAm"), format!("{q}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{vow}e"), format!("{q}ByAm"), format!("{q}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{vow}aH"), format!("{q}ByAm"), format!("{q}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{vow}aH"), format!("{vow}oH"), format!("{vow}Am")]);
+    decl.insert("saptamI".into(), vec![format!("{vow}i"), format!("{vow}oH"), format!("{w}su")]);
+    decl.insert("samboDana".into(), vec![w.into(), q.into(), format!("{vow}O"), format!("{vow}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1055,6 +1079,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_vah(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_bhrasj(&cand, linga) {
             return Some(d);
         }
         let mut best: Option<(String, Vec<Vec<String>>)> = None;
@@ -1960,5 +1987,21 @@ mod tests {
         has(&generate("duh", "pum").unwrap(), "prathamA", "Duk");
         has(&generate("uzRih", "pum").unwrap(), "prathamA", "uzRik");
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "viSvavAk"));
+    }
+
+    #[test]
+    fn bhrasj_bhrat_bhrjja() {
+        // भृस्ज्: पद भृट्/भृड्, vowel भृज्जौ. Not ज-anta *भृस्क्.
+        let b = generate("Bfsj", "pum").expect("Bfsj");
+        has(&b, "prathamA", "Bfw");
+        has(&b, "prathamA", "Bfq");
+        has(&b, "prathamA", "BfjjO");
+        has(&b, "dvitIyA", "Bfjjam");
+        has(&b, "tfIyA", "BfjjA");
+        has(&b, "tfIyA", "BfqByAm");
+        has(&b, "saptamI", "Bfjji");
+        has(&b, "saptamI", "Bfwsu");
+        has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
+        assert!(!b.declension.get("prathamA").unwrap().iter().any(|x| x == "Bfsk"));
     }
 }
