@@ -1917,6 +1917,31 @@ fn decline_prarai(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// चमू-anta पुं (अतिचमू) — यण् अतिचम्वौ/अतिचम्वा; सु अतिचमूः; अम् अतिचमूम्; शस् अतिचमून् (not स्त्री *अतिचमूः).
+/// loc नदीवत् अतिचम्वाम्. nonempty `camU` + pum. वधू stays acc वधूः; हूहू stays हूहूम्.
+fn decline_camu(cand: &str, linga: &str) -> Option<Declension> {
+    let pre = cand.strip_suffix("camU")?;
+    if pre.is_empty() || linga != "pum" {
+        return None;
+    }
+    let v = format!("{pre}camv");
+    let uu = format!("{pre}camU");
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{uu}H"), format!("{v}O"), format!("{v}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{uu}m"), format!("{v}O"), format!("{uu}n")]);
+    decl.insert("tfIyA".into(), vec![format!("{v}A"), format!("{uu}ByAm"), format!("{uu}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{v}E"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{v}AH"), format!("{uu}ByAm"), format!("{uu}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{v}AH"), format!("{v}oH"), polish(&format!("{uu}nAm"))]);
+    decl.insert("saptamI".into(), vec![format!("{v}Am"), format!("{v}oH"), format!("{uu}zu")]);
+    decl.insert("samboDana".into(), vec![format!("{pre}camu"), format!("{v}O"), format!("{v}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -1986,6 +2011,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_prarai(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_camu(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -3750,5 +3778,26 @@ mod tests {
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vaDU"));
         assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vaDavaH"));
         assert!(!v.declension.get("tfIyA").unwrap().iter().any(|x| x == "vaDuByAm"));
+    }
+
+    #[test]
+    fn aticamu_aticamun() {
+        // अतिचमू पुं: यण् अतिचम्वौ; शस् अतिचमून्. वधू stays acc वधूः. हूहू stays हूहूम्.
+        let a = generate("aticamU", "pum").expect("aticamU");
+        has(&a, "prathamA", "aticamUH");
+        has(&a, "prathamA", "aticamvO");
+        has(&a, "prathamA", "aticamvaH");
+        has(&a, "dvitIyA", "aticamUm");
+        has(&a, "dvitIyA", "aticamUn");
+        has(&a, "tfIyA", "aticamvA");
+        has(&a, "tfIyA", "aticamUByAm");
+        has(&a, "caturTI", "aticamvE");
+        has(&a, "saptamI", "aticamvAm");
+        has(&a, "saptamI", "aticamUzu");
+        has(&a, "samboDana", "aticamu");
+        has(&generate("vaDU", "stri").unwrap(), "dvitIyA", "vaDUH");
+        has(&generate("hUhU", "pum").unwrap(), "dvitIyA", "hUhUm");
+        assert!(!a.declension.get("dvitIyA").unwrap().iter().any(|x| x == "aticamUH"));
+        assert!(!a.declension.get("prathamA").unwrap().iter().any(|x| x == "aticamavaH"));
     }
 }
