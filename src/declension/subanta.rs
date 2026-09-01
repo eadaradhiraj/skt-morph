@@ -4180,4 +4180,45 @@ mod tests {
         assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "dadantO"));
         assert!(!j.declension.get("prathamA").unwrap().iter().any(|x| x == "jakzAn"));
     }
+
+    #[test]
+    fn denu_sambhu_drs_payas() {
+        // धेनु u-stri; शम्भु u-pum; दृश् श-anta; पयस् as-nap; धीमत् शतृ; शार्ङ्गिन्.
+        let d = generate("Denu", "stri").expect("Denu");
+        has(&d, "prathamA", "DenuH");
+        has(&d, "prathamA", "DenU");
+        has(&d, "prathamA", "DenavaH");
+        has(&d, "dvitIyA", "Denum");
+        has(&d, "tfIyA", "DenvA");
+        has(&d, "caturTI", "DenvE");
+        has(&d, "saptamI", "DenvAm");
+        has(&d, "samboDana", "Deno");
+        let s = generate("SamBu", "pum").expect("SamBu");
+        has(&s, "prathamA", "SamBuH");
+        has(&s, "prathamA", "SamBavaH");
+        has(&s, "tfIyA", "SamBunA");
+        has(&s, "saptamI", "SamBO");
+        let r = generate("dfS", "pum").expect("dfS");
+        has(&r, "prathamA", "dfk");
+        has(&r, "prathamA", "dfg");
+        has(&r, "dvitIyA", "dfSam");
+        has(&r, "saptamI", "dfkzu");
+        let p = generate("payas", "nap").expect("payas");
+        has(&p, "prathamA", "payaH");
+        has(&p, "prathamA", "payasI");
+        has(&p, "prathamA", "payAMsi");
+        has(&p, "tfIyA", "payoByAm");
+        has(&p, "saptamI", "payaHsu");
+        let m = generate("DImat", "pum").expect("DImat");
+        has(&m, "prathamA", "DImAn");
+        has(&m, "dvitIyA", "DImantam");
+        has(&m, "tfIyA", "DImadByAm");
+        let g = generate("SArNgin", "pum").expect("SArNgin");
+        has(&g, "prathamA", "SArNgI");
+        has(&g, "dvitIyA", "SArNgiRam");
+        has(&g, "tfIyA", "SArNgiRA");
+        has(&generate("vaDU", "stri").unwrap(), "prathamA", "vaDvO");
+        assert!(!d.declension.get("prathamA").unwrap().iter().any(|x| x == "DenvO"));
+        assert!(!r.declension.get("prathamA").unwrap().iter().any(|x| x == "dfw"));
+    }
 }
