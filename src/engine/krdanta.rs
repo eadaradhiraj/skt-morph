@@ -93,7 +93,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ukaY" => Some(("uka", vec!["3.2.154"], "ukan")),
         "ini" => Some(("in", vec!["3.2.156", "3.2.157"], "ini")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
-        "kyap" => Some(("ya", vec!["3.1.106", "3.1.108", "3.1.109", "3.1.120", "3.1.121"], "kyap")),
+        "kyap" => Some(("ya", vec!["3.1.106", "3.1.107", "3.1.108", "3.1.109", "3.1.120", "3.1.121"], "kyap")),
         "sya-Satf" => Some(("t", vec!["3.2.124"], "present")),
         "sya-Satf~" => Some(("", vec!["3.2.124"], "present")),
         "sya-SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
@@ -416,9 +416,13 @@ fn ktin_form(root: &str) -> String {
 }
 
 /// क्यप् (3.1.106–110, 3.1.120–121): कित् no गुण; पित् 6.1.71 तुक् after ह्रस्व (कृत्य, भृत्य, स्तुत्य).
-/// 6.1.15 इज्या/उच्य; 3.1.108 हत्य; 3.1.109 शिष्य (इत्त्व+षत्व). 3.1.120 कृत्य/वृष्य vs ण्यत् कार्य/वर्ष्य.
-/// 3.1.121 युग्य vs ण्यत् योग्य. यक् stays क्रियमाण.
+/// 6.1.15 इज्या/उच्य; 3.1.107 भूय vs यत् भव्य; 3.1.108 हत्य; 3.1.109 शिष्य (इत्त्व+षत्व).
+/// 3.1.120 कृत्य/वृष्य vs ण्यत् कार्य/वर्ष्य. 3.1.121 युग्य vs ण्यत् योग्य. यक् stays क्रियमाण.
 fn kyap_form(root: &str) -> String {
+    // 3.1.107 भुवो भावे: भूय (दीर्घ, no तुक्). यत् stays भव्य; ण्यत् भाव्या; ल्यप् homophone भूय.
+    if root == "BU" {
+        return "BUya".into();
+    }
     // 3.1.108 हनस्त च: हत्य not *हन्य.
     if root == "han" {
         return "hatya".into();
@@ -1923,6 +1927,9 @@ mod tests {
         let d = decline("yujir", "kyap", "pum", &[]).expect("yugyaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "yugyaH"), "{:?}", pr);
+        let d = decline("BU", "kyap", "pum", &[]).expect("BUyaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "BUyaH"), "{:?}", pr);
     }
 
     #[test]
@@ -2019,6 +2026,16 @@ mod tests {
         assert_eq!(derive("yujir", "Ryat"), vec!["yogya"]);
         assert_eq!(derive("yujir", "kta"), vec!["yukta"]);
         assert_eq!(derive("yujir", "GaY"), vec!["yoga"]);
+        assert_eq!(derive("BU", "kyap"), vec!["BUya"]);
+        assert_eq!(derive("BU", "yat"), vec!["Bavya"]);
+        assert_eq!(derive("BU", "Ryat"), vec!["BAvya"]);
+        assert_eq!(derive("BU", "lyap"), vec!["BUya"]);
+        assert_eq!(derive("BU", "ukaY"), vec!["BAvuka"]);
+        assert_eq!(derive("BU", "ini"), vec!["Bavin"]);
+        let f = generate_with_prefixes("BU", "kyap", &["pra".into()]);
+        assert!(f.forms.iter().any(|x| x == "praBUya"), "{:?}", f.forms);
+        let f = generate_with_prefixes("BU", "yat", &["pra".into()]);
+        assert!(f.forms.iter().any(|x| x == "praBavya"), "{:?}", f.forms);
         assert_eq!(derive("hana", "GaY"), vec!["GAta"]);
         assert_eq!(derive("hana", "Rvul"), vec!["GAtaka"]);
         assert_eq!(derive("hana", "vun"), vec!["hanaka"]);
