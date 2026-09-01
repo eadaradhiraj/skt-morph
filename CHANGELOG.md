@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 17: data header
+
+- **data:** header → source/fallback docs; no logic change.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 16: subanta header
 
 - **subanta:** header → sūtra-cited (1.4.14/8.2.30); no logic change.
