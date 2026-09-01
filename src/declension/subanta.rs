@@ -625,6 +625,27 @@ fn decline_krunc(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// नृ — पितृ-type नरम् (not कर्तृ *नारम्); acc नॄन्; 6.4.6 नृ च नॄणाम्/नृणाम्.
+fn decline_nr(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "nf" || linga != "pum" {
+        return None;
+    }
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec!["nA".into(), "narO".into(), "naraH".into()]);
+    decl.insert("dvitIyA".into(), vec!["naram".into(), "narO".into(), "nFn".into()]);
+    decl.insert("tfIyA".into(), vec!["nrA".into(), "nfByAm".into(), "nfBiH".into()]);
+    decl.insert("caturTI".into(), vec!["nre".into(), "nfByAm".into(), "nfByaH".into()]);
+    decl.insert("paYcamI".into(), vec!["nuH".into(), "nfByAm".into(), "nfByaH".into()]);
+    decl.insert("zazWI".into(), vec!["nuH".into(), "nroH".into(), "nFRAm".into(), "nfRAm".into()]);
+    decl.insert("saptamI".into(), vec!["nari".into(), "nroH".into(), "nfzu".into()]);
+    decl.insert("samboDana".into(), vec!["naH".into(), "narO".into(), "naraH".into()]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// अस्थि/दधि/सक्थि/अक्षि — 7.1.75 अनङ् before vowel (दध्ना); स्वमोः दधि/दधिनी/दधीनि. Not i-nap *दधिना.
 fn decline_asthyadi(cand: &str, linga: &str) -> Option<Declension> {
     if linga != "nap" {
@@ -729,6 +750,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_krunc(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_nr(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_asthyadi(&cand, linga) {
@@ -1402,5 +1426,25 @@ mod tests {
         has(&generate("kruYc", "stri").unwrap(), "prathamA", "kruN");
         has(&generate("prAYc", "pum").unwrap(), "tfIyA", "prAcA");
         has(&generate("vAc", "stri").unwrap(), "tfIyA", "vAgByAm");
+    }
+
+    #[test]
+    fn nr_naram_nrnam() {
+        // नृ: नरम् not कर्तृ *नारम्; नॄन्; 6.4.6 नॄणाम्/नृणाम्.
+        let n = generate("nf", "pum").expect("nf");
+        has(&n, "prathamA", "nA");
+        has(&n, "prathamA", "narO");
+        has(&n, "dvitIyA", "naram");
+        has(&n, "dvitIyA", "nFn");
+        has(&n, "tfIyA", "nrA");
+        has(&n, "tfIyA", "nfBiH");
+        has(&n, "zazWI", "nuH");
+        has(&n, "zazWI", "nFRAm");
+        has(&n, "zazWI", "nfRAm");
+        has(&n, "saptamI", "nfzu");
+        has(&n, "samboDana", "naH");
+        has(&generate("pitf", "pum").unwrap(), "dvitIyA", "pitaram");
+        has(&generate("kartf", "pum").unwrap(), "dvitIyA", "kartAram");
+        assert!(!n.declension.get("dvitIyA").unwrap().iter().any(|x| x == "nAram"));
     }
 }
