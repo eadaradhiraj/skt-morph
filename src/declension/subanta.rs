@@ -1967,6 +1967,30 @@ fn decline_amba(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// लक्ष्मी — सु लक्ष्मीः (not नदी *लक्ष्मी); यण् लक्ष्म्यौ/लक्ष्म्या. श्री stays इयङ् श्रियम्.
+/// Exact `lakzmI` + stri. अतिलक्ष्मी not stolen (acc In).
+fn decline_lakshmi(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "lakzmI" || linga != "stri" {
+        return None;
+    }
+    let y = "lakzmy";
+    let ii = "lakzmI";
+    let mut decl = HashMap::new();
+    decl.insert("prathamA".into(), vec![format!("{ii}H"), format!("{y}O"), format!("{y}aH")]);
+    decl.insert("dvitIyA".into(), vec![format!("{ii}m"), format!("{y}O"), format!("{ii}H")]);
+    decl.insert("tfIyA".into(), vec![format!("{y}A"), format!("{ii}ByAm"), format!("{ii}BiH")]);
+    decl.insert("caturTI".into(), vec![format!("{y}E"), format!("{ii}ByAm"), format!("{ii}ByaH")]);
+    decl.insert("paYcamI".into(), vec![format!("{y}AH"), format!("{ii}ByAm"), format!("{ii}ByaH")]);
+    decl.insert("zazWI".into(), vec![format!("{y}AH"), format!("{y}oH"), polish(&format!("{ii}nAm"))]);
+    decl.insert("saptamI".into(), vec![format!("{y}Am"), format!("{y}oH"), format!("{ii}zu")]);
+    decl.insert("samboDana".into(), vec!["lakzmi".into(), format!("{y}O"), format!("{y}aH")]);
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 // ---------------------------------------------------------------------------
 // const `F_KINSHIP`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
@@ -2042,6 +2066,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_amba(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_lakshmi(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_anc(&cand, linga) {
@@ -3845,5 +3872,27 @@ mod tests {
         has(&generate("sItA", "stri").unwrap(), "prathamA", "sItA");
         has(&generate("akkA", "stri").unwrap(), "samboDana", "akka");
         assert_eq!(a.declension.get("samboDana").unwrap()[0], "amba");
+    }
+
+    #[test]
+    fn lakshmi_lakshmih() {
+        // लक्ष्मीः visarga + यण् लक्ष्म्यौ. नदी/गौरी stay no visarga. श्री stays इयङ् श्रियम्.
+        let l = generate("lakzmI", "stri").expect("lakzmI");
+        has(&l, "prathamA", "lakzmIH");
+        has(&l, "prathamA", "lakzmyO");
+        has(&l, "prathamA", "lakzmyaH");
+        has(&l, "dvitIyA", "lakzmIm");
+        has(&l, "dvitIyA", "lakzmIH");
+        has(&l, "tfIyA", "lakzmyA");
+        has(&l, "tfIyA", "lakzmIByAm");
+        has(&l, "saptamI", "lakzmyAm");
+        has(&l, "saptamI", "lakzmIzu");
+        has(&l, "samboDana", "lakzmi");
+        has(&generate("gOrI", "stri").unwrap(), "prathamA", "gOrI");
+        has(&generate("gOrI", "stri").unwrap(), "prathamA", "gOryO");
+        has(&generate("SrI", "stri").unwrap(), "dvitIyA", "Sriyam");
+        assert!(!l.declension.get("prathamA").unwrap().iter().any(|x| x == "lakzmI"));
+        assert!(!generate("gOrI", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "gOrIH"));
+        assert!(!l.declension.get("dvitIyA").unwrap().iter().any(|x| x == "lakzmiyam"));
     }
 }
