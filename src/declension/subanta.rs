@@ -83,6 +83,10 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("t".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tam".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],]);
   // त-anta nap (शकृत्) — 7.1.23 शकृत्/शकृती/शकृन्ति, शकृद्भ्याम्. `at` जगत् keeps longer match.
   m.insert(("t".to_string(),"nap".to_string()), vec![vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],]);
+  // थ-anta (अग्निमथ्) — 8.2.39 जश् थ्→द्, 8.4.56 त्; भ् द्भ्याम्; सप्तमी त्सु. `at` शतृ/`t` मरुत् stay longer or other key.
+  m.insert(("T".to_string(),"pum".to_string()), vec![vec!["t,d".to_string(),"TO".to_string(),"TaH".to_string(),],vec!["Tam".to_string(),"TO".to_string(),"TaH".to_string(),],vec!["TA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["Te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["TaH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["TaH".to_string(),"ToH".to_string(),"TAm".to_string(),],vec!["Ti".to_string(),"ToH".to_string(),"tsu".to_string(),],vec!["t,d".to_string(),"TO".to_string(),"TaH".to_string(),],]);
+  let t_aspir_pum = m.get(&("T".to_string(), "pum".to_string())).expect("T pum").clone();
+  m.insert(("T".to_string(), "stri".to_string()), t_aspir_pum);
   // h-anta (उष्णिह्) — पद क्/ग् (8.2.30/8.4.56); सप्तमी क्षु not *त्सु. अनडुह्/उपानह् stay named द्.
   m.insert(("h".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"hO".to_string(),"haH".to_string(),],vec!["ham".to_string(),"hO".to_string(),"haH".to_string(),],vec!["hA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["he".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["haH".to_string(),"hoH".to_string(),"hAm".to_string(),],vec!["hi".to_string(),"hoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"hO".to_string(),"haH".to_string(),],]);
   let h_pum = m.get(&("h".to_string(), "pum".to_string())).expect("h pum").clone();
@@ -91,7 +95,7 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   let b_pum = m.get(&("B".to_string(), "pum".to_string())).expect("B pum").clone();
   m.insert(("B".to_string(), "stri".to_string()), b_pum);
   // प-anta (ककुप्) — पद प्; 8.2.39 before भ् → ब्भ्याम्. Distinct from भ्-anta (लभ्→लप्).
-  m.insert(("p".to_string(),"pum".to_string()), vec![vec!["p".to_string(),"pO".to_string(),"paH".to_string(),],vec!["pam".to_string(),"pO".to_string(),"paH".to_string(),],vec!["pA".to_string(),"bByAm".to_string(),"bBiH".to_string(),],vec!["pe".to_string(),"bByAm".to_string(),"bByaH".to_string(),],vec!["paH".to_string(),"bByAm".to_string(),"bByaH".to_string(),],vec!["paH".to_string(),"poH".to_string(),"pAm".to_string(),],vec!["pi".to_string(),"poH".to_string(),"psu".to_string(),],vec!["p".to_string(),"pO".to_string(),"paH".to_string(),],]);
+  m.insert(("p".to_string(),"pum".to_string()), vec![vec!["p,b".to_string(),"pO".to_string(),"paH".to_string(),],vec!["pam".to_string(),"pO".to_string(),"paH".to_string(),],vec!["pA".to_string(),"bByAm".to_string(),"bBiH".to_string(),],vec!["pe".to_string(),"bByAm".to_string(),"bByaH".to_string(),],vec!["paH".to_string(),"bByAm".to_string(),"bByaH".to_string(),],vec!["paH".to_string(),"poH".to_string(),"pAm".to_string(),],vec!["pi".to_string(),"poH".to_string(),"psu".to_string(),],vec!["p,b".to_string(),"pO".to_string(),"paH".to_string(),],]);
   let p_pum = m.get(&("p".to_string(), "pum".to_string())).expect("p pum").clone();
   m.insert(("p".to_string(), "stri".to_string()), p_pum);
   // श-anta (दिश्) — 8.2.36 शां षः then 8.2.39/8.4.56 दिक्/दिग्; भ्-initial दिग्भ्याम्; सप्तमी दिक्षु.
@@ -1640,10 +1644,16 @@ mod tests {
         // प-anta: ककुप् (पद already प्).
         let kp = generate("kakup", "pum").expect("kakup");
         has(&kp, "prathamA", "kakup");
+        has(&kp, "prathamA", "kakub");
         has(&kp, "dvitIyA", "kakupam");
         has(&kp, "tfIyA", "kakupA");
         has(&kp, "tfIyA", "kakubByAm");
         has(&kp, "saptamI", "kakupsu");
+        let gp = generate("gup", "pum").expect("gup");
+        has(&gp, "prathamA", "gup");
+        has(&gp, "prathamA", "gub");
+        has(&gp, "tfIyA", "gubByAm");
+        has(&gp, "saptamI", "gupsu");
         // ष-anta: द्विष् — द्विट्/द्विड्, द्विषौ, द्विट्भ्याम्, द्विट्सु (not visarga *द्विः).
         let dz = generate("dviz", "pum").expect("dviz");
         has(&dz, "prathamA", "dviw");
@@ -2405,5 +2415,22 @@ mod tests {
         has(&generate("vaRij", "pum").unwrap(), "prathamA", "vaRik");
         has(&generate("kruYc", "pum").unwrap(), "prathamA", "kruN");
         assert!(!k.declension.get("prathamA").unwrap().iter().any(|x| x == "KaYk"));
+    }
+
+    #[test]
+    fn agnimat_agnimatsu() {
+        // अग्निमथ्: थ्→त्/द्, अग्निमद्भ्याम्/अग्निमत्सु. मरुत् stays त-anta; भवत् stays at.
+        let a = generate("agnimaT", "pum").expect("agnimaT");
+        has(&a, "prathamA", "agnimat");
+        has(&a, "prathamA", "agnimad");
+        has(&a, "prathamA", "agnimaTO");
+        has(&a, "dvitIyA", "agnimaTam");
+        has(&a, "tfIyA", "agnimaTA");
+        has(&a, "tfIyA", "agnimadByAm");
+        has(&a, "saptamI", "agnimaTi");
+        has(&a, "saptamI", "agnimatsu");
+        has(&generate("marut", "pum").unwrap(), "prathamA", "marut");
+        has(&generate("Bavat", "pum").unwrap(), "prathamA", "BavAn");
+        assert!(!a.declension.get("tfIyA").unwrap().iter().any(|x| x == "agnimaTena"));
     }
 }
