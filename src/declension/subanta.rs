@@ -1262,6 +1262,85 @@ fn decline_vish(cand: &str, linga: &str) -> Option<Declension> {
     })
 }
 
+/// नश् — 8.2.36 षः वा: नट्/नड् (ष्टुत्व) and नक्/नग् (कुत्व like दिश्). पद नड्भ्याम्/नग्भ्याम्; loc नट्सु/नक्षु.
+/// Exact `naS`. दिश् stays दिक्; विश् stays विट्.
+fn decline_nash(cand: &str, linga: &str) -> Option<Declension> {
+    if cand != "naS" || (linga != "pum" && linga != "stri") {
+        return None;
+    }
+    let weak = cand;
+    let mut decl = HashMap::new();
+    decl.insert(
+        "prathamA".into(),
+        vec![
+            "naw".into(),
+            "naq".into(),
+            "nak".into(),
+            "nag".into(),
+            format!("{weak}O"),
+            format!("{weak}aH"),
+        ],
+    );
+    decl.insert("dvitIyA".into(), vec![format!("{weak}am"), format!("{weak}O"), format!("{weak}aH")]);
+    decl.insert(
+        "tfIyA".into(),
+        vec![
+            format!("{weak}A"),
+            "naqByAm".into(),
+            "nagByAm".into(),
+            "naqBiH".into(),
+            "nagBiH".into(),
+        ],
+    );
+    decl.insert(
+        "caturTI".into(),
+        vec![
+            format!("{weak}e"),
+            "naqByAm".into(),
+            "nagByAm".into(),
+            "naqByaH".into(),
+            "nagByaH".into(),
+        ],
+    );
+    decl.insert(
+        "paYcamI".into(),
+        vec![
+            format!("{weak}aH"),
+            "naqByAm".into(),
+            "nagByAm".into(),
+            "naqByaH".into(),
+            "nagByaH".into(),
+        ],
+    );
+    decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+    decl.insert(
+        "saptamI".into(),
+        vec![
+            format!("{weak}i"),
+            format!("{weak}oH"),
+            "nawsu".into(),
+            "nawtsu".into(),
+            "nakzu".into(),
+        ],
+    );
+    decl.insert(
+        "samboDana".into(),
+        vec![
+            "naw".into(),
+            "naq".into(),
+            "nak".into(),
+            "nag".into(),
+            format!("{weak}O"),
+            format!("{weak}aH"),
+        ],
+    );
+    Some(Declension {
+        stem: cand.to_string(),
+        linga: linga.to_string(),
+        declension: decl,
+    })
+}
+
 /// खञ्ज् — 8.2.23 संयोगान्त लोपः पद खन्/खन्भ्याम्/खन्सु. Vowel खञ्जौ. Not ज-anta *खङ्क्. क्रुञ्च् stays क्रुङ्.
 fn decline_khanj(cand: &str, linga: &str) -> Option<Declension> {
     if cand != "KaYj" || (linga != "pum" && linga != "stri") {
@@ -1453,6 +1532,9 @@ pub fn generate(base: &str, linga: &str) -> Option<Declension> {
             return Some(d);
         }
         if let Some(d) = decline_vish(&cand, linga) {
+            return Some(d);
+        }
+        if let Some(d) = decline_nash(&cand, linga) {
             return Some(d);
         }
         if let Some(d) = decline_khanj(&cand, linga) {
@@ -2658,5 +2740,26 @@ mod tests {
         has(&generate("paTin", "pum").unwrap(), "prathamA", "panTAH");
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "supanTAH"));
         assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "panTAH"));
+    }
+
+    #[test]
+    fn nash_nat_nak_optional() {
+        // नश्: 8.2.36 वा नट्/नड् and नक्/नग्. दिश् stays दिक्; विश् stays विट्.
+        let n = generate("naS", "pum").expect("naS");
+        has(&n, "prathamA", "naw");
+        has(&n, "prathamA", "naq");
+        has(&n, "prathamA", "nak");
+        has(&n, "prathamA", "nag");
+        has(&n, "prathamA", "naSO");
+        has(&n, "dvitIyA", "naSam");
+        has(&n, "tfIyA", "naSA");
+        has(&n, "tfIyA", "naqByAm");
+        has(&n, "tfIyA", "nagByAm");
+        has(&n, "saptamI", "naSi");
+        has(&n, "saptamI", "nawsu");
+        has(&n, "saptamI", "nakzu");
+        has(&generate("diS", "stri").unwrap(), "prathamA", "dik");
+        has(&generate("viS", "pum").unwrap(), "prathamA", "viw");
+        assert!(!generate("diS", "stri").unwrap().declension.get("prathamA").unwrap().iter().any(|x| x == "diw"));
     }
 }
