@@ -1,4 +1,4 @@
-/** Grammatical labels: WASM codes / numbers → Sanskrit in Devanagari. */
+/** Grammatical labels: WASM codes / numbers → Sanskrit in Devanagari (Kaumudī). */
 
 export const WORD_TYPE = {
   tinanta: "तिङन्त",
