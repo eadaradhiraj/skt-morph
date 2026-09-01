@@ -56,7 +56,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "lyap" => Some(("ya", vec!["3.2.187"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
         "a" => Some(("", vec!["3.3.56"], "guna_a")),
-        "kyap" => Some(("", vec!["3.3.56"], "guna_a")),
+        "kyap" => Some(("ya", vec!["3.1.106"], "kyap")),
         "sya-Satf" => Some(("t", vec!["3.2.124"], "present")),
         "sya-Satf~" => Some(("", vec!["3.2.124"], "present")),
         "sya-SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
@@ -378,6 +378,29 @@ fn ktin_form(root: &str) -> String {
     internal_sandhi(&kit_anga(&base), "ti")
 }
 
+/// क्यप् (3.1.106–110): कित् no गुण; पित् 6.1.71 तुक् after ह्रस्व (कृत्य, भृत्य, स्तुत्य).
+/// 6.1.15 इज्या/उच्य; 3.1.108 हत्य. यक् stays क्रियमाण; ण्यत् stays कार्य.
+fn kyap_form(root: &str) -> String {
+    // 3.1.108 हनस्त च: हत्य not *हन्य.
+    if root == "han" {
+        return "hatya".into();
+    }
+    let r = match root {
+        "vac" => "uc".into(),
+        "yaj" => "ij".into(),
+        "vap" => "up".into(),
+        "vah" => "uh".into(),
+        "svap" | "zvap" => "sup".into(),
+        other => other.to_string(),
+    };
+    // 6.1.71 ह्रस्वस्य पिति कृति तुक् (not दीर्घ भूय; not हल् वृत्य).
+    if r.chars().last().is_some_and(|c| matches!(c, 'a' | 'i' | 'u' | 'f' | 'x')) {
+        format!("{r}tya")
+    } else {
+        format!("{r}ya")
+    }
+}
+
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
 fn kvasu_form(dhatu: &str) -> String {
     // — if-branch — condition → aṅga/sandhi step; sūtra gating, see comments above.
@@ -601,7 +624,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
         && (matches!(
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
-                | "yat" | "Ryat"
+                | "yat" | "Ryat" | "kyap"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -735,6 +758,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
             }
         }
         "guna_a" => join_eco(&guna, "a"),
+        "kyap" => kyap_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1037,6 +1061,11 @@ mod tests {
         let d = decline("BU", "SAnac", "pum", &[]).expect("BavamAnaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "BavamAnaH"), "{:?}", pr);
+        let d = decline("qukfY", "kyap", "pum", &[]).expect("kftyaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "kftyaH"), "{:?}", pr);
+        let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
+        assert_eq!(d.stem, "kftyA");
     }
 
     #[test]
@@ -1123,6 +1152,15 @@ mod tests {
         assert_eq!(derive("qudAY", "BAvakarma-SAnac"), vec!["dIyamAna"]);
         assert_eq!(derive("gamx", "sya-BAvakarma-SAnac"), vec!["gamizyamARa"]);
         assert_eq!(derive("BU", "SAnac"), vec!["BavamAna"]);
+        assert_eq!(derive("qukfY", "kyap"), vec!["kftya"]);
+        assert_eq!(derive("Bf", "kyap"), vec!["Bftya"]);
+        assert_eq!(derive("stu", "kyap"), vec!["stutya"]);
+        assert_eq!(derive("yaja", "kyap"), vec!["ijya"]);
+        assert_eq!(derive("vaca", "kyap"), vec!["ucya"]);
+        assert_eq!(derive("hana", "kyap"), vec!["hatya"]);
+        assert_eq!(derive("vft", "kyap"), vec!["vftya"]);
+        assert_eq!(derive("qukfY", "Ryat"), vec!["kArya"]);
+        assert_eq!(derive("qukfY", "BAvakarma-SAnac"), vec!["kriyamARa"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
         assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
