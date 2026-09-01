@@ -102,6 +102,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("s".to_string(),"pum".to_string()), vec![vec!["H".to_string(),"sO".to_string(),"saH".to_string(),],vec!["sam".to_string(),"sO".to_string(),"saH".to_string(),],vec!["sA".to_string(),"sByAm".to_string(),"sBiH".to_string(),],vec!["se".to_string(),"sByAm".to_string(),"sByaH".to_string(),],vec!["saH".to_string(),"sByAm".to_string(),"sByaH".to_string(),],vec!["saH".to_string(),"soH".to_string(),"sAm".to_string(),],vec!["si".to_string(),"soH".to_string(),"tsu".to_string(),],vec!["H".to_string(),"sO".to_string(),"saH".to_string(),],]);
   let r_pum = m.get(&("r".to_string(), "pum".to_string())).expect("r pum").clone();
   m.insert(("r".to_string(), "stri".to_string()), r_pum);
+  // र-anta nap (वार) — 7.1.19/20 शी/शि वः/वारी/वारि; पद वार्भ्याम्/वार्षु. Not a-stem *वारम्.
+  m.insert(("r".to_string(),"nap".to_string()), vec![vec!["H".to_string(),"rI".to_string(),"ri".to_string(),],vec!["H".to_string(),"rI".to_string(),"ri".to_string(),],vec!["rA".to_string(),"rByAm".to_string(),"rBiH".to_string(),],vec!["re".to_string(),"rByAm".to_string(),"rByaH".to_string(),],vec!["raH".to_string(),"rByAm".to_string(),"rByaH".to_string(),],vec!["raH".to_string(),"roH".to_string(),"rAm".to_string(),],vec!["ri".to_string(),"roH".to_string(),"rzu".to_string(),],vec!["H".to_string(),"rI".to_string(),"ri".to_string(),],]);
   let s_pum = m.get(&("s".to_string(), "pum".to_string())).expect("s pum").clone();
   m.insert(("s".to_string(), "stri".to_string()), s_pum);
   // as-anta (मनस्) as pum/nap already but pum missing — 8.2.66 ru, 8.3.15 khari? Actually as→aH at pada
@@ -1776,5 +1778,24 @@ mod tests {
         has(&generate("suhfd", "pum").unwrap(), "prathamA", "suhft");
         has(&generate("suhfd", "pum").unwrap(), "tfIyA", "suhfdA");
         assert!(!s.declension.get("tfIyA").unwrap().iter().any(|x| x == "supAdA"));
+    }
+
+    #[test]
+    fn var_vah_vari_varzu() {
+        // वार nap: वः/वारी/वारि, वार्भ्याम्/वार्षु (not a-stem *वारम्). वारि i-nap stays वारिणा.
+        let v = generate("vAr", "nap").expect("vAr");
+        has(&v, "prathamA", "vAH");
+        has(&v, "prathamA", "vArI");
+        has(&v, "prathamA", "vAri");
+        has(&v, "dvitIyA", "vAH");
+        has(&v, "tfIyA", "vArA");
+        has(&v, "tfIyA", "vArByAm");
+        has(&v, "tfIyA", "vArBiH");
+        has(&v, "saptamI", "vAri");
+        has(&v, "saptamI", "vArzu");
+        has(&v, "zazWI", "vArAm");
+        has(&generate("vAri", "nap").unwrap(), "tfIyA", "vAriRA");
+        has(&generate("gir", "pum").unwrap(), "prathamA", "giH");
+        assert!(!v.declension.get("prathamA").unwrap().iter().any(|x| x == "vAram"));
     }
 }
