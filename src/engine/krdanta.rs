@@ -1,4 +1,4 @@
-//! Port of sktmorph/engine/krdanta.py
+//! krdanta — kṛt pratyayas (3.1–3.4, Kaumudī). Port of sktmorph/engine/krdanta.py, sūtra-gated.
 
 use crate::engine::phonology::apply_guna_to_stem;
 use serde::{Deserialize, Serialize};

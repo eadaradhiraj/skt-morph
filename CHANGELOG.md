@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 27: krdanta header
+
+- **krdanta:** header → Kaumudī 3.1–3.4; concise.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 26: derived header
 
 - **derived:** header → Kaumudī 3.1.26/3.1.7/3.1.22/2.4.74/3.1.67; concise.
