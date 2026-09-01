@@ -82,6 +82,8 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   // त-anta (मरुत्, सरित्, त्रिंशत्) — पद त्; 8.2.39 before भ् → द्भ्याम्/द्भिः. `at` शतृ stays longer-match.
   m.insert(("t".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tam".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],]);
   m.insert(("t".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tam".to_string(),"tO".to_string(),"taH".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tO".to_string(),"taH".to_string(),],]);
+  // त-anta nap (शकृत्) — 7.1.23 शकृत्/शकृती/शकृन्ति, शकृद्भ्याम्. `at` जगत् keeps longer match.
+  m.insert(("t".to_string(),"nap".to_string()), vec![vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],vec!["tA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["te".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["taH".to_string(),"toH".to_string(),"tAm".to_string(),],vec!["ti".to_string(),"toH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"tI".to_string(),"nti".to_string(),],]);
   // h-anta (लिह्) and B-anta (लभ्-type bh) — 8.2.31 हो ढः, 8.2.32 दादेर्धातोर्घः + जश्त्व
   // sūtra: 8.2.31 h→Q/ḍh at jhal, pada h→k (दुह्→धुक्); Future devs: h shows ढ/क, B shows प्/भ्
   // Extreme: keep tsu/zu for saptamī bahu, consistent with j/d paradigms above
@@ -1693,5 +1695,20 @@ mod tests {
         has(&generate("anehas", "pum").unwrap(), "tfIyA", "anehoByAm");
         has(&generate("manas", "pum").unwrap(), "prathamA", "manaH");
         assert!(!u.declension.get("prathamA").unwrap().iter().any(|x| x == "uSanaH"));
+    }
+
+    #[test]
+    fn sakrt_sakrti_sakrdbhyam() {
+        // शकृत् nap: शकृत्/शकृती/शकृन्ति, शकृद्भ्याम्. जगत् stays at-nap जगन्ति.
+        let s = generate("Sakft", "nap").expect("Sakft");
+        has(&s, "prathamA", "Sakft");
+        has(&s, "prathamA", "SakftI");
+        has(&s, "prathamA", "SakfRti");
+        has(&s, "tfIyA", "SakftA");
+        has(&s, "tfIyA", "SakfdByAm");
+        has(&s, "saptamI", "Sakftsu");
+        has(&generate("jagat", "nap").unwrap(), "prathamA", "jagat");
+        has(&generate("jagat", "nap").unwrap(), "prathamA", "jaganti");
+        has(&generate("marut", "pum").unwrap(), "prathamA", "marut");
     }
 }
