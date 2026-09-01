@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 140: README 139
+
+- **README:** sync to 139 iters + 138 (187 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 139: README 138
 
 - **README:** sync to 138 iters + 137 (187 tests).
