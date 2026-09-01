@@ -651,6 +651,7 @@ pub fn apply_nasal_palatal(word: &str) -> String {
     s
 }
 
+/// 8.4.1 णत्व — r/ṛ/ṣ → n → ṇ (e.g. pra+nam→praṇam, but pra+Bhavāni not). Kaumudī-ordered.
 pub fn apply_natva_to_word(word: &str) -> String {
     if !word.contains('n') { return word.to_string(); }
     let mut chars: Vec<char> = word.chars().collect();

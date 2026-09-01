@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 48: phonology natva doc
+
+- **phonology:** `apply_natva_to_word` doc → Kaumudī 8.4.1; no logic change.
+- **wasm:** rebuilt 1.2M; 185 tests.
+
 ## 2026-09-01 — iteration 47: README 46
 
 - **README:** recent line updated to 46 iters + derived hint (185 tests).
