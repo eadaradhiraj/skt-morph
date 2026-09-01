@@ -230,11 +230,15 @@ fn pronouns() -> HashMap<(String,String), Vec<Vec<String>>> { let mut m=HashMap:
   m.insert(("viSva".to_string(),"pum".to_string()), vec![vec!["viSvaH".to_string(),"viSvO".to_string(),"viSve".to_string()],vec!["viSvam".to_string(),"viSvO".to_string(),"viSvAn".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
   m.insert(("viSva".to_string(),"stri".to_string()), vec![vec!["viSvA".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvAm".to_string(),"viSve".to_string(),"viSvAH".to_string()],vec!["viSvayA".to_string(),"viSvAByAm".to_string(),"viSvABiH".to_string()],vec!["viSvasyE".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvAByAm".to_string(),"viSvAByaH".to_string()],vec!["viSvasyAH".to_string(),"viSvayoH".to_string(),"viSvAsAm".to_string()],vec!["viSvasyAm".to_string(),"viSvayoH".to_string(),"viSvAsu".to_string()]]);
   m.insert(("viSva".to_string(),"nap".to_string()), vec![vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSvam".to_string(),"viSve".to_string(),"viSvARi".to_string()],vec!["viSveRa".to_string(),"viSvAByAm".to_string(),"viSvEH".to_string()],vec!["viSvasmE".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasmAt".to_string(),"viSvAByAm".to_string(),"viSveByaH".to_string()],vec!["viSvasya".to_string(),"viSvayoH".to_string(),"viSvezAm".to_string()],vec!["viSvasmin".to_string(),"viSvayoH".to_string(),"viSvezu".to_string()]]);
-  // 1.1.27 remainder: डतर/डतम, इतर, नेम, सम, सिम, त्व, अन्यतर. भवत् is at-stem सुबन्त (भवान्), not this table.
+  // 1.1.27 remainder: डतर/डतम, इतर, नेम, सम, सिम, त्व, अन्यतर, एकतर/एकतम, ततर/ततम. भवत् is at-stem सुबन्त (भवान्), not this table.
   insert_a_sarvanama(&mut m, "katara", true);
   insert_a_sarvanama(&mut m, "katama", false);
   insert_a_sarvanama(&mut m, "yatara", true);
   insert_a_sarvanama(&mut m, "yatama", false);
+  insert_a_sarvanama(&mut m, "ekatara", true);
+  insert_a_sarvanama(&mut m, "ekatama", false);
+  insert_a_sarvanama(&mut m, "tatara", true);
+  insert_a_sarvanama(&mut m, "tatama", false);
   insert_a_sarvanama(&mut m, "itara", true);
   insert_a_sarvanama(&mut m, "anyatara", true);
   insert_a_sarvanama(&mut m, "nema", false);
@@ -521,6 +525,12 @@ mod tests {
         has(&generate("tva", "pum").unwrap(), "saptamI", "tvasmin");
         has(&generate("sama", "pum").unwrap(), "prathamA", "same");
         has(&generate("anyatara", "pum").unwrap(), "tfIyA", "anyatareRa");
+        has(&generate("ekatara", "pum").unwrap(), "caturTI", "ekatarasmE");
+        has(&generate("ekatara", "pum").unwrap(), "tfIyA", "ekatareRa");
+        has(&generate("ekatama", "pum").unwrap(), "prathamA", "ekatame");
+        has(&generate("ekatama", "pum").unwrap(), "tfIyA", "ekatamena");
+        has(&generate("tatara", "pum").unwrap(), "tfIyA", "tatareRa");
+        has(&generate("tatama", "pum").unwrap(), "caturTI", "tatamasmE");
         has(&generate("dakziRa", "pum").unwrap(), "caturTI", "dakziRasmE");
         has(&generate("dakziRa", "pum").unwrap(), "tfIyA", "dakziReRa");
         has(&generate("uttara", "stri").unwrap(), "prathamA", "uttarA");
