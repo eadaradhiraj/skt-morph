@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 53: translit doc
+
+- **www/translit:** header clarified browser SLP1 canonical; no logic change.
+- **wasm:** rebuilt 1.2M; 186 tests.
+
 ## 2026-09-01 — iteration 52: README 51
 
 - **README:** recent line updated to 51 iters + natva test (186 tests).

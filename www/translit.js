@@ -1,4 +1,5 @@
-/** Harvard-Kyoto / Devanagari (JS) ↔ SLP1 (WASM). */
+/** Harvard-Kyoto / Devanagari (JS) ↔ SLP1 (WASM) — browser side, Kaumudī SLP1 canonical.
+ *  WASM stays SLP1-only; this file handles Devanagari/HK → SLP1 for analyze/generate inputs. */
 
 const DEV_CONS = {
   क: "k", ख: "K", ग: "g", घ: "G", ङ: "N",
