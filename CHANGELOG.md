@@ -140,6 +140,7 @@ Engine and demo history. The project outline lives in [README.MD](README.MD).
 - **कृदन्त शतृ nap:** fold to सुबन्त 7.1.80 (भवत्/भवन्ती/भवन्ति).
 - **कृदन्त तृच् स्त्री:** कर्त्री via 4.1.5 सुबन्त.
 - **सर्वनाम 1.1.33 तय:** द्वितीयस्मै/तृतीयस्मै. `dvitIyA`/`tftIyA` alias. राम stays रामाय.
+- **सुबन्त 6.4.14 असन्:** वेधाः, सुमनाः. मनः/तपः stay.
 
 ## 2026-08-31
 
