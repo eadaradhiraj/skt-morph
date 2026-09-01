@@ -157,6 +157,10 @@ fn attach_upasarga(a: &Analysis, prefs: &[String], word: &str) -> Analysis {
 }
 
 pub fn analyze_word(word: &str) -> Vec<Analysis> {
+    let w = word.trim();
+    if w.is_empty() {
+        return Vec::new(); // guard empty/whitespace — no panic on peel
+    }
     let mut out: Vec<Analysis> = Vec::new();
     let mut seen: HashSet<String> = HashSet::new();
     for m in crate::declension::subanta::analyze(word) {

@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 35: analyze empty guard
+
+- **analyze:** `analyze_word` now early-return on empty/whitespace (no peel); + comment guard.
+- **wasm:** rebuilt 1.2M; 183 tests.
+
 ## 2026-09-01 — iteration 34: README recent 33
 
 - **README:** recent line updated to 33 iters + dhatu cache perf.
