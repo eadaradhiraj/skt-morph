@@ -51,7 +51,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "tfc" => Some(("tf", vec!["3.3.92"], "guna")),
         "SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
         "cAnaS" => Some(("mAna", vec!["3.2.124"], "present")),
-        "gsnu" => Some(("zRu", vec!["3.2.94"], "root")),
+        "gsnu" => Some(("snu", vec!["3.2.139"], "gsnu")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["3.2.187"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -398,6 +398,16 @@ fn kyap_form(root: &str) -> String {
         format!("{r}tya")
     } else {
         format!("{r}ya")
+    }
+}
+
+/// 3.2.139 ग्लाजिस्थाश्च गस्नुः: ग्लास्नु, जिष्णु (8.3.59), स्थास्नु. Not *ग्लाष्णु.
+fn gsnu_form(root: &str) -> String {
+    match root {
+        "glA" => "glAsnu".into(),
+        "ji" => "jizRu".into(),
+        "sTA" => "sTAsnu".into(),
+        other => format!("{other}snu"),
     }
 }
 
@@ -759,6 +769,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         }
         "guna_a" => join_eco(&guna, "a"),
         "kyap" => kyap_form(&root),
+        "gsnu" => gsnu_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1161,6 +1172,9 @@ mod tests {
         assert_eq!(derive("vft", "kyap"), vec!["vftya"]);
         assert_eq!(derive("qukfY", "Ryat"), vec!["kArya"]);
         assert_eq!(derive("qukfY", "BAvakarma-SAnac"), vec!["kriyamARa"]);
+        assert_eq!(derive("glA", "gsnu"), vec!["glAsnu"]);
+        assert_eq!(derive("ji", "gsnu"), vec!["jizRu"]);
+        assert_eq!(derive("zWA", "gsnu"), vec!["sTAsnu"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
         assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
