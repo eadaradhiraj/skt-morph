@@ -35,7 +35,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "ktavatu" => Some(("vat", vec!["3.2.171"], "kta")),
         "ktavatu~" => Some(("", vec!["3.2.171"], "kta")),
         "lyuw" => Some(("ana", vec!["3.3.115"], "guna")),
-        "lyu" => Some(("ana", vec!["3.3.115"], "guna")),
+        "lyu" => Some(("ana", vec!["3.1.134"], "guna")),
         "tumun" => Some(("tum", vec!["3.3.158"], "guna_tum")),
         "ktvA" => Some(("tvA", vec!["3.4.21"], "root")),
         "ac" => Some(("", vec!["3.3.56"], "guna_a")),
@@ -1036,7 +1036,7 @@ pub fn lingas(pratyaya: &str) -> &'static [&'static str] {
     match pratyaya {
         "ktin" => &["stri"],
         "aN" => &["stri"],
-        "lyuw" | "lyu" => &["nap"],
+        "lyuw" => &["nap"],
         "itra" => &["nap"],
         "GaY" => &["pum"],
         _ => &["pum", "stri", "nap"],
@@ -1083,7 +1083,7 @@ fn pratipadika(form: &str, pratyaya: &str, linga: &str) -> Option<String> {
             pratyaya,
             "kta" | "SAnac" | "cAnaS" | "tavya" | "anIyar" | "Rvul" | "vun" | "ac" | "anIya"
                 | "yat" | "Ryat" | "kyap" | "kmarac" | "Gurac" | "kurac" | "klukan" | "krukan"
-                | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa" | "ka"
+                | "ra" | "naN" | "SAnan" | "ktri" | "ap" | "Ra" | "Sa" | "ka" | "lyu"
         ) || pratyaya.contains("SAnac")
             || pratyaya.contains("cAnaS"))
     {
@@ -1749,6 +1749,11 @@ mod tests {
         let d = decline("wunadi", "aTuc", "pum", &[]).expect("nandaTuH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "nandaTuH"), "{:?}", pr);
+        let d = decline("wunadi", "lyu", "pum", &[]).expect("nandanaH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "nandanaH"), "{:?}", pr);
+        let d = decline("wunadi", "lyu", "stri", &[]).expect("nandanA");
+        assert_eq!(d.stem, "nandanA");
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1764,6 +1769,7 @@ mod tests {
         assert!(lingas("tumun").is_empty());
         assert!(lingas("Ramul").is_empty());
         assert_eq!(lingas("lyuw"), &["nap"]);
+        assert_eq!(lingas("lyu"), &["pum", "stri", "nap"]);
         assert_eq!(lingas("itra"), &["nap"]);
         assert!(decline("f", "itra", "pum", &[]).is_none());
         let d = decline("f", "itra", "nap", &[]).expect("aritram");
@@ -1923,6 +1929,9 @@ mod tests {
         assert_eq!(derive("praCa", "naN"), vec!["praSna"]);
         assert_eq!(derive("rakza", "naN"), vec!["rakzRa"]);
         assert_eq!(derive("wunadi", "aTuc"), vec!["nandaTu"]);
+        assert_eq!(derive("wunadi", "lyu"), vec!["nandana"]);
+        assert_eq!(derive("wunadi", "lyuw"), vec!["nandana"]);
+        assert_eq!(derive("qukfY", "lyuw"), vec!["karaRa"]);
         assert_eq!(derive("wuvepf", "aTuc"), vec!["vepaTu"]);
         assert_eq!(derive("wuBrAjf", "aTuc"), vec!["BrAjaTu"]);
         assert_eq!(derive("yaja", "Nvanip"), vec!["yajvan"]);

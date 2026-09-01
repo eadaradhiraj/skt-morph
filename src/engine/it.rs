@@ -361,7 +361,11 @@ pub fn anIya_form(root: &str) -> String {
 // fn `lyuw_form`: purpose, inputs→outputs, edge cases.
 // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
 // ---------------------------------------------------------------------------
+/// 3.3.115 ल्युट् अन; 3.1.134 नन्द्यादि ल्यु. 7.1.58 इदितो नुम्: नन्दन not *नदन.
 pub fn lyuw_form(root: &str) -> String {
+    if matches!(root, "nad" | "nand" | "nadi") {
+        return "nandana".into();
+    }
     guna_ac_suffix(root, "ana")
 }
 
