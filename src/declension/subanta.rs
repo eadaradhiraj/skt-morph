@@ -469,7 +469,62 @@ fn decline_sakhi(cand: &str, linga: &str) -> Option<Declension> {
 }
 
 /// पुंस् — सर्वनामस्थान नुम् पुमान्/पुमांसौ; weak पुंसा; पद पुंभ्याम् (8.3.6). Not s-anta *पुः.
+/// Compounds nap (7.1.23): सुपुम्/सुपुंसी/सुपुमांसि, not पुमान्.
 fn decline_pums(cand: &str, linga: &str) -> Option<Declension> {
+    if linga == "nap" {
+        let pre = cand.strip_suffix("puMs").or_else(|| cand.strip_suffix("pums"))?;
+        if pre.is_empty() {
+            return None;
+        }
+        let sg = format!("{pre}pum");
+        let dual = format!("{pre}puMsI");
+        let pl = format!("{pre}pumAMsi");
+        let weak = format!("{pre}puMs");
+        let pada = format!("{pre}puM");
+        let pada2 = format!("{pre}pum");
+        let nom = vec![sg.clone(), dual.clone(), pl.clone()];
+        let mut decl = HashMap::new();
+        decl.insert("prathamA".into(), nom.clone());
+        decl.insert("dvitIyA".into(), nom.clone());
+        decl.insert(
+            "tfIyA".into(),
+            vec![
+                format!("{weak}A"),
+                format!("{pada}ByAm"),
+                format!("{pada2}ByAm"),
+                format!("{pada}BiH"),
+                format!("{pada2}BiH"),
+            ],
+        );
+        decl.insert(
+            "caturTI".into(),
+            vec![
+                format!("{weak}e"),
+                format!("{pada}ByAm"),
+                format!("{pada2}ByAm"),
+                format!("{pada}ByaH"),
+                format!("{pada2}ByaH"),
+            ],
+        );
+        decl.insert(
+            "paYcamI".into(),
+            vec![
+                format!("{weak}aH"),
+                format!("{pada}ByAm"),
+                format!("{pada2}ByAm"),
+                format!("{pada}ByaH"),
+                format!("{pada2}ByaH"),
+            ],
+        );
+        decl.insert("zazWI".into(), vec![format!("{weak}aH"), format!("{weak}oH"), format!("{weak}Am")]);
+        decl.insert("saptamI".into(), vec![format!("{weak}i"), format!("{weak}oH"), format!("{pada}su")]);
+        decl.insert("samboDana".into(), nom);
+        return Some(Declension {
+            stem: cand.to_string(),
+            linga: linga.to_string(),
+            declension: decl,
+        });
+    }
     if linga != "pum" || !matches!(cand, "puMs" | "pums") {
         return None;
     }
@@ -1793,6 +1848,16 @@ mod tests {
         has(&p, "saptamI", "puMsu");
         has(&p, "samboDana", "puman");
         has(&generate("pums", "pum").unwrap(), "prathamA", "pumAn");
+        let s = generate("supums", "nap").expect("supums");
+        has(&s, "prathamA", "supum");
+        has(&s, "prathamA", "supuMsI");
+        has(&s, "prathamA", "supumAMsi");
+        has(&s, "dvitIyA", "supum");
+        has(&s, "tfIyA", "supuMsA");
+        has(&s, "tfIyA", "supuMByAm");
+        has(&s, "saptamI", "supuMsi");
+        has(&s, "saptamI", "supuMsu");
+        assert!(!s.declension.get("prathamA").unwrap().iter().any(|x| x == "supumAn"));
     }
 
     #[test]
