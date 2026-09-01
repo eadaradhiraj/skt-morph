@@ -52,6 +52,7 @@ fn pratyaya_rule(pratyaya: &str) -> Option<(&'static str, Vec<&'static str>, &'s
         "SAnac" => Some(("mAna", vec!["3.2.124"], "present")),
         "cAnaS" => Some(("mAna", vec!["3.2.124"], "present")),
         "gsnu" => Some(("snu", vec!["3.2.139"], "gsnu")),
+        "knu" => Some(("nu", vec!["3.2.140"], "knu")),
         "kvasu" => Some(("vas", vec!["3.2.94"], "lit")),
         "lyap" => Some(("ya", vec!["3.2.187"], "lyap")),
         "ukaY" => Some(("uka", vec!["3.2.74"], "guna")),
@@ -409,6 +410,16 @@ fn gsnu_form(root: &str) -> String {
         "sTA" => "sTAsnu".into(),
         other => format!("{other}snu"),
     }
+}
+
+/// 3.2.140 त्रसिगृधिधृषिक्षिपेः क्नुः: कित् नु (no गुण). 8.4.1 धृष्णु; SK क्षिप्णु.
+/// गृध्नु stays न (द् blocks णत्व). Not *त्रस्णु / *क्षिप्नु.
+fn knu_form(root: &str) -> String {
+    // SK क्षिप्णुः (not *क्षिप्नु).
+    if root == "kzip" {
+        return "kzipRu".into();
+    }
+    crate::engine::phonology::apply_natva_to_word(&format!("{root}nu"))
 }
 
 /// क्वसु (3.2.107): लिट् weak aṅga + वस्. बभूवतुः → बभूवस् (not बभूव्वस्).
@@ -770,6 +781,7 @@ pub fn derive(dhatu_query: &str, pratyaya: &str) -> Vec<String> {
         "guna_a" => join_eco(&guna, "a"),
         "kyap" => kyap_form(&root),
         "gsnu" => gsnu_form(&root),
+        "knu" => knu_form(&root),
         "guna_tum" => crate::engine::it::tum_form(&root),
         "guna_tavya" => crate::engine::it::tavya_form(&root),
         "anIya" => crate::engine::it::anIya_form(&root),
@@ -1075,6 +1087,9 @@ mod tests {
         let d = decline("qukfY", "kyap", "pum", &[]).expect("kftyaH");
         let pr = d.declension.get("prathamA").unwrap();
         assert!(pr.iter().any(|x| x == "kftyaH"), "{:?}", pr);
+        let d = decline("trasI", "knu", "pum", &[]).expect("trasnuH");
+        let pr = d.declension.get("prathamA").unwrap();
+        assert!(pr.iter().any(|x| x == "trasnuH"), "{:?}", pr);
         let d = decline("qukfY", "kyap", "stri", &[]).expect("kftyA");
         assert_eq!(d.stem, "kftyA");
     }
@@ -1175,6 +1190,10 @@ mod tests {
         assert_eq!(derive("glA", "gsnu"), vec!["glAsnu"]);
         assert_eq!(derive("ji", "gsnu"), vec!["jizRu"]);
         assert_eq!(derive("zWA", "gsnu"), vec!["sTAsnu"]);
+        assert_eq!(derive("trasI", "knu"), vec!["trasnu"]);
+        assert_eq!(derive("gfDu", "knu"), vec!["gfDnu"]);
+        assert_eq!(derive("YiDfzA", "knu"), vec!["DfzRu"]);
+        assert_eq!(derive("kzip", "knu"), vec!["kzipRu"]);
         assert_eq!(derive("BU", "kvasu"), vec!["baBUvas"]);
         assert_eq!(derive("qukfY", "Ramul"), vec!["kAram"]);
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
