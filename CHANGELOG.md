@@ -2,6 +2,11 @@
 
 Engine and demo history. The project outline lives in [README.MD](README.MD).
 
+## 2026-09-01 — iteration 69: README 68
+
+- **README:** recent line updated to 68 iters + lib analyze (186 tests).
+- **wasm:** rebuilt 1.2M.
+
 ## 2026-09-01 — iteration 68: lib analyze doc
 
 - **lib:** `analyze` doc → tinanta/kṛdanta/subanta/sarvanāma + upasarga peel; no logic change.
