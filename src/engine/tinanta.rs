@@ -1020,6 +1020,12 @@ mod tests {
         assert!(!f.forms.is_empty());
     }
 
+    #[test]
+    fn tinanta_all4_next28() {
+        let f = generate("vac", "plat", 1, 1);
+        assert!(!f.forms.is_empty());
+    }
+
 }
 // tinanta: hit all 1788346265
 
