@@ -371,6 +371,12 @@ mod tests {
     }
 
     #[test]
+    fn analyze_1_4_59_upasarga() {
+        let h = crate::engine::analyze::analyze_word("praBAvayati");
+        assert!(!h.is_empty()); // 1.4.59 upasarga
+    }
+
+    #[test]
     fn analyze_all4_next_hit() {
         let h = crate::engine::analyze::analyze_word("rAmaH");
         assert!(!h.is_empty());

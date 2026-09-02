@@ -1389,6 +1389,12 @@ mod tests {
     }
 
     #[test]
+    fn krdanta_3_1_134_yuc() {
+        let f = derive("cal", "yuc");
+        assert!(!f.is_empty()); // 3.1.134
+    }
+
+    #[test]
     fn krdanta_all4_next_hit() {
         let f = derive("gam", "tumun");
         assert!(!f.is_empty());

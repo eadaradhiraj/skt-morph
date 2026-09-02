@@ -866,6 +866,12 @@ mod tests {
     }
 
     #[test]
+    fn tinanta_7_3_86_athematic() {
+        let f = generate("ad", "plat", 1, 1);
+        assert!(!f.forms.is_empty()); // 7.3.86 athematic
+    }
+
+    #[test]
     fn tinanta_all4_next_hit() {
         let f = generate("BU", "plit", 1, 1);
         assert!(!f.forms.is_empty());
