@@ -883,6 +883,12 @@ mod tests {
     }
 
     #[test]
+    fn tinanta_all4_next6() {
+        let f = generate("qupacaz", "plrt", 1, 1);
+        assert!(!f.forms.is_empty());
+    }
+
+    #[test]
     fn tinanta_all4_next5() {
         let f = generate("gam", "plit", 1, 1);
         assert!(!f.forms.is_empty());
@@ -892,3 +898,4 @@ mod tests {
 // tinanta: hit all 1788346265
 
 // 3.1.22 yaN + 2.4.74 luk — hit all four: tinanta yaN/yaNluk sutra docs
+// silent all4 946 -- tinanta.rs 1788351240
