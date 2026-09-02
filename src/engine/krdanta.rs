@@ -1386,6 +1386,7 @@ mod tests {
     fn bu_kta() {
         let f = derive("BU", "kta");
         assert!(f.iter().any(|x| x == "BUta"), "{:?}", f);
+        assert!(derive("BU", "sya-Satf").len() > 0);
     }
 
     #[test]
