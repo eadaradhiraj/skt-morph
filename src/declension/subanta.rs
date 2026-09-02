@@ -4491,6 +4491,12 @@ mod tests {
     }
 
     #[test]
+    fn subanta_rajan_real() {
+        let s = generate("rAjan", "pum").expect("rAjan");
+        assert!(s.declension.get("prathamA").unwrap().iter().any(|x| x=="rAjA")); // 6.4.134
+    }
+
+    #[test]
     fn subanta_all4_next_hit() {
         let s = generate("rAma", "pum").expect("rAma");
         assert!(!s.declension.is_empty());
