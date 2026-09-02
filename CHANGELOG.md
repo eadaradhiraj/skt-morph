@@ -18,7 +18,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - declension via subanta where linga-bearing
 
 **सुबन्त/सर्वनाम (declension):**
-- ending-class subanta (8.2.30/39/66): a/Ā/i/I/u/U/ṛ + halanta j/d/t/p/h/B/r/s/S/as/is/us/an/in + o/O (go/nau), foreign Trump→Trumpeṇa
+- ending-class subanta (8.2.30/39/66): a/Ā/i/I/u/U/ṛ + halanta j/d/t/p/h/B/r/s/S/as/is/us/an/in/C/Y + o/O (go/nau), foreign Trump→Trumpeṇa — added C (छ) + Y (ञ) halanta
 - covers ~300+ stems: vaṇij/dik/kakubh, pathin/panthāḥ, rājan/rājñī, śvan/yuvan, ahan, puṃs, ap, div, etc.
 - sarvanāma 1.1.27: tad/etad/idam/ad as/tyad/dvi/tri/catur/ubha/pañcan etc., numbers 20–100, ṅīp (4.1.5/6)
 
@@ -32,7 +32,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 
 - **fuller yaṅ:** yaṅ + yaṅluk done, extend to rarer abhyāsa + atmanepada nuances
 - **kta ādeśa:** remaining class sandhi edge + named forms (full 7.2.10/6.4.42 list)
-- **fuller subanta:** extend halanta beyond j/d/t/p/h/B/r/s/S/as/is/us (add c/ch/ñ etc. + nap special)
+- **fuller subanta:** done C (छ) + Y (ञ) halanta beyond j/d/t/p/h/B/r/s/S/as/is/us; remaining nap special + rarer halanta
 - **derived in analyze:** done for lat/lit/lun/lrt/ashir (was generate-only) — extend to remaining lakaras if needed
 - **gold cross-check:** optional skt_morph.db validate (`--full --live`), keep live ≠ scrape principle
 - **removed:** taddhita (4.1/5.x) — deleted per focus; out of scope

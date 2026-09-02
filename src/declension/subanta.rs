@@ -47,6 +47,10 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("c".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"cO".to_string(),"caH".to_string(),],vec!["cam".to_string(),"cO".to_string(),"caH".to_string(),],vec!["cA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"coH".to_string(),"cAm".to_string(),],vec!["ci".to_string(),"coH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"cO".to_string(),"caH".to_string(),],]);
   // च-anta nap — 7.1.19/20 वाक्-class: क्/ची/चि; पद ग्भ्याम्/क्षु. पुं stays चौ.
   m.insert(("c".to_string(),"nap".to_string()), vec![vec!["k,g".to_string(),"cI".to_string(),"ci".to_string(),],vec!["k,g".to_string(),"cI".to_string(),"ci".to_string(),],vec!["cA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["caH".to_string(),"coH".to_string(),"cAm".to_string(),],vec!["ci".to_string(),"coH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"cI".to_string(),"ci".to_string(),],]);
+  // छ-anta (C) — 8.2.30 palatal C→k, same as c-anta वाच्-class (पृच्छ् पृष्ट से अलग, यह हलन्त C)
+  m.insert(("C".to_string(),"pum".to_string()), vec![vec!["k,g".to_string(),"CO".to_string(),"CaH".to_string(),],vec!["Cam".to_string(),"CO".to_string(),"CaH".to_string(),],vec!["CA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["Ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["CaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["CaH".to_string(),"CoH".to_string(),"CAm".to_string(),],vec!["Ci".to_string(),"CoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"CO".to_string(),"CaH".to_string(),],]);
+  m.insert(("C".to_string(),"stri".to_string()), vec![vec!["k,g".to_string(),"CO".to_string(),"CaH".to_string(),],vec!["Cam".to_string(),"CO".to_string(),"CaH".to_string(),],vec!["CA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["Ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["CaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["CaH".to_string(),"CoH".to_string(),"CAm".to_string(),],vec!["Ci".to_string(),"CoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"CO".to_string(),"CaH".to_string(),],]);
+  m.insert(("C".to_string(),"nap".to_string()), vec![vec!["k,g".to_string(),"CI".to_string(),"Ci".to_string(),],vec!["k,g".to_string(),"CI".to_string(),"Ci".to_string(),],vec!["CA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["Ce".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["CaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["CaH".to_string(),"CoH".to_string(),"CAm".to_string(),],vec!["Ci".to_string(),"CoH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"CI".to_string(),"Ci".to_string(),],]);
   m.insert(("ad".to_string(),"nap".to_string()), vec![vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adam".to_string(),"adI".to_string(),"AmSi".to_string(),],vec!["adA".to_string(),"aByAm".to_string(),"aBiH".to_string(),],vec!["ade".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"aByAm".to_string(),"aByaH".to_string(),],vec!["adaH".to_string(),"adoh".to_string(),"Am".to_string(),],vec!["adi".to_string(),"adoh".to_string(),"atsu".to_string(),],vec!["ad".to_string(),"adI".to_string(),"AmSi".to_string(),],]);
   // ष-anta (द्विष्) — 8.2.39 जश्त्व ष्→ड्, 8.4.56 वाऽवसाने ट्; भ्-initial ड्; सप्तमी ट्सु.
   m.insert(("z".to_string(),"pum".to_string()), vec![vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zam".to_string(),"zO".to_string(),"zaH".to_string(),],vec!["zA".to_string(),"qByAm".to_string(),"qBiH".to_string(),],vec!["ze".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"qByAm".to_string(),"qByaH".to_string(),],vec!["zaH".to_string(),"zoH".to_string(),"zAm".to_string(),],vec!["zi".to_string(),"zoH".to_string(),"wsu".to_string(),],vec!["w,q".to_string(),"zO".to_string(),"zaH".to_string(),],]);
@@ -71,6 +75,10 @@ fn paradigms() -> HashMap<(String,String), Vec<Vec<String>>> {
   m.insert(("j".to_string(),"stri".to_string()), vec![vec!["k,g".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jam".to_string(),"jO".to_string(),"jaH".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"jO".to_string(),"jaH".to_string(),],]);
   // ज-anta nap (ऊर्ज्) — 7.1.19/20 ऊर्क्/ऊर्जी/ऊर्जि; पद ऊर्ग्भ्याम्/ऊर्क्षु. Gold *Unrji is scrape.
   m.insert(("j".to_string(),"nap".to_string()), vec![vec!["k,g".to_string(),"jI".to_string(),"ji".to_string(),],vec!["k,g".to_string(),"jI".to_string(),"ji".to_string(),],vec!["jA".to_string(),"gByAm".to_string(),"gBiH".to_string(),],vec!["je".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"gByAm".to_string(),"gByaH".to_string(),],vec!["jaH".to_string(),"joH".to_string(),"jAm".to_string(),],vec!["ji".to_string(),"joH".to_string(),"kzu".to_string(),],vec!["k,g".to_string(),"jI".to_string(),"ji".to_string(),],]);
+  // ञ-anta (Y) — 8.2.30 palatal Y→n/k, schwa? simple n/k like j, for testing halanta Y
+  m.insert(("Y".to_string(),"pum".to_string()), vec![vec!["n,k".to_string(),"YO".to_string(),"YaH".to_string(),],vec!["Yam".to_string(),"YO".to_string(),"YaH".to_string(),],vec!["YA".to_string(),"nByAm".to_string(),"nBiH".to_string(),],vec!["Ye".to_string(),"nByAm".to_string(),"nByaH".to_string(),],vec!["YaH".to_string(),"nByAm".to_string(),"nByaH".to_string(),],vec!["YaH".to_string(),"YoH".to_string(),"YAm".to_string(),],vec!["Yi".to_string(),"YoH".to_string(),"nzu".to_string(),],vec!["n,k".to_string(),"YO".to_string(),"YaH".to_string(),],]);
+  m.insert(("Y".to_string(),"stri".to_string()), vec![vec!["n,k".to_string(),"YO".to_string(),"YaH".to_string(),],vec!["Yam".to_string(),"YO".to_string(),"YaH".to_string(),],vec!["YA".to_string(),"nByAm".to_string(),"nBiH".to_string(),],vec!["Ye".to_string(),"nByAm".to_string(),"nByaH".to_string(),],vec!["YaH".to_string(),"nByAm".to_string(),"nByaH".to_string(),],vec!["YaH".to_string(),"YoH".to_string(),"YAm".to_string(),],vec!["Yi".to_string(),"YoH".to_string(),"nzu".to_string(),],vec!["n,k".to_string(),"YO".to_string(),"YaH".to_string(),],]);
+  m.insert(("Y".to_string(),"nap".to_string()), vec![vec!["n,k".to_string(),"YI".to_string(),"Yi".to_string(),],vec!["n,k".to_string(),"YI".to_string(),"Yi".to_string(),],vec!["YA".to_string(),"nByAm".to_string(),"nBiH".to_string(),],vec!["Ye".to_string(),"nByAm".to_string(),"nByaH".to_string(),],vec!["YaH".to_string(),"nByAm".to_string(),"nByaH".to_string(),],vec!["YaH".to_string(),"YoH".to_string(),"YAm".to_string(),],vec!["Yi".to_string(),"YoH".to_string(),"nzu".to_string(),],vec!["n,k".to_string(),"YI".to_string(),"Yi".to_string(),],]);
   m.insert(("d".to_string(),"pum".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
   m.insert(("d".to_string(),"stri".to_string()), vec![vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dam".to_string(),"dO".to_string(),"daH".to_string(),],vec!["dA".to_string(),"dByAm".to_string(),"dBiH".to_string(),],vec!["de".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"dByAm".to_string(),"dByaH".to_string(),],vec!["daH".to_string(),"doH".to_string(),"dAm".to_string(),],vec!["di".to_string(),"doH".to_string(),"tsu".to_string(),],vec!["t".to_string(),"dO".to_string(),"daH".to_string(),],]);
   // त-anta (मरुत्, सरित्, त्रिंशत्) — पद त्; 8.2.39 before भ् → द्भ्याम्/द्भिः. `at` शतृ stays longer-match.
@@ -4505,41 +4513,3 @@ mod tests {
         assert!(!u.declension.get("caturTI").unwrap().iter().any(|x| x == "uttarapUrvasyE"));
     }
 }
-// all4 848 -- subanta
-// all4 852 -- subanta
-// all4 856 -- subanta
-// all4 860 -- subanta
-// all4 864 -- subanta
-// all4 868 -- subanta
-// all4 872 -- subanta
-// all4 876 -- subanta
-// all4 880 -- subanta
-// all4 884 -- subanta
-// all4 888 -- subanta
-// all4 892 -- subanta
-// all4 896 -- subanta
-// all4 900 -- subanta
-// all4 904 -- subanta
-// all4 908 -- subanta
-// all4 912 -- subanta
-// all4 916 -- subanta
-// all4 920 -- subanta
-// all4 924 -- subanta
-// all4 928 -- subanta
-// all4 932 -- subanta
-// all4 936 -- subanta
-// all4 940 -- subanta
-// all4 944 -- subanta
-// all4 948 -- subanta
-// all4 952 -- subanta
-// all4 956 -- subanta
-// all4 960 -- subanta
-// all4 964 -- subanta
-// all4 968 -- subanta
-// all4 972 -- subanta
-// all4 976 -- subanta
-// all4 980 -- subanta
-// all4 984 -- subanta
-// all4 988 -- subanta
-// all4 992 -- subanta
-// all4 996 -- subanta
