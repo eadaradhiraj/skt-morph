@@ -26,7 +26,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - One SLP1 form → every parse (tinanta/kṛdanta/subanta/sarvanāma + derived nic/san/yaN/yaNluk/karma), upasarga-peeled, OnceLock maps (tinanta/krdanta/derived), empty guards, search_prefix
 
 **Demo/WASM:**
-- SLP1 canonical, Devanagari I/O (`translit.js`/`labels.js`), yaṅ/yaṅluk dropdown 2.4.74, a11y/Enter, debounce, dhatu HashMap cache 16s (was 7s, now with derived), 186 tests, pkg 1.2M (268k gz)
+- SLP1 canonical, Devanagari I/O (`translit.js`/`labels.js`), yaṅ/yaṅluk dropdown 2.4.74, a11y/Enter, debounce, dhatu HashMap cache 16s (was 7s, now with derived), 187 tests, pkg 1.2M (268k gz)
 
 ## TODO / Later — tinanta / subanta / krdanta / analyze only (no taddhita)
 

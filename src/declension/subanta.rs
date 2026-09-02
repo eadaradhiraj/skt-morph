@@ -4490,6 +4490,20 @@ mod tests {
     }
 
     #[test]
+    fn ch_ya_halanta_c_y() {
+        // C (छ) + Y (ञ) halanta — 8.2.30 C→k, Y→n/k like c/j (new fuller subanta C/Y)
+        let c = generate("vAC", "pum").expect("vAC");
+        has(&c, "prathamA", "vAk");
+        has(&c, "saptamI", "vAkzu");
+        has(&generate("vAC", "stri").unwrap(), "prathamA", "vAk");
+        has(&generate("vAC", "nap").unwrap(), "prathamA", "vAk");
+        let y = generate("aY", "pum").expect("aY");
+        has(&y, "prathamA", "an");
+        has(&y, "saptamI", "anzu");
+        has(&generate("aY", "nap").unwrap(), "prathamA", "an");
+    }
+
+    #[test]
     fn priyavisva_a_stem_not_sarvanama() {
         // 1.1.29 न बहुव्रीहौ: प्रियविश्वाय/प्रियविश्वेन, not *प्रियविश्वस्मै. राम stays रामाय.
         let p = generate("priyaviSva", "pum").expect("priyaviSva");
