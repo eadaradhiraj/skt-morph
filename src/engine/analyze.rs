@@ -433,6 +433,12 @@ mod tests {
         assert!(!h.is_empty());
     }
 
+    #[test]
+    fn analyze_all4_next10() {
+        let h = crate::engine::analyze::analyze_word("bhavati");
+        assert!(!h.is_empty());
+    }
+
 }
 // analyze: hit all 1788346265
 
