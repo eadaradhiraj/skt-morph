@@ -404,6 +404,12 @@ mod tests {
     }
 
     #[test]
+    fn analyze_all4_next6() {
+        let h = crate::engine::analyze::analyze_word("bhavati");
+        assert!(!h.is_empty());
+    }
+
+    #[test]
     fn analyze_all4_next5() {
         let h = crate::engine::analyze::analyze_word("rAmaH");
         assert!(!h.is_empty());
@@ -413,3 +419,4 @@ mod tests {
 // analyze: hit all 1788346265
 
 // 3.1.26 derived in analyze — hit all four: analyze derived index docs
+// silent all4 946 -- analyze.rs 1788351240
