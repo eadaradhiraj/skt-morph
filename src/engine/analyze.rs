@@ -365,6 +365,12 @@ mod tests {
     }
 
     #[test]
+    fn analyze_all4_next_hit() {
+        let h = crate::engine::analyze::analyze_word("rAmaH");
+        assert!(!h.is_empty());
+    }
+
+    #[test]
     fn search_prefix_finds_rama() {
         let v = crate::engine::analyze::search_prefix("hari", 5);
         assert!(v.iter().any(|x| x == "hari"));
