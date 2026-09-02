@@ -4574,6 +4574,12 @@ mod tests {
         assert!(!s.declension.is_empty());
     }
 
+    #[test]
+    fn subanta_all4_next9() {
+        let s = generate("hari", "pum").expect("hari");
+        assert!(!s.declension.is_empty());
+    }
+
 }
 // subanta: hit all 1788346265
 
