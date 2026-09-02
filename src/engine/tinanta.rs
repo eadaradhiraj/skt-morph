@@ -858,6 +858,12 @@ mod tests {
         let f = generate_all_with_artha("yama", "alat", 1, 1, &sam, "granthe");
         assert!(f.is_empty(), "{:?}", f);
     }
+
+    #[test]
+    fn tinanta_all4_next_hit() {
+        let f = generate("BU", "plit", 1, 1);
+        assert!(!f.forms.is_empty());
+    }
 }
 // tinanta: hit all 1788346265
 
