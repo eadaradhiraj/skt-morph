@@ -4538,6 +4538,12 @@ mod tests {
         has(&generate("sItA", "stri").unwrap(), "caturTI", "sItAyE");
         assert!(!u.declension.get("caturTI").unwrap().iter().any(|x| x == "uttarapUrvasyE"));
     }
+    #[test]
+    fn subanta_all4_next3() {
+        let s = generate("guru", "pum").expect("guru");
+        assert!(!s.declension.is_empty());
+    }
+
 }
 // subanta: hit all 1788346265
 

@@ -2242,6 +2242,12 @@ mod tests {
         assert_eq!(derive("BU", "Ramul"), vec!["BAvam"]);
         assert!(decline("qukfY", "Ramul", "pum", &[]).is_none());
     }
+    #[test]
+    fn krdanta_all4_next3() {
+        let f = derive("han", "kta");
+        assert!(!f.is_empty());
+    }
+
 }
 // krdanta: hit all 1788346265
 
