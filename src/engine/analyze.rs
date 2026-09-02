@@ -328,7 +328,7 @@ pub fn search_prefix(prefix: &str, limit: usize) -> Vec<String> {
     }
     // Common subantas for quick demo probing
     for stem in ["rAma", "hari", "guru", "nadI", "Bava", "gacC", "rAjan", "pitf", "go", "nO", "tad", "etad", "yad", "idam", "ad", "dvi", "tri", "pazcan", "wrampa"] {
-        if stem.starts_with(prefix) {
+        if stem.to_lowercase().starts_with(&prefix_lower) {
             results.push(stem.to_string());
             if results.len() >= limit {
                 break;
