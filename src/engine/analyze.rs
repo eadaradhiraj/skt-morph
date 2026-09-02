@@ -49,7 +49,7 @@ const LAKARAS: &[&str] = &[
 /// KRTS indexed for reverse lookup — must stay in sync with `krdanta::pratyaya_rule`.
 /// Expanded from 19 → full set so e.g. gAsnu/jizRu/sthAsnu, kvasu, lyu etc. are analyzed.
 const DERIVED_KINDS: &[&str] = &["Ric", "san", "yaN", "yaNluk", "karma"];
-const DERIVED_LAKARAS: &[&str] = &["plat", "alat", "plot", "alot", "plit", "plun", "alun", "plrt", "pvidhilin", "pashirling"];
+const DERIVED_LAKARAS: &[&str] = &["plat", "alat", "plan", "alan", "plot", "alot", "plrt", "alrt", "pvidhilin", "avidhilin", "plit", "alit", "plun", "alun", "pashirling", "aashirling"];
 
 const KRTS: &[&str] = &[
     "kta", "ktavatu", "ktavatu~", "Satf", "Satf~", "SAnac", "cAnaS", "tumun", "ktvA", "lyap",

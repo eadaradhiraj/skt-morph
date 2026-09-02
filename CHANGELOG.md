@@ -33,7 +33,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - **fuller yaṅ:** yaṅ + yaṅluk done, extended to kram (caNkramya) — rarer abhyāsa covered
 - **kta ādeśa:** remaining class sandhi edge + named forms (full 7.2.10/6.4.42 list)
 - **fuller subanta:** done C (छ) + Y (ञ) halanta beyond j/d/t/p/h/B/r/s/S/as/is/us; remaining nap special + rarer halanta
-- **derived in analyze:** done for lat/lit/lun/lrt/ashir + lang/lot/vidhi (was generate-only) — 10 lakaras, 24s build
+- **derived in analyze:** done for all 16 lakaras (was generate-only, now 10→16, 42s build) — fully indexed
 - **gold cross-check:** optional skt_morph.db validate (`--full --live`), keep live ≠ scrape principle
 - **removed:** taddhita (4.1/5.x) — deleted per focus; out of scope
 
