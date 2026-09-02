@@ -58,7 +58,7 @@ const KRTS: &[&str] = &[
     "gsnu", "knu", "GinuR", "kvarap", "Aluc", "kmarac", "Gurac", "varac", "itra", "zwran",
     "kurac", "kru", "klukan", "krukan", "Aru", "ra", "u", "naN", "aTuc", "Nvanip", "Takan",
     "Ryuw", "nan", "najiN", "zAkan", "zvun", "SAnan", "atfn", "vuY", "ktri", "aN", "ap",
-    "sya-Satf", "sya-SAnac", "sya-cAnaS", "ini",
+    "sya-Satf", "sya-Satf~", "sya-SAnac", "sya-cAnaS", "BAvakarma-SAnac", "sya-BAvakarma-SAnac", "Nini", "yuc", "ini",
 ];
 
 fn push_form(map: &mut HashMap<String, Vec<Analysis>>, form: &str, a: Analysis) {

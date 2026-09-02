@@ -13,7 +13,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - ṇic, san, yaṅ (ātmane boBUyate 3.1.22), yaṅluk luk 2.4.74 (parasmai boBU/vAvac/cekrI/jaṄgam/pApac/jaṄgan), karmaṇi yak — now indexed in analyze (was generate-only)
 
 **कृदन्त (krdanta.rs, 3.1–3.4):**
-- 60+ pratyayas (was 19): kta/ktavatu/śatṛ/śānac/tumun/ktvā/lyap/tavya/tṛc/lyu/kvasu etc.
+- 60+ pratyayas (was 19): kta/ktavatu/śatṛ/śānac/tumun/ktvā/lyap/tavya/tṛc/lyu/kvasu etc. — KRTS index now in sync with pratyaya_rule (added Nini/yuc/BAvakarma variants)
 - kta class sandhi before 7.2.35 iṭ: 8.2.30/36/37/40/42/45, 6.4.37/42, 6.1.15/16/45 (mukta/labdha/bhinna/gata/gīta/uta/uṣṭa/rakta) + named ādeśa jagdha/pakva/soḍha/bhagna/dyūta/naddha/jīna (6.1.16 etc.)
 - declension via subanta where linga-bearing
 
