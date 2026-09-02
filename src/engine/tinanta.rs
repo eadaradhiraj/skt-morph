@@ -860,6 +860,12 @@ mod tests {
     }
 
     #[test]
+    fn tinanta_atmanepada_next() {
+        let f = generate("labh", "plat", 1, 1);
+        assert!(!f.forms.is_empty());
+    }
+
+    #[test]
     fn tinanta_all4_next_hit() {
         let f = generate("BU", "plit", 1, 1);
         assert!(!f.forms.is_empty());
