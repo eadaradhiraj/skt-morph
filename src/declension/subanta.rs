@@ -4509,6 +4509,13 @@ mod tests {
     }
 
     #[test]
+    fn subanta_is_vs_as_nap() {
+        let is_n = generate("havis", "nap").expect("havis");
+        let as_n = generate("manas", "nap").expect("manas");
+        assert_ne!(is_n.declension.get("prathamA").unwrap()[0], as_n.declension.get("prathamA").unwrap()[0]); // is vs as nap distinct
+    }
+
+    #[test]
     fn subanta_is_nap_real() {
         let s = generate("havis", "nap").expect("havis");
         assert!(s.declension.get("prathamA").unwrap().iter().any(|x| x=="haviH"));
