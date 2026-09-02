@@ -4509,6 +4509,12 @@ mod tests {
     }
 
     #[test]
+    fn subanta_is_nap_real() {
+        let s = generate("havis", "nap").expect("havis");
+        assert!(s.declension.get("prathamA").unwrap().iter().any(|x| x=="haviH"));
+    }
+
+    #[test]
     fn ch_ya_halanta_c_y() {
         // C (छ) + Y (ञ) halanta — 8.2.30 C→k, Y→n/k like c/j (new fuller subanta C/Y)
         let c = generate("vAC", "pum").expect("vAC");
