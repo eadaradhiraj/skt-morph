@@ -365,6 +365,12 @@ mod tests {
     }
 
     #[test]
+    fn search_prefix_finds_rama() {
+        let v = crate::engine::analyze::search_prefix("hari", 5);
+        assert!(v.iter().any(|x| x == "hari"));
+    }
+
+    #[test]
     fn trampe_na_is_foreign_instrumental() {
         let hits = crate::declension::subanta::analyze("wrampeRa");
         assert!(hits.iter().any(|m| {
