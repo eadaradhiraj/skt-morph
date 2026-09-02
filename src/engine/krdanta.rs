@@ -2398,6 +2398,12 @@ mod tests {
         assert!(!f.is_empty());
     }
 
+    #[test]
+    fn krdanta_all4_next29() {
+        let f = derive("vac", "kta");
+        assert!(!f.is_empty());
+    }
+
 }
 // krdanta: hit all 1788346265
 
