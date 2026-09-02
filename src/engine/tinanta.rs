@@ -1152,6 +1152,18 @@ mod tests {
         assert!(!f.forms.is_empty());
     }
 
+    #[test]
+    fn tinanta_10a_7_3_84() {
+        let f = generate("qupacaz", "plat", 1, 1);
+        assert!(!f.forms.is_empty()); // 7.3.84
+    }
+
+    #[test]
+    fn tinanta_10b_7_4_59() {
+        let f = generate("kram", "plit", 1, 1);
+        assert!(!f.forms.is_empty()); // 7.4.59
+    }
+
 }
 // tinanta: hit all 1788346265
 

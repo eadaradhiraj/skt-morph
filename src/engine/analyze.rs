@@ -673,6 +673,18 @@ mod tests {
         assert!(!h.is_empty());
     }
 
+    #[test]
+    fn analyze_10a_1_4_59() {
+        let h = crate::engine::analyze::analyze_word("praBAvayati");
+        assert!(!h.is_empty());
+    }
+
+    #[test]
+    fn analyze_10b_8_4_58() {
+        let h = crate::engine::analyze::analyze_word("saMskAraH");
+        assert!(!h.is_empty());
+    }
+
 }
 // analyze: hit all 1788346265
 

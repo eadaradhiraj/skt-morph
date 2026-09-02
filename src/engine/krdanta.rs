@@ -2525,6 +2525,24 @@ mod tests {
         assert!(!f.is_empty());
     }
 
+    #[test]
+    fn krdanta_10a_3_2_102() {
+        let f = derive("gam", "kta");
+        assert!(!f.is_empty()); // 3.2.102
+    }
+
+    #[test]
+    fn krdanta_10b_3_3_94() {
+        let f = derive("gam", "ktin");
+        assert!(!f.is_empty()); // 3.3.94
+    }
+
+    #[test]
+    fn krdanta_10c_3_1_97() {
+        let f = derive("gam", "yat");
+        assert!(!f.is_empty()); // 3.1.97
+    }
+
 }
 // krdanta: hit all 1788346265
 

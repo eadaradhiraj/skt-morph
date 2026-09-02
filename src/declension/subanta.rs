@@ -4821,6 +4821,24 @@ mod tests {
         assert!(!s.declension.is_empty());
     }
 
+    #[test]
+    fn subanta_10a_8_2_39() {
+        let s = generate("marut", "pum").expect("marut");
+        assert!(s.declension.get("tfIyA").unwrap().iter().any(|x| x.contains("dByAm")));
+    }
+
+    #[test]
+    fn subanta_10b_8_2_66() {
+        let s = generate("manas", "nap").expect("manas");
+        assert!(s.declension.get("prathamA").unwrap().iter().any(|x| x=="manaH"));
+    }
+
+    #[test]
+    fn subanta_10c_7_1_23() {
+        let s = generate("jagat", "nap").expect("jagat");
+        assert!(s.declension.get("prathamA").unwrap().len()>=3);
+    }
+
 }
 // subanta: hit all 1788346265
 
