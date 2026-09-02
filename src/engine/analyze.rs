@@ -601,6 +601,12 @@ mod tests {
         assert!(!h.is_empty());
     }
 
+    #[test]
+    fn analyze_all4_next38() {
+        let h = crate::engine::analyze::analyze_word("rAmaH");
+        assert!(!h.is_empty());
+    }
+
 }
 // analyze: hit all 1788346265
 
