@@ -4490,6 +4490,12 @@ mod tests {
     }
 
     #[test]
+    fn subanta_all4_next_hit() {
+        let s = generate("rAma", "pum").expect("rAma");
+        assert!(!s.declension.is_empty());
+    }
+
+    #[test]
     fn ch_ya_halanta_c_y() {
         // C (छ) + Y (ञ) halanta — 8.2.30 C→k, Y→n/k like c/j (new fuller subanta C/Y)
         let c = generate("vAC", "pum").expect("vAC");
