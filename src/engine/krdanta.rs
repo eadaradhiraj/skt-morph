@@ -1431,6 +1431,7 @@ mod tests {
         assert_eq!(derive("sah", "kta"), vec!["soQa"]);
         // क्रम् → क्रान्त (krAnta) — 6.1.15 + 8.2.30 (kram is mit, but kta is krAnta via vrddhi)
         assert_eq!(derive("kram", "kta"), vec!["krAnta"]); // क्रम् → क्रान्त
+        assert_eq!(derive("Kan", "kta"), vec!["KAta"]); // खन् → खात (6.4.42)
         // बन्ध् → बद्ध (badDa in SLP1, D=ध) — 8.2.40 झष्, SLP1 banD (not bandh)
         assert_eq!(derive("banD", "kta"), vec!["badDa"]); // बन्ध् → बद्ध
         // वह् → ऊढ (UQa) — 6.1.15 + 8.2.31
