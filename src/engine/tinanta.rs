@@ -884,7 +884,7 @@ mod tests {
 
     #[test]
     fn tinanta_all4_next6() {
-        let f = generate("qupacaz", "plrt", 1, 1);
+        let f = generate("BU", "plat", 1, 1);
         assert!(!f.forms.is_empty());
     }
 
@@ -914,7 +914,7 @@ mod tests {
 
     #[test]
     fn tinanta_all4_next10() {
-        let f = generate("qupacaz", "plrt", 1, 1);
+        let f = generate("BU", "plat", 1, 1);
         assert!(!f.forms.is_empty());
     }
 
@@ -933,6 +933,12 @@ mod tests {
     #[test]
     fn tinanta_all4_next13() {
         let f = generate("gam", "plun", 1, 1);
+        assert!(!f.forms.is_empty());
+    }
+
+    #[test]
+    fn tinanta_all4_next14() {
+        let f = generate("BU", "plat", 1, 1);
         assert!(!f.forms.is_empty());
     }
 
