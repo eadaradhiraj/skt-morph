@@ -1416,6 +1416,8 @@ mod tests {
         // सह् → सोढ (soQa) — 8.2.31 + guṇa
         assert_eq!(derive("saha", "kta"), vec!["soQa"]); // सह् → सोढ (saha is सह् with a)
         assert_eq!(derive("sah", "kta"), vec!["soQa"]);
+        // क्रम् → क्रान्त (krAnta) — 6.1.15 + 8.2.30 (kram is mit, but kta is krAnta via vrddhi)
+        assert_eq!(derive("kram", "kta"), vec!["krAnta"]); // क्रम् → क्रान्त
         // वह् → ऊढ (UQa) — 6.1.15 + 8.2.31
         assert_eq!(derive("vaha", "kta"), vec!["UQa"]); // वह् → ऊढ (already in gam_kf_vac_da_kta? keep explicit)
         assert_eq!(derive("vah", "kta"), vec!["UQa"]);
