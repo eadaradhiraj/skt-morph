@@ -39,6 +39,7 @@ fn keys_for(form: &str) -> [String; 2] {
 /// OnceLock HashMaps built on first `analyze_word` (~7s with dhatu cache, then µs).
 static TINANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 static KRDANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
+static DERIVED_TINANTA_MAP: OnceLock<HashMap<String, Vec<Analysis>>> = OnceLock::new();
 
 const LAKARAS: &[&str] = &[
     "plat", "alat", "plan", "alan", "plot", "alot", "plrt", "alrt",
@@ -47,6 +48,9 @@ const LAKARAS: &[&str] = &[
 
 /// KRTS indexed for reverse lookup — must stay in sync with `krdanta::pratyaya_rule`.
 /// Expanded from 19 → full set so e.g. gAsnu/jizRu/sthAsnu, kvasu, lyu etc. are analyzed.
+const DERIVED_KINDS: &[&str] = &["Ric", "san", "yaN", "yaNluk", "karma"];
+const DERIVED_LAKARAS: &[&str] = &["plat", "plit", "plun", "plrt", "pashirling"];
+
 const KRTS: &[&str] = &[
     "kta", "ktavatu", "ktavatu~", "Satf", "Satf~", "SAnac", "cAnaS", "tumun", "ktvA", "lyap",
     "lyuw", "lyu", "tavya", "anIyar", "Rvul", "vun", "tfc", "ktin", "GaY", "Ramul", "ac", "a",
@@ -106,6 +110,45 @@ fn build_tinanta_map() -> HashMap<String, Vec<Analysis>> {
                                 upasarga: None,
                             },
                         );
+                    }
+                }
+            }
+        }
+    }
+    map
+}
+
+fn build_derived_tinanta_map() -> HashMap<String, Vec<Analysis>> {
+    let mut map: HashMap<String, Vec<Analysis>> = HashMap::new();
+    for (dhatu_id, dhatu, _, _, _, _, _) in crate::data::DHATUS {
+        for kind in DERIVED_KINDS {
+            for lak in DERIVED_LAKARAS {
+                for p in 1..=3u8 {
+                    for v in 1..=3u8 {
+                        let bases = crate::engine::tinanta::generate_all_derived(dhatu_id, kind, lak, p, v, &[]);
+                        for base in bases {
+                            if base.is_empty() {
+                                continue;
+                            }
+                            push_form(
+                                &mut map,
+                                &base,
+                                Analysis {
+                                    word: String::new(),
+                                    word_type: "tinanta".to_string(),
+                                    dhatu: Some(dhatu.to_string()),
+                                    dhatu_id: Some(dhatu_id.to_string()),
+                                    pratyaya: Some(kind.to_string()),
+                                    pratipadika: None,
+                                    linga: None,
+                                    vibhakti: None,
+                                    vacana: Some(v),
+                                    lakara: Some((*lak).to_string()),
+                                    purusha: Some(p),
+                                    upasarga: None,
+                                },
+                            );
+                        }
                     }
                 }
             }
@@ -217,6 +260,7 @@ pub fn analyze_word(word: &str) -> Vec<Analysis> {
 
     let tmap = TINANTA_MAP.get_or_init(build_tinanta_map);
     let kmap = KRDANTA_MAP.get_or_init(build_krdanta_map);
+    let dmap = DERIVED_TINANTA_MAP.get_or_init(build_derived_tinanta_map);
     for (prefs, rest) in split_upasarga_candidates(word) {
         for key in keys_for(&rest) {
             if let Some(v) = tmap.get(&key) {
@@ -224,6 +268,22 @@ pub fn analyze_word(word: &str) -> Vec<Analysis> {
                     let sig = format!(
                         "tinanta:{}:{}:{}:{}:{:?}",
                         a.dhatu_id.as_deref().unwrap_or(""),
+                        a.lakara.as_deref().unwrap_or(""),
+                        a.purusha.unwrap_or(0),
+                        a.vacana.unwrap_or(0),
+                        prefs
+                    );
+                    if seen.insert(sig) {
+                        out.push(attach_upasarga(a, &prefs, word));
+                    }
+                }
+            }
+            if let Some(v) = dmap.get(&key) {
+                for a in v {
+                    let sig = format!(
+                        "derived:{}:{}:{}:{}:{}:{:?}",
+                        a.dhatu_id.as_deref().unwrap_or(""),
+                        a.pratyaya.as_deref().unwrap_or(""),
                         a.lakara.as_deref().unwrap_or(""),
                         a.purusha.unwrap_or(0),
                         a.vacana.unwrap_or(0),
@@ -298,6 +358,13 @@ mod tests {
     }
 
     #[test]
+    fn derived_nic_is_analyzed() {
+        // derived tinanta now indexed (was generate-only)
+        let hits = crate::engine::analyze::analyze_word("BAvayati");
+        assert!(hits.iter().any(|a| a.dhatu.as_deref() == Some("BU") && a.pratyaya.as_deref() == Some("Ric") && a.lakara.as_deref() == Some("plat")));
+    }
+
+    #[test]
     fn trampe_na_is_foreign_instrumental() {
         let hits = crate::declension::subanta::analyze("wrampeRa");
         assert!(hits.iter().any(|m| {
@@ -307,41 +374,3 @@ mod tests {
         }));
     }
 }
-// all4 850 -- analyze
-// all4 854 -- analyze
-// all4 858 -- analyze
-// all4 862 -- analyze
-// all4 866 -- analyze
-// all4 870 -- analyze
-// all4 874 -- analyze
-// all4 878 -- analyze
-// all4 882 -- analyze
-// all4 886 -- analyze
-// all4 890 -- analyze
-// all4 894 -- analyze
-// all4 898 -- analyze
-// all4 902 -- analyze
-// all4 906 -- analyze
-// all4 910 -- analyze
-// all4 914 -- analyze
-// all4 918 -- analyze
-// all4 922 -- analyze
-// all4 926 -- analyze
-// all4 930 -- analyze
-// all4 934 -- analyze
-// all4 938 -- analyze
-// all4 942 -- analyze
-// all4 946 -- analyze
-// all4 950 -- analyze
-// all4 954 -- analyze
-// all4 958 -- analyze
-// all4 962 -- analyze
-// all4 966 -- analyze
-// all4 970 -- analyze
-// all4 974 -- analyze
-// all4 978 -- analyze
-// all4 982 -- analyze
-// all4 986 -- analyze
-// all4 990 -- analyze
-// all4 994 -- analyze
-// all4 998 -- analyze

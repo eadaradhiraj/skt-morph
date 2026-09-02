@@ -10,7 +10,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - upasarga 1.4.59 + free field (`prefix.rs`), sandhi + ṇatva 8.4.1, artha 1.3 (karma/kram etc.)
 
 **Derived (derived.rs, 3.1.26/3.1.7/3.1.22/2.4.74/3.1.67):**
-- ṇic, san, yaṅ (ātmane boBUyate 3.1.22), yaṅluk luk 2.4.74 (parasmai boBU/vAvac/cekrI/jaṄgam/pApac/jaṄgan), karmaṇi yak — not indexed in analyze
+- ṇic, san, yaṅ (ātmane boBUyate 3.1.22), yaṅluk luk 2.4.74 (parasmai boBU/vAvac/cekrI/jaṄgam/pApac/jaṄgan), karmaṇi yak — now indexed in analyze (was generate-only)
 
 **कृदन्त (krdanta.rs, 3.1–3.4):**
 - 60+ pratyayas (was 19): kta/ktavatu/śatṛ/śānac/tumun/ktvā/lyap/tavya/tṛc/lyu/kvasu etc.
@@ -23,17 +23,17 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - sarvanāma 1.1.27: tad/etad/idam/ad as/tyad/dvi/tri/catur/ubha/pañcan etc., numbers 20–100, ṅīp (4.1.5/6)
 
 **Analyze (analyze.rs):**
-- One SLP1 form → every parse (tinanta/kṛdanta/subanta/sarvanāma), upasarga-peeled, OnceLock maps, empty guards, search_prefix
+- One SLP1 form → every parse (tinanta/kṛdanta/subanta/sarvanāma + derived nic/san/yaN/yaNluk/karma), upasarga-peeled, OnceLock maps (tinanta/krdanta/derived), empty guards, search_prefix
 
 **Demo/WASM:**
-- SLP1 canonical, Devanagari I/O (`translit.js`/`labels.js`), yaṅ/yaṅluk dropdown 2.4.74, a11y/Enter, debounce, dhatu HashMap cache 15s→7s, 185 tests, pkg 1.2M (268k gz)
+- SLP1 canonical, Devanagari I/O (`translit.js`/`labels.js`), yaṅ/yaṅluk dropdown 2.4.74, a11y/Enter, debounce, dhatu HashMap cache 16s (was 7s, now with derived), 186 tests, pkg 1.2M (268k gz)
 
 ## TODO / Later — tinanta / subanta / krdanta / analyze only (no taddhita)
 
 - **fuller yaṅ:** yaṅ + yaṅluk done, extend to rarer abhyāsa + atmanepada nuances
 - **kta ādeśa:** remaining class sandhi edge + named forms (full 7.2.10/6.4.42 list)
 - **fuller subanta:** extend halanta beyond j/d/t/p/h/B/r/s/S/as/is/us (add c/ch/ñ etc. + nap special)
-- **derived in analyze:** index ṇic/san/yaṅ/yaṅluk/karma for reverse lookup (currently generate-only)
+- **derived in analyze:** done for lat/lit/lun/lrt/ashir (was generate-only) — extend to remaining lakaras if needed
 - **gold cross-check:** optional skt_morph.db validate (`--full --live`), keep live ≠ scrape principle
 - **removed:** taddhita (4.1/5.x) — deleted per focus; out of scope
 
