@@ -1167,5 +1167,5 @@ mod tests {
 }
 // tinanta: hit all 1788346265
 
-// 3.1.22 yaN + 2.4.74 luk — safe real — hit all four: tinanta yaN/yaNluk sutra docs
+// 1.3.12 atmanepada with upasarga + 3.1.22 yaN + 2.4.74 luk — safe real — hit all four: tinanta yaN/yaNluk sutra docs
 // silent all4 946 -- tinanta.rs 1788351240
