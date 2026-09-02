@@ -4491,6 +4491,12 @@ mod tests {
     }
 
     #[test]
+    fn subanta_rama_real_next() {
+        let s = generate("rAma", "pum").expect("rAma");
+        assert!(s.declension.get("prathamA").unwrap().iter().any(|x| x=="rAmaH"));
+    }
+
+    #[test]
     fn subanta_rajan_real() {
         let s = generate("rAjan", "pum").expect("rAjan");
         assert!(s.declension.get("prathamA").unwrap().iter().any(|x| x=="rAjA")); // 6.4.134
