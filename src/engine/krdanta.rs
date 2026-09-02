@@ -2255,6 +2255,12 @@ mod tests {
     }
 
     #[test]
+    fn krdanta_all4_next6() {
+        let f = derive("yuj", "kta");
+        assert!(!f.is_empty());
+    }
+
+    #[test]
     fn krdanta_all4_next5() {
         let f = derive("han", "kta");
         assert!(!f.is_empty());
@@ -2264,3 +2270,4 @@ mod tests {
 // krdanta: hit all 1788346265
 
 // 3.2.102 kta — hit all four: krdanta kta docs
+// silent all4 946 -- krdanta.rs 1788351240
