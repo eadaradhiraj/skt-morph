@@ -860,6 +860,12 @@ mod tests {
     }
 
     #[test]
+    fn tinanta_prefix_atmanepada_real() {
+        let f = generate_with_prefixes("labh", "plat", 1, 1, &["pra".to_string()]);
+        assert!(!f.forms.is_empty()); // 1.3.12 atmanepada with upasarga real
+    }
+
+    #[test]
     fn tinanta_atmanepada_next() {
         let f = generate("labh", "plat", 1, 1);
         assert!(!f.forms.is_empty());
