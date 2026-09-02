@@ -1505,6 +1505,8 @@ mod tests {
         assert_eq!(derive("kamp", "kta"), vec!["kampita"]);
         // ष्+त → ष्ट (कृष्ट); शुष् is शुष्क not *शुष्ट. द्+त → त्त (नुत्त); भिद् stays भिन्न.
         assert_eq!(derive("kfz", "kta"), vec!["kfzwa"]); // 8.2.30 kRz real
+        assert_eq!(derive("qupacaz", "kta"), vec!["pakva"]); // pac 8.2.30 real
+
         assert_eq!(derive("yuj", "kta"), vec!["yukta"]); // 8.2.30 yuj real
 
         assert_eq!(derive("sru", "kta"), vec!["sruta"]); // sru 7.2.11 real
