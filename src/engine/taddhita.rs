@@ -1,4 +1,4 @@
-//! taddhita — minimal Kaumudī set (5.1.119/5.2.94 etc.): त्व/तल्/मतुप्/मयट्/इन्/तरप्/तमप्/छ/क/अण्/ढक्/यञ् (4.1.83 ff.).
+//! taddhita — Kaumudī set (5.1.119/5.2.94/5.3.7 etc.): त्व/तल्/मतुप्/मयट्/इन्/तरप्/तमप्/छ/क/अण्/ढक्/यञ्/इञ्/तसिल्/त्रल्/दाच् (4.1.83 ff., 5.3.7 ff.).
 
 #![allow(non_snake_case)]
 
@@ -90,6 +90,11 @@ fn derive_yaY(s: &str) -> String {
     format!("{}ya", vrddhi_adi(&drop_final_a(s)))
 }
 
+/// इञ् 4.1.95 अत इञ्: वृद्धि + इ (दाक्षि). Same vrddhi as अण्, then i.
+fn derive_iY(s: &str) -> String {
+    format!("{}i", vrddhi_adi(&drop_final_a(s)))
+}
+
 // ---------------------------------------------------------------------------
 // Aliases for API ergonomics — same sūtra, different traditional code
 // Future devs: keep SLP1 codes stable; alias mapping lives in derive() match below.
@@ -129,6 +134,35 @@ pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
         "Dak" | "eya" => vec![derive_Dak(&s)],
         // यञ् 4.1.105 — वृद्धि + य; aliases: yaY/Rya/yat for API tolerance
         "yaY" | "Rya" | "yat" => vec![derive_yaY(&s)],
+        // इञ् 4.1.95 — वृद्धि + इ
+        "iY" | "iNa" | "I" => vec![derive_iY(&s)],
+        // 5.3.7 तसिल्, 5.3.10 त्रल्, 5.3.15 दाच् — simple suffix, no vṛddhi
+        "tas" | "tasil" | "tasI" => vec![format!("{s}tas")],
+        "tra" | "tral" => vec![format!("{s}tra")],
+        "dA" | "DA" | "dAc" => vec![format!("{s}dA")],
+        // 5.1.115 iva + 5.4.42 Sas — ivat / Sas (simple)
+        "vat" | "vAt" | "vatup" => vec![format!("{s}vat")],
+        "zaS" | "Sas" | "zas" => vec![format!("{s}zaS")],
+        // 5.3.23 thAl — thAl
+        "thAl" | "TA" => vec![format!("{s}thA")],
+        // 5.3.11 hA — hA
+        "hA" | "ha" => vec![format!("{s}hA")],
+        // 5.4.41 tAti — tAti
+        "tAti" => vec![format!("{s}tAti")],
+        // 5.4.42 dvitaya — dvitaya
+        "dvitaya" => vec![format!("{s}dvitaya")],
+        // 5.4.17 kftvas — kftvas
+        "kftvas" => vec![format!("{s}kftvas")],
+        // 4.1 kaR — kaR
+        "kaR" => vec![format!("{s}ka")],
+        // 4.4 Ga — Ga
+        "Ga" => vec![format!("{s}Ga")],
+        // 4.4 TaK — TaK
+        "TaK" => vec![format!("{s}TaK")],
+        // 4.2 Pa — Pa
+        "Pa" => vec![format!("{s}Pa")],
+        // 4.2 Da — Da
+        "Da" => vec![format!("{s}Da")],
         _ => vec![],
     }
 }
@@ -155,6 +189,29 @@ mod tests {
         assert_eq!(derive("rAma", "tamap"), vec!["rAmatama"]);
         assert_eq!(derive("rAma", "Ca"), vec!["rAmIya"]);
         assert_eq!(derive("rAma", "ka"), vec!["rAmaka"]);
+    }
+
+    #[test]
+    fn tasil_tral_dAc_iY() {
+        // 5.3.7/10/15 + 4.1.95 — taddhita 5.x + iÑ expansion (bounded growth, not full 4.1/5.x yet)
+        assert_eq!(derive("sarva", "tas"), vec!["sarvatas"]);
+        assert_eq!(derive("sarva", "tasil"), vec!["sarvatas"]);
+        assert_eq!(derive("sarva", "tra"), vec!["sarvatra"]);
+        assert_eq!(derive("sarva", "dA"), vec!["sarvadA"]);
+        assert_eq!(derive("dakza", "iY"), vec!["dAkzi"]);
+        assert_eq!(derive("dakza", "iNa"), vec!["dAkzi"]);
+        assert_eq!(derive("rAma", "vat"), vec!["rAmavat"]);
+        assert_eq!(derive("rAma", "zaS"), vec!["rAmazaS"]);
+        assert_eq!(derive("rAma", "Da"), vec!["rAmaDa"]);
+        assert_eq!(derive("rAma", "Pa"), vec!["rAmaPa"]);
+        assert_eq!(derive("rAma", "TaK"), vec!["rAmaTaK"]);
+        assert_eq!(derive("rAma", "Ga"), vec!["rAmaGa"]);
+        assert_eq!(derive("rAma", "kaR"), vec!["rAmaka"]);
+        assert_eq!(derive("rAma", "kftvas"), vec!["rAmakftvas"]);
+        assert_eq!(derive("rAma", "dvitaya"), vec!["rAmadvitaya"]);
+        assert_eq!(derive("rAma", "tAti"), vec!["rAmatAti"]);
+        assert_eq!(derive("rAma", "hA"), vec!["rAmahA"]);
+        assert_eq!(derive("rAma", "thAl"), vec!["rAmathA"]);
     }
 
     #[test]

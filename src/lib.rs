@@ -67,7 +67,7 @@ pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &st
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 
-/// Taddhita (4.1): tva/tal/matup/mayaT/in/tarap/tamap/Ca/ka/aN/Dak/yaY etc.
+/// Taddhita (4.1/5.x): tva/tal/matup/mayaT/in/tarap/tamap/Ca/ka/aN/Dak/yaY/iY/tas/tra/dA etc. (4.1.83 ff., 5.3.7 ff.)
 #[wasm_bindgen]
 pub fn generate_taddhita(pratipadika: &str, pratyaya: &str) -> JsValue {
     let result = engine::taddhita::generate(pratipadika, pratyaya);
