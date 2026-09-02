@@ -340,3 +340,4 @@ mod tests {
 // all4 970 -- analyze
 // all4 974 -- analyze
 // all4 978 -- analyze
+// all4 982 -- analyze
