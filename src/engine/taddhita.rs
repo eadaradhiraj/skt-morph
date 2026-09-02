@@ -433,6 +433,8 @@ pub fn derive(pratipadika: &str, pratyaya: &str) -> Vec<String> {
         "seq591" => vec![format!("{s}seq591")],
         // seq — seq592
         "seq592" => vec![format!("{s}seq592")],
+        // seq — seq593
+        "seq593" => vec![format!("{s}seq593")],
         _ => vec![],
     }
 }
@@ -472,6 +474,7 @@ mod tests {
         assert_eq!(derive("dakza", "iNa"), vec!["dAkzi"]);
         assert_eq!(derive("rAma", "vat"), vec!["rAmavat"]);
         assert_eq!(derive("rAma", "zaS"), vec!["rAmazaS"]);
+        assert_eq!(derive("rAma", "seq593"), vec!["rAmaseq593"]);
         assert_eq!(derive("rAma", "seq592"), vec!["rAmaseq592"]);
         assert_eq!(derive("rAma", "seq591"), vec!["rAmaseq591"]);
         assert_eq!(derive("rAma", "seq590"), vec!["rAmaseq590"]);
