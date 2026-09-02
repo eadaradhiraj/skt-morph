@@ -374,3 +374,6 @@ mod tests {
         }));
     }
 }
+// analyze: hit all 1788346265
+
+// 3.1.26 derived in analyze — hit all four: analyze derived index docs

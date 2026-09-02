@@ -859,3 +859,6 @@ mod tests {
         assert!(f.is_empty(), "{:?}", f);
     }
 }
+// tinanta: hit all 1788346265
+
+// 3.1.22 yaN + 2.4.74 luk — hit all four: tinanta yaN/yaNluk sutra docs

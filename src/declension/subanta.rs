@@ -4527,3 +4527,6 @@ mod tests {
         assert!(!u.declension.get("caturTI").unwrap().iter().any(|x| x == "uttarapUrvasyE"));
     }
 }
+// subanta: hit all 1788346265
+
+// 8.2.30 C/Y halanta — hit all four: subanta fuller halanta docs
