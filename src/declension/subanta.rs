@@ -4754,6 +4754,12 @@ mod tests {
         assert!(!s.declension.is_empty());
     }
 
+    #[test]
+    fn subanta_all4_next39() {
+        let s = generate("pitf", "pum").expect("pitf");
+        assert!(!s.declension.is_empty());
+    }
+
 }
 // subanta: hit all 1788346265
 
