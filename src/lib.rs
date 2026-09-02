@@ -1,6 +1,6 @@
 //! skt-morph — Pāṇini as ordered in the Siddhānta-Kaumudī.
 //! * `data`      — dhātupāṭha + gold cross-check (never source of truth).
-//! * `engine`    — tinanta / kṛdanta / taddhita live generation (sūtra-driven).
+//! * `engine`    — tinanta / kṛdanta live generation (sūtra-driven).
 //! * `declension`— subanta + sarvanāma (ending-class, not site scrape).
 //! * `translit`  — SLP1 internally; Devanagari only at JS boundary (www/translit.js).
 //!
@@ -64,13 +64,6 @@ pub fn generate_verb_derived(dhatu: &str, derivation: &str, lakara: &str, purush
 pub fn generate_verb_paradigm_derived(dhatu: &str, derivation: &str, lakara: &str, prefixes: &str, artha: &str) -> JsValue {
     let prefs: Vec<String> = prefixes.split(',').map(|s| s.trim().to_string()).filter(|s| !s.is_empty()).collect();
     let result = engine::tinanta::generate_paradigm_derived_artha(dhatu, derivation, lakara, &prefs, artha);
-    serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
-}
-
-/// Taddhita (4.1/5.x): tva/tal/matup/mayaT/in/tarap/tamap/Ca/ka/aN/Dak/yaY/iY/tas/tra/dA etc. (4.1.83 ff., 5.3.7 ff.)
-#[wasm_bindgen]
-pub fn generate_taddhita(pratipadika: &str, pratyaya: &str) -> JsValue {
-    let result = engine::taddhita::generate(pratipadika, pratyaya);
     serde_wasm_bindgen::to_value(&result).unwrap_or(JsValue::NULL)
 }
 

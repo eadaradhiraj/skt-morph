@@ -17,7 +17,6 @@ pub mod lit;     // liṭ abhyāsa + atideśa
 pub mod lun;     // luṅ (aṅ/sic/caṅ/ksa etc.)
 pub mod phonology; // guṇa/vṛddhi, ṇatva, sandhi helpers
 pub mod prefix;  // upasarga sandhi (1.4.59 + 6.1.87 etc.)
-pub mod taddhita; // taddhita (4.1 ff.)
 pub mod upa_pada; // 1.3.1 upa-pada pada selection + artha
 pub mod redup;   // abhyāsa redup (6.1.8 ff.)
 pub mod stems;   // vikaraṇa stems (śap/śnu/śnam etc.)

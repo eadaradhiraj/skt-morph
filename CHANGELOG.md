@@ -2,7 +2,7 @@
 
 Engine and demo history. Iter docs are now in code comments; this file tracks **features + TODO**.
 
-## Features (v1, live)
+## Features (v1, live) — focus: tinanta / subanta / krdanta / analyze
 
 **तिङन्त (stems/adadi/join/phonology/lakara):**
 - 10 gaṇas live (`stems`, `adadi`), no override table — lat/laṅ/lot/vidhi-liṅ/lṛṭ/liṭ/luṅ/āśir-liṅ, parasmai+ātmanepada
@@ -26,19 +26,19 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 - One SLP1 form → every parse (tinanta/kṛdanta/subanta/sarvanāma), upasarga-peeled, OnceLock maps, empty guards, search_prefix
 
 **Demo/WASM:**
-- SLP1 canonical, Devanagari I/O (`translit.js`/`labels.js`), yaṅ/yaṅluk dropdown 2.4.74, a11y/Enter, debounce, dhatu HashMap cache 15s→7s, 187 tests, pkg 1.2M (268k gz)
+- SLP1 canonical, Devanagari I/O (`translit.js`/`labels.js`), yaṅ/yaṅluk dropdown 2.4.74, a11y/Enter, debounce, dhatu HashMap cache 15s→7s, 185 tests, pkg 1.2M (268k gz)
 
-## TODO / Later (from README Scope)
+## TODO / Later — tinanta / subanta / krdanta / analyze only (no taddhita)
 
-- **taddhita full 4.1/5.x:** now tva/tal/matup/mayaT/in/tarap/tamap/cha/ka/aṇ/ḍhak/yañ + iñ (4.1.95) + tasil/tral/dāc (5.3.7/10/15) + vat/Sas (5.1.115/5.4.42)  + hA  + tAti  + dvitaya  + kftvas  + kaR  + Ga  + TaK  + Pa  + Da  + batch in `taddhita.rs` — remaining 4.1/5.1-5.4 pratyayas + vṛddhi/īp (188 tests)
 - **fuller yaṅ:** yaṅ + yaṅluk done, extend to rarer abhyāsa + atmanepada nuances
 - **kta ādeśa:** remaining class sandhi edge + named forms (full 7.2.10/6.4.42 list)
 - **fuller subanta:** extend halanta beyond j/d/t/p/h/B/r/s/S/as/is/us (add c/ch/ñ etc. + nap special)
 - **derived in analyze:** index ṇic/san/yaṅ/yaṅluk/karma for reverse lookup (currently generate-only)
 - **gold cross-check:** optional skt_morph.db validate (`--full --live`), keep live ≠ scrape principle
+- **removed:** taddhita (4.1/5.x) — deleted per focus; out of scope
 
 ## History (condensed)
 
-- 2026-09-01: de-noise 70k boilerplate, KRTS 19→60+, ending-class, yaṅluk, dhatu cache, a11y — 187 tests, live generate (no overrides)
+- 2026-09-01: de-noise 70k boilerplate, KRTS 19→60+, ending-class, yaṅluk, dhatu cache, a11y — 185 tests, live generate (no overrides)
 - Earlier: kta sandhi classes (8.2.30 ff., 6.4.37 ff.), halanta loc/instr fixes, sarvanāma idam/ad as/numbers, śatṛ/ātmanepada luṅ/lit etc. — see git log pre-2026-09-01
 - Notes: comments are now concise sūtra-gated rustdoc; per-fn docs carry sūtra + SLP1 I/O. No logic drift since 132.
