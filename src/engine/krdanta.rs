@@ -104,6 +104,7 @@ fn surface_root(dhatu: &str) -> String {
     }
 }
 
+// 7.2.10 anit — kta base via anit handling
 fn kta_base(dhatu: &str) -> String {
     nistha_base(dhatu, true)
 }
