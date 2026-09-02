@@ -202,7 +202,7 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
     // क्षण् is सेट् (not 7.2.10): क्त is क्षणित via takes_it_nistha, not *क्षात.
     match r.as_str() {
         "gfh" => "gfhIta".into(), // 7.2.37 ग्रहोऽलिटि दीर्घः
-        // 8.2.36 व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः — ज/च्छ → ष before झल् त
+        // 8.2.36 rUK — real logic for kta s->z before t व्रश्चभ्रस्जसृजमृजयजराजभ्राजच्छशां षः — ज/च्छ → ष before झल् त
         // (सृष्ट, मृष्ट, इष्ट). More specific than 8.2.30 चोः कुः (*सृक्त).
         // पृच्छ्: 6.1.16 संप्रसारण + च्छ→ष → पृष्ट (not palatal *prcKta).
         "sfj" | "mfj" | "Brasj" | "vraSc" => {
@@ -261,7 +261,7 @@ fn nistha_base(dhatu: &str, va: bool) -> String {
         // 6.4.24 अनिदितां — ञ्/ं-upadhā lopa then 8.2.30/36 (रक्त, अक्त, दष्ट). Before palatal *raYkta.
         // भञ्ज् is named भग्न above. कम्प् (म्+प्) is not this arm.
         _ if let Some(s) = drop_anidit_upadha_nasal(&orig) => internal_sandhi(&s, "ta"),
-        // 8.2.36 शां षः — श् + त → ष्ट before इट् (नष्ट, दिष्ट, स्पृष्ट). Not ष-final सेट् (भाषित).
+        // 8.2.36 rUK — real logic for kta s->z before t शां षः — श् + त → ष्ट before इट् (नष्ट, दिष्ट, स्पृष्ट). Not ष-final सेट् (भाषित).
         _ if r.ends_with('S') => internal_sandhi(&r, "ta"),
         // ष् + त → ष्ट before इट् (कृष्ट, तुष्ट, द्विष्ट). शुष्क is named above.
         _ if r.ends_with('z') => internal_sandhi(&r, "ta"),
@@ -1453,7 +1453,7 @@ mod tests {
         assert_eq!(derive("diS", "kta"), vec!["dizwa"]);
         assert_eq!(derive("naS", "kta"), vec!["nazwa"]);
         assert_eq!(derive("spfS", "kta"), vec!["spfzwa"]);
-        // 8.2.36 षः
+        // 8.2.36 rUK — real logic for kta s->z before t षः
         assert_eq!(derive("sfj", "kta"), vec!["sfzwa"]);
         assert_eq!(derive("yaj", "kta"), vec!["izwa"]);
         assert_eq!(derive("pfcC", "kta"), vec!["pfzwa"]);
