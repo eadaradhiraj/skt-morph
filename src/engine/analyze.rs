@@ -475,6 +475,12 @@ mod tests {
         assert!(!h.is_empty());
     }
 
+    #[test]
+    fn analyze_all4_next17() {
+        let h = crate::engine::analyze::analyze_word("gacchati");
+        assert!(!h.is_empty());
+    }
+
 }
 // analyze: hit all 1788346265
 
