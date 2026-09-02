@@ -30,7 +30,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 
 ## TODO / Later — tinanta / subanta / krdanta / analyze only (no taddhita)
 
-- **fuller yaṅ:** yaṅ + yaṅluk done, extend to rarer abhyāsa + atmanepada nuances
+- **fuller yaṅ:** yaṅ + yaṅluk done, extended to kram (caNkramya) — rarer abhyāsa covered
 - **kta ādeśa:** remaining class sandhi edge + named forms (full 7.2.10/6.4.42 list)
 - **fuller subanta:** done C (छ) + Y (ञ) halanta beyond j/d/t/p/h/B/r/s/S/as/is/us; remaining nap special + rarer halanta
 - **derived in analyze:** done for lat/lit/lun/lrt/ashir (was generate-only) — extend to remaining lakaras if needed

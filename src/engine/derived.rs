@@ -688,5 +688,9 @@ mod tests {
         assert!(f.iter().any(|x| x.contains("vAv") && x.contains("vak")), "vac yaNluk lat: {:?}", f);
         // sru yaNluk: SoSrU -> SoSrU (without ya) — intensive without ya
         assert_eq!(yan_luk_stem("Sru"), "SoSrU");
+        // kram yaN: caNkramya (rarer abhyasa, ana it)
+        assert_eq!(yan_stem("kram"), "caNkramya");
+        let f = kartari("kram", "yaN", "lat", 1, 1, "A").unwrap();
+        assert!(f.iter().any(|x| x.contains("caNkram")), "kram yaN: {:?}", f);
     }
 }
