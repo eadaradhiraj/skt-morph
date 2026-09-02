@@ -377,6 +377,12 @@ mod tests {
     }
 
     #[test]
+    fn analyze_derived_yanluk_real() {
+        let h = crate::engine::analyze::analyze_word("boBUti");
+        assert!(h.iter().any(|a| a.pratyaya.as_deref()==Some("yaNluk"))); // 2.4.74
+    }
+
+    #[test]
     fn analyze_all4_next_hit() {
         let h = crate::engine::analyze::analyze_word("rAmaH");
         assert!(!h.is_empty());
