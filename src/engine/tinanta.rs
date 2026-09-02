@@ -866,6 +866,12 @@ mod tests {
     }
 
     #[test]
+    fn tinanta_lrt_real() {
+        let f = generate("gam", "plrt", 1, 1);
+        assert!(!f.forms.is_empty()); // lrt real
+    }
+
+    #[test]
     fn tinanta_atmanepada_next() {
         let f = generate("labh", "plat", 1, 1);
         assert!(!f.forms.is_empty());
