@@ -4551,6 +4551,12 @@ mod tests {
     }
 
     #[test]
+    fn subanta_all4_next6() {
+        let s = generate("nadI", "stri").expect("nadI");
+        assert!(!s.declension.is_empty());
+    }
+
+    #[test]
     fn subanta_all4_next5() {
         let s = generate("guru", "pum").expect("guru");
         assert!(!s.declension.is_empty());
@@ -4560,3 +4566,4 @@ mod tests {
 // subanta: hit all 1788346265
 
 // 8.2.30 C/Y halanta — hit all four: subanta fuller halanta docs
+// silent all4 946 -- subanta.rs 1788351240
