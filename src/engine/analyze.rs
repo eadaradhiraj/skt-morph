@@ -365,6 +365,12 @@ mod tests {
     }
 
     #[test]
+    fn analyze_all4_next2() {
+        let h = crate::engine::analyze::analyze_word("gacchati");
+        assert!(!h.is_empty());
+    }
+
+    #[test]
     fn analyze_all4_next_hit() {
         let h = crate::engine::analyze::analyze_word("rAmaH");
         assert!(!h.is_empty());
