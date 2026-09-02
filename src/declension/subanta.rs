@@ -4616,6 +4616,12 @@ mod tests {
         assert!(!s.declension.is_empty());
     }
 
+    #[test]
+    fn subanta_all4_next16() {
+        let s = generate("nadI", "stri").expect("nadI");
+        assert!(!s.declension.is_empty());
+    }
+
 }
 // subanta: hit all 1788346265
 
