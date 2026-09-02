@@ -1383,6 +1383,12 @@ mod tests {
     // fn `bu_kta`: purpose, inputs→outputs, edge cases.
     // Pāṇini step; see Kaumudī ordering. SLP1 I/O. No DB fallback.
     // ---------------------------------------------------------------------------
+    fn krdanta_all4_next_hit() {
+        let f = derive("gam", "tumun");
+        assert!(!f.is_empty());
+    }
+
+    #[test]
     fn bu_kta() {
         let f = derive("BU", "kta");
         assert!(f.iter().any(|x| x == "BUta"), "{:?}", f);
