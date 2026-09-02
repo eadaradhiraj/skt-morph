@@ -30,7 +30,7 @@ Engine and demo history. Iter docs are now in code comments; this file tracks **
 
 ## TODO / Later (from README Scope)
 
-- **taddhita full 4.1/5.x:** now tva/tal/matup/mayaT/in/tarap/tamap/cha/ka/aṇ/ḍhak/yañ + iñ (4.1.95) + tasil/tral/dāc (5.3.7/10/15) + vat/Sas (5.1.115/5.4.42)  + hA  + tAti  + dvitaya  + kftvas  + kaR  + Ga  + TaK  + Pa  + Da in `taddhita.rs` — remaining 4.1/5.1-5.4 pratyayas + vṛddhi/īp (188 tests)
+- **taddhita full 4.1/5.x:** now tva/tal/matup/mayaT/in/tarap/tamap/cha/ka/aṇ/ḍhak/yañ + iñ (4.1.95) + tasil/tral/dāc (5.3.7/10/15) + vat/Sas (5.1.115/5.4.42)  + hA  + tAti  + dvitaya  + kftvas  + kaR  + Ga  + TaK  + Pa  + Da  + batch in `taddhita.rs` — remaining 4.1/5.1-5.4 pratyayas + vṛddhi/īp (188 tests)
 - **fuller yaṅ:** yaṅ + yaṅluk done, extend to rarer abhyāsa + atmanepada nuances
 - **kta ādeśa:** remaining class sandhi edge + named forms (full 7.2.10/6.4.42 list)
 - **fuller subanta:** extend halanta beyond j/d/t/p/h/B/r/s/S/as/is/us (add c/ch/ñ etc. + nap special)
