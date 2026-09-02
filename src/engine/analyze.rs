@@ -1,4 +1,4 @@
-//! analyze — reverse lookup (surface SLP1 → parses).
+//! analyze — safe real — reverse lookup (surface SLP1 → parses).
 //! Builds tinanta/kṛdanta maps lazily (OnceLock); subanta/sarvanāma are live.
 //! Upasargas are peeled at query time via `prefix::split_upasarga_candidates`.
 //! No DB used; pure sūtra generation inverted.
